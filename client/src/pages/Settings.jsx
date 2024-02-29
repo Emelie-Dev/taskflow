@@ -214,9 +214,15 @@ const Settings = () => {
                 className={`${styles['category-item']} ${
                   category === 'general' ? styles['current-category-item'] : ''
                 }`}
-                onClick={() => setCategory('general')}
               >
-                <CgProfile className={styles['category-icon']} /> Profile
+                <span
+                  className={`${styles['category-box']} ${
+                    category === 'general' ? styles['current-category-box'] : ''
+                  }`}
+                  onClick={() => setCategory('general')}
+                >
+                  <CgProfile className={styles['category-icon']} /> Profile
+                </span>
               </li>
 
               <li
@@ -225,10 +231,18 @@ const Settings = () => {
                     ? styles['current-category-item']
                     : ''
                 }`}
-                onClick={() => setCategory('notifications')}
               >
-                <IoIosNotifications className={styles['category-icon']} />{' '}
-                Notifications
+                <span
+                  className={`${styles['category-box']} ${
+                    category === 'notifications'
+                      ? styles['current-category-box']
+                      : ''
+                  }`}
+                  onClick={() => setCategory('notifications')}
+                >
+                  <IoIosNotifications className={styles['category-icon']} />{' '}
+                  Notifications
+                </span>
               </li>
               <li
                 className={`${styles['category-item']} ${
@@ -236,19 +250,36 @@ const Settings = () => {
                     ? styles['current-category-item']
                     : ''
                 }`}
-                onClick={() => setCategory('personalization')}
               >
-                <IoColorPaletteSharp className={styles['category-icon']} />{' '}
-                Personalization
+                {' '}
+                <span
+                  className={`${styles['category-box']} ${
+                    category === 'personalization'
+                      ? styles['current-category-box']
+                      : ''
+                  }`}
+                  onClick={() => setCategory('personalization')}
+                >
+                  <IoColorPaletteSharp className={styles['category-icon']} />{' '}
+                  Personalization
+                </span>
               </li>
               <li
                 className={`${styles['category-item']} ${
                   category === 'security' ? styles['current-category-item'] : ''
                 }`}
-                onClick={() => setCategory('security')}
               >
-                <MdOutlineSecurity className={styles['category-icon']} />{' '}
-                Security
+                <span
+                  className={`${styles['category-box']} ${
+                    category === 'security'
+                      ? styles['current-category-box']
+                      : ''
+                  }`}
+                  onClick={() => setCategory('security')}
+                >
+                  <MdOutlineSecurity className={styles['category-icon']} />{' '}
+                  Security
+                </span>
               </li>
             </ul>
           </div>

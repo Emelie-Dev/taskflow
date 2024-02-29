@@ -113,23 +113,28 @@
 }
 
 .category-item {
-  display: flex;
-  align-items: center;
+  display: block;
   font-family: var(--general-font);
   font-weight: 600;
   color: gray;
   font-size: 1.05rem;
   padding: 1rem 1rem;
   border-radius: 8px;
-  cursor: pointer;
   transition: background 0.3s;
   margin-bottom: 0.5rem;
   transition: color 0.2s;
 }
 
-.category-item:hover {
+.category-box {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.category-box:hover {
   color: orange;
 }
+
 .category-icon {
   width: 1.6rem;
   height: 1.6rem;
@@ -137,9 +142,12 @@
 }
 
 .current-category-item {
+  background: #f5f5dc;
+}
+
+.current-category-box {
   color: orange;
   font-weight: 600;
-  background: #f5f5dc;
   cursor: default;
 }
 

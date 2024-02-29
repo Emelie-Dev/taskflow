@@ -333,14 +333,21 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
       if (!project.deadline) {
         deadlineRemoval = false;
       } else {
-        // validates deadline field
-        if (new Date(req.body.deadline) < new Date(project.createdAt)) {
-          return next(
-            new CustomError(
-              'Please provide a valid value for the deadline!',
-              400
-            )
-          );
+        if (
+          Date.parse(new Date(req.body.deadline)) ===
+          Date.parse(project.deadline)
+        ) {
+          delete req.body.deadline;
+        } else {
+          // validates deadline field
+          if (new Date(req.body.deadline) < new Date(project.createdAt)) {
+            return next(
+              new CustomError(
+                'Please provide a valid value for the deadline!',
+                400
+              )
+            );
+          }
         }
       }
     }

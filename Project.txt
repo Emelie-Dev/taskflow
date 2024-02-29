@@ -40,11 +40,11 @@
     - Adjust the user data in profile page ✔
     - Send email for activation and deactivation of accounts ✔
     - Handle all request handlers for deactivated members ✔
-    - Handle project deadline update ✔✔
+    - Handle project deadline update ✔
     - Enable users to leave project teams on purpose ✔
-    - Fix month configuration for analytics page
-    - Fix sidenav for settings page(hover functionality)
-    - Fix profile settings update(mobile number)
+    - Fix month configuration for analytics page ✔✔
+    - Fix sidenav for settings page(hover functionality) ✔
+    - Fix profile settings update(mobile number) ✔✔
     - Fix email verification message
     - Fix task creation in dashboard page(project loading)
 
