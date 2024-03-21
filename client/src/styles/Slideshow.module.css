@@ -1,0 +1,325 @@
+.section {
+  margin-top: 10rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.img {
+  width: 60rem;
+  height: 600px;
+  border-radius: 10px;
+  border: 1px solid orange;
+  animation: slideAnim 0.5s ease-in-out;
+  /* transition: all 0.5s; */
+}
+
+.icon {
+  width: 5.5rem;
+  height: 5.5rem;
+  margin: 0 3rem;
+}
+
+.icon1 {
+  align-self: flex-start;
+  margin: 7rem 0;
+}
+
+.icon2 {
+  align-self: flex-end;
+  margin: 7rem 0;
+}
+
+.anim {
+  animation: slideAnim 0.5s ease-in-out;
+}
+
+.second-icon-box {
+  display: none;
+}
+
+@keyframes slideAnim {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Media Queries */
+
+@media screen and (max-width: 1330px) {
+  .img {
+    width: 57rem;
+  }
+}
+
+@media screen and (max-width: 1280px) {
+  .img {
+    width: 52rem;
+  }
+}
+
+@media screen and (max-width: 1199px) {
+  .img {
+    width: 47rem;
+    height: 550px;
+  }
+}
+
+@media screen and (max-width: 1119px) {
+  .img {
+    width: 42.5rem;
+    height: 500px;
+  }
+}
+
+@media screen and (max-width: 1049px) {
+  .img {
+    width: 37.5rem;
+    height: 450px;
+  }
+}
+
+@media screen and (max-width: 969px) {
+  .img {
+    width: 33rem;
+    height: 400px;
+  }
+
+  .icon1 {
+    margin: 5rem 0;
+  }
+
+  .icon2 {
+    margin: 5rem 0;
+  }
+}
+
+@media screen and (max-width: 899px) {
+  .icon {
+    width: 5rem;
+    height: 5rem;
+    margin: 0 2rem;
+  }
+
+  .section {
+    margin-top: 8rem;
+  }
+
+  .icon1 {
+    margin: 4rem 0;
+  }
+
+  .icon2 {
+    margin: 4rem 0;
+  }
+}
+
+@media screen and (max-width: 819px) {
+  .img {
+    width: 29rem;
+    height: 350px;
+  }
+  .icon {
+    width: 4.5rem;
+    height: 4.5rem;
+    margin: 0 2rem;
+  }
+
+  .section {
+    margin-top: 8rem;
+  }
+
+  .icon1 {
+    margin: 3rem 0;
+  }
+
+  .icon2 {
+    margin: 3rem 0;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .img {
+    width: 27.5rem;
+    height: 330px;
+  }
+  .icon {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 1.5rem;
+  }
+
+  .section {
+    margin-top: 6rem;
+  }
+
+  .icon1 {
+    margin: 2.5rem 0;
+  }
+
+  .icon2 {
+    margin: 2.5rem 0;
+  }
+}
+
+@media screen and (max-width: 669px) {
+  .img {
+    width: 100%;
+    height: 370px;
+  }
+
+  .img-box {
+    width: 100%;
+  }
+
+  .icon {
+    width: 4rem;
+    height: 4rem;
+    margin: 0;
+  }
+
+  .section {
+    margin: 0 3.5rem;
+    margin-top: 6rem;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .icon1,
+  .icon2 {
+    display: none;
+  }
+
+  .second-icon-box {
+    display: flex;
+    width: 100%;
+  }
+
+  .icon3 {
+    margin: 1.5rem 2rem;
+    margin-right: auto;
+  }
+
+  .icon4 {
+    margin: 1.5rem 2rem;
+    margin-left: auto;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .img {
+    width: 100%;
+    height: 350px;
+  }
+
+  .icon {
+    width: 4rem;
+    height: 4rem;
+    margin: 0;
+  }
+
+  .section {
+    margin: 0 2rem;
+    margin-top: 6rem;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 549px) {
+  .img {
+    width: 100%;
+    height: 330px;
+  }
+
+  .icon {
+    width: 3.7rem;
+    height: 3.7rem;
+    margin: 0;
+  }
+
+  .section {
+    margin: 0 1.5rem;
+    margin-top: 6rem;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  .img {
+    width: 100%;
+    height: 300px;
+  }
+}
+
+@media screen and (max-width: 449px) {
+  .img {
+    width: 100%;
+    height: 270px;
+  }
+
+  .section {
+    margin: 5 1rem 0;
+  }
+
+  .icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 399px) {
+  .img {
+    width: 100%;
+    height: 230px;
+  }
+
+  .section {
+    margin: 5rem 1.5rem 0;
+  }
+
+  .icon {
+    width: 3rem;
+    height: 3rem;
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 349px) {
+  .img {
+    width: 100%;
+    height: 200px;
+  }
+
+  .section {
+    margin: 5rem 1rem 0;
+  }
+
+  .icon {
+    width: 3rem;
+    height: 3rem;
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 299px) {
+  .img {
+    width: 100%;
+    height: 180px;
+  }
+
+  .section {
+    margin: 5rem 1rem 0;
+  }
+
+  .icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin: 0;
+  }
+}

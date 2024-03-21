@@ -1,0 +1,115 @@
+.text {
+  font-size: 5rem;
+  margin: 6rem 3rem 0;
+  font-family: calligraphy;
+  text-shadow: 2px 2px 5px black;
+  color: orange;
+  font-weight: bold;
+  height: 15rem;
+}
+
+/* Media Queries */
+
+@media screen and (max-width: 1280px) {
+  .text {
+    font-size: 4.7rem;
+  }
+}
+
+@media screen and (max-width: 1199px) {
+  .text {
+    font-size: 4.5rem;
+  }
+}
+
+@media screen and (max-width: 1119px) {
+  .text {
+    font-size: 4.2rem;
+    height: 12rem;
+  }
+}
+
+@media screen and (max-width: 1049px) {
+  .text {
+    font-size: 3.8rem;
+    height: 10rem;
+    margin-top: 4rem;
+  }
+}
+
+@media screen and (max-width: 969px) {
+  .text {
+    font-size: 3.5rem;
+    height: 8rem;
+    margin-top: 4rem;
+  }
+}
+
+@media screen and (max-width: 899px) {
+  .text {
+    font-size: 3.1rem;
+    height: 5rem;
+    margin-top: 3rem;
+  }
+}
+
+@media screen and (max-width: 819px) {
+  .text {
+    font-size: 2.8rem;
+    height: 5rem;
+    margin-top: 3rem;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .text {
+    font-size: 2.65rem;
+    height: 7rem;
+    margin-top: 3rem;
+  }
+}
+
+@media screen and (max-width: 669px) {
+  .text {
+    font-size: 2.5rem;
+    height: 7rem;
+    margin: 6rem 2rem 0;
+    margin-top: 3rem;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .text {
+    font-size: 2.3rem;
+    height: 6rem;
+    margin: 6rem 2rem 0;
+    margin-top: 3rem;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  .text {
+    font-size: 2rem;
+    height: 4rem;
+    margin: 6rem 2rem 0;
+    margin-top: 3rem;
+  }
+}
+
+@media screen and (max-width: 449px) {
+  .text {
+    font-size: 1.8rem;
+    height: 6rem;
+    margin: 0rem 2rem 0rem;
+    margin-top: 2rem;
+  }
+}
+
+@media screen and (max-width: 349px) {
+  .text {
+    font-size: 1.6rem;
+    height: 7rem;
+    margin: 0rem 2rem 0rem;
+    margin-top: 2rem;
+  }
+}

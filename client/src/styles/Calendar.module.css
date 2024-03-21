@@ -1,0 +1,114 @@
+.calender-div {
+  margin: 1.5rem 0 0;
+}
+
+.current-month {
+  font-family: calligraphy;
+  padding: 0 1.5rem;
+}
+
+.calendar-box {
+  margin-top: 1.5rem;
+  position: relative;
+  padding: 0 0.5rem;
+  display: flex;
+  justify-content: center;
+  user-select: none;
+}
+
+.calendar-table {
+  margin: 0 1rem;
+}
+
+.calendar-head {
+  color: gray;
+  font-weight: bold;
+  font-size: 1.05rem;
+  padding: 0 0.6rem;
+  padding-bottom: 0.5rem;
+  text-align: center;
+  font-family: monospace;
+}
+
+.calendar-data {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  padding: 0.25rem 0.5rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+
+}
+
+.calendar-back-arrow {
+  width: 1.6rem;
+  height: 1.6rem;
+  position: absolute;
+  left: 3%;
+  top: 45%;
+  color: gray;
+  box-shadow: 1px 1px 2px 1px black;
+  border-radius: 5px;
+  padding: 0.2rem;
+  cursor: pointer;
+}
+
+.calendar-front-arrow {
+  width: 1.6rem;
+  height: 1.6rem;
+  position: absolute;
+  right: 3%;
+  top: 45%;
+  color: gray;
+  box-shadow: 1px 1px 2px 1px black;
+  border-radius: 5px;
+  padding: 0.2rem;
+  cursor: pointer;
+}
+
+.calendar-front-arrow:hover,
+.calendar-back-arrow:hover {
+  color: orange;
+}
+
+.current-date {
+  background: orange;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transform: translateX(8px);
+  box-shadow: 1px 1px 20px -5px black;
+}
+
+.calendar-data:hover {
+  color: orange;
+}
+
+.current-date:hover {
+  color: white;
+}
+
+.hide-month {
+  visibility: hidden;
+}
+
+/* Media Queries */
+
+@media screen and (max-width: 1099px) {
+  .current-month {
+    padding: 0 2rem;
+  }
+}
+
+@media screen and (max-width: 799px) {
+  .calendar-head {
+    padding: 0 0.4rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .calendar-data {
+    padding: 0.25rem 0.4rem;
+  }
+}

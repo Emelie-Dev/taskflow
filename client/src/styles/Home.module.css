@@ -1,0 +1,1157 @@
+.header {
+  color: black;
+  font-family: protestRiot;
+  font-size: 1.2rem;
+  padding: 1.5rem 2rem 1rem;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  border-bottom: 2px solid rgba(128, 128, 128, 0.356);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 2;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.logo {
+  width: 2rem;
+  height: 2rem;
+  margin-right: 1rem;
+  fill: black;
+  animation:  rotate 0.5s linear 0s infinite;
+}
+
+.login-link {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.button {
+  outline: none;
+  border: none;
+  font-size: 1.05rem;
+  padding: 0.7rem 1.2rem;
+  font-family: calligraphy;
+  border-radius: 20px;
+  background: linear-gradient(to bottom right, white, orange);
+  color: black;
+  transition: box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.button:hover {
+  box-shadow: inset 1px 1px 2px 1px black;
+}
+
+.section {
+  background-image: url('../../public/assets/images/Background.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding-bottom: 8rem;
+}
+
+.content {
+  margin-top: 11rem;
+  text-align: center;
+}
+
+.headText {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  text-transform: capitalize;
+  font-size: 3.5rem;
+  color: white;
+  text-shadow: 2px 2px 10px black;
+}
+
+.description {
+  font-size: 1.2rem;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  margin: 0 7rem;
+  margin-top: 4rem;
+  color: white;
+  text-shadow: 10px 10px 50px black;
+  letter-spacing: 0.05rem;
+  text-align: center;
+  font-weight: 900;
+}
+
+.aside {
+  position: fixed;
+  z-index: 3;
+  top: 25%;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  margin-right: 2rem;
+  border-radius: 10px;
+  backdrop-filter: blur(7px);
+  padding: 0 0.2rem;
+  padding-top: 0.3rem;
+  background: transparent;
+  border: 1px solid gray;
+}
+
+.icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.1rem;
+  cursor: pointer;
+  background: transparent;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.icon:hover {
+  background: gray;
+}
+
+.features-section {
+  margin: 4rem;
+  margin-top: 8rem;
+  margin-bottom: 0;
+}
+
+.site-name {
+  font-size: 3rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: black;
+  text-shadow: none;
+}
+
+.features-paragraph {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 1.4rem;
+  color: orange;
+  font-weight: bold;
+
+  margin-bottom: 5rem;
+}
+
+.site-name {
+  font-size: 3rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: black;
+  text-shadow: none;
+}
+/* 
+.card-box {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 33.33%;
+  margin-bottom: 2rem;
+  padding: 2rem;
+}
+
+.card-icon-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid orange;
+  border-radius: 50%;
+  padding: 0.8rem;
+  width: fit-content;
+}
+
+.card-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  fill: orange;
+}
+
+.card-title {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  margin-top: 1rem;
+}
+
+.card-description {
+  margin-top: 1.5rem;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 1.1rem;
+  text-align: center;
+} */
+
+/* Coloured cards */
+
+.card-box {
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+ .article {
+  border-radius: 30px;
+  padding: 0.2rem;
+  width: 28%;
+  display: flex;
+  position: relative;
+  cursor: pointer;
+  margin-right: 2.5rem;
+  margin-bottom: 2rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+  height: 26.5rem;
+}
+
+.darkred {
+  background: linear-gradient(orange, black, darkred);
+}
+
+.gold {
+  background: linear-gradient(orange, black, gold);
+}
+
+.gray {
+  background: linear-gradient(orange, black, gray);
+}
+
+.red {
+  background: linear-gradient(orange, black, red);
+}
+
+.midnightblue {
+  background: linear-gradient(orange, black, midnightblue);
+}
+
+.dodgerblue {
+  background: linear-gradient(orange, black, dodgerblue);
+}
+
+.article:hover {
+  transform: scale(0.97);
+  box-shadow: inset 2px 2px 4px 2px black;
+}
+
+.card-icon {
+  width: 3rem;
+  height: 3rem;
+  fill: white;
+  position: absolute;
+  top: 2%;
+  right: 2%;
+}
+
+.organization-icon,
+.share-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+}
+
+.clock-icon,
+.track-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  top: 1%;
+  right: 1%;
+}
+
+.track-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  top: 1%;
+  right: 1%;
+  fill: none;
+}
+
+.card-details {
+  color: white;
+  border-radius: 30px 70% 30px 30px;
+}
+
+.card-head {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.7rem;
+  margin: 2rem 1rem 1rem;
+  text-shadow: 1px 1px 10px black;
+}
+
+.card-paragraph {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  margin: 0 1rem 2rem;
+}
+
+.card-img {
+  border-radius: 30px 70% 30px 30px;
+  width: 100%;
+  height: 210px;
+}  
+
+.footer {
+  background: orange;
+  margin-top: 8rem;
+  display: flex;
+  align-items: center;
+  padding: 5rem;
+}
+
+.footer-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-text {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.footer-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 1rem;
+  animation: rotate 0.5s linear 0s infinite;
+}
+
+.icon-box {
+  display: flex;
+  align-items: center;
+}
+
+.footer-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: 0.5rem;
+  background: white;
+  padding: 0.4rem;
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px 1px black;
+  cursor: pointer;
+}
+
+.footer-icon:hover {
+  box-shadow: inset 1px 1px 1px 1px black;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Media Queries */
+
+@media screen and (min-width: 1050px) {
+  .card-box > .article:nth-child(3n) {
+    margin-right: 0;
+  }
+}
+
+@media screen and (max-width: 1049px) {
+  .card-box > .article:nth-child(2n) {
+    margin-right: 0;
+  }
+}
+
+@media screen and (max-width: 1280px) {
+  .features-section {
+    margin: 3rem;
+    margin-top: 8rem;
+    margin-bottom: 0;
+  }
+}
+
+@media screen and (max-width: 1199px) {
+  .features-section {
+    margin: 2.5rem;
+    margin-top: 8rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 29.5%;
+    height: 26.5rem;
+  }
+}
+
+@media screen and (max-width: 1119px) {
+  .features-section {
+    margin: 2rem;
+    margin-top: 6rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 30%;
+    height: 27rem;
+  }
+
+  .site-name {
+    font-size: 2.5rem;
+  }
+
+  .card-head {
+    font-size: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 1049px) {
+  .features-section {
+    margin: 3rem;
+    margin-top: 5rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 35%;
+    height: 26.5rem;
+    margin-right: 8rem;
+  }
+
+  .site-name {
+    font-size: 2.5rem;
+  }
+
+  .card-head {
+    font-size: 1.5rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.32rem;
+  }
+
+  .description {
+    margin: 0 6rem;
+    margin-top: 4rem;
+  }
+}
+
+@media screen and (max-width: 969px) {
+  .features-section {
+    margin: 3rem;
+    margin-top: 5rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 40%;
+    height: 26.5rem;
+    margin-right: 5rem;
+  }
+
+  .site-name {
+    font-size: 2rem;
+  }
+
+  .card-head {
+    font-size: 1.5rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.28rem;
+  }
+
+  .description {
+    margin: 0 6rem;
+    margin-top: 4rem;
+  }
+}
+
+@media screen and (max-width: 899px) {
+  .features-section {
+    margin: 3rem;
+    margin-top: 5rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 43%;
+    height: 26rem;
+    margin-right: 4rem;
+  }
+
+  .site-name {
+    font-size: 2rem;
+  }
+
+  .card-head {
+    font-size: 1.5rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.25rem;
+  }
+
+  .description {
+    margin: 0 3.5rem;
+    margin-top: 4rem;
+  }
+
+  .headText {
+    font-size: 3rem;
+  }
+}
+
+@media screen and (max-width: 819px) {
+  .features-section {
+    margin: 3rem;
+    margin-top: 4.5rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 45%;
+    height: 26.5rem;
+    margin-right: 3rem;
+  }
+
+  .site-name {
+    font-size: 2rem;
+  }
+
+  .card-head {
+    font-size: 1.4rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.2rem;
+  }
+
+  .description {
+    margin: 0 3rem;
+    margin-top: 4rem;
+  }
+
+  .headText {
+    font-size: 3rem;
+  }
+
+  .aside {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .features-section {
+    margin: 2rem;
+    margin-top: 4.5rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 46%;
+    height: 26rem;
+    margin-right: 2rem;
+  }
+
+  .site-name {
+    font-size: 2rem;
+  }
+
+  .card-head {
+    font-size: 1.35rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.15rem;
+  }
+
+  .description {
+    margin: 0 3rem;
+    margin-top: 4rem;
+    font-size: 1.15rem;
+  }
+
+  .headText {
+    font-size: 3rem;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .card-img {
+    height: 200px;
+  }
+}
+
+@media screen and (max-width: 669px) {
+  .features-section {
+    margin: 1rem;
+    margin-top: 2.5rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 46.5%;
+    height: 24.5rem;
+    margin-right: 1rem;
+  }
+
+  .site-name {
+    font-size: 2rem;
+  }
+
+  .card-head {
+    font-size: 1.3rem;
+    margin: 1.5rem 1rem 1rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.15rem;
+    margin: 0 2rem;
+    margin-bottom: 4rem;
+  }
+
+  .description {
+    margin: 0 3rem;
+    margin-top: 4rem;
+  }
+
+  .headText {
+    font-size: 2.5rem;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .card-img {
+    height: 190px;
+  }
+
+  .card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .organization-icon,
+  .share-icon {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .clock-icon,
+  .track-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .features-section {
+    margin: 1rem;
+    margin-top: 2.5rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 57%;
+    height: 24rem;
+    margin-right: 0;
+  }
+
+  .site-name {
+    font-size: 2rem;
+  }
+
+  .card-head {
+    font-size: 1.3rem;
+    margin: 1.5rem 1rem 1rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.1rem;
+    margin: 0 1rem;
+    margin-bottom: 4rem;
+  }
+
+  .description {
+    margin: 0 3rem;
+    margin-top: 4rem;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .card-img {
+    height: 190px;
+  }
+
+  .card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .organization-icon,
+  .share-icon {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .clock-icon,
+  .track-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+@media screen and (max-width: 549px) {
+  .features-section {
+    margin: 0.7rem;
+    margin-top: 2rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 62%;
+    height: 24rem;
+    margin-right: 0;
+  }
+
+  .site-name {
+    font-size: 2rem;
+  }
+
+  .card-head {
+    font-size: 1.3rem;
+    margin: 1.5rem 1rem 1rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.1rem;
+    margin: 0 1rem;
+    margin-bottom: 4rem;
+  }
+
+  .description {
+    margin: 0 3rem;
+    margin-top: 4rem;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .card-img {
+    height: 190px;
+  }
+
+  .card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .organization-icon,
+  .share-icon {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .clock-icon,
+  .track-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .button {
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  .features-section {
+    margin: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 67%;
+    height: 23rem;
+    margin-right: 0;
+  }
+
+  .site-name {
+    font-size: 1.9rem;
+  }
+
+  .card-head {
+    font-size: 1.27rem;
+    margin: 1.5rem 1rem 1rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.1rem;
+    margin: 0 1rem;
+    margin-bottom: 4rem;
+  }
+
+  .description {
+    margin: 0 2rem;
+    margin-top: 4rem;
+  }
+
+  .headText {
+    font-size: 2rem;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .card-img {
+    height: 180px;
+  }
+
+  .card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .organization-icon,
+  .share-icon {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .clock-icon,
+  .track-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .button {
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+}
+
+@media screen and (max-width: 449px) {
+  .features-section {
+    margin: 0.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 73%;
+    height: 23.5rem;
+    margin-right: 0;
+  }
+
+  .site-name {
+    font-size: 1.9rem;
+  }
+
+  .card-head {
+    font-size: 1.25rem;
+    margin: 1.5rem 1rem 1rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.1rem;
+    margin: 0 1rem;
+    margin-bottom: 4rem;
+  }
+
+  .description {
+    margin: 0 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .card-img {
+    height: 180px;
+  }
+
+  .card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .organization-icon,
+  .share-icon {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .clock-icon,
+  .track-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .button {
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .header {
+    padding: 1.5rem 1.5rem 1rem;
+    font-size: 1.1rem;
+  }
+
+  .logo {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}
+
+@media screen and (max-width: 399px) {
+  .features-section {
+    margin: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 80%;
+    height: 23rem;
+    margin-right: 0;
+  }
+
+  .site-name {
+    font-size: 1.8rem;
+  }
+
+  .headText {
+    margin: 0 0.5rem;
+  }
+  .card-head {
+    font-size: 1.2rem;
+    margin: 1.5rem 1rem 1rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.1rem;
+    margin: 0 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .description {
+    margin: 0 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .card-img {
+    height: 170px;
+  }
+
+  .card-icon {
+    width: 2.3rem;
+    height: 2.3rem;
+    top: 3%;
+    right: 3%;
+  }
+
+  .organization-icon,
+  .share-icon {
+    width: 2rem;
+    height: 2rem;
+    top: 3%;
+    right: 3%;
+  }
+
+  .clock-icon,
+  .track-icon {
+    width: 2.7rem;
+    height: 2.7rem;
+    top: 2%;
+    right: 2%;
+  }
+
+  .button {
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .header {
+    padding: 1.5rem 1rem 1rem;
+    font-size: 1.1rem;
+  }
+
+  .logo {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}
+
+@media screen and (max-width: 349px) {
+  .features-section {
+    margin: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 0;
+  }
+
+  .article {
+    width: 90%;
+    height: 24rem;
+    margin-right: 0;
+  }
+
+  .site-name {
+    font-size: 1.8rem;
+  }
+
+  .card-head {
+    font-size: 1.2rem;
+    margin: 1.5rem 1rem 1rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.1rem;
+    margin: 0 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .description {
+    margin: 0 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .card-img {
+    height: 170px;
+  }
+
+  .card-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    top: 2%;
+    right: 3%;
+  }
+
+  .organization-icon,
+  .share-icon {
+    width: 1.8rem;
+    height: 2rem;
+    top: 3%;
+    right: 3%;
+  }
+
+  .clock-icon,
+  .track-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    top: 2%;
+    right: 2%;
+  }
+
+  .button {
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .header {
+    padding: 1.5rem 1rem 1rem;
+    font-size: 1.1rem;
+  }
+
+  .logo {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}
+
+@media screen and (max-width: 299px) {
+  .article {
+    width: 95%;
+    height: 24rem;
+    margin-right: 0;
+  }
+
+  .site-name {
+    font-size: 1.7rem;
+  }
+
+  .card-head {
+    font-size: 1.2rem;
+    margin: 1.5rem 1rem 1rem;
+  }
+
+  .features-paragraph {
+    font-size: 1.05rem;
+    margin: 0 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .description {
+    margin: 0 1.5rem;
+    margin-top: 4rem;
+    font-size: 1.05rem;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .card-img {
+    height: 170px;
+  }
+
+  .card-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    top: 2%;
+    right: 3%;
+  }
+
+  .organization-icon,
+  .share-icon {
+    width: 1.8rem;
+    height: 2rem;
+    top: 3%;
+    right: 3%;
+  }
+
+  .clock-icon,
+  .track-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    top: 2%;
+    right: 2%;
+  }
+
+  .button {
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .header {
+    padding: 1.5rem 1rem 1rem;
+    font-size: 1.1rem;
+  }
+
+  .logo {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}
