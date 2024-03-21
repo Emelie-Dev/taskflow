@@ -16,6 +16,7 @@ import { GoProjectTemplate } from 'react-icons/go';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import TaskBox from '../components/TaskBox';
 import TaskBox2 from '../components/TaskBox2';
+import { HiPlus } from 'react-icons/hi';
 
 const Tasks = () => {
   const [searchText, setSearchText] = useState('');
@@ -120,7 +121,7 @@ const Tasks = () => {
             </li>
           </ul>
         </section>
-      </nav> 
+      </nav>
 
       <nav className={styles.nav}>
         {' '}
@@ -659,7 +660,10 @@ const Tasks = () => {
 
             <div className={styles['add-task-btn-div']}>
               <h1 className={styles['tasks-section-text']}>Tasks</h1>
-              <button className={styles['add-task-btn']}>Add task</button>
+              <button className={styles['add-task-btn']}>
+                <HiPlus className={styles['add-task-icon']}/>
+                Add task
+              </button>
             </div>
 
             <div className={styles['article-box']}>
@@ -672,7 +676,6 @@ const Tasks = () => {
           </section>
         </section>
       </section>
-      
     </main>
   );
 };

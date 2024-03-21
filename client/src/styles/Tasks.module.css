@@ -607,6 +607,12 @@
   display: block;
 }
 
+.add-task-icon {
+  margin-right: 0.5rem;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
 /* Animations */
 
 @keyframes showNav {
@@ -846,6 +852,10 @@
     padding: 0.5rem 1rem;
     border-radius: 5px;
   }
+  .add-task-icon {
+    width: 1rem;
+    height: 1rem;
+  }
 }
 
 @media screen and (max-width: 399px) {
@@ -877,12 +887,6 @@
 
   .select-btn {
     padding: 0.4rem 0.7rem;
-  }
-
-  .add-task-btn {
-    padding: 0.4rem 0.8rem;
-    border-radius: 5px;
-    font-size: 0.95rem;
   }
 
   .projects-item-name {
