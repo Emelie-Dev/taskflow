@@ -120,7 +120,7 @@ const Tasks = () => {
             </li>
           </ul>
         </section>
-      </nav>
+      </nav> 
 
       <nav className={styles.nav}>
         {' '}
