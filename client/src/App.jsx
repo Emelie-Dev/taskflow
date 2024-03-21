@@ -6,6 +6,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
+import CalendarPage from './pages/CalendarPage';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
       <Route path={`/dashboard`} element={<Dashboard />} />
       <Route path="/projects" element={<Projects />} />
       <Route path="/tasks" element={<Tasks />} />
+      <Route path='/calendar' element={<CalendarPage />} />
     </Routes>
   );
 };

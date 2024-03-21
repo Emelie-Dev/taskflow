@@ -119,7 +119,7 @@ const Projects = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
-              <Link to={'/projects'} className={styles['side-nav-link']}>
+              <Link to={'/calendar'} className={styles['side-nav-link']}>
                 <FaCalendarAlt className={styles['side-nav-icon']} /> Calendar
               </Link>
             </li>
@@ -185,7 +185,7 @@ const Projects = () => {
             </Link>
           </li>
           <li className={styles['side-nav-item']}>
-            <Link to={'/projects'} className={styles['side-nav-link']}>
+            <Link to={'/calendar'} className={styles['side-nav-link']}>
               <FaCalendarAlt className={styles['side-nav-icon']} /> Calendar
             </Link>
           </li>

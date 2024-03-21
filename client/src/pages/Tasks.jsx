@@ -90,7 +90,7 @@ const Tasks = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
-              <Link to={'/projects'} className={styles['side-nav-link']}>
+              <Link to={'/calendar'} className={styles['side-nav-link']}>
                 <FaCalendarAlt className={styles['side-nav-icon']} /> Calendar
               </Link>
             </li>
@@ -158,7 +158,7 @@ const Tasks = () => {
             </Link>
           </li>
           <li className={styles['side-nav-item']}>
-            <Link to={'/projects'} className={styles['side-nav-link']}>
+            <Link to={'/calendar'} className={styles['side-nav-link']}>
               <FaCalendarAlt className={styles['side-nav-icon']} /> Calendar
             </Link>
           </li>
@@ -660,8 +660,12 @@ const Tasks = () => {
 
             <div className={styles['add-task-btn-div']}>
               <h1 className={styles['tasks-section-text']}>Tasks</h1>
-              <button className={styles['add-task-btn']}>
-                <HiPlus className={styles['add-task-icon']}/>
+              <button
+                className={`${styles['add-task-btn']} ${
+                  taskType === 'assigned' ? styles['hide-add-task'] : ''
+                }`}
+              >
+                <HiPlus className={styles['add-task-icon']} />
                 Add task
               </button>
             </div>

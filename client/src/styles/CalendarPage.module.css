@@ -239,19 +239,19 @@
   font-weight: bold;
 }
 
-.tasks {
+.calendar {
   border-right: 2px solid orange;
 }
 
-.tasks-link {
+.calendar-link {
   color: orange;
 }
 
-.tasks-icon {
+.calendar-icon {
   fill: orange;
 }
 
-.tasks-link:hover {
+.calendar-link:hover {
   font-weight: 500;
 }
 
@@ -347,275 +347,6 @@
 .notifications {
   display: none;
 }
-
-.projects-section {
-  width: 35%;
-  padding: 1rem 1.5rem;
-  height: 100%;
-  overflow: auto;
-}
-
-.projects-section-head {
-  font-family: var(--general-font);
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
-}
-
-.projects-head {
-  font-weight: 500;
-  color: gray;
-  font-family: var(--general-font);
-  font-size: 1.15rem;
-}
-
-.projects-list {
-  list-style-type: none;
-  margin-top: 1rem;
-  overflow: auto;
-  max-height: 28vh;
-}
-
-.projects-list-item {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-bottom: 0.5rem;
-  border: 1px solid white;
-  width: 95%;
-}
-
-.projects-list-item:hover {
-  border: 1px solid orange;
-}
-
-.projects-item-img {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 5px;
-  object-fit: cover;
-}
-
-.projects-item-details {
-  display: flex;
-  flex-direction: column;
-  margin-left: 1rem;
-  color: black;
-  width: calc(100% - 5rem);
-}
-
-.projects-item-name {
-  font-family: var(--general-font);
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-  font-size: 1.1rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.projects-item-count {
-  font-family: var(--general-font);
-}
-
-.projects-item-action {
-  align-self: flex-start;
-  margin-left: auto;
-  position: relative;
-}
-
-.projects-item-menu {
-  width: 1.2rem;
-  height: 1.2rem;
-  fill: gray;
-}
-
-.view-project-link {
-  position: absolute;
-  font-family: var(--general-font);
-  padding: 0.5rem;
-  white-space: nowrap;
-  right: 0;
-  top: 90%;
-  z-index: 20;
-  display: none;
-  background: white;
-  box-shadow: 1px 1px 10px -3px black;
-  font-size: 0.9rem;
-  transition: background 0.2s;
-  cursor: pointer;
-}
-
-.view-project-link:hover {
-  background: #dcdcdc;
-}
-
-.projects-item-action:hover .view-project-link {
-  display: inline;
-}
-
-.current-project-list-item {
-  background: orange;
-  border: 1px solid orange;
-  cursor: default;
-}
-
-.current-projects-item-details {
-  color: white;
-  text-shadow: 1px 2px 3px black;
-}
-
-.current-projects-item-menu {
-  fill: white;
-  cursor: pointer;
-}
-
-.tasks-section {
-  width: 65%;
-  padding: 1rem 2rem;
-  height: auto;
-  overflow: auto;
-  border-left: 1px solid rgba(128, 128, 128, 0.404);
-}
-
-.tasks-section-head {
-  font-family: var(--general-font);
-  font-size: 1.4rem;
-}
-
-.project-icon-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.add-task-btn-div {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 2rem;
-}
-
-.add-task-btn {
-  outline: none;
-  font-family: var(--general-font);
-  background: orange;
-  color: white;
-  padding: 0.8rem 1.5rem;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  font-size: 1.03rem;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 2px 2px 20px -5px orange;
-  transition: opacity 0.3s;
-  text-transform: capitalize;
-}
-
-.select-btn {
-  outline: none;
-  font-family: var(--general-font);
-  background: white;
-  color: orange;
-  padding: 0.5rem 1.2rem;
-  border: 1px solid orange;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.3s, color 0.3s;
-  text-transform: capitalize;
-  display: none;
-  margin-bottom: 1rem;
-}
-
-.active-select-btn {
-  background: orange;
-  color: white;
-}
-
-.select-btn-icon {
-  width: 1.2rem;
-  height: 1.2rem;
-  margin-left: 0.5rem;
-}
-
-.tasks-section-text {
-  margin-right: auto;
-  font-family: var(--general-font);
-  font-size: 1.4rem;
-  display: none;
-}
-
-.add-task-btn:hover {
-  opacity: 0.85;
-}
-
-.article-box {
-  display: flex;
-  flex-direction: column;
-}
-
-.projects-container {
-  position: relative;
-}
-
-.alt-projects-section {
-  position: absolute;
-  background: white;
-  box-shadow: 1px 1px 10px -3px black;
-  z-index: 3;
-  width: 55%;
-  max-height: 90vh;
-  padding: 1rem;
-  padding-bottom: 1.5rem;
-  border-radius: 5px;
-  overflow: auto;
-  display: none;
-  animation: showProjects 0.3s ease-in-out 0s;
-}
-
-.alt-projects-list {
-  list-style-type: none;
-  margin-top: 1rem;
-  overflow: auto;
-  max-height: 25vh;
-}
-
-.alt-projects-list-item {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-  border-radius: 10px;
-  cursor: pointer;
-  margin: auto;
-  margin-bottom: 0.5rem;
-  border: 1px solid white;
-  width: 90%;
-}
-
-.alt-projects-list-item:hover {
-  border: 1px solid orange;
-}
-
-.show-projects {
-  display: block;
-}
-
-.add-task-icon {
-  margin-right: 0.5rem;
-  width: 1.2rem;
-  height: 1.2rem;
-}
-
-.hide-add-task {
-  display: none;
-}
 /* Animations */
 
 @keyframes showNav {
@@ -627,25 +358,10 @@
   }
 }
 
-@keyframes showProjects {
-  from {
-    max-height: 0;
-  }
-  to {
-    max-height: 90vh;
-  }
-}
-
 /* Media Queries */
 
 @media screen and (min-width: 1100px) {
   .responsive-nav {
-    display: none;
-  }
-}
-
-@media screen and (min-width: 800px) {
-  .alt-projects-section {
     display: none;
   }
 }
@@ -657,14 +373,6 @@
   .search {
     width: 22rem;
   }
-
-  .projects-section {
-    width: 38%;
-  }
-
-  .tasks-section {
-    width: 62%;
-  }
 }
 
 @media screen and (max-width: 1099px) {
@@ -673,7 +381,7 @@
   }
 
   .section-content {
-    margin-top: 6rem;
+    margin-top: 5.9rem;
   }
 
   .nav {
@@ -694,14 +402,6 @@
   .menu-icon-box {
     display: flex;
   }
-
-  .projects-section {
-    width: 35%;
-  }
-
-  .tasks-section {
-    width: 65%;
-  }
 }
 
 @media screen and (max-width: 999px) {
@@ -716,14 +416,6 @@
   .notifications {
     display: block;
   }
-
-  .projects-section {
-    width: 38%;
-  }
-
-  .tasks-section {
-    width: 62%;
-  }
 }
 
 @media screen and (max-width: 899px) {
@@ -733,10 +425,6 @@
 
   .search {
     width: 20rem;
-  }
-
-  .projects-list-item {
-    width: 100%;
   }
 }
 
@@ -751,30 +439,6 @@
   .search {
     width: 18rem;
   }
-
-  .projects-section {
-    display: none;
-  }
-
-  .tasks-section {
-    width: 100%;
-  }
-
-  .tasks-section-head {
-    display: none;
-  }
-
-  .select-btn {
-    display: flex;
-  }
-
-  .tasks-section-text {
-    display: flex;
-  }
-
-  .add-task-btn {
-    padding: 0.6rem 1.2rem;
-  }
 }
 
 @media screen and (max-width: 699px) {
@@ -784,14 +448,6 @@
   .profile-box {
     display: none;
   }
-
-  .alt-projects-section {
-    width: 65%;
-  }
-
-  .alt-projects-list-item {
-    width: 95%;
-  }
 }
 
 @media screen and (max-width: 599px) {
@@ -800,18 +456,6 @@
   }
   .search {
     width: 13rem;
-  }
-
-  .tasks-section {
-    padding: 1rem 1.5rem;
-  }
-
-  .alt-projects-section {
-    width: 75%;
-  }
-
-  .alt-projects-list-item {
-    width: 95%;
   }
 }
 
@@ -830,35 +474,6 @@
   .alternate-search-box {
     display: flex;
   }
-
-  .tasks-section {
-    padding: 1rem;
-  }
-
-  .alt-projects-section {
-    width: 90%;
-  }
-
-  .projects-item-name {
-    font-size: 1.05rem;
-  }
-  .projects-item-img {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-
-  .select-btn {
-    padding: 0.5rem 1rem;
-  }
-
-  .add-task-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-  }
-  .add-task-icon {
-    width: 1rem;
-    height: 1rem;
-  }
 }
 
 @media screen and (max-width: 399px) {
@@ -874,44 +489,11 @@
     height: 1.1rem;
     fill: gray;
   }
-
-  .alt-projects-section {
-    width: 100%;
-  }
-
-  .alt-projects-list-item {
-    width: 100%;
-  }
-
-  .projects-item-img {
-    width: 2.3rem;
-    height: 2.3rem;
-  }
-
-  .select-btn {
-    padding: 0.4rem 0.7rem;
-  }
-
-  .projects-item-name {
-    font-size: 1rem;
-  }
-
-  .projects-item-count {
-    font-size: 0.9rem;
-  }
-
-  .tasks-section-text {
-    font-size: 1.2rem;
-  }
 }
 
 @media screen and (max-width: 329px) {
   .responsive-section {
     width: 70%;
-  }
-
-  .tasks-section {
-    padding: 1rem 0.75rem;
   }
 }
 
@@ -926,17 +508,5 @@
 
   .menu-icon-box {
     margin-right: 0.3rem;
-  }
-
-  .select-btn {
-    font-size: 0.9rem;
-  }
-
-  .tasks-section {
-    padding: 1rem 0.5rem;
-  }
-  .select-btn-icon {
-    width: 1.05rem;
-    height: 1.05rem;
   }
 }
