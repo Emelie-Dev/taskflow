@@ -37,15 +37,54 @@ const Calendar = ({
     });
   };
 
+  const maxDays = () => {
+    const month = currentMonth;
+    const arr30 = [4, 6, 9, 11];
+    let days = 0;
+
+    if (month === 2) {
+      if (currentYear % 4 === 0) {
+        days = 29;
+      } else {
+        days = 28;
+      }
+    } else if (arr30.includes(month)) {
+      days = 30;
+    } else {
+      days = 31;
+    }
+    return days;
+  };
+
+  const maxRows = () => {
+    const maxNumber = maxDays();
+    const firstDay = new Date(`${currentYear}-${currentMonth}-1`).getDay();
+    let rows = 4;
+
+    if (maxNumber === 30) {
+      if (firstDay === 0) {
+        rows = 5;
+      }
+    } else if (maxNumber === 31) {
+      if (firstDay === 0 || firstDay === 6) {
+        rows = 5;
+      }
+    }
+
+    return rows;
+  };
+
   const tableData = (currentMonth, currentYear) => {
     const currentDate = new Date().getDate();
     const currentDay = new Date(`${currentYear}-${currentMonth}-1`).getDay();
+    const maxNumber = maxDays();
+    const rows = maxRows();
 
     let dataArray = [];
 
     let value = 0;
 
-    for (let i = 0; i <= 5; i++) {
+    for (let i = 0; i <= rows; i++) {
       let data = [];
       if (i === 0) {
         for (let j = 0; j <= 6; j++) {
@@ -88,7 +127,7 @@ const Calendar = ({
 
           if (`${input}`.length < 2) {
             input = `0${input}`;
-          } else if (input > 31) {
+          } else if (input > maxNumber) {
             input = '';
           }
 
