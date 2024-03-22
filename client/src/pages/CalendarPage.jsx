@@ -300,6 +300,14 @@ const CalendarPage = () => {
               <div className={styles['calendar-details']}>
                 <h1 className={styles['current-month']}>
                   {month[currentMonth - 1]} {currentYear}
+                  <button
+                    className={`${styles['alt-today-btn']} ${
+                      enableTodayBtn() ? styles['disabled-btn'] : ''
+                    }`}
+                    onClick={moveToToday}
+                  >
+                    Today
+                  </button>
                 </h1>
                 <p className={styles['calendar-text']}>
                   This displays task deadlines with color-coded priorities: red
