@@ -6,14 +6,11 @@ import { Link } from 'react-router-dom';
 import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
 import { IoIosSearch, IoMdClose, IoIosNotifications } from 'react-icons/io';
 
-import {
-  MdOutlineDashboard,
-  MdOutlineSegment,
-  MdArrowForwardIos,
-  MdArrowBackIosNew,
-} from 'react-icons/md';
+import { MdOutlineDashboard, MdOutlineSegment } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt, FaSearch, FaCircle } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
+import { GrStatusGood } from 'react-icons/gr';
+import BigCalendar from '../components/BigCalendar';
 
 const CalendarPage = () => {
   const [searchText, setSearchText] = useState('');
@@ -75,84 +72,6 @@ const CalendarPage = () => {
     return rows;
   };
 
-  const tableData = (currentMonth, currentYear) => {
-    const currentDate = new Date().getDate();
-    const currentDay = new Date(`${currentYear}-${currentMonth}-1`).getDay();
-    const maxNumber = maxDays(currentMonth);
-    const prevMonthNumber = maxDays(currentMonth - 1);
-    const rows = maxRows();
-
-    let dataArray = [];
-
-    let value = 0;
-
-    for (let i = 0; i <= rows; i++) {
-      let data = [];
-      if (i === 0) {
-        let num = prevMonthNumber - (currentDay - 1);
-        let row1Num = prevMonthNumber - 6;
-        for (let j = 0; j <= 6; j++) {
-          if (currentDay === 0) {
-            value = 1;
-            let input = value;
-
-            let current = input === currentDate;
-
-            if (`${input}`.length < 2) {
-              input = `0${input}`;
-            }
-
-            if (j === 6) {
-              data.push({ input, current, member: true });
-            } else {
-              row1Num++;
-              input = row1Num;
-              data.push({ input, current: false, member: false });
-            }
-          } else if (j >= currentDay - 1) {
-            value++;
-            let input = value;
-
-            let current = input === currentDate;
-
-            if (`${input}`.length < 2) {
-              input = `0${input}`;
-            }
-
-            data.push({ input, current, member: true });
-          } else {
-            num++;
-            let input = num;
-            data.push({ input, current: false, member: false });
-          }
-        }
-      } else {
-        let nextMonthNumber = 0;
-        for (let j = 0; j <= 6; j++) {
-          value++;
-          let input = value;
-
-          let current = input === currentDate;
-
-          let member = true;
-
-          if (`${input}`.length < 2) {
-            input = `0${input}`;
-          } else if (input > maxNumber) {
-            nextMonthNumber++;
-            member = false;
-            input = `0${nextMonthNumber}`;
-          }
-
-          data.push({ input, current, member });
-        }
-      }
-      dataArray.push(data);
-    }
-
-    return dataArray;
-  };
-
   const month = [
     'January',
     'February',
@@ -167,33 +86,6 @@ const CalendarPage = () => {
     'November',
     'December',
   ];
-
-  const moveNextMonth = () => {
-    if (currentMonth === 12) {
-      setCurrentMonth(1);
-      setCurrentYear((prev) => prev + 1);
-    } else {
-      setCurrentMonth((prev) => prev + 1);
-    }
-
-    calenderRef.current.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: 400,
-      iterations: 1,
-    });
-  };
-
-  const movePreviousMonth = () => {
-    if (currentMonth === 1) {
-      setCurrentMonth(12);
-      setCurrentYear((prev) => prev - 1);
-    } else {
-      setCurrentMonth((prev) => prev - 1);
-    }
-    calenderRef.current.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: 400,
-      iterations: 1,
-    });
-  };
 
   const moveToToday = () => {
     setCurrentMonth(new Date().getMonth() + 1);
@@ -210,16 +102,6 @@ const CalendarPage = () => {
 
     return year === currentYear && month === currentMonth;
   };
-
-  
-  const checkCurrentDate = (current) => {
-    return (
-      current &&
-      currentYear === new Date().getFullYear() &&
-      currentMonth === new Date().getMonth() + 1
-    );
-  };
-
 
   return (
     <main className={styles.div}>
@@ -413,7 +295,6 @@ const CalendarPage = () => {
         </header>
 
         <section className={styles['section-content']}>
-
           <section className={styles['calendar-section']}>
             <div className={styles['calendar-section-head']}>
               <div className={styles['calendar-details']}>
@@ -437,88 +318,266 @@ const CalendarPage = () => {
               </div>
             </div>
 
-            <div className={styles['table-container']}>
-              <span
-                className={styles['prev-arrow-box']}
-                title="Previous Month"
-                onClick={movePreviousMonth}
-              >
-                <MdArrowBackIosNew className={styles['arrow-icon']} />
-              </span>
-
-              <div className={styles['table-box']}>
-                <table className={styles.table} ref={calenderRef}>
-                  <thead className={styles.thead}>
-                    <tr>
-                      <th className={styles['table-head']}>mon</th>
-                      <th className={styles['table-head']}>tue</th>
-                      <th className={styles['table-head']}>wed</th>
-                      <th className={styles['table-head']}>thu</th>
-                      <th className={styles['table-head']}>fri</th>
-                      <th className={styles['table-head']}>sat</th>
-                      <th className={styles['table-head']}>Sun</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {tableData(currentMonth, currentYear).map((data, index) => (
-                      <tr key={index}>
-                        {data.map(({ input, current, member }, index) => (
-                          <td
-                            key={index}
-                            className={`${styles['table-data']} ${
-                              member ? '' : styles['prev-month']
-                            } ${checkCurrentDate(current) ? styles['current-date'] : ''}`}
-                          >
-                            <div className={styles['data-box']}>
-                              <span>{input}</span>
-
-                              {member && (
-                                <div className={styles['priority-div']}>
-                                  <span
-                                    className={`${styles['priority-box']} `}
-                                  >
-                                    <FaCircle
-                                      className={`${styles['priority-icon']} ${styles['high-priority']}`}
-                                    />
-                                    5 tasks
-                                  </span>
-                                  <span className={`${styles['priority-box']}`}>
-                                    <FaCircle
-                                      className={`${styles['priority-icon']}  ${styles['mid-priority']} `}
-                                    />
-                                    2 tasks
-                                  </span>
-                                  <span className={`${styles['priority-box']}`}>
-                                    <FaCircle
-                                      className={`${styles['priority-icon']}  ${styles['low-priority']}`}
-                                    />
-                                    3 tasks
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <span
-                className={styles['next-arrow-box']}
-                title="Next Month"
-                onClick={moveNextMonth}
-              >
-                <MdArrowForwardIos className={styles['arrow-icon']} />
-              </span>
-            </div>
+            <BigCalendar
+              currentMonth={currentMonth}
+              currentYear={currentYear}
+              setCurrentMonth={setCurrentMonth}
+              setCurrentYear={setCurrentYear}
+              calenderRef={calenderRef}
+            />
           </section>
 
-        <section className={styles['tasks-section']}>
-            Tasks section
-        </section>
+          <section className={styles['tasks-section']}>
+            <h1 className={styles['task-section-head']}>Tasks</h1>
 
+            <div className={styles['task-container']}>
+              <article className={styles.article}>
+                <div className={styles['task-time']}>12:00</div>
+                <div className={styles['task-box']}>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboards
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboard
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article className={styles.article}>
+                <div className={styles['task-time']}>12:00</div>
+                <div className={styles['task-box']}>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboard
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboard
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article className={styles.article}>
+                <div className={styles['task-time']}>12:00</div>
+                <div className={styles['task-box']}>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboard
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboard
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article className={styles.article}>
+                <div className={styles['task-time']}>12:00</div>
+                <div className={styles['task-box']}>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboard
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboard
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article className={styles.article}>
+                <div className={styles['task-time']}>12:00</div>
+                <div className={styles['task-box']}>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboard
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles['task-item']}>
+                    <span className={styles['task-name']}>
+                      Make a single landing page and dashboard
+                    </span>
+                    <div className={styles['task-details']}>
+                      <span className={styles['task-priority-box']}>
+                        Priority:
+                        <span className={styles['task-priority-value']}>
+                          High
+                        </span>
+                      </span>
+                      <span className={styles['task-status-box']}>
+                        Status:{' '}
+                        <span className={styles['task-status-value']}>
+                          <GrStatusGood
+                            className={styles['task-status-icon']}
+                          />
+                          Completed
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
         </section>
       </section>
     </main>
