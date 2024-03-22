@@ -779,6 +779,11 @@
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .tasks-section {
+    padding: 1.5rem;
+    padding-bottom: 1rem;
+  }
 }
 
 @media screen and (max-width: 329px) {
