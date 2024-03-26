@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import CalendarPage from './pages/CalendarPage';
+import Chats from './pages/Chats';
 
 const App = () => {
   return (
@@ -18,7 +19,8 @@ const App = () => {
       <Route path={`/dashboard`} element={<Dashboard />} />
       <Route path="/projects" element={<Projects />} />
       <Route path="/tasks" element={<Tasks />} />
-      <Route path='/calendar' element={<CalendarPage />} />
+      <Route path="/calendar" element={<CalendarPage />} />
+      <Route path="/chats" element={<Chats />} />
     </Routes>
   );
 };

@@ -124,8 +124,8 @@ const Projects = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
-              <Link to={'/projects'} className={styles['side-nav-link']}>
-                <IoChatbubblesSharp className={styles['side-nav-icon']} /> Chat
+              <Link to={'/chats'} className={styles['side-nav-link']}>
+                <IoChatbubblesSharp className={styles['side-nav-icon']} /> Chats
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
@@ -190,8 +190,8 @@ const Projects = () => {
             </Link>
           </li>
           <li className={styles['side-nav-item']}>
-            <Link to={'/projects'} className={styles['side-nav-link']}>
-              <IoChatbubblesSharp className={styles['side-nav-icon']} /> Chat
+            <Link to={'/chats'} className={styles['side-nav-link']}>
+              <IoChatbubblesSharp className={styles['side-nav-icon']} /> Chats
             </Link>
           </li>
           <li className={styles['side-nav-item']}>
