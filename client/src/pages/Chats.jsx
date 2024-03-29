@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Chats.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -21,6 +21,14 @@ const Chat = () => {
   const [showNav, setShowNav] = useState(false);
   const [chatMode, setChatMode] = useState('private');
   const [emptyMode, setEmptyMode] = useState({ private: true, group: true });
+  const [hideContacts, setHideContacts] = useState(false);
+  const [showChats, setShowChats] = useState(false);
+
+  // useEffect(() => {
+  //   if (window.matchMedia('(min-width: 800px)').matches) {
+  //     setHideContacts(false);
+  //   }
+  // });
 
   const searchRef = useRef();
   const navRef = useRef();
@@ -37,6 +45,14 @@ const Chat = () => {
   const clearSearchText = () => {
     setSearchText('');
     searchRef.current.focus();
+  };
+
+  const handlePrivateChat = () => {
+    setEmptyMode({ ...emptyMode, private: false });
+    if (window.matchMedia('(max-width: 799px)').matches) {
+      setHideContacts(true);
+      setShowChats(true);
+    }
   };
 
   return (
@@ -231,7 +247,11 @@ const Chat = () => {
         </header>
 
         <section className={styles['section-content']}>
-          <section className={styles['contacts-section']}>
+          <section
+            className={`${styles['contacts-section']} ${
+              hideContacts ? styles['hide-contacts-section'] : ''
+            }`}
+          >
             <h1 className={styles['contacts-section-head']}>
               <span
                 className={`${styles['private-head']} ${
@@ -256,7 +276,7 @@ const Chat = () => {
               <ul className={styles['contacts-list']}>
                 <li
                   className={styles['contacts-box']}
-                  onClick={() => setEmptyMode({ ...emptyMode, private: false })}
+                  onClick={handlePrivateChat}
                 >
                   <span className={styles['contacts-img-box']}>
                     <img
@@ -490,7 +510,11 @@ const Chat = () => {
             )}
           </section>
 
-          <section className={styles['chats-section']}>
+          <section
+            className={`${styles['chats-section']} ${
+              showChats ? styles['show-chats'] : ''
+            }`}
+          >
             <p
               className={`${styles['empty-chat-box']} ${
                 emptyMode[chatMode] === false ? styles['hide-empty-text'] : ''
