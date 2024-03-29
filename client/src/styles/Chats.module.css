@@ -346,6 +346,7 @@
 .notifications {
   display: none;
 }
+
 .contacts-section {
   width: 33%;
   border-right: 1px solid rgba(128, 128, 128, 0.404);
@@ -520,13 +521,12 @@
 .chats-section {
   width: 67%;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .empty-chat-box {
-  position: absolute;
-  top: 40%;
-  left: 21%;
-  margin: 0 auto;
   font-family: var(--general-font);
   color: gray;
   font-weight: 600;
@@ -545,7 +545,6 @@
   height: 2rem;
   margin-bottom: 0.5rem;
 }
-
 
 /* Animations */
 
@@ -567,11 +566,25 @@
 }
 
 @media screen and (max-width: 1250px) {
+  .contacts-box {
+    padding: 0.5rem 0.8rem;
+  }
+  .contact-details {
+    width: 55%;
+  }
 }
 
 @media screen and (max-width: 1174px) {
   .search {
     width: 22rem;
+  }
+
+  .contacts-section {
+    width: 35%;
+  }
+
+  .chats-section {
+    width: 65%;
   }
 }
 
@@ -602,6 +615,21 @@
   .menu-icon-box {
     display: flex;
   }
+
+  .contacts-box {
+    padding: 0.5rem 1rem;
+  }
+
+  .contact-details {
+    width: 60%;
+  }
+
+  .chats-section {
+    width: 65%;
+  }
+  .contacts-section {
+    width: 35%;
+  }
 }
 
 @media screen and (max-width: 999px) {
@@ -616,6 +644,19 @@
   .notifications {
     display: block;
   }
+
+  .contacts-box {
+    padding: 0.5rem 0.8rem;
+  }
+  .contact-details {
+    width: 55%;
+  }
+  .chats-section {
+    width: 63%;
+  }
+  .contacts-section {
+    width: 37%;
+  }
 }
 
 @media screen and (max-width: 899px) {
@@ -625,6 +666,22 @@
 
   .search {
     width: 20rem;
+  }
+
+  .contacts-list {
+    padding: 0 0.25rem;
+  }
+
+  .contacts-box {
+    padding: 0.5rem 0.7rem;
+  }
+
+  .contact-details {
+    width: 50%;
+  }
+
+  .empty-chat-box {
+    font-size: 1.025rem;
   }
 }
 
@@ -638,6 +695,15 @@
 
   .search {
     width: 18rem;
+  }
+
+  .contacts-section {
+    /* display: none; */
+    width: 100%;
+  }
+
+  .chats-section {
+    display: none;
   }
 }
 

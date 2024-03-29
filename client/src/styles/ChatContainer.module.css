@@ -79,7 +79,7 @@
   padding-bottom: 2rem;
   overflow: auto;
   overflow-x: hidden;
-  height: calc(74%);
+  height: 74%;
 }
 
 .chat-bubble {
@@ -458,4 +458,53 @@
 
 .file-download-btn:hover {
   opacity: 0.8;
+}
+
+/* Media Queries */
+
+@media screen and (max-width: 1174px) {
+  .chat-input-box {
+    width: 48.5%;
+  }
+}
+
+@media screen and (max-width: 1099px) {
+  .chat-input-box {
+    width: 59.5%;
+  }
+}
+
+@media screen and (max-width: 999px) {
+  .chat-input-box {
+    width: 57%;
+  }
+
+  .chat-pics {
+    max-width: 20rem;
+  }
+
+  .media-chat-content {
+    max-width: 21.1rem;
+  }
+
+  .multi-chat-pics {
+    width: 8.5rem;
+    height: 7.5rem;
+  }
+
+  .more-media-box {
+    width: 8.5rem;
+    height: 7.5rem;
+  }
+
+  .more-media-box::after {
+    width: 8.5rem;
+    height: 7.5rem;
+  }
+}
+
+@media screen and (max-width: 899px) {
+  .chat-input-box {
+    width: 56.5%;
+  }
 }

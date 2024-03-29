@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from '../styles/ChatContainer.module.css';
 
 import { IoCheckmarkDoneSharp } from 'react-icons/io5';
@@ -13,6 +13,11 @@ import { TbClock } from 'react-icons/tb';
 import { FaSearch } from 'react-icons/fa';
 
 const ChatBox = ({ emptyMode, chatMode }) => {
+  const [height, setHeight] = useState(0);
+  const messageRef = useRef();
+  const headerRef = useRef();
+  const chatRef = useRef();
+
   return (
     <div
       className={`${styles['chat-box']} ${
