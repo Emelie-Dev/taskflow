@@ -728,6 +728,10 @@
   .contacts-box {
     padding: 0.5rem 1rem;
   }
+
+  .contact-details {
+    width: 77%;
+  }
 }
 
 @media screen and (max-width: 699px) {
@@ -737,6 +741,10 @@
   .profile-box {
     display: none;
   }
+
+  .contact-details {
+    width: 72.5%;
+  }
 }
 
 @media screen and (max-width: 599px) {
@@ -745,6 +753,18 @@
   }
   .search {
     width: 13rem;
+  }
+
+  .contacts-list {
+    padding: 0 0.5rem;
+  }
+
+  .contacts-box {
+    padding: 0.5rem 1rem;
+  }
+
+  .contact-details {
+    width: 67%;
   }
 }
 
@@ -763,6 +783,18 @@
   .alternate-search-box {
     display: flex;
   }
+
+  .contacts-list {
+    padding: 0 0.35rem;
+  }
+
+  .contacts-box {
+    padding: 0.5rem 0.8rem;
+  }
+
+  .contact-details {
+    width: 60%;
+  }
 }
 
 @media screen and (max-width: 399px) {
@@ -778,11 +810,27 @@
     height: 1.1rem;
     fill: gray;
   }
+
+  .contact-details {
+    width: 55%;
+  }
 }
 
 @media screen and (max-width: 329px) {
   .responsive-section {
     width: 70%;
+  }
+
+  .contacts-list {
+    padding: 0 0.3rem;
+  }
+
+  .contacts-box {
+    padding: 0.3rem 0.7rem;
+  }
+
+  .contact-details {
+    width: 47%;
   }
 }
 

@@ -11,6 +11,7 @@ import { BiSolidFileDoc } from 'react-icons/bi';
 import { BsFillFileEarmarkTextFill } from 'react-icons/bs';
 import { TbClock } from 'react-icons/tb';
 import { FaSearch } from 'react-icons/fa';
+import { FaArrowLeft } from 'react-icons/fa6';
 
 const ChatBox = ({ emptyMode, chatMode }) => {
   const [height, setHeight] = useState(0);
@@ -27,6 +28,9 @@ const ChatBox = ({ emptyMode, chatMode }) => {
       }`}
     >
       <div className={styles['contact-head']}>
+        <span className={styles['back-arrow-box']}>
+          <FaArrowLeft className={styles['back-arrow']} />
+        </span>
         <figure className={styles['profile-img-box']}>
           <img
             src="../../assets/images/profile3.jpeg"

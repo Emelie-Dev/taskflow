@@ -23,15 +23,22 @@ const Chat = () => {
   const [emptyMode, setEmptyMode] = useState({ private: true, group: true });
   const [hideContacts, setHideContacts] = useState(false);
   const [showChats, setShowChats] = useState(false);
-
-  // useEffect(() => {
-  //   if (window.matchMedia('(min-width: 800px)').matches) {
-  //     setHideContacts(false);
-  //   }
-  // });
-
   const searchRef = useRef();
   const navRef = useRef();
+
+  useEffect(() => {
+    const resizeHandler = () => {
+      if (window.matchMedia('(min-width: 800px)').matches) {
+        setHideContacts(false);
+        setShowChats(false);
+      }
+    };
+
+    window.addEventListener('resize', resizeHandler);
+    return () => {
+      window.removeEventListener('resize', resizeHandler);
+    };
+  }, []);
 
   const hideNav = (e) => {
     if (e.target === navRef.current) {
@@ -49,6 +56,14 @@ const Chat = () => {
 
   const handlePrivateChat = () => {
     setEmptyMode({ ...emptyMode, private: false });
+    if (window.matchMedia('(max-width: 799px)').matches) {
+      setHideContacts(true);
+      setShowChats(true);
+    }
+  };
+
+  const handleGroupChat = () => {
+    setEmptyMode({ ...emptyMode, group: false });
     if (window.matchMedia('(max-width: 799px)').matches) {
       setHideContacts(true);
       setShowChats(true);
@@ -390,7 +405,7 @@ const Chat = () => {
               <ul className={styles['contacts-list']}>
                 <li
                   className={styles['contacts-box']}
-                  onClick={() => setEmptyMode({ ...emptyMode, group: false })}
+                  onClick={handleGroupChat}
                 >
                   <span className={styles['contacts-img-box']}>
                     <img

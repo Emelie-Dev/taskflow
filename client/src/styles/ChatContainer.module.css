@@ -460,6 +460,29 @@
   opacity: 0.8;
 }
 
+.back-arrow-box {
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.6rem;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: none;
+  background: white;
+  transition: background 0.2s;
+}
+
+.back-arrow {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: gray;
+}
+
+.back-arrow-box:hover {
+  background: #dcdcdc;
+}
+
 /* Media Queries */
 
 @media screen and (max-width: 1174px) {
@@ -506,5 +529,213 @@
 @media screen and (max-width: 899px) {
   .chat-input-box {
     width: 56.5%;
+  }
+}
+
+@media screen and (max-width: 799px) {
+  .chat-input-box {
+    width: 94%;
+  }
+
+  .chat-input-container {
+    padding: 0.8rem 1.5rem;
+  }
+  .back-arrow-box {
+    display: flex;
+  }
+
+  .contact-head {
+    padding: 0.75rem 1.5rem;
+    padding-left: 1rem;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .chat-input-box {
+    width: 90%;
+  }
+
+  .chat-input-container {
+    padding: 0.8rem 1rem;
+  }
+
+  .owner-chat-content,
+  .others-chat-content,
+  .others-chat-content2 {
+    max-width: 80%;
+  }
+
+  .media-chat-content {
+    max-width: 21.1rem;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  .chat-response {
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  .chat-pics {
+    max-width: 18rem;
+    max-height: 15rem;
+  }
+
+  .multi-chat-pics {
+    width: 7.5rem;
+    height: 6.5rem;
+  }
+
+  .more-media-box {
+    width: 7.5rem;
+    height: 6.5rem;
+    font-size: 1.5rem;
+  }
+
+  .more-media-box::after {
+    width: 7.5rem;
+    height: 6.5rem;
+  }
+
+  .owner-chat-content,
+  .others-chat-content,
+  .others-chat-content2 {
+    max-width: 95%;
+  }
+
+  .contact-head {
+    padding: 0.75rem 0.75rem;
+    padding-left: 0.5rem;
+  }
+
+  .back-arrow-box {
+    margin-right: 0.4rem;
+  }
+
+  .media-chat-content {
+    max-width: 19.1rem;
+  }
+}
+
+@media screen and (max-width: 399px) {
+  .chat-pics {
+    max-width: 15rem;
+    max-height: 14rem;
+  }
+
+  .multi-chat-pics {
+    width: 6.5rem;
+    height: 5.5rem;
+  }
+
+  .more-media-box {
+    width: 6.5rem;
+    height: 5.5rem;
+  }
+
+  .more-media-box::after {
+    width: 6.5rem;
+    height: 5.5rem;
+  }
+
+  .owner-chat-content,
+  .others-chat-content,
+  .others-chat-content2 {
+    max-width: 100%;
+  }
+
+  .media-chat-content {
+    max-width: 16.1rem;
+  }
+
+  .back-arrow-box {
+    margin-right: 0.3rem;
+  }
+
+  .search-div {
+    padding: 0.5rem;
+  }
+
+  .chat-search-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .back-arrow {
+    width: 1.2rem;
+    height: 1.2rem;
+    color: gray;
+  }
+
+  .profile-img {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .chat-name {
+    font-size: 1rem;
+  }
+
+  .last-time-seen {
+    font-size: 0.8rem;
+  }
+  .chat-input-box {
+    margin-left: 0.8rem;
+  }
+}
+
+@media screen and (max-width: 329px) {
+  .profile-img {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .profile-img-box {
+    margin-right: 0.75rem;
+  }
+
+  .contact-head {
+    padding: 0.75rem 0.75rem;
+    padding-left: 0.25rem;
+  }
+
+  .back-arrow-box {
+    margin-right: 0.2rem;
+  }
+
+  .last-time-seen {
+    font-size: 0.75rem;
+  }
+
+  .chat-container {
+    padding: 1rem;
+    padding-top: 0;
+    padding-bottom: 2rem;
+  }
+}
+
+@media screen and (max-width: 299px) {
+  .chat-pics {
+    max-width: 13rem;
+    max-height: 12rem;
+  }
+
+  .media-chat-content {
+    max-width: 14.1rem;
+  }
+
+  .multi-chat-pics {
+    width: 5rem;
+    height: 4rem;
+  }
+
+  .more-media-box {
+    width: 5rem;
+    height: 4rem;
+  }
+
+  .more-media-box::after {
+    width: 5rem;
+    height: 4rem;
   }
 }
