@@ -13,7 +13,7 @@ import { TbClock } from 'react-icons/tb';
 import { FaSearch } from 'react-icons/fa';
 import { FaArrowLeft } from 'react-icons/fa6';
 
-const ChatBox = ({ emptyMode, chatMode }) => {
+const ChatBox = ({ emptyMode, chatMode, goBack }) => {
   const [height, setHeight] = useState(0);
   const messageRef = useRef();
   const headerRef = useRef();
@@ -28,7 +28,7 @@ const ChatBox = ({ emptyMode, chatMode }) => {
       }`}
     >
       <div className={styles['contact-head']}>
-        <span className={styles['back-arrow-box']}>
+        <span className={styles['back-arrow-box']} onClick={goBack}>
           <FaArrowLeft className={styles['back-arrow']} />
         </span>
         <figure className={styles['profile-img-box']}>

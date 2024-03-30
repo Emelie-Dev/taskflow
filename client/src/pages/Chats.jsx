@@ -70,6 +70,11 @@ const Chat = () => {
     }
   };
 
+  const goBack = () => {
+    setHideContacts(false);
+    setShowChats(false);
+  };
+
   return (
     <main className={styles.main}>
       <nav
@@ -540,9 +545,17 @@ const Chat = () => {
               and view the chat conversation.
             </p>
 
-            <PrivateChatContainer chatMode={chatMode} emptyMode={emptyMode} />
+            <PrivateChatContainer
+              chatMode={chatMode}
+              emptyMode={emptyMode}
+              goBack={goBack}
+            />
 
-            <GroupChatContainer chatMode={chatMode} emptyMode={emptyMode} />
+            <GroupChatContainer
+              chatMode={chatMode}
+              emptyMode={emptyMode}
+              goBack={goBack}
+            />
           </section>
         </section>
       </section>
