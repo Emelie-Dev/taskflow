@@ -84,7 +84,7 @@ const Dashboard = () => {
     scales: {
       x: {
         grid: {
-          display: false, // Remove x-axis grid lines
+          display: false, 
         },
         ticks: {
           padding: 15,
@@ -187,12 +187,14 @@ const Dashboard = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
-              <Link to={'/projects'} className={styles['side-nav-link']}>
+              <Link to={'/analytics'} className={styles['side-nav-link']}>
                 <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
                 Analytics
               </Link>
             </li>
-            <li className={`${styles['side-nav-item']} ${styles.notifications}`}>
+            <li
+              className={`${styles['side-nav-item']} ${styles.notifications}`}
+            >
               <Link to={'/projects'} className={styles['side-nav-link']}>
                 <IoIosNotifications className={styles['side-nav-icon']} />{' '}
                 Notifications
@@ -252,7 +254,7 @@ const Dashboard = () => {
             </Link>
           </li>
           <li className={styles['side-nav-item']}>
-            <Link to={'/projects'} className={styles['side-nav-link']}>
+            <Link to={'/analytics'} className={styles['side-nav-link']}>
               <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
               Analytics
             </Link>

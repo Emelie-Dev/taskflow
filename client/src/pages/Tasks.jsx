@@ -100,7 +100,7 @@ const Tasks = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
-              <Link to={'/projects'} className={styles['side-nav-link']}>
+              <Link to={'/analytics'} className={styles['side-nav-link']}>
                 <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
                 Analytics
               </Link>
@@ -168,7 +168,7 @@ const Tasks = () => {
             </Link>
           </li>
           <li className={styles['side-nav-item']}>
-            <Link to={'/projects'} className={styles['side-nav-link']}>
+            <Link to={'/analytics'} className={styles['side-nav-link']}>
               <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
               Analytics
             </Link>

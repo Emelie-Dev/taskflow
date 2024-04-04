@@ -157,7 +157,7 @@ const CalendarPage = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
-              <Link to={'/projects'} className={styles['side-nav-link']}>
+              <Link to={'/analytics'} className={styles['side-nav-link']}>
                 <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
                 Analytics
               </Link>
@@ -225,7 +225,7 @@ const CalendarPage = () => {
             </Link>
           </li>
           <li className={styles['side-nav-item']}>
-            <Link to={'/projects'} className={styles['side-nav-link']}>
+            <Link to={'/analytics'} className={styles['side-nav-link']}>
               <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
               Analytics
             </Link>
@@ -310,9 +310,10 @@ const CalendarPage = () => {
                   </button>
                 </h1>
                 <p className={styles['calendar-text']}>
-                  This displays task deadlines with color-coded priorities:{' '}
-                 red
-                  for  <span className={styles.red}>high</span>, yellow for  <span className={styles.yellow}>medium</span>, and green for  <span className={styles.green}>low</span>.
+                  This displays task deadlines with color-coded priorities: red
+                  for <span className={styles.red}>high</span>, yellow for{' '}
+                  <span className={styles.yellow}>medium</span>, and green for{' '}
+                  <span className={styles.green}>low</span>.
                 </p>
               </div>
               <div className={styles['today-btn-div']}>

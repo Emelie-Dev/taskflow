@@ -8,6 +8,7 @@ import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import CalendarPage from './pages/CalendarPage';
 import Chats from './pages/Chats';
+import Analytics from './pages/Analytics';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
       <Route path="/tasks" element={<Tasks />} />
       <Route path="/calendar" element={<CalendarPage />} />
       <Route path="/chats" element={<Chats />} />
+      <Route path="/analytics" element={<Analytics />} />
     </Routes>
   );
 };
