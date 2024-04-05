@@ -428,38 +428,40 @@ const Analytics = () => {
               </article>
             </div>
 
-            <div className={styles['project-graph-box']}>
-              <div className={styles['graph-head-box']}>
-                <span className={styles['graph-head']}>Projects Done</span>
-                <select
-                  className={styles['graph-select']}
-                  onChange={selectHandler}
-                >
-                  <option value={'year'}>Last Year</option>
-                  <option value={'month'}>Last Month</option>
-                  <option value={'week'}>Last Week</option>
-                  <option value={'date'}>Select Date</option>
-                </select>
-                <div
-                  className={`${styles['view-project-div']} ${
-                    showDate === false ? styles['hide-date-input'] : ''
-                  }`}
-                >
-                  <input
-                    className={styles['view-project-input']}
-                    type="month"
-                  />
-                  <button className={styles['view-project-btn']}>View</button>
+            <div className={styles['project-graph-container']}>
+              <div className={styles['project-graph-box']}>
+                <div className={styles['graph-head-box']}>
+                  <span className={styles['graph-head']}>Projects Done</span>
+                  <select
+                    className={styles['graph-select']}
+                    onChange={selectHandler}
+                  >
+                    <option value={'year'}>Last Year</option>
+                    <option value={'month'}>Last Month</option>
+                    <option value={'week'}>Last Week</option>
+                    <option value={'date'}>Select Date</option>
+                  </select>
+                  <div
+                    className={`${styles['view-project-div']} ${
+                      showDate === false ? styles['hide-date-input'] : ''
+                    }`}
+                  >
+                    <input
+                      className={styles['view-project-input']}
+                      type="month"
+                    />
+                    <button className={styles['view-project-btn']}>View</button>
+                  </div>
                 </div>
-              </div>
 
-              <Bar
-                className={`${styles['project-graph']} ${
-                  addPadding() ? styles['add-padding'] : ''
-                }`}
-                data={lineData}
-                options={lineOptions}
-              />
+                <Bar
+                  className={`${styles['project-graph']} ${
+                    addPadding() ? styles['add-padding'] : ''
+                  }`}
+                  data={lineData}
+                  options={lineOptions}
+                />
+              </div>
             </div>
           </section>
 

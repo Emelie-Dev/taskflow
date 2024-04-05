@@ -430,12 +430,16 @@
   height: 3.5rem;
 }
 
+.project-graph-container {
+  width: 50%;
+}
+
 .project-graph-box {
   display: flex;
   flex-direction: column;
   /* width: 34rem; */
   padding: 1.5rem 1rem;
-  width: 50%;
+  width: 100%;
 }
 
 .bottom-section {
@@ -752,7 +756,7 @@
     align-items: flex-start;
   }
 
-  .project-graph-box {
+  .project-graph-box, .project-graph-container {
     width: 100%;
   }
 
@@ -865,6 +869,14 @@
   }
   .search {
     width: 13rem;
+  }
+
+  .project-graph-container {
+    overflow: auto;
+  }
+
+  .project-graph-box {
+    width: 150%;
   }
 }
 
