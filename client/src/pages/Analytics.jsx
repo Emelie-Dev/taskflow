@@ -41,6 +41,7 @@ ChartJS.register(
 const Analytics = () => {
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
+  const [showDate, setShowDate] = useState(false);
 
   const searchRef = useRef();
   const navRef = useRef();
@@ -77,7 +78,7 @@ const Analytics = () => {
     datasets: [
       {
         label: '',
-        data: [50, 37, 73, 29, 58, 23, 65, 78, 67, 12, 23, 68],
+        data: [50, 37, 73, 29, 58, 23, 65, 78, 67, 12, 23, 54],
         backgroundColor: 'rgba(255,165,0,1)',
         borderColor: 'rgba(255, 165, 0, 1)',
         borderWidth: 1,
@@ -144,7 +145,7 @@ const Analytics = () => {
     labels: ['Red', 'Blue', 'Yellow'],
     datasets: [
       {
-        label: 'My First Dataset',
+        label: 'Tasks Category',
         data: [34, 56, 27], // Data values for each segment
         backgroundColor: [
           // Background colors for each segment
@@ -164,6 +165,16 @@ const Analytics = () => {
         display: false,
       },
     },
+  };
+
+  const selectHandler = (e) => {
+    const value = `${e.target.value}`;
+
+    value === 'date' ? setShowDate(true) : setShowDate(false);
+  };
+
+  const addPadding = () => {
+    return showDate && matchMedia('(max-width: 1250px)').matches;
   };
 
   return (
@@ -417,15 +428,32 @@ const Analytics = () => {
             <div className={styles['project-graph-box']}>
               <div className={styles['graph-head-box']}>
                 <span className={styles['graph-head']}>Projects Done</span>
-                <select className={styles['graph-select']}>
+                <select
+                  className={styles['graph-select']}
+                  onChange={selectHandler}
+                >
                   <option value={'year'}>Last Year</option>
                   <option value={'month'}>Last Month</option>
                   <option value={'week'}>Last Week</option>
                   <option value={'date'}>Select Date</option>
                 </select>
+                <div
+                  className={`${styles['view-project-div']} ${
+                    showDate === false ? styles['hide-date-input'] : ''
+                  }`}
+                >
+                  <input
+                    className={styles['view-project-input']}
+                    type="month"
+                  />
+                  <button className={styles['view-project-btn']}>View</button>
+                </div>
               </div>
+
               <Bar
-                className={styles['project-graph']}
+                className={`${styles['project-graph']} ${
+                  addPadding() ? styles['add-padding'] : ''
+                }`}
                 data={lineData}
                 options={lineOptions}
               />
