@@ -758,7 +758,7 @@
 
   .category-div {
     grid-template-columns: auto auto;
-    padding: 2rem 1.5rem;
+    padding: 2rem 1.5rem 2.5rem;
     justify-content: stretch;
     width: 100%;
   }
@@ -771,7 +771,10 @@
 
   .project-graph-box {
     padding: 0rem 2rem;
-    /* width: 90%; */
+  }
+
+  .project-graph {
+    padding: 0 1rem;
   }
   .rate-icon,
   .rate-icon-inverse {
@@ -787,12 +790,32 @@
 
   .tasks-area-box {
     width: 100%;
-    padding: 1.5rem;
+    padding: 2.5rem 2rem 0;
+  }
+
+  .tasks-area-graph {
+    padding: 0 1rem;
   }
 
   .pie-chart-container {
     width: 100%;
-    padding: 1.5rem;
+    padding: 3rem 2rem 1rem;
+  }
+
+  .pie-chart-div {
+    padding: 0 0.5rem;
+  }
+
+  .task-category-item {
+    margin-bottom: 2rem;
+  }
+
+  .pie-chart-box {
+    width: 32%;
+  }
+
+  .view-project-div {
+    position: static;
   }
 }
 
@@ -807,6 +830,10 @@
   .search {
     width: 18rem;
   }
+
+  .pie-chart-box {
+    width: 35%;
+  }
 }
 
 @media screen and (max-width: 699px) {
@@ -815,6 +842,20 @@
   }
   .profile-box {
     display: none;
+  }
+
+  .project-graph {
+    padding: 0;
+  }
+  .tasks-area-graph {
+    padding: 0;
+  }
+  .pie-chart-div {
+    padding: 0;
+  }
+
+  .pie-chart-box {
+    width: 40%;
   }
 }
 

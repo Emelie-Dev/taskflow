@@ -174,7 +174,10 @@ const Analytics = () => {
   };
 
   const addPadding = () => {
-    return showDate && matchMedia('(max-width: 1250px)').matches;
+    return (
+      showDate &&
+      matchMedia('(max-width: 1250px) and (min-width:900px)').matches
+    );
   };
 
   return (
