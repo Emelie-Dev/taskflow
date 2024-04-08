@@ -114,7 +114,7 @@ const Tasks = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
-              <Link to={'/projects'} className={styles['side-nav-link']}>
+              <Link to={'/settings'} className={styles['side-nav-link']}>
                 <IoSettingsOutline className={styles['side-nav-icon']} />{' '}
                 Settings
               </Link>
@@ -174,7 +174,7 @@ const Tasks = () => {
             </Link>
           </li>
           <li className={styles['side-nav-item']}>
-            <Link to={'/projects'} className={styles['side-nav-link']}>
+            <Link to={'/settings'} className={styles['side-nav-link']}>
               <IoSettingsOutline className={styles['side-nav-icon']} /> Settings
             </Link>
           </li>

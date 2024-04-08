@@ -1,0 +1,67 @@
+.section {
+  margin-left: 25vw;
+  overflow: auto;
+  overflow-x: hidden;
+  padding: 2rem 1.5rem 2.5rem;
+}
+
+.section-head {
+  font-family: var(--general-font);
+  font-size: 1.3rem;
+}
+
+.list {
+  list-style-type: none;
+  margin-top: 2.5rem;
+  padding: 0 1rem;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--general-font);
+  align-items: flex-start;
+  margin-bottom: 3rem;
+}
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-head {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.item-text {
+  margin-top: 0.5rem;
+  color: gray;
+  font-weight: 600;
+  font-size: 1.03rem;
+}
+
+.item-checkbox {
+  cursor: pointer;
+  accent-color: orange;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-left: 2rem;
+}
+
+.save-btn {
+  outline: none;
+  border: 2px solid orange;
+  background: orange;
+  color: white;
+  padding: 0.4rem 0.6rem;
+  font-family: var(--general-font);
+  border-radius: 5px;
+  font-size: 1.01rem;
+  cursor: pointer;
+  margin-left: 1rem;
+}
+
+.save-btn:hover {
+  box-shadow: inset 1px 1px 4px -1px black;
+}
