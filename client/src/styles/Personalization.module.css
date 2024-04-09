@@ -8,4 +8,135 @@
 .section-head {
   font-family: var(--general-font);
   font-size: 1.3rem;
+  margin-bottom: 2rem;
+}
+
+.option-div {
+  margin-top: 2rem;
+}
+
+.option-head {
+  font-family: var(--general-font);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.theme-container {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.img-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-right: 2rem;
+  position: relative;
+}
+
+.theme-img {
+  width: 9rem;
+  height: 7rem;
+  border-radius: 20px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid gray;
+}
+
+.theme-type {
+  font-family: var(--general-font);
+  color: gray;
+  font-weight: 700;
+  font-size: 1.02rem;
+  margin-top: 1rem;
+}
+
+.current-theme {
+  border: 2px solid orange;
+}
+
+.radio {
+  width: 1.5rem;
+  height: 1.5rem;
+  accent-color: orange;
+  position: absolute;
+  bottom: 32%;
+  right: 7%;
+  outline: none;
+}
+
+.view-div,
+.color-div {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.view-box,
+.color-box {
+  display: flex;
+  align-items: center;
+  font-family: var(--general-font);
+  font-weight: 700;
+  color: gray;
+  margin-bottom: 0.5rem;
+}
+
+.color-box {
+  margin-bottom: 1rem;
+}
+
+.view-box:nth-child(2),
+.color-box:nth-child(3) {
+  margin-bottom: 0;
+}
+
+.view-radio {
+  width: 1rem;
+  height: 1rem;
+  accent-color: orange;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.color-input {
+  margin-left: 1rem;
+  width: 3rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+
+.fields-div {
+  margin-top: 1.5rem;
+}
+
+.field-input {
+  outline: none;
+  font-weight: 600;
+  padding: 0.4rem;
+  border-radius: 5px;
+  border: 2px solid orange;
+  width: 8rem;
+  font-size: 1.02rem;
+  margin-right: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.add-btn {
+  border: none;
+  outline: none;
+  padding: 0.5rem 0.7rem;
+  background: orange;
+  color: white;
+  font-size: 1.01rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  box-shadow: inset 1px 1px 4px -1px black;
 }
