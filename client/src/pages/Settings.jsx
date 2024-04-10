@@ -241,14 +241,21 @@ const Settings = () => {
         <section className={styles['section-content']}>
           <div className={styles['settings-category']}>
             <figure className={styles['profile-img-box']}>
-              <span className={styles['change-img-box']} onClick={changeImage}>
-                <MdModeEditOutline className={styles['change-img-icon']} />
-              </span>
               <input type="file" ref={fileRef} className={styles['file-btn']} />
-              <img
-                className={styles['profile-pics']}
-                src="../../assets/images/download.jpeg"
-              />
+
+              <span className={styles['img-box']}>
+                <span
+                  className={styles['change-img-box']}
+                  onClick={changeImage}
+                >
+                  <MdModeEditOutline className={styles['change-img-icon']} />
+                </span>
+                <img
+                  className={styles['profile-pics']}
+                  src="../../assets/images/download.jpeg"
+                />
+              </span>
+
               <figcaption className={styles['profile-img-caption']}>
                 <span className={styles['username']}>Ofoka Vincent</span>
                 <span className={styles['user-title']}>Web Developer</span>

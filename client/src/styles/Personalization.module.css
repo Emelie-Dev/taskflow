@@ -253,3 +253,29 @@
   opacity: 1;
   pointer-events: all;
 }
+
+/* Media Queries */
+
+@media screen and (max-width: 1099px) {
+  .section {
+    margin-left: 30vw;
+  }
+}
+
+@media screen and (max-width: 899px) {
+  .section {
+    margin-left: 35vw;
+  }
+
+  .theme-img {
+    width: 8rem;
+    height: 6rem;
+  }
+}
+
+@media screen and (max-width: 799px) {
+  .section {
+    margin-left: 0;
+    display: none;
+  }
+}
