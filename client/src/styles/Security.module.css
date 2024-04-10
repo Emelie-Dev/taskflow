@@ -1,0 +1,12 @@
+.section {
+  margin-left: 25vw;
+  overflow: auto;
+  overflow-x: hidden;
+  padding: 2rem 1.5rem 2.5rem;
+}
+
+.section-head {
+  font-family: var(--general-font);
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+}

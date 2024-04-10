@@ -1,7 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '../styles/NotificationSettings.module.css';
 
+const initialData = {
+  assignment: true,
+  tActivity: true,
+  deadline: true,
+  pActivity: true,
+  email: true,
+};
+
 const NotificationSettings = () => {
+  const [data, setData] = useState({
+    assignment: true,
+    tActivity: true,
+    deadline: true,
+    pActivity: true,
+    email: true,
+  });
+
+  const [enableBtn, setEnableBtn] = useState(false);
+
+  useEffect(() => {
+    let count = 0;
+
+    for (let prop in data) {
+      data[prop] === initialData[prop] && count++;
+    }
+
+    count !== 5 ? setEnableBtn(true) : setEnableBtn(false);
+  }, [data]);
+
+  const changeHandler = (e, prop) => {
+    const newObj = { ...data, [prop]: e.target.checked };
+    setData(newObj);
+  };
+
+  const resetData = () => {
+    setData(initialData);
+  };
+
+  const { assignment, tActivity, deadline, pActivity, email } = data;
+
   return (
     <section className={styles.section}>
       <h1 className={styles['section-head']}>Notifications</h1>
@@ -14,7 +53,12 @@ const NotificationSettings = () => {
               Enables you to receive notifications when assigned a new task.
             </span>
           </span>
-          <input type="checkbox" className={styles['item-checkbox']} />
+          <input
+            type="checkbox"
+            className={styles['item-checkbox']}
+            checked={assignment}
+            onChange={() => changeHandler(event, 'assignment')}
+          />
         </li>
 
         <li className={styles['list-item']}>
@@ -25,7 +69,12 @@ const NotificationSettings = () => {
               various actions related to tasks.
             </span>
           </span>
-          <input type="checkbox" className={styles['item-checkbox']} />
+          <input
+            type="checkbox"
+            className={styles['item-checkbox']}
+            checked={tActivity}
+            onChange={() => changeHandler(event, 'tActivity')}
+          />
         </li>
 
         <li className={styles['list-item']}>
@@ -36,7 +85,12 @@ const NotificationSettings = () => {
               the deadline of tasks.
             </span>
           </span>
-          <input type="checkbox" className={styles['item-checkbox']} />
+          <input
+            type="checkbox"
+            className={styles['item-checkbox']}
+            checked={deadline}
+            onChange={() => changeHandler(event, 'deadline')}
+          />
         </li>
 
         <li className={styles['list-item']}>
@@ -47,7 +101,12 @@ const NotificationSettings = () => {
               projects.
             </span>
           </span>
-          <input type="checkbox" className={styles['item-checkbox']} />
+          <input
+            type="checkbox"
+            className={styles['item-checkbox']}
+            checked={pActivity}
+            onChange={() => changeHandler(event, 'pActivity')}
+          />
         </li>
 
         <li className={styles['list-item']}>
@@ -57,11 +116,30 @@ const NotificationSettings = () => {
               Important notifications will be sent to your email address.
             </span>
           </span>
-          <input type="checkbox" className={styles['item-checkbox']} />
+          <input
+            type="checkbox"
+            className={styles['item-checkbox']}
+            checked={email}
+            onChange={() => changeHandler(event, 'email')}
+          />
         </li>
       </ul>
 
-      <button className={styles['save-btn']}>Save</button>
+      <button
+        className={`${styles['save-btn']} ${
+          enableBtn ? styles['enable-btn'] : ''
+        }`}
+      >
+        Save Changes
+      </button>
+      <button
+        className={`${styles['reset-btn']} ${
+          enableBtn ? styles['enable-btn'] : ''
+        }`}
+        onClick={resetData}
+      >
+        Reset
+      </button>
     </section>
   );
 };

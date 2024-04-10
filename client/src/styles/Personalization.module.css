@@ -46,6 +46,10 @@
   border: 2px solid gray;
 }
 
+.theme-img:hover {
+  box-shadow: 1px 1px 8px -3px black;
+}
+
 .theme-type {
   font-family: var(--general-font);
   color: gray;
@@ -58,6 +62,10 @@
   border: 2px solid orange;
 }
 
+.current-theme:hover {
+  box-shadow: none;
+}
+
 .radio {
   width: 1.5rem;
   height: 1.5rem;
@@ -66,6 +74,11 @@
   bottom: 32%;
   right: 7%;
   outline: none;
+  display: none;
+}
+
+.show-theme-radio {
+  display: block;
 }
 
 .view-div,
@@ -111,7 +124,7 @@
 }
 
 .fields-div {
-  margin-top: 1.5rem;
+  margin-top: 1.7rem;
 }
 
 .field-input {
@@ -122,8 +135,19 @@
   border: 2px solid orange;
   width: 8rem;
   font-size: 1.02rem;
-  margin-right: 0.8rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.new-field-input {
+  outline: none;
+  font-weight: 600;
+  padding: 0.4rem;
+  border-radius: 5px;
+  border: 2px solid orange;
+  width: 8rem;
+  font-size: 1.02rem;
+  margin-bottom: 0.7rem;
+  margin-right: 1rem;
 }
 
 .add-btn {
@@ -139,4 +163,93 @@
 
 .add-btn:hover {
   box-shadow: inset 1px 1px 4px -1px black;
+}
+
+.save-btn {
+  outline: none;
+  border: 2px solid orange;
+  background: orange;
+  color: white;
+  padding: 0.4rem 0.6rem;
+  font-family: var(--general-font);
+  border-radius: 5px;
+  font-size: 1.01rem;
+  cursor: pointer;
+  margin-top: 2rem;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.save-btn:hover {
+  box-shadow: inset 1px 1px 4px -1px black;
+}
+
+.description {
+  font-family: var(--general-font);
+  color: gray;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+.input-box {
+  position: relative;
+  margin-right: 1rem;
+}
+
+.remove-box {
+  position: absolute;
+  top: -100%;
+  right: -5%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0.3rem;
+  cursor: pointer;
+  box-shadow: 1px 1px 8px -4px black;
+  transition: background 0.2s;
+}
+
+.remove-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.remove-box:hover {
+  background: #dcdcdc;
+}
+
+.hide-new-field {
+  display: none;
+}
+
+.disable-btn {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.reset-btn {
+  outline: none;
+  border: 2px solid orange;
+  background: white;
+  color: orange;
+  padding: 0.4rem 0.6rem;
+  font-family: var(--general-font);
+  border-radius: 5px;
+  font-size: 1.01rem;
+  cursor: pointer;
+  margin-left: 1rem;
+  pointer-events: none;
+  opacity: 0.6;
+  margin-top: 2rem;
+}
+
+.save-btn:hover,
+.reset-btn:hover {
+  box-shadow: inset 1px 1px 4px -1px black;
+}
+
+.enable-btn {
+  opacity: 1;
+  pointer-events: all;
 }

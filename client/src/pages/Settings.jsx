@@ -19,6 +19,7 @@ import { IoColorPaletteSharp } from 'react-icons/io5';
 import GeneralInfo from '../components/GeneralInfo';
 import NotificationSettings from '../components/NotificationSettings';
 import Personalization from '../components/Personalization';
+import Security from '../components/Security';
 
 const Settings = () => {
   const [searchText, setSearchText] = useState('');
@@ -304,6 +305,8 @@ const Settings = () => {
           {category === 'notifications' && <NotificationSettings />}
 
           {category === 'personalization' && <Personalization />}
+
+          {category === 'security' && <Security />}
         </section>
       </section>
     </main>

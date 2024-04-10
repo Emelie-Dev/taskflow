@@ -21,7 +21,7 @@
   justify-content: space-between;
   font-family: var(--general-font);
   align-items: flex-start;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .item-details {
@@ -47,6 +47,7 @@
   width: 1.2rem;
   height: 1.2rem;
   margin-left: 2rem;
+  flex-shrink: 0;
 }
 
 .save-btn {
@@ -60,8 +61,31 @@
   font-size: 1.01rem;
   cursor: pointer;
   margin-left: 1rem;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
-.save-btn:hover {
+.reset-btn {
+  outline: none;
+  border: 2px solid orange;
+  background: white;
+  color: orange;
+  padding: 0.4rem 0.6rem;
+  font-family: var(--general-font);
+  border-radius: 5px;
+  font-size: 1.01rem;
+  cursor: pointer;
+  margin-left: 1rem;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.save-btn:hover,
+.reset-btn:hover {
   box-shadow: inset 1px 1px 4px -1px black;
+}
+
+.enable-btn {
+  opacity: 1;
+  pointer-events: all;
 }
