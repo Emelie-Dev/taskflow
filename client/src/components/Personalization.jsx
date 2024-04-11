@@ -183,7 +183,9 @@ const Personalization = () => {
           </span>
         </div>
       </div>
-      <div className={styles['option-div']}>
+      <div
+        className={`${styles['option-div']} ${styles['project-div-container']}`}
+      >
         <span className={styles['option-head']}>Default project view</span>
 
         <div className={styles['view-div']}>

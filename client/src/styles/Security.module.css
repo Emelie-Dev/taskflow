@@ -148,7 +148,6 @@
 
 .delete-btn {
   width: 50%;
-  margin-right: 5rem;
   outline: none;
   border: 2px solid red;
   color: white;
@@ -173,6 +172,7 @@
   font-size: 1.05rem;
   cursor: pointer;
   transition: box-shadow 0.2s;
+  margin-right: 5rem;
 }
 
 .delete-btn:hover,
@@ -228,7 +228,11 @@
   }
 
   .password {
-    width: 22rem;
+    width: 90%;
+  }
+
+  .input-box {
+    width: 100%;
   }
 
   .password-box {
@@ -244,6 +248,75 @@
 @media screen and (max-width: 799px) {
   .section {
     margin-left: 0;
-   
+  }
+
+  .password-box {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .password {
+    width: 18.5rem;
+  }
+
+  .input-box:nth-child(1) {
+    margin-bottom: 0;
+  }
+}
+
+@media screen and (max-width: 699px) {
+  .password {
+    width: 15.5rem;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .password {
+    width: 90%;
+  }
+
+  .password-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .input-box {
+    width: 100%;
+  }
+
+  .input-box:nth-child(1) {
+    margin-bottom: 1rem;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  .password {
+    width: 100%;
+  }
+
+  .btn-div {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .deactivate-btn {
+    margin-bottom: 1.2rem;
+    margin-right: 0;
+  }
+
+  .delete-btn,
+  .deactivate-btn {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 329px) {
+  .section {
+    padding: 2rem 1rem 2.5rem;
+  }
+
+  .content-container {
+    padding: 1rem 1rem 1.5rem;
   }
 }

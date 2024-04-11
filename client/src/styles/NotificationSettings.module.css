@@ -106,6 +106,10 @@
   .list {
     padding: 0;
   }
+
+  .save-btn {
+    margin-left: 0;
+  }
 }
 
 @media screen and (max-width: 799px) {
@@ -115,5 +119,34 @@
 
   .list {
     padding: 0 1rem;
+  }
+
+  .save-btn {
+    margin-left: 1rem;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .list {
+    padding: 0;
+  }
+
+  .save-btn {
+    margin-left: 0;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  .item-checkbox {
+    margin-left: 1rem;
+  }
+}
+
+@media screen and (max-width: 329px) {
+  .section {
+    padding: 2rem 1rem 2.5rem;
+  }
+  .item-checkbox {
+    margin-left: 0.6rem;
   }
 }

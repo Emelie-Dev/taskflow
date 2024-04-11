@@ -94,7 +94,10 @@ const Settings = () => {
               className={`${styles['category-item']} ${
                 category === 'general' ? styles['current-category-item'] : ''
               }`}
-              onClick={() => setCategory('general')}
+              onClick={() => {
+                setCategory('general');
+                setDisplayCategory(false);
+              }}
             >
               <CgProfile className={styles['category-icon']} /> General
               Information
@@ -106,7 +109,10 @@ const Settings = () => {
                   ? styles['current-category-item']
                   : ''
               }`}
-              onClick={() => setCategory('notifications')}
+              onClick={() => {
+                setCategory('notifications');
+                setDisplayCategory(false);
+              }}
             >
               <IoIosNotifications className={styles['category-icon']} />{' '}
               Notifications
@@ -117,7 +123,10 @@ const Settings = () => {
                   ? styles['current-category-item']
                   : ''
               }`}
-              onClick={() => setCategory('personalization')}
+              onClick={() => {
+                setCategory('personalization');
+                setDisplayCategory(false);
+              }}
             >
               <IoColorPaletteSharp className={styles['category-icon']} />{' '}
               Personalization
@@ -126,7 +135,10 @@ const Settings = () => {
               className={`${styles['category-item']} ${
                 category === 'security' ? styles['current-category-item'] : ''
               }`}
-              onClick={() => setCategory('security')}
+              onClick={() => {
+                setCategory('security');
+                setDisplayCategory(false);
+              }}
             >
               <MdOutlineSecurity className={styles['category-icon']} /> Security
             </li>

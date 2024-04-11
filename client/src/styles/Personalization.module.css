@@ -276,10 +276,52 @@
 @media screen and (max-width: 799px) {
   .section {
     margin-left: 0;
+    padding: 2rem 2rem 2.5rem;
   }
 
   .theme-img {
     width: 9rem;
     height: 7rem;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .section {
+    padding: 2rem 1.5rem 2.5rem;
+  }
+
+  .theme-container {
+    flex-wrap: wrap;
+  }
+
+  .img-box {
+    margin-bottom: 2rem;
+  }
+
+  .project-div-container {
+    margin-top: 0;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  .theme-img {
+    width: 8.5rem;
+    height: 7rem;
+  }
+}
+
+@media screen and (max-width: 399px) {
+  .section {
+    padding: 2rem 1.5rem 2.5rem;
+    padding-right: 1rem;
+  }
+
+  .theme-img {
+    width: 8rem;
+    height: 6.5rem;
+  }
+
+  .img-box {
+    margin-right: 1rem;
   }
 }

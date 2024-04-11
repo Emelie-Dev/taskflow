@@ -146,8 +146,8 @@ const Security = () => {
       </button>
 
       <div className={styles['btn-div']}>
-        <button className={styles['delete-btn']}>Delete Account</button>
         <button className={styles['deactivate-btn']}>Deactivate Account</button>
+        <button className={styles['delete-btn']}>Delete Account</button>
       </div>
     </section>
   );
