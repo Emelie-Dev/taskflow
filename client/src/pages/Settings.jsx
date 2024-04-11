@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Settings.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -20,11 +20,13 @@ import GeneralInfo from '../components/GeneralInfo';
 import NotificationSettings from '../components/NotificationSettings';
 import Personalization from '../components/Personalization';
 import Security from '../components/Security';
+import { AiOutlineMenuFold } from 'react-icons/ai';
 
 const Settings = () => {
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [category, setCategory] = useState('general');
+  const [displayCategory, setDisplayCategory] = useState(false);
 
   const searchRef = useRef();
   const navRef = useRef();
@@ -48,8 +50,90 @@ const Settings = () => {
     fileRef.current.click();
   };
 
+  const hideResponsiveSettings = (e) => {
+    e.target === e.currentTarget && setDisplayCategory(false);
+  };
+
   return (
     <main className={styles.main}>
+      <section
+        className={`${styles['responsive-settings']} ${
+          displayCategory ? styles['show-responsive-settings'] : ''
+        }`}
+        onClick={hideResponsiveSettings}
+      >
+        <div className={styles['responsive-settings-category']}>
+          <span
+            className={styles['close-responsive-settings']}
+            onClick={() => setDisplayCategory(false)}
+          >
+            <IoMdClose className={styles['close-responsive-icon']} />
+          </span>
+
+          <figure className={styles['profile-img-box']}>
+            <input type="file" ref={fileRef} className={styles['file-btn']} />
+
+            <span className={styles['img-box']}>
+              <span className={styles['change-img-box']} onClick={changeImage}>
+                <MdModeEditOutline className={styles['change-img-icon']} />
+              </span>
+              <img
+                className={styles['profile-pics']}
+                src="../../assets/images/download.jpeg"
+              />
+            </span>
+
+            <figcaption className={styles['profile-img-caption']}>
+              <span className={styles['username']}>Ofoka Vincent</span>
+              <span className={styles['user-title']}>Web Developer</span>
+            </figcaption>
+          </figure>
+
+          <ul className={styles['category-list']}>
+            <li
+              className={`${styles['category-item']} ${
+                category === 'general' ? styles['current-category-item'] : ''
+              }`}
+              onClick={() => setCategory('general')}
+            >
+              <CgProfile className={styles['category-icon']} /> General
+              Information
+            </li>
+
+            <li
+              className={`${styles['category-item']} ${
+                category === 'notifications'
+                  ? styles['current-category-item']
+                  : ''
+              }`}
+              onClick={() => setCategory('notifications')}
+            >
+              <IoIosNotifications className={styles['category-icon']} />{' '}
+              Notifications
+            </li>
+            <li
+              className={`${styles['category-item']} ${
+                category === 'personalization'
+                  ? styles['current-category-item']
+                  : ''
+              }`}
+              onClick={() => setCategory('personalization')}
+            >
+              <IoColorPaletteSharp className={styles['category-icon']} />{' '}
+              Personalization
+            </li>
+            <li
+              className={`${styles['category-item']} ${
+                category === 'security' ? styles['current-category-item'] : ''
+              }`}
+              onClick={() => setCategory('security')}
+            >
+              <MdOutlineSecurity className={styles['category-icon']} /> Security
+            </li>
+          </ul>
+        </div>
+      </section>
+
       <nav
         ref={navRef}
         className={`${styles['responsive-nav']} ${
@@ -307,6 +391,10 @@ const Settings = () => {
             </ul>
           </div>
 
+          <AiOutlineMenuFold
+            className={styles['settings-menu-icon']}
+            onClick={() => setDisplayCategory(true)}
+          />
           {category === 'general' && <GeneralInfo />}
 
           {category === 'notifications' && <NotificationSettings />}
