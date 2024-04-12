@@ -130,6 +130,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .profile-picture {
@@ -795,6 +796,52 @@
 
 .notifications {
   display: none;
+}
+
+.user-profile-box {
+  position: absolute;
+  background: white;
+  list-style-type: none;
+  left: -220%;
+  top: 120%;
+  white-space: nowrap;
+  box-shadow: 1px 1px 10px -4px black;
+  border-radius: 5px;
+  display: none;
+}
+
+.user-profile-item {
+  font-family: var(--general-font);
+  padding: 0.6rem 1rem;
+  padding-right: 2rem;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.user-profile-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+.user-profile-item:nth-child(1) {
+  border-radius: 5px 5px 0 0;
+}
+
+.user-profile-item:nth-child(2) {
+  border-radius: 0 0 5px 5px;
+}
+
+.user-profile-item:hover {
+  background: orange;
+  color: white;
+}
+
+.show-user-box {
+  display: block;
 }
 
 /* Animations */

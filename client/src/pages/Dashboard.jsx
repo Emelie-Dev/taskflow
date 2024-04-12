@@ -12,12 +12,12 @@ import {
   IoIosNotifications,
 } from 'react-icons/io';
 
-import { HiPlus } from 'react-icons/hi';
+import { HiPlus, HiOutlineLogout } from 'react-icons/hi';
 import { HiMiniArrowTrendingUp } from 'react-icons/hi2';
 import { ImBrightnessContrast } from 'react-icons/im';
 import { Line } from 'react-chartjs-2';
 
-import { FaRegClock } from 'react-icons/fa6';
+import { FaRegClock, FaRegCircleUser } from 'react-icons/fa6';
 import { MdOutlineDashboard } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
@@ -53,9 +53,34 @@ const Dashboard = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [showNav, setShowNav] = useState(false);
+  const [showUserBox, setShowUserBox] = useState(false);
   const searchRef = useRef();
   const calenderRef = useRef();
   const navRef = useRef();
+  const userBoxRef = useRef();
+  const imgRef = useRef();
+
+  useEffect(() => {
+    const handleUserBox = (e) => {
+      if (showUserBox) {
+        if (
+          e.target === imgRef.current ||
+          e.target === userBoxRef.current ||
+          userBoxRef.current.contains(e.target)
+        ) {
+          return;
+        } else {
+          setShowUserBox(false);
+        }
+      }
+    };
+
+    window.addEventListener('click', handleUserBox);
+
+    return () => {
+      window.removeEventListener('click', handleUserBox);
+    };
+  }, [showUserBox]);
 
   const handleSearchText = (e) => {
     setSearchText(e.target.value);
@@ -84,7 +109,7 @@ const Dashboard = () => {
     scales: {
       x: {
         grid: {
-          display: false, 
+          display: false,
         },
         ticks: {
           padding: 15,
@@ -318,7 +343,26 @@ const Dashboard = () => {
               <img
                 className={styles['profile-picture']}
                 src="../../assets/images/download.jpeg"
+                ref={imgRef}
+                onClick={() => setShowUserBox(true)}
               />
+
+              <ul
+                className={`${styles['user-profile-box']} ${
+                  showUserBox ? styles['show-user-box'] : ''
+                }`}
+                ref={userBoxRef}
+              >
+                <li className={styles['user-profile-item']}>
+                  {' '}
+                  <FaRegCircleUser className={styles['user-profile-icon']} />
+                  My Profile
+                </li>
+                <li className={styles['user-profile-item']}>
+                  <HiOutlineLogout className={styles['user-profile-icon']} />
+                  Log out
+                </li>
+              </ul>
             </figure>
           </div>
         </header>

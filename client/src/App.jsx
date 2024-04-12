@@ -10,6 +10,7 @@ import CalendarPage from './pages/CalendarPage';
 import Chats from './pages/Chats';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 
 const App = () => {
   return (
@@ -18,13 +19,14 @@ const App = () => {
       <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path={`/dashboard`} element={<Dashboard />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/projects" element={<Projects />} />
       <Route path="/tasks" element={<Tasks />} />
       <Route path="/calendar" element={<CalendarPage />} />
       <Route path="/chats" element={<Chats />} />
       <Route path="/analytics" element={<Analytics />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/profile" element={<Profile />} />
     </Routes>
   );
 };
