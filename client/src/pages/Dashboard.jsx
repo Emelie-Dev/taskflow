@@ -25,6 +25,7 @@ import Calendar from '../components/Calendar';
 import { MdOutlineSegment } from 'react-icons/md';
 import { FaSearch } from 'react-icons/fa';
 
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -45,8 +46,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-// alert(window.innerWidth)
 
 const Dashboard = () => {
   const [searchText, setSearchText] = useState('');
@@ -226,6 +225,11 @@ const Dashboard = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
+              <Link to={'/profile'} className={styles['side-nav-link']}>
+                <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
+              </Link>
+            </li>
+            <li className={styles['side-nav-item']}>
               <Link to={'/settings'} className={styles['side-nav-link']}>
                 <IoSettingsOutline className={styles['side-nav-icon']} />{' '}
                 Settings
@@ -282,6 +286,11 @@ const Dashboard = () => {
             <Link to={'/analytics'} className={styles['side-nav-link']}>
               <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
               Analytics
+            </Link>
+          </li>
+          <li className={styles['side-nav-item']}>
+            <Link to={'/profile'} className={styles['side-nav-link']}>
+              <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
             </Link>
           </li>
           <li className={styles['side-nav-item']}>

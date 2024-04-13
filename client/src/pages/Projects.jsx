@@ -25,6 +25,7 @@ import { HiPlus } from 'react-icons/hi';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { FaRegDotCircle } from 'react-icons/fa';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import { FaRegCircleUser } from 'react-icons/fa6';
 
 const Projects = () => {
   const [searchText, setSearchText] = useState('');
@@ -143,6 +144,11 @@ const Projects = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
+              <Link to={'/profile'} className={styles['side-nav-link']}>
+                <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
+              </Link>
+            </li>
+            <li className={styles['side-nav-item']}>
               <Link to={'/settings'} className={styles['side-nav-link']}>
                 <IoSettingsOutline className={styles['side-nav-icon']} />{' '}
                 Settings
@@ -200,6 +206,11 @@ const Projects = () => {
             <Link to={'/analytics'} className={styles['side-nav-link']}>
               <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
               Analytics
+            </Link>
+          </li>
+          <li className={styles['side-nav-item']}>
+            <Link to={'/profile'} className={styles['side-nav-link']}>
+              <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
             </Link>
           </li>
           <li className={styles['side-nav-item']}>

@@ -15,6 +15,7 @@ import { IoCheckmarkDoneSharp } from 'react-icons/io5';
 import { BsClock } from 'react-icons/bs';
 import PrivateChatContainer from '../components/PrivateChatContainer';
 import GroupChatContainer from '../components/GroupChatContainer';
+import { FaRegCircleUser } from 'react-icons/fa6';
 
 const Chat = () => {
   const [searchText, setSearchText] = useState('');
@@ -143,6 +144,11 @@ const Chat = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
+              <Link to={'/profile'} className={styles['side-nav-link']}>
+                <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
+              </Link>
+            </li>
+            <li className={styles['side-nav-item']}>
               <Link to={'/settings'} className={styles['side-nav-link']}>
                 <IoSettingsOutline className={styles['side-nav-icon']} />{' '}
                 Settings
@@ -200,6 +206,11 @@ const Chat = () => {
             <Link to={'/analytics'} className={styles['side-nav-link']}>
               <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
               Analytics
+            </Link>
+          </li>
+          <li className={styles['side-nav-item']}>
+            <Link to={'/profile'} className={styles['side-nav-link']}>
+              <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
             </Link>
           </li>
           <li className={styles['side-nav-item']}>

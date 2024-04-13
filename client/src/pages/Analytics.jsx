@@ -12,6 +12,7 @@ import { GoProjectTemplate } from 'react-icons/go';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { AiOutlineRise } from 'react-icons/ai';
 import { GoDotFill } from 'react-icons/go';
+import { FaRegCircleUser } from 'react-icons/fa6';
 
 import {
   Chart as ChartJS,
@@ -249,6 +250,11 @@ const Analytics = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
+              <Link to={'/profile'} className={styles['side-nav-link']}>
+                <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
+              </Link>
+            </li>
+            <li className={styles['side-nav-item']}>
               <Link to={'/settings'} className={styles['side-nav-link']}>
                 <IoSettingsOutline className={styles['side-nav-icon']} />{' '}
                 Settings
@@ -305,6 +311,11 @@ const Analytics = () => {
                 className={`${styles['side-nav-icon']} ${styles['analytics-icon']}`}
               />{' '}
               Analytics
+            </Link>
+          </li>
+          <li className={styles['side-nav-item']}>
+            <Link to={'/profile'} className={styles['side-nav-link']}>
+              <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
             </Link>
           </li>
           <li className={styles['side-nav-item']}>

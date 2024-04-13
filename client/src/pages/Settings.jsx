@@ -21,6 +21,7 @@ import NotificationSettings from '../components/NotificationSettings';
 import Personalization from '../components/Personalization';
 import Security from '../components/Security';
 import { AiOutlineMenuFold } from 'react-icons/ai';
+import { FaRegCircleUser } from 'react-icons/fa6';
 
 const Settings = () => {
   const [searchText, setSearchText] = useState('');
@@ -99,8 +100,7 @@ const Settings = () => {
                 setDisplayCategory(false);
               }}
             >
-              <CgProfile className={styles['category-icon']} /> General
-              Information
+              <CgProfile className={styles['category-icon']} /> Profile
             </li>
 
             <li
@@ -205,6 +205,11 @@ const Settings = () => {
                 Notifications
               </Link>
             </li>
+            <li className={styles['side-nav-item']}>
+              <Link to={'/profile'} className={styles['side-nav-link']}>
+                <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
+              </Link>
+            </li>
             <li className={`${styles['side-nav-item']} ${styles.settings}`}>
               <Link
                 to={'/settings'}
@@ -262,6 +267,11 @@ const Settings = () => {
             <Link to={'/analytics'} className={styles['side-nav-link']}>
               <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
               Analytics
+            </Link>
+          </li>
+          <li className={styles['side-nav-item']}>
+            <Link to={'/profile'} className={styles['side-nav-link']}>
+              <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
             </Link>
           </li>
           <li className={`${styles['side-nav-item']}  ${styles.settings}`}>
@@ -365,8 +375,7 @@ const Settings = () => {
                 }`}
                 onClick={() => setCategory('general')}
               >
-                <CgProfile className={styles['category-icon']} /> General
-                Information
+                <CgProfile className={styles['category-icon']} /> Profile
               </li>
 
               <li

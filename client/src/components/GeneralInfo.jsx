@@ -79,7 +79,7 @@ const GeneralInfo = () => {
   return (
     <section className={styles['section']}>
       <ToastContainer autoClose={2500} />
-      <h1 className={styles['section-head']}>General Information</h1>
+      <h1 className={styles['section-head']}>Profile</h1>
 
       <form className={styles['form']}>
         <div className={styles['form-box']}>

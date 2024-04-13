@@ -11,6 +11,7 @@ import { FaTasks, FaCalendarAlt, FaSearch, FaCircle } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { GrStatusGood } from 'react-icons/gr';
 import BigCalendar from '../components/BigCalendar';
+import { FaRegCircleUser } from 'react-icons/fa6';
 
 const CalendarPage = () => {
   const [searchText, setSearchText] = useState('');
@@ -171,6 +172,11 @@ const CalendarPage = () => {
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
+              <Link to={'/profile'} className={styles['side-nav-link']}>
+                <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
+              </Link>
+            </li>
+            <li className={styles['side-nav-item']}>
               <Link to={'/settings'} className={styles['side-nav-link']}>
                 <IoSettingsOutline className={styles['side-nav-icon']} />{' '}
                 Settings
@@ -228,6 +234,11 @@ const CalendarPage = () => {
             <Link to={'/analytics'} className={styles['side-nav-link']}>
               <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
               Analytics
+            </Link>
+          </li>
+          <li className={styles['side-nav-item']}>
+            <Link to={'/profile'} className={styles['side-nav-link']}>
+              <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
             </Link>
           </li>
           <li className={styles['side-nav-item']}>
