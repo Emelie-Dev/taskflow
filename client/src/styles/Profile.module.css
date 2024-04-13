@@ -500,6 +500,21 @@
   .search {
     width: 22rem;
   }
+
+  .left-section {
+    width: 45%;
+  }
+  .right-section {
+    width: 55%;
+  }
+
+  .property-name {
+    width: 35%;
+  }
+
+  .property-value {
+    width: 65%;
+  }
 }
 
 @media screen and (max-width: 1099px) {
@@ -529,6 +544,21 @@
   .menu-icon-box {
     display: flex;
   }
+
+  .left-section {
+    width: 40%;
+  }
+  .right-section {
+    width: 60%;
+  }
+
+  .property-name {
+    width: 30%;
+  }
+
+  .property-value {
+    width: 70%;
+  }
 }
 
 @media screen and (max-width: 999px) {
@@ -543,6 +573,20 @@
   .notifications {
     display: block;
   }
+  .left-section {
+    width: 45%;
+  }
+  .right-section {
+    width: 55%;
+  }
+
+  .property-name {
+    width: 40%;
+  }
+
+  .property-value {
+    width: 60%;
+  }
 }
 
 @media screen and (max-width: 899px) {
@@ -552,6 +596,25 @@
 
   .search {
     width: 20rem;
+  }
+
+  .left-section {
+    width: 48%;
+  }
+  .right-section {
+    width: 52%;
+  }
+
+  .property-name {
+    width: 45%;
+  }
+
+  .property-value {
+    width: 55%;
+  }
+  .profile-pics {
+    width: 16rem;
+    height: 16rem;
   }
 }
 
@@ -566,6 +629,37 @@
   .search {
     width: 18rem;
   }
+  .left-section {
+    width: 50%;
+    padding: 0 1rem;
+  }
+  .right-section {
+    width: 50%;
+    padding: 0 1rem;
+  }
+
+  .property-name {
+    width: 50%;
+  }
+
+  .property-value {
+    width: 50%;
+  }
+  .profile-pics {
+    width: 15rem;
+    height: 15rem;
+  }
+  .message-btn {
+    margin-right: 1rem;
+  }
+
+  .edit-profile-link {
+    padding: 0.5rem;
+  }
+  .edit-profile-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
 }
 
 @media screen and (max-width: 699px) {
@@ -575,6 +669,54 @@
   .profile-box {
     display: none;
   }
+
+  .profile-container {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 1.5rem;
+  }
+
+  .left-section {
+    width: 100%;
+    padding: 0;
+    border-right: none;
+    border-bottom: 2px dashed rgba(128, 128, 128, 0.404);
+    padding-bottom: 3rem;
+    align-items: center;
+  }
+
+  .user-title,
+  .username {
+    text-align: center;
+  }
+  .right-section {
+    width: 100%;
+    padding: 0;
+    margin-top: 2rem;
+  }
+
+  .property-name {
+    width: 33%;
+  }
+
+  .property-value {
+    width: 67%;
+  }
+  .profile-pics {
+    width: 16rem;
+    height: 16rem;
+  }
+  .message-btn {
+    margin-right: 2rem;
+  }
+
+  .edit-profile-link {
+    right: 2.5%;
+    top: 1.5%;
+  }
+  .property-box:last-child {
+    margin-bottom: 1rem;
+  }
 }
 
 @media screen and (max-width: 599px) {
@@ -583,6 +725,13 @@
   }
   .search {
     width: 13rem;
+  }
+  .property-name {
+    width: 40%;
+  }
+
+  .property-value {
+    width: 60%;
   }
 }
 
@@ -601,6 +750,11 @@
   .alternate-search-box {
     display: flex;
   }
+
+  .profile-pics {
+    width: 15rem;
+    height: 15rem;
+  }
 }
 
 @media screen and (max-width: 399px) {
@@ -616,11 +770,62 @@
     height: 1.1rem;
     fill: gray;
   }
+
+  .profile-pics {
+    width: 14rem;
+    height: 14rem;
+  }
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .message-btn,
+  .group-btn {
+    padding: 0.6rem;
+    font-size: 1.01rem;
+  }
+
+  .message-btn {
+    margin-right: 1rem;
+  }
+
+  .section-content {
+    padding: 2rem 1rem;
+  }
 }
 
 @media screen and (max-width: 329px) {
   .responsive-section {
     width: 70%;
+  }
+
+  .profile-btn-div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .message-btn {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .message-btn,
+  .group-btn {
+    padding: 0.6rem 1rem;
+    font-size: 1.02rem;
+  }
+
+  .property-name {
+    font-size: 1.1rem;
+  }
+
+  .property-value {
+    font-size: 1rem;
+  }
+
+  .profile-pics {
+    width: 13rem;
+    height: 13rem;
   }
 }
 
@@ -635,5 +840,19 @@
 
   .menu-icon-box {
     margin-right: 0.3rem;
+  }
+
+  .profile-pics {
+    width: 11rem;
+    height: 11rem;
+  }
+
+  .property-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .property-name {
+    margin-bottom: 0.2rem;
   }
 }
