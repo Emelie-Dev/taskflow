@@ -201,7 +201,8 @@
   list-style-type: none;
   margin-top: 5.3rem;
   padding-top: 2.7rem;
-  height: calc(100vh - 8rem);
+  padding-bottom: 1rem;
+  height: calc(100vh - 5.33rem);
   overflow: auto;
 }
 
@@ -293,6 +294,7 @@
   padding-top: 2.5rem;
   height: auto;
   overflow: auto;
+  padding-bottom: 1rem;
 }
 
 .menu-icon-box {
@@ -1236,11 +1238,9 @@ tr {
 /* Media Queries */
 
 @media screen and (min-width: 1100px) {
-
   .responsive-nav {
     display: none;
   }
-  
 }
 
 @media screen and (max-width: 1250px) {
@@ -1323,10 +1323,9 @@ tr {
     display: none;
   }
 
-  
-.notifications {
-  display: block;
-}
+  .notifications {
+    display: block;
+  }
 }
 
 @media screen and (max-width: 899px) {

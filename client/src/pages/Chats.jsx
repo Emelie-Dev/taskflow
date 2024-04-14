@@ -138,7 +138,7 @@ const Chat = () => {
             <li
               className={`${styles['side-nav-item']} ${styles.notifications}`}
             >
-              <Link to={'/projects'} className={styles['side-nav-link']}>
+              <Link to={'/notifications'} className={styles['side-nav-link']}>
                 <IoIosNotifications className={styles['side-nav-icon']} />{' '}
                 Notifications
               </Link>
@@ -250,9 +250,9 @@ const Chat = () => {
             />
           </span>
           <div className={styles['icon-div']}>
-            <span className={styles['icon-container']}>
+            <Link className={styles['icon-container']}  to={'/notifications'}>
               <IoIosNotifications className={styles['notification-icon']} />
-            </span>
+            </Link>
             <span className={styles['icon-container']}>
               <IoChatbubblesSharp className={styles['chat-icon']} />
             </span>

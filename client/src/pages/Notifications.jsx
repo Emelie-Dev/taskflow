@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import styles from '../styles/Profile.module.css';
+import styles from '../styles/Notifications.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
 
@@ -10,10 +10,10 @@ import { FaRegCircleUser } from 'react-icons/fa6';
 import { MdOutlineDashboard } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
-import { MdOutlineSegment, MdEdit } from 'react-icons/md';
+import { MdOutlineSegment } from 'react-icons/md';
 import { FaSearch } from 'react-icons/fa';
 
-const Profile = () => {
+const Notifications = () => {
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const searchRef = useRef();
@@ -87,23 +87,23 @@ const Profile = () => {
                 Analytics
               </Link>
             </li>
+
             <li
-              className={`${styles['side-nav-item']} ${styles.notifications}`}
+              className={`${styles['side-nav-item']} ${styles.notify} ${styles.notifications}`}
             >
-              <Link to={'/notifications'} className={styles['side-nav-link']}>
-                <IoIosNotifications className={styles['side-nav-icon']} />{' '}
+              <Link
+                to={'/notifications'}
+                className={`${styles['side-nav-link']}  ${styles['notify-link']}`}
+              >
+                <IoIosNotifications
+                  className={`${styles['side-nav-icon']}  ${styles['notify-icon']}`}
+                />{' '}
                 Notifications
               </Link>
             </li>
-            <li className={`${styles['side-nav-item']}  ${styles.profile}`}>
-              <Link
-                to={'/profile'}
-                className={`${styles['side-nav-link']}  ${styles['profile-link']}`}
-              >
-                <FaRegCircleUser
-                  className={`${styles['side-nav-icon']}   ${styles['profile-icon']}`}
-                />{' '}
-                Profile
+            <li className={styles['side-nav-item']}>
+              <Link to={'/profile'} className={styles['side-nav-link']}>
+                <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
               </Link>
             </li>
             <li className={styles['side-nav-item']}>
@@ -160,6 +160,17 @@ const Profile = () => {
               Analytics
             </Link>
           </li>
+          <li className={`${styles['side-nav-item']} ${styles.notify}`}>
+            <Link
+              to={'/notifications'}
+              className={`${styles['side-nav-link']}  ${styles['notify-link']}`}
+            >
+              <IoIosNotifications
+                className={`${styles['side-nav-icon']}  ${styles['notify-icon']}`}
+              />{' '}
+              Notifications
+            </Link>
+          </li>
           <li className={`${styles['side-nav-item']}  ${styles.profile}`}>
             <Link
               to={'/profile'}
@@ -188,7 +199,7 @@ const Profile = () => {
             />
           </b>
 
-          <h1 className={styles['page']}>Profile</h1>
+          <h1 className={styles['page']}>Notifications</h1>
 
           <span className={styles['search-box']}>
             <IoIosSearch className={styles['search-icon']} />
@@ -197,7 +208,7 @@ const Profile = () => {
               className={styles.search}
               value={searchText}
               ref={searchRef}
-              placeholder="Search for users"
+              placeholder="Search..."
               onChange={handleSearchText}
             />
             <IoMdClose
@@ -208,9 +219,9 @@ const Profile = () => {
             />
           </span>
           <div className={styles['icon-div']}>
-            <Link className={styles['icon-container']}  to={'/notifications'}>
+            <span className={styles['icon-container']}>
               <IoIosNotifications className={styles['notification-icon']} />
-            </Link>
+            </span>
             <span className={styles['icon-container']}>
               <IoChatbubblesSharp className={styles['chat-icon']} />
             </span>
@@ -235,69 +246,10 @@ const Profile = () => {
           </div>
         </header>
 
-        <section className={styles['section-content']}>
-          <div className={styles['profile-container']}>
-            <Link
-              to={'/settings'}
-              className={styles['edit-profile-link']}
-              title="Edit Profile"
-            >
-              <MdEdit className={styles['edit-profile-icon']} />
-            </Link>
-
-            <div className={styles['left-section']}>
-              <figure className={styles['profile-pics-box']}>
-                <img
-                  src="../../assets/images/download.jpeg"
-                  className={styles['profile-pics']}
-                />
-              </figure>
-
-              <span className={styles['username']}>Ofoka Vincent</span>
-
-              <span className={styles['user-title']}>Web Developer</span>
-
-              <div className={styles['profile-btn-div']}>
-                <button className={styles['message-btn']}>Send message</button>
-                <button className={styles['group-btn']}>Add to group</button>
-              </div>
-            </div>
-
-            <div className={styles['right-section']}>
-              <div className={styles['property-box']}>
-                <span className={styles['property-name']}>Username:</span>
-                <span className={styles['property-value']}>Godfather</span>
-              </div>
-              <div className={styles['property-box']}>
-                <span className={styles['property-name']}>Phone Number:</span>
-                <span className={styles['property-value']}>09039382783</span>
-              </div>
-              <div className={styles['property-box']}>
-                <span className={styles['property-name']}>Birthday:</span>
-                <span className={styles['property-value']}>10th December</span>
-              </div>
-              <div className={styles['property-box']}>
-                <span className={styles['property-name']}>Email:</span>
-                <span className={styles['property-value']}>abc@gmail.com</span>
-              </div>{' '}
-              <div className={styles['property-box']}>
-                <span className={styles['property-name']}>Country:</span>
-                <span className={styles['property-value']}>Nigeria</span>
-              </div>{' '}
-              <div className={styles['property-box']}>
-                <span className={styles['property-name']}>Language:</span>
-                <span className={styles['property-value']}>English</span>
-              </div>
-              <div className={styles['property-box']}>
-                <span className={styles['property-name']}>Gender:</span>
-                <span className={styles['property-value']}>Male</span>
-              </div>
-            </div>
-          </div>
-        </section>
+        <section className={styles['section-content']}>Notifications</section>
       </section>
     </main>
   );
 };
 
-export default Profile;
+export default Notifications;
