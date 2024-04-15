@@ -346,9 +346,151 @@
   width: 100%;
   overflow: auto;
   overflow-x: hidden;
-  padding: 2rem 1.5rem;
+  padding: 1rem 1rem 2rem;
 }
 
+.section-head {
+  display: flex;
+  justify-content: center;
+}
+
+.notification-container {
+  padding: 0 1rem;
+}
+
+.article {
+  font-family: var(--general-font);
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.article-head {
+  font-size: 1.2rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.notifications-length {
+  background: rgba(128, 128, 128, 0.8);
+  color: white;
+  padding: 0.1rem 0.5rem;
+  border-radius: 5px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+}
+
+.notification-box {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  background: white;
+  box-shadow: 1px 1px 10px -6px black;
+  border-radius: 10px;
+  padding: 0.7rem 1.2rem;
+  padding-right: 2rem;
+  position: relative;
+}
+
+.content-icon {
+  width: 1.7rem;
+  height: 1.7rem;
+  color: orange;
+  flex-shrink: 0;
+  margin-right: 1rem;
+  transform: translateY(0.5rem);
+}
+
+.notification-img {
+  width: 3.3rem;
+  height: 3.3rem;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 1.5rem;
+  cursor: pointer;
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.notification-text {
+  font-size: 1.03rem;
+}
+.content-name {
+  font-weight: 700;
+  font-size: 1.04rem;
+}
+
+.notification-time {
+  color: gray;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.important-text {
+  color: orange;
+  font-weight: 700;
+  font-variant: small-caps;
+  font-size: 1.1rem;
+}
+
+.btn-box {
+  margin-top: 0.5rem;
+}
+
+.project-btn {
+  outline: none;
+  background: orange;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  border: 2px solid orange;
+  font-family: var(--general-font);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.decline-btn {
+  outline: none;
+  background: white;
+  color: orange;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  border: 2px solid orange;
+  font-family: var(--general-font);
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-left: 1rem;
+}
+
+.project-btn:hover,
+.decline-btn:hover {
+  box-shadow: inset 1px 1px 4px -1px black;
+}
+
+.notification-close-icon {
+  position: absolute;
+  right: 1%;
+  top: 6%;
+  width: 1.3rem;
+  height: 1.3rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.notification-close-icon:hover {
+  color: orange;
+}
 /* Animations */
 
 @keyframes showNav {

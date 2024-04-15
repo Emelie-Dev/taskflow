@@ -12,10 +12,51 @@ import { FaTasks, FaCalendarAlt } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { MdOutlineSegment } from 'react-icons/md';
 import { FaSearch } from 'react-icons/fa';
+import NotificationBox from '../components/NotificationBox';
+
+const data = [
+  {
+    date: 1,
+    action: 'transition',
+    state1: 'active',
+    state2: 'inactive',
+    user: 'Jon snow',
+    project: 'Fitness App',
+    id: Math.random(),
+    count: 2,
+  },
+  {
+    date: 1,
+    action: 'task',
+    user: 'Anita',
+    project: 'Fitness App',
+    id: Math.random(),
+  },
+  {
+    date: 2,
+    action: 'task',
+    user: 'Sansa',
+    project: 'Media Player',
+    id: Math.random(),
+    count: 3,
+  },
+  {
+    date: 2,
+    action: 'security',
+    device: 'Redmi note 10',
+    location: 'Netherlands',
+  },
+  {
+    date: 2,
+    action: 'request',
+    group: 'Boolean Autocrats',
+  },
+];
 
 const Notifications = () => {
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
+  const [category, setCategory] = useState('unread');
   const searchRef = useRef();
   const navRef = useRef();
 
@@ -246,7 +287,19 @@ const Notifications = () => {
           </div>
         </header>
 
-        <section className={styles['section-content']}>Notifications</section>
+        <section className={styles['section-content']}>
+          <div className={styles['notification-container']}>
+            {data.map((item, index, array) => {
+              if (index === 0) {
+                return <NotificationBox data={item} date={item.date} />;
+              } else if (item.date === array[index - 1].date) {
+                return <NotificationBox data={item} />;
+              } else {
+                return <NotificationBox data={item} date={item.date} />;
+              }
+            })}
+          </div>
+        </section>
       </section>
     </main>
   );
