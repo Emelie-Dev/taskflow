@@ -409,6 +409,7 @@
   border-radius: 8px;
   margin-right: 1.5rem;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .notification-content {
@@ -475,7 +476,7 @@
 
 .project-btn:hover,
 .decline-btn:hover {
-  box-shadow: inset 1px 1px 4px -1px black;
+  box-shadow: inset 1px 1px 4px -2px black;
 }
 
 .notification-close-icon {
@@ -583,6 +584,20 @@
   .search {
     width: 18rem;
   }
+
+  .section-content {
+    padding: 1rem 0.5rem 2rem;
+  }
+
+  .notification-img {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .content-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }
 
 @media screen and (max-width: 699px) {
@@ -592,6 +607,14 @@
   .profile-box {
     display: none;
   }
+  .section-content {
+    padding: 1rem 0 2rem;
+  }
+
+  .notification-box {
+    padding: 0.7rem 1rem;
+    padding-right: 2rem;
+  }
 }
 
 @media screen and (max-width: 599px) {
@@ -600,6 +623,10 @@
   }
   .search {
     width: 13rem;
+  }
+
+  .notification-img {
+    display: none;
   }
 }
 

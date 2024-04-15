@@ -92,9 +92,10 @@ const NotificationBox = ({ data, date }) => {
                 A new login has been detected on a
                 <span className={styles['content-name']}> {device} </span>{' '}
                 device from{' '}
-                <span className={styles['content-name']}>{location}.</span>{' '}
-                Click the <span className={styles['content-name']}>block</span>{' '}
-                button to restrict access from the device.
+                <span className={styles['content-name']}>{location}.</span> If
+                you aren't aware of this, click the{' '}
+                <span className={styles['content-name']}>block</span> button to
+                restrict access from the device.
               </span>
               <span className={styles['btn-box']}>
                 <button className={styles['project-btn']}>Block</button>
