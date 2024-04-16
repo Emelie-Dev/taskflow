@@ -1,30 +1,21 @@
 import React, { useState, useRef } from 'react';
-import styles from '../styles/Projects.module.css';
+import styles from '../styles/ProjectItem.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
 
 import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
-import { IoIosSearch, IoMdClose, IoIosNotifications } from 'react-icons/io';
+import { IoIosNotifications } from 'react-icons/io';
 
 import { MdOutlineDashboard, MdOutlineSegment } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
-import { FaRegCircleUser } from 'react-icons/fa6';
+import { FaRegCircleUser, FaFileImage } from 'react-icons/fa6';
+import { FaFileLines } from 'react-icons/fa6';
+import { BsFileEarmarkPdfFill } from 'react-icons/bs';
 
 const Projects = () => {
-  const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
-  const searchRef = useRef();
   const navRef = useRef();
-
-  const handleSearchText = (e) => {
-    setSearchText(e.target.value);
-  };
-
-  const clearSearchText = () => {
-    setSearchText('');
-    searchRef.current.focus();
-  };
 
   const hideNav = (e) => {
     if (e.target === navRef.current) {
@@ -185,25 +176,8 @@ const Projects = () => {
             />
           </b>
 
-          <h1 className={styles['page']}>Projects</h1>
+          <h1 className={styles['page']}>Project</h1>
 
-          <span className={styles['search-box']}>
-            <IoIosSearch className={styles['search-icon']} />
-            <input
-              type="text"
-              className={styles.search}
-              value={searchText}
-              ref={searchRef}
-              placeholder="Search..."
-              onChange={handleSearchText}
-            />
-            <IoMdClose
-              className={`${styles['cancel-icon']} ${
-                searchText.length !== 0 ? styles['show-cancel-icon'] : ''
-              }`}
-              onClick={clearSearchText}
-            />
-          </span>
           <div className={styles['icon-div']}>
             <Link className={styles['icon-container']} to={'/notifications'}>
               <IoIosNotifications className={styles['notification-icon']} />
@@ -232,7 +206,166 @@ const Projects = () => {
           </div>
         </header>
 
-        <section className={styles['section-content']}>Project Item</section>
+        <section className={styles['section-content']}>
+          <h1 className={styles['project-name']}>Fitness App</h1>
+
+          <div className={styles['project-container']}>
+            <div className={styles['left-section']}>
+              <div className={styles['project-content']}>
+                <span className={styles['project-leader']}>
+                  <span className={styles['leader-text']}>Project Leader:</span>
+                  <span className={styles['leader']}>
+                    <img
+                      src="../../assets/images/profile1.webp"
+                      className={styles['leader-img']}
+                    />{' '}
+                    Jon Snow
+                  </span>
+                </span>
+
+                <span className={styles['project-description']}>
+                  <span className={styles['description-text']}>
+                    Project Description:
+                  </span>
+                  <div className={styles['description']}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Donec vel elit neque. Class aptent taciti sociosqu ad litora
+                    torquent per conubia nostra, per inceptos himenaeos.
+                    Vestibulum sollicitudin libero vitae est consectetur, a
+                    molestie tortor consectetur. Aenean tincidunt interdum
+                    ipsum, id pellentesque diam suscipit ut. Vivamus massa mi,
+                    fermentum eget neque eget, imperdiet tristique lectus. Proin
+                    at purus ut sem pellentesque tempor sit amet ut lectus. Sed
+                    orci augue, placerat et pretium ac, hendrerit in felis.
+                    Integer scelerisque libero non metus commodo, et hendrerit
+                    diam aliquet. Proin tincidunt porttitor ligula, a tincidunt
+                    orci pellentesque nec. Ut ultricies maximus nulla id
+                    consequat. Fusce eu consequat mi, eu euismod ligula. Aliquam
+                    porttitor neque id massa porttitor, a pretium velit
+                    vehicula. Morbi volutpat tincidunt urna, vel ullamcorper
+                    ligula fermentum at.
+                  </div>
+                </span>
+              </div>
+
+              <div className={styles['files-conatiner']}>
+                <span className={styles['files-text']}>Uploaded Files</span>
+
+                <div className={styles['files-box']}>
+                  <article className={styles['uploaded-file']}>
+                    <BsFileEarmarkPdfFill
+                      className={`${styles['file-icon']} ${styles['file-icon1']}`}
+                    />
+                    <div className={styles['file-content']}>
+                      <span className={styles['file-name']}>
+                        AHA Selfcare Mobile Application Test-Cases.xls
+                      </span>
+                      <span className={styles['file-details']}>
+                        <span className={styles['file-property']}>Sender:</span>
+                        <span className={styles['file-sender']}>
+                          Arya Stark
+                        </span>
+                      </span>
+                      <span className={styles['file-details']}>
+                        <span className={styles['file-property']}>Size:</span>
+                        <span className={styles['file-size']}>
+                          2<span className={styles['size-unit']}>mb</span>
+                        </span>
+                      </span>
+                      <span className={styles['file-details']}>
+                        <span className={styles['file-property']}>
+                          Time Sent:
+                        </span>
+                        <span className={styles['time-sent']}>
+                          March 31st at 6:53 PM
+                        </span>
+                      </span>
+                    </div>
+                  </article>
+
+                  <article className={styles['uploaded-file']}>
+                    <FaFileImage
+                      className={`${styles['file-icon']} ${styles['file-icon2']}`}
+                    />
+                    <div className={styles['file-content']}>
+                      <span className={styles['file-name']}>
+                        AHA Selfcare Mobile Application Test-Cases.xls
+                      </span>
+                      <span className={styles['file-details']}>
+                        <span className={styles['file-property']}>Sender:</span>
+                        <span className={styles['file-sender']}>
+                          Arya Stark
+                        </span>
+                      </span>
+                      <span className={styles['file-details']}>
+                        <span className={styles['file-property']}>Size:</span>
+                        <span className={styles['file-size']}>
+                          2<span className={styles['size-unit']}>mb</span>
+                        </span>
+                      </span>
+                      <span className={styles['file-details']}>
+                        <span className={styles['file-property']}>
+                          Time Sent:
+                        </span>
+                        <span className={styles['time-sent']}>
+                          March 31st at 6:53 PM
+                        </span>
+                      </span>
+                    </div>
+                  </article>
+
+                  <article className={styles['uploaded-file']}>
+                    <FaFileLines
+                      className={`${styles['file-icon']} ${styles['file-icon3']}`}
+                    />
+                    <div className={styles['file-content']}>
+                      <span className={styles['file-name']}>
+                        AHA Selfcare Mobile Application Test-Cases.xls
+                      </span>
+                      <span className={styles['file-details']}>
+                        <span className={styles['file-property']}>Sender:</span>
+                        <span className={styles['file-sender']}>
+                          Arya Stark
+                        </span>
+                      </span>
+                      <span className={styles['file-details']}>
+                        <span className={styles['file-property']}>Size:</span>
+                        <span className={styles['file-size']}>
+                          2<span className={styles['size-unit']}>mb</span>
+                        </span>
+                      </span>
+                      <span className={styles['file-details']}>
+                        <span className={styles['file-property']}>
+                          Time Sent:
+                        </span>
+                        <span className={styles['time-sent']}>
+                          March 31st at 6:53 PM
+                        </span>
+                      </span>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles['right-section']}>
+              <div className={styles['project-details-container']}>
+                <span className={styles['project-details-head']}>
+                  Project Details
+                </span>
+
+                <table>
+                  <tbody>
+                    <tr>
+                      <td></td>
+                      <td>2</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
     </main>
   );
