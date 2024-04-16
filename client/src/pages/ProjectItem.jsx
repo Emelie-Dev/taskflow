@@ -209,6 +209,10 @@ const ProjectItem = () => {
         <section className={styles['section-content']}>
           <h1 className={styles['project-name']}>Fitness App</h1>
 
+          <div className={styles['edit-btn-div']}>
+            <button className={styles['edit-btn']}>Edit Project</button>
+          </div>
+
           <div className={styles['project-container']}>
             <div className={styles['left-section']}>
               <div className={styles['project-content']}>
@@ -320,6 +324,13 @@ const ProjectItem = () => {
                         </span>
                       </span>
                     </div>
+                    <div className={styles['menu-box']}>
+                      <BsThreeDotsVertical className={styles['menu-icon']} />
+                      <ul className={styles['menu-list']}>
+                        <li className={styles['menu-item']}>Download</li>
+                        <li className={styles['menu-item']}>Delete</li>
+                      </ul>
+                    </div>
                   </article>
 
                   <article className={styles['uploaded-file']}>
@@ -350,6 +361,13 @@ const ProjectItem = () => {
                           March 31st at 6:53 PM
                         </span>
                       </span>
+                    </div>
+                    <div className={styles['menu-box']}>
+                      <BsThreeDotsVertical className={styles['menu-icon']} />
+                      <ul className={styles['menu-list']}>
+                        <li className={styles['menu-item']}>Download</li>
+                        <li className={styles['menu-item']}>Delete</li>
+                      </ul>
                     </div>
                   </article>
                 </div>

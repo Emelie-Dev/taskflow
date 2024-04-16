@@ -603,7 +603,8 @@
 .menu-box {
   position: relative;
   margin-left: auto;
-  display: inline;
+  height: fit-content;
+  width: fit-content;
 }
 
 .menu-icon {
@@ -617,6 +618,7 @@
   list-style-type: none;
   position: absolute;
   left: -400%;
+  top: 110%;
   box-shadow: 1px 1px 8px -3px black;
   border-radius: 5px;
   display: none;
@@ -647,6 +649,26 @@
 
 .menu-box:hover .menu-list {
   display: block;
+}
+
+.edit-btn-div {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.edit-btn {
+  border: none;
+  outline: none;
+  background: orange;
+  color: white;
+  border-radius: 5px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  box-shadow: 1px 1px 8px -4px black;
 }
 /* Animations */
 
