@@ -12,6 +12,7 @@ import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
+import ProjectItem from './pages/ProjectItem';
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
       <Route path="/settings" element={<Settings />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/notifications" element={<Notifications />} />
+      <Route path="/projectitem" element={<ProjectItem />} />
     </Routes>
   );
 };
