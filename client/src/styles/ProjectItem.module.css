@@ -323,10 +323,10 @@
 
 .project-leader {
   display: flex;
-  align-items: center;
   font-family: var(--general-font);
   font-size: 1.05rem;
   margin-bottom: 1rem;
+  width: 100%;
 }
 
 .leader-img {
@@ -334,6 +334,8 @@
   height: 2.5rem;
   border-radius: 50%;
   margin-right: 0.75rem;
+  flex-shrink: 0;
+  object-fit: cover;
 }
 
 .leader-text {
@@ -347,6 +349,7 @@
   display: flex;
   align-items: flex-end;
   cursor: pointer;
+  word-break: break-all;
 }
 
 .project-description {
@@ -369,11 +372,13 @@
 
 .files-conatiner {
   font-family: var(--general-font);
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   padding: 1rem 1rem 2rem;
   box-shadow: 1px 1px 10px -7px black;
   border-radius: 5px;
   width: 100%;
+  max-height: 70vh;
+  overflow: auto;
 }
 
 .files-text {
@@ -386,6 +391,7 @@
   flex-direction: column;
   padding: 0 0.5rem;
   margin-top: 0.5rem;
+  padding-right: 0;
 }
 
 .uploaded-file {
@@ -417,7 +423,8 @@
 .file-content {
   display: flex;
   flex-direction: column;
-  width: calc(100% - 3rem);
+  width: calc(100% - 5.3rem);
+  margin-right: 1rem;
 }
 
 .file-name {
@@ -466,7 +473,7 @@
 
 .right-section {
   width: 35%;
-  margin-left: 1.5rem;
+  margin-left: 2rem;
   display: flex;
   flex-direction: column;
 }
@@ -476,12 +483,170 @@
   border-radius: 5px;
   width: 100%;
   font-family: var(--general-font);
-  padding: 1rem 1rem 2rem;
+  padding: 1rem;
 }
 
 .project-details-head {
   font-weight: 700;
   font-size: 1.2rem;
+}
+
+.table-container {
+  padding: 0 0.5rem;
+}
+
+.table {
+  border-collapse: collapse;
+  cursor: default;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.table tr:nth-child(odd) {
+  background: #dcdcdc;
+}
+
+.table-property {
+  font-weight: 600;
+  font-size: 1.03rem;
+}
+
+.progress-div {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+  padding: 0 0.5rem;
+}
+
+.progress-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.progress-value {
+  color: orange;
+}
+
+.progress-bar {
+  height: 0.25rem;
+  border-radius: 20px;
+  margin: 1rem 0;
+  background: linear-gradient(
+    to right,
+    orange 60%,
+    rgba(128, 128, 128, 0.5) 40%
+  );
+}
+
+.project-team-container {
+  box-shadow: 1px 1px 10px -7px black;
+  border-radius: 5px;
+  width: 100%;
+  font-family: var(--general-font);
+  padding: 1rem;
+  margin-top: 2rem;
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.team-head {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.team-div {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.member-box {
+  display: flex;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  cursor: pointer;
+}
+
+.member-img {
+  width: 2.8rem;
+  height: 2.8rem;
+  object-fit: cover;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1rem;
+  width: calc(100% - 3.8rem);
+}
+
+.member-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  word-wrap: break-word;
+}
+
+.member-title {
+  color: gray;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: 0.2rem;
+  word-wrap: break-word;
+}
+
+.menu-box {
+  position: relative;
+  margin-left: auto;
+  display: inline;
+}
+
+.menu-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  cursor: pointer;
+  display: none;
+}
+
+.menu-list {
+  list-style-type: none;
+  position: absolute;
+  left: -400%;
+  box-shadow: 1px 1px 8px -3px black;
+  border-radius: 5px;
+  display: none;
+}
+
+.menu-item {
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: orange;
+  color: white;
+}
+
+.menu-item:nth-child(1) {
+  border-radius: 5px 5px 0 0;
+}
+
+.menu-item:nth-child(2) {
+  border-radius: 0 0 5px 5px;
+}
+
+.uploaded-file:hover .menu-icon {
+  display: block;
+}
+
+.menu-box:hover .menu-list {
+  display: block;
 }
 /* Animations */
 

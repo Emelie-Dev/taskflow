@@ -11,9 +11,9 @@ import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { FaRegCircleUser, FaFileImage } from 'react-icons/fa6';
 import { FaFileLines } from 'react-icons/fa6';
-import { BsFileEarmarkPdfFill } from 'react-icons/bs';
+import { BsFileEarmarkPdfFill, BsThreeDotsVertical } from 'react-icons/bs';
 
-const Projects = () => {
+const ProjectItem = () => {
   const [showNav, setShowNav] = useState(false);
   const navRef = useRef();
 
@@ -281,6 +281,14 @@ const Projects = () => {
                         </span>
                       </span>
                     </div>
+
+                    <div className={styles['menu-box']}>
+                      <BsThreeDotsVertical className={styles['menu-icon']} />
+                      <ul className={styles['menu-list']}>
+                        <li className={styles['menu-item']}>Download</li>
+                        <li className={styles['menu-item']}>Delete</li>
+                      </ul>
+                    </div>
                   </article>
 
                   <article className={styles['uploaded-file']}>
@@ -354,14 +362,89 @@ const Projects = () => {
                   Project Details
                 </span>
 
-                <table>
-                  <tbody>
-                    <tr>
-                      <td></td>
-                      <td>2</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div className={styles['table-container']}>
+                  <table className={styles.table}>
+                    <tbody>
+                      <tr>
+                        <td className={styles['table-property']}>Tasks:</td>
+                        <td>15</td>
+                      </tr>
+                      <tr>
+                        <td className={styles['table-property']}>Created:</td>
+                        <td>10th January, 2024</td>
+                      </tr>
+                      <tr>
+                        <td className={styles['table-property']}>Deadline:</td>
+                        <td>26 April, 2024</td>
+                      </tr>
+                      <tr>
+                        <td className={styles['table-property']}>Team:</td>
+                        <td>6 members</td>
+                      </tr>
+                      <tr>
+                        <td className={styles['table-property']}>Status:</td>
+                        <td>Active</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className={styles['progress-div']}>
+                  <span className={styles['progress-box']}>
+                    <span>Progress</span>
+                    <span className={styles['progress-value']}>60%</span>
+                  </span>
+
+                  <span className={styles['progress-bar']}>&nbsp;</span>
+                </div>
+              </div>
+
+              <div className={styles['project-team-container']}>
+                <span className={styles['team-head']}>Team</span>
+
+                <div className={styles['team-div']}>
+                  <div className={styles['member-box']}>
+                    <img
+                      src="../../assets/images/profile2webp.webp"
+                      className={styles['member-img']}
+                    />
+                    <span className={styles['member-details']}>
+                      <span className={styles['member-name']}>Arya Stark</span>
+                      <span className={styles['member-title']}>
+                        Web Designer
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className={styles['member-box']}>
+                    <img
+                      src="../../assets/images/profile3.jpeg"
+                      className={styles['member-img']}
+                    />
+                    <span className={styles['member-details']}>
+                      <span className={styles['member-name']}>
+                        Ramsay Bolton
+                      </span>
+                      <span className={styles['member-title']}>
+                        Web Developer
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className={styles['member-box']}>
+                    <img
+                      src="../../assets/images/profile4.jpeg"
+                      className={styles['member-img']}
+                    />
+                    <span className={styles['member-details']}>
+                      <span className={styles['member-name']}>
+                        Cersei Lannister
+                      </span>
+                      <span className={styles['member-title']}>
+                        Human resources manager
+                      </span>
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -371,4 +454,4 @@ const Projects = () => {
   );
 };
 
-export default Projects;
+export default ProjectItem;
