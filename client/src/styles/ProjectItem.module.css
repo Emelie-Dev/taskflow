@@ -302,6 +302,8 @@
 .project-name {
   font-family: var(--general-font);
   font-size: 1.5rem;
+  word-wrap: break-word;
+  margin-bottom: 1rem;
 }
 
 .project-container {
@@ -638,6 +640,8 @@
   box-shadow: 1px 1px 8px -3px black;
   border-radius: 5px;
   display: none;
+  z-index: 3;
+  background: white;
 }
 
 .menu-item {
@@ -659,7 +663,7 @@
   border-radius: 0 0 5px 5px;
 }
 
-.uploaded-file:hover .menu-icon {
+.uploaded-file:hover .menu-file-icon {
   display: block;
 }
 
@@ -740,10 +744,16 @@
 
 .task-item {
   display: flex;
+  flex-direction: column;
   border: 1px solid rgba(128, 128, 128, 0.3);
   padding: 0.9rem 1rem;
   border-bottom: 0;
   position: relative;
+}
+
+.task-box {
+  display: flex;
+  width: 100%;
 }
 
 .task-item:last-child {
@@ -780,6 +790,11 @@
   position: absolute;
   display: none;
   right: 1rem;
+}
+
+.alt-action-box {
+  display: none;
+  align-items: center;
 }
 
 .view-icon-box,
@@ -925,6 +940,19 @@
   .profile-box {
     display: none;
   }
+
+  .section-content {
+    padding: 1.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .task-container {
+    padding: 0;
+  }
+
+  .delete-icon-box {
+    margin-left: 0.5rem;
+  }
 }
 
 @media screen and (max-width: 599px) {
@@ -933,6 +961,23 @@
   }
   .search {
     width: 13rem;
+  }
+
+  .section-content {
+    padding: 1.5rem 1rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .project-name {
+    padding: 0 0.5rem;
+  }
+
+  .view-icon,
+  .delete-icon {
+    color: gray;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
   }
 }
 
@@ -943,6 +988,51 @@
 
   .menu-icon-box {
     margin-right: 0.8rem;
+  }
+
+  .task-category-div {
+    overflow: auto;
+  }
+
+  .tasks-category-list {
+    width: 130%;
+  }
+
+  .status-icon {
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+  .task-name {
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  .task-item:hover .action-box {
+    display: none;
+  }
+
+  .task-item:hover .alt-action-box {
+    display: flex;
+    align-items: center;
+    margin-left: 2.3rem;
+    margin-top: 0.5rem;
+  }
+
+  .files-conatiner {
+    padding: 1rem 0.5rem 2rem;
+  }
+
+  .files-box {
+    padding: 0;
+  }
+
+  .menu-list {
+    left: -450%;
+    top: 110%;
+  }
+
+  .files-text {
+    padding: 0 0.5rem;
   }
 }
 
@@ -964,6 +1054,10 @@
     display: block;
   }
 
+  .tasks-category-list {
+    width: 150%;
+  }
+
   .icon-div {
     display: none;
   }
@@ -971,11 +1065,45 @@
   .profile-div {
     margin-left: auto;
   }
+
+  .project-content {
+    padding: 1rem 0.5rem;
+  }
+
+  .alt-project-details-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .project-details-head {
+    padding: 0 0.5rem;
+  }
+
+  .team-div {
+    padding: 0;
+  }
+  .member-img {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .file-content {
+    width: calc(100% - 4.8rem);
+    margin-right: 0.5rem;
+  }
 }
 
 @media screen and (max-width: 329px) {
   .responsive-section {
     width: 70%;
+  }
+
+  .section-content {
+    padding: 1.5rem 0.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .tasks-category-list {
+    width: 180%;
   }
 }
 
@@ -990,5 +1118,9 @@
 
   .menu-icon-box {
     margin-right: 0.3rem;
+  }
+
+  .tasks-category-list {
+    width: 200%;
   }
 }
