@@ -296,7 +296,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: 1.5rem;
-  padding-bottom: 3rem;
+  padding-bottom: 3.5rem;
 }
 
 .project-name {
@@ -478,12 +478,18 @@
   flex-direction: column;
 }
 
-.project-details-container {
+.project-details-container,
+.alt-project-details-container {
   box-shadow: 1px 1px 10px -7px black;
   border-radius: 5px;
   width: 100%;
   font-family: var(--general-font);
   padding: 1rem;
+}
+
+.alt-project-details-container {
+  margin-top: 2rem;
+  display: none;
 }
 
 .project-details-head {
@@ -541,7 +547,8 @@
   );
 }
 
-.project-team-container {
+.project-team-container,
+.alt-project-team-container {
   box-shadow: 1px 1px 10px -7px black;
   border-radius: 5px;
   width: 100%;
@@ -550,6 +557,10 @@
   margin-top: 2rem;
   max-height: 70vh;
   overflow: auto;
+}
+
+.alt-project-team-container {
+  display: none;
 }
 
 .team-head {
@@ -569,6 +580,11 @@
   margin-bottom: 1.5rem;
   width: 100%;
   cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.member-box:hover {
+  opacity: 0.7;
 }
 
 .member-img {
@@ -607,7 +623,7 @@
   width: fit-content;
 }
 
-.menu-icon {
+.menu-file-icon {
   width: 1.3rem;
   height: 1.3rem;
   cursor: pointer;
@@ -670,6 +686,128 @@
 .edit-btn:hover {
   box-shadow: 1px 1px 8px -4px black;
 }
+
+.task-container {
+  margin-top: 3rem;
+  padding: 0 0.5rem;
+}
+
+.tasks-category-list {
+  list-style-type: none;
+  width: 100%;
+}
+
+.taks-category {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 25%;
+  font-family: var(--general-font);
+  color: gray;
+  font-weight: 700;
+  font-size: 1.05rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.404);
+  border-top: 2px solid white;
+  padding: 1rem 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.taks-category:hover {
+  background: rgba(220, 220, 220, 0.7);
+  border-top: 2px solid rgba(220, 220, 220, 0.7);
+}
+
+.current-task-category {
+  color: black;
+  border-bottom: 1px solid rgba(220, 220, 220, 0.5);
+  border-top: 2px solid orange;
+  background: rgba(220, 220, 220, 0.5);
+  transition: none;
+}
+
+.current-task-category:hover {
+  background: rgba(220, 220, 220, 0.5);
+  border-top: 2px solid orange;
+}
+
+.tasks-list {
+  margin-top: 2rem;
+  list-style-type: none;
+  padding: 0 2rem;
+  width: 100%;
+}
+
+.task-item {
+  display: flex;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  padding: 0.9rem 1rem;
+  border-bottom: 0;
+  position: relative;
+}
+
+.task-item:last-child {
+  border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.status-icon {
+  color: green;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+.status-icon2 {
+  color: red;
+}
+
+.status-icon3 {
+  color: orange;
+}
+
+.task-name {
+  font-family: var(--general-font);
+  margin-left: 1rem;
+  font-weight: 600;
+  font-size: 1.03rem;
+  word-wrap: break-word;
+  width: calc(100% - 8rem);
+}
+
+.action-box {
+  margin-left: auto;
+  align-items: center;
+  position: absolute;
+  display: none;
+  right: 1rem;
+}
+
+.view-icon-box,
+.delete-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  padding: 0.3rem;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.view-icon,
+.delete-icon {
+  color: gray;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+}
+
+.delete-icon-box {
+  margin-left: 1rem;
+}
+
+.task-item:hover .action-box {
+  display: flex;
+}
 /* Animations */
 
 @keyframes showNav {
@@ -725,15 +863,16 @@
   .menu-icon-box {
     display: flex;
   }
+
+  .section-content {
+    padding: 1.5rem 2rem;
+    padding-bottom: 3.5rem;
+  }
 }
 
 @media screen and (max-width: 999px) {
   .responsive-section {
     width: 28%;
-  }
-
-  .notifications {
-    display: block;
   }
 }
 
@@ -744,6 +883,25 @@
 
   .search {
     width: 20rem;
+  }
+
+  .left-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .right-section {
+    display: none;
+  }
+
+  .alt-project-team-container,
+  .alt-project-details-container {
+    display: block;
+  }
+
+  .tasks-list {
+    padding: 0;
   }
 }
 
@@ -800,6 +958,10 @@
     width: 1.1rem;
     height: 1.1rem;
     fill: gray;
+  }
+
+  .notifications {
+    display: block;
   }
 
   .icon-div {

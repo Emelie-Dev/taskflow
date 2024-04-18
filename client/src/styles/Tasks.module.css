@@ -374,7 +374,7 @@
   list-style-type: none;
   margin-top: 1rem;
   overflow: auto;
-  max-height: 28vh;
+  max-height: 35vh;
 }
 
 .projects-list-item {

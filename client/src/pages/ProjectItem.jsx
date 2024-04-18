@@ -6,15 +6,24 @@ import { Link } from 'react-router-dom';
 import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
 import { IoIosNotifications } from 'react-icons/io';
 
-import { MdOutlineDashboard, MdOutlineSegment } from 'react-icons/md';
+import {
+  MdOutlineDashboard,
+  MdOutlineSegment,
+  MdDelete,
+  MdRemoveRedEye,
+  MdOpenInNew,
+} from 'react-icons/md';
 import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { FaRegCircleUser, FaFileImage } from 'react-icons/fa6';
 import { FaFileLines } from 'react-icons/fa6';
 import { BsFileEarmarkPdfFill, BsThreeDotsVertical } from 'react-icons/bs';
+import { GrStatusGood } from 'react-icons/gr';
+import { RiContrastLine } from 'react-icons/ri';
 
 const ProjectItem = () => {
   const [showNav, setShowNav] = useState(false);
+  const [taskCategory, setTaskCategory] = useState('all');
   const navRef = useRef();
 
   const hideNav = (e) => {
@@ -252,6 +261,96 @@ const ProjectItem = () => {
                 </span>
               </div>
 
+              <div className={styles['alt-project-details-container']}>
+                <span className={styles['project-details-head']}>
+                  Project Details
+                </span>
+
+                <div className={styles['table-container']}>
+                  <table className={styles.table}>
+                    <tbody>
+                      <tr>
+                        <td className={styles['table-property']}>Tasks:</td>
+                        <td>15</td>
+                      </tr>
+                      <tr>
+                        <td className={styles['table-property']}>Created:</td>
+                        <td>10th January, 2024</td>
+                      </tr>
+                      <tr>
+                        <td className={styles['table-property']}>Deadline:</td>
+                        <td>26 April, 2024</td>
+                      </tr>
+                      <tr>
+                        <td className={styles['table-property']}>Team:</td>
+                        <td>6 members</td>
+                      </tr>
+                      <tr>
+                        <td className={styles['table-property']}>Status:</td>
+                        <td>Active</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className={styles['progress-div']}>
+                  <span className={styles['progress-box']}>
+                    <span>Progress</span>
+                    <span className={styles['progress-value']}>60%</span>
+                  </span>
+
+                  <span className={styles['progress-bar']}>&nbsp;</span>
+                </div>
+              </div>
+
+              <div className={styles['alt-project-team-container']}>
+                <span className={styles['team-head']}>Team</span>
+
+                <div className={styles['team-div']}>
+                  <div className={styles['member-box']}>
+                    <img
+                      src="../../assets/images/profile2webp.webp"
+                      className={styles['member-img']}
+                    />
+                    <span className={styles['member-details']}>
+                      <span className={styles['member-name']}>Arya Stark</span>
+                      <span className={styles['member-title']}>
+                        Web Designer
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className={styles['member-box']}>
+                    <img
+                      src="../../assets/images/profile3.jpeg"
+                      className={styles['member-img']}
+                    />
+                    <span className={styles['member-details']}>
+                      <span className={styles['member-name']}>
+                        Ramsay Bolton
+                      </span>
+                      <span className={styles['member-title']}>
+                        Web Developer
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className={styles['member-box']}>
+                    <img
+                      src="../../assets/images/profile4.jpeg"
+                      className={styles['member-img']}
+                    />
+                    <span className={styles['member-details']}>
+                      <span className={styles['member-name']}>
+                        Cersei Lannister
+                      </span>
+                      <span className={styles['member-title']}>
+                        Human resources manager
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               <div className={styles['files-conatiner']}>
                 <span className={styles['files-text']}>Uploaded Files</span>
 
@@ -287,7 +386,7 @@ const ProjectItem = () => {
                     </div>
 
                     <div className={styles['menu-box']}>
-                      <BsThreeDotsVertical className={styles['menu-icon']} />
+                      <BsThreeDotsVertical className={styles['menu-file-icon']} />
                       <ul className={styles['menu-list']}>
                         <li className={styles['menu-item']}>Download</li>
                         <li className={styles['menu-item']}>Delete</li>
@@ -325,7 +424,7 @@ const ProjectItem = () => {
                       </span>
                     </div>
                     <div className={styles['menu-box']}>
-                      <BsThreeDotsVertical className={styles['menu-icon']} />
+                      <BsThreeDotsVertical className={styles['menu-file-icon']} />
                       <ul className={styles['menu-list']}>
                         <li className={styles['menu-item']}>Download</li>
                         <li className={styles['menu-item']}>Delete</li>
@@ -363,7 +462,7 @@ const ProjectItem = () => {
                       </span>
                     </div>
                     <div className={styles['menu-box']}>
-                      <BsThreeDotsVertical className={styles['menu-icon']} />
+                      <BsThreeDotsVertical className={styles['menu-file-icon']} />
                       <ul className={styles['menu-list']}>
                         <li className={styles['menu-item']}>Download</li>
                         <li className={styles['menu-item']}>Delete</li>
@@ -465,6 +564,250 @@ const ProjectItem = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className={styles['task-container']}>
+            <ul className={styles['tasks-category-list']}>
+              <li
+                className={`${styles['taks-category']} ${
+                  taskCategory === 'all' ? styles['current-task-category'] : ''
+                }`}
+                onClick={() => setTaskCategory('all')}
+              >
+                All tasks
+              </li>
+              <li
+                className={`${styles['taks-category']} ${
+                  taskCategory === 'open' ? styles['current-task-category'] : ''
+                }`}
+                onClick={() => setTaskCategory('open')}
+              >
+                Open
+              </li>
+              <li
+                className={`${styles['taks-category']} ${
+                  taskCategory === 'progress'
+                    ? styles['current-task-category']
+                    : ''
+                }`}
+                onClick={() => setTaskCategory('progress')}
+              >
+                In Progress
+              </li>
+              <li
+                className={`${styles['taks-category']} ${
+                  taskCategory === 'completed'
+                    ? styles['current-task-category']
+                    : ''
+                }`}
+                onClick={() => setTaskCategory('completed')}
+              >
+                Completed
+              </li>
+            </ul>
+
+            {taskCategory === 'all' && (
+              <ul className={styles['tasks-list']}>
+                <li className={styles['task-item']}>
+                  <GrStatusGood className={styles['status-icon']} />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>
+                <li className={styles['task-item']}>
+                  <MdOpenInNew
+                    className={`${styles['status-icon']} ${styles['status-icon2']}`}
+                  />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>{' '}
+                <li className={styles['task-item']}>
+                  <GrStatusGood className={styles['status-icon']} />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>
+                <li className={styles['task-item']}>
+                  <RiContrastLine
+                    className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                  />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>
+                <li className={styles['task-item']}>
+                  <RiContrastLine
+                    className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                  />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>
+              </ul>
+            )}
+
+            {taskCategory === 'open' && (
+              <ul className={styles['tasks-list']}>
+                <li className={styles['task-item']}>
+                  <MdOpenInNew
+                    className={`${styles['status-icon']} ${styles['status-icon2']}`}
+                  />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>{' '}
+              </ul>
+            )}
+
+            {taskCategory === 'progress' && (
+              <ul className={styles['tasks-list']}>
+                <li className={styles['task-item']}>
+                  <RiContrastLine
+                    className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                  />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>
+                <li className={styles['task-item']}>
+                  <RiContrastLine
+                    className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                  />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>
+              </ul>
+            )}
+
+            {taskCategory === 'completed' && (
+              <ul className={styles['tasks-list']}>
+                <li className={styles['task-item']}>
+                  <GrStatusGood className={styles['status-icon']} />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>
+
+                <li className={styles['task-item']}>
+                  <GrStatusGood className={styles['status-icon']} />{' '}
+                  <span className={styles['task-name']}>
+                    Make a single landing page and dashboard
+                  </span>
+                  <span className={styles['action-box']}>
+                    <span className={styles['view-icon-box']} title="View Task">
+                      <MdRemoveRedEye className={styles['view-icon']} />
+                    </span>
+                    <span
+                      className={styles['delete-icon-box']}
+                      title="Delete Task"
+                    >
+                      <MdDelete className={styles['delete-icon']} />
+                    </span>
+                  </span>
+                </li>
+              </ul>
+            )}
           </div>
         </section>
       </section>
