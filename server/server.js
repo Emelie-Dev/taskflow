@@ -3,13 +3,12 @@
 // Custom Modules
 
 // Third Party Modules
-
-import express from 'express';
-
 import { config } from 'dotenv';
 
 config({ path: './config.env' });
 
-const app = express();
+import app from './app.js';
 
-export default app;
+app.listen(process.env.PORT || 2005, () => {
+  console.log('Server has started....');
+});
