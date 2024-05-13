@@ -64,7 +64,7 @@ const AccountAccess = () => {
       !password.match(/[0-9]/) ||
       !password.match(/\W/)
     ) {
-      toast('Password must have letter, digit, and special character.', {
+      toast('Password must consist of letter, digit, and special character.', {
         toastId: customId,
       });
       return;

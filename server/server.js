@@ -4,6 +4,8 @@
 
 import { config } from 'dotenv';
 
+import mongoose from 'mongoose';
+
 // Set environmental variables
 
 export const configEnv = () => config({ path: './config.env' });
@@ -21,6 +23,13 @@ process.on('uncaughtException', (err) => {
 // Custom Modules
 
 import app from './app.js';
+
+// Connects to database
+
+(async () => {
+  await mongoose.connect(process.env.DB_LOCAL_CONN_STR);
+  console.log('Database Connection successfull....');
+})();
 
 // Starting the server
 

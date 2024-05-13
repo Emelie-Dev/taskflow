@@ -1,5 +1,9 @@
 // Core Modules
 
+import { fileURLToPath } from 'url';
+
+import { dirname, join } from 'path';
+
 // Third party Modules
 
 import express from 'express';
@@ -26,6 +30,18 @@ import morgan from 'morgan';
 
 // Custom Modules
 
+import userRouter from './Routes/userRoutes.js';
+
+import authRouter from './Routes/authRoutes.js';
+
+import errorController from './Controllers/errorController.js';
+
+import CustomError from './Utils/CustomError.js';
+
+import projectRouter from './Routes/projectRoutes.js';
+
+import taskRouter from './Routes/taskRoutes.js';
+
 const app = express();
 
 config({ path: './config.env' });
@@ -35,6 +51,11 @@ config({ path: './config.env' });
 // Implements Cors
 app.use(cors());
 app.options('*', cors());
+
+// Render static files
+app.use(
+  express.static(join(dirname(fileURLToPath(import.meta.url)), 'Public'))
+);
 
 // Adds security headers
 app.use(helmet());
@@ -73,5 +94,27 @@ app.use(compression());
 
 // Displays response details in terminal
 app.use(morgan('dev'));
+
+// Route handlers
+
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/projects', projectRouter);
+app.use('/api/v1/tasks', taskRouter);
+
+// For wrong endpoints
+
+app.all('*', (req, res, next) => {
+  const error = new CustomError(
+    `Cant find ${req.originalUrl} on the server.`,
+    404
+  );
+
+  next(error);
+});
+
+// Error middleware
+
+app.use(errorController);
 
 export default app;

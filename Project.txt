@@ -1,0 +1,42 @@
+=> SERVER
+
+ --Adjustments 
+
+    - Write enough comments 
+    - Add project activity to project item page
+    - Add project active state when editing projects
+    - Add projects and tasks created to the analytics page
+    - Implement search functionality with queries
+    - Remove leader from tasks
+    - Show project leader on hover of leader img
+    
+ -- Data Design
+
+    - Datasets
+
+        - Projects
+        - Tasks
+        - Analytics
+        - Users
+        - Notifications
+        - Activity
+
+    - Collections
+
+        - Projects
+        - Tasks
+        - Users
+        - Notifications
+        - Activity
+    
+    - Modelling
+
+        -Users
+            - Users & Projects (Parent Referencing)
+            - Users & Tasks (Parent Referencing)
+            - Users & Analytics (Embedding)
+            - Users & Notifications (Parent Referencing)
+        
+        -Projects
+
+            - Projects & Tasks (Parent Referencing)
