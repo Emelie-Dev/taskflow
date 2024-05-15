@@ -186,6 +186,23 @@ const userSchema = new mongoose.Schema({
       dob: false,
     },
   },
+  notifications: [
+    {
+      type: {
+        type: String,
+        enum: ['login', 'group', 'private'],
+        required: [true, 'Please provide a value for the type field.'],
+      },
+      time: {
+        type: Date,
+        required: [true, 'Please provide a value for the date field.'],
+      },
+      group: String,
+      private: String,
+      phone: String,
+      country: String,
+    },
+  ],
   firstName: String,
   lastName: String,
   occupation: String,

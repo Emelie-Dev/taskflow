@@ -27,7 +27,7 @@ import app from './app.js';
 // Connects to database
 
 (async () => {
-  await mongoose.connect(process.env.DB_LOCAL_CONN_STR);
+  await mongoose.connect(process.env.DB_LOCAL_CONN_STR, { autoIndex: false });
   console.log('Database Connection successfull....');
 })();
 

@@ -278,7 +278,7 @@ const CalendarPage = () => {
             />
           </span>
           <div className={styles['icon-div']}>
-            <Link className={styles['icon-container']}  to={'/notifications'}>
+            <Link className={styles['icon-container']} to={'/notifications'}>
               <IoIosNotifications className={styles['notification-icon']} />
             </Link>
             <span className={styles['icon-container']}>

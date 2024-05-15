@@ -42,6 +42,10 @@ import projectRouter from './Routes/projectRoutes.js';
 
 import taskRouter from './Routes/taskRoutes.js';
 
+import activityRouter from './Routes/activityRoutes.js';
+
+import analyticsRouter from './Routes/analyticsRoutes.js';
+
 const app = express();
 
 config({ path: './config.env' });
@@ -101,6 +105,8 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/projects', projectRouter);
 app.use('/api/v1/tasks', taskRouter);
+app.use('/api/v1/activities', activityRouter);
+app.use('/api/v1/analytics', analyticsRouter);
 
 // For wrong endpoints
 

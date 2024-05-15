@@ -9,6 +9,7 @@
     - Implement search functionality with queries
     - Remove leader from tasks
     - Show project leader on hover of leader img
+    - Add select year and month for projects and tasks
     
  -- Data Design
 
@@ -26,17 +27,23 @@
         - Projects
         - Tasks
         - Users
-        - Notifications
         - Activity
+        - Analytics
     
     - Modelling
 
         -Users
             - Users & Projects (Parent Referencing)
             - Users & Tasks (Parent Referencing)
-            - Users & Analytics (Embedding)
-            - Users & Notifications (Parent Referencing)
+            - Users & Analytics ( Referencing)
+            - Users & Notifications (Embedding)
         
         -Projects
 
             - Projects & Tasks (Parent Referencing)
+
+=> CLIENT
+
+=> UPDATES
+
+    - Enable confirmation of reset password

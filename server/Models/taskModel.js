@@ -9,7 +9,12 @@ const taskSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    required: [true, 'Project must belong to a user.'],
+    required: [true, 'Task must belong to a user.'],
+  },
+  owner: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: [true, 'Task must belong to an owner.'],
   },
   project: {
     type: mongoose.Schema.ObjectId,
