@@ -146,7 +146,6 @@ export class QueryFeatures {
 
       switch (range) {
         case '1y':
-          console.log(1);
           break;
       }
     }
