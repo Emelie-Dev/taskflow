@@ -42,9 +42,11 @@ import projectRouter from './Routes/projectRoutes.js';
 
 import taskRouter from './Routes/taskRoutes.js';
 
-import activityRouter from './Routes/activityRoutes.js';
+import notificationRouter from './Routes/notificationRoutes.js';
 
 import analyticsRouter from './Routes/analyticsRoutes.js';
+
+import dashboardRouter from './Routes/dashboardRoutes.js';
 
 const app = express();
 
@@ -105,8 +107,9 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/projects', projectRouter);
 app.use('/api/v1/tasks', taskRouter);
-app.use('/api/v1/activities', activityRouter);
+app.use('/api/v1/notifications', notificationRouter);
 app.use('/api/v1/analytics', analyticsRouter);
+app.use('/api/v1/dashboard', dashboardRouter);
 
 // For wrong endpoints
 

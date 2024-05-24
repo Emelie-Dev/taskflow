@@ -10,6 +10,13 @@
     - Remove leader from tasks
     - Show project leader on hover of leader img
     - Add select year and month for projects and tasks
+    - Add fileds to hpp whitelist
+    - Set all createdAt field to immutable
+    - Edit project page 
+    - Modify nested routes
+    - Encrypt admin
+    - Resolve custom fields
+    - Enable viewing project group chat from project item page
     
  -- Data Design
 
@@ -27,7 +34,7 @@
         - Projects
         - Tasks
         - Users
-        - Activity
+        - Notifications
         - Analytics
     
     - Modelling
@@ -35,15 +42,28 @@
         -Users
             - Users & Projects (Parent Referencing)
             - Users & Tasks (Parent Referencing)
-            - Users & Analytics ( Referencing)
-            - Users & Notifications (Embedding)
+            - Users & Analytics ()
+            - Users & Notifications (Parent Referencing)
         
         -Projects
 
             - Projects & Tasks (Parent Referencing)
 
+        - Notifications
+
+            - An assigned task deleted
+            - A project or task deleted
+            - A task created
+            - A task or project updated
+            
+
 => CLIENT
+
+    --Pages request Analysis
+
+        - Dashboard
 
 => UPDATES
 
     - Enable confirmation of reset password
+

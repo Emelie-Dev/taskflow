@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import Task from './taskModel.js';
 
 const projectSchema = new mongoose.Schema(
   {
@@ -12,16 +11,18 @@ const projectSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'User',
       required: [true, 'Project must belong to a user.'],
+      immutable: true,
     },
-    leader: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      required: [true, 'Please provide a value for the project leader field.'],
-    },
+    // leader: {
+    //   type: mongoose.Schema.ObjectId,
+    //   ref: 'User',
+    //   required: [true, 'Please provide a value for the project leader field.'],
+    // },
     team: [
       {
         type: mongoose.Schema.ObjectId,
         ref: 'User',
+        default: [],
       },
     ],
     description: {
@@ -68,6 +69,10 @@ const projectSchema = new mongoose.Schema(
         },
       },
     ],
+    enableVisibility: {
+      type: Boolean,
+      default: true,
+    },
     progress: Number,
     openTasks: Number,
     completedTasks: Number,
@@ -91,24 +96,38 @@ projectSchema.virtual('tasks', {
 });
 
 projectSchema.pre('find', function (next) {
-  this.populate({
-    path: 'tasks',
-    select: 'status',
-  });
+  if (this.getFilter().calculateProgress) {
+    delete this.getFilter().calculateProgress;
+
+    this.calculateProjectsProgress = true;
+
+    this.populate({
+      path: 'tasks',
+      select: 'status',
+    });
+  }
+
   next();
 });
 
 projectSchema.post('find', function (docs) {
-  docs.forEach((doc) => {
-    const openTasks = doc.tasks.filter((task) => task.status === 'open');
-    const completedTasks = doc.tasks.filter(
-      (task) => task.status === 'complete'
-    );
+  if (this.calculateProjectsProgress) {
+    docs.forEach((doc) => {
+      let openTasks = 0;
+      let completedTasks = 0;
 
-    doc.openTasks = openTasks.length;
-    doc.completedTasks = completedTasks.length;
-    doc.progress = Math.floor((completedTasks.length / doc.tasks.length) * 100);
-  });
+      for (let task of doc.tasks) {
+        if (task.status === 'open') openTasks++;
+        if (task.status === 'complete') completedTasks++;
+      }
+
+      doc.openTasks = openTasks;
+      doc.completedTasks = completedTasks;
+      doc.progress = Math.floor(
+        (completedTasks / (doc.tasks.length || 1)) * 100
+      );
+    });
+  }
 });
 
 const Project = mongoose.model('Project', projectSchema);

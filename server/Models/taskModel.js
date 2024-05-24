@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import CustomError from '../Utils/CustomError.js';
 
 const taskSchema = new mongoose.Schema({
   name: {
@@ -6,20 +7,45 @@ const taskSchema = new mongoose.Schema({
     trim: true,
     required: [true, 'Please provide a value for the name field.'],
   },
+  // Thw owner or an assignee
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
     required: [true, 'Task must belong to a user.'],
+    immutable: true,
   },
-  owner: {
+  // The persons who owns the project
+  leader: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    required: [true, 'Task must belong to an owner.'],
+    immutable: true,
+  },
+  assigned: {
+    type: Boolean,
+    immutable: true,
+  },
+  assignee: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+    },
+  ],
+  mainTask: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Task',
+    immutable: true,
+  },
+  // For creating tasks on project
+  createdBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    immutable: true,
   },
   project: {
     type: mongoose.Schema.ObjectId,
     ref: 'Project',
     required: [true, 'Please provide a value for the project field.'],
+    immutable: true,
   },
   status: {
     type: String,
@@ -31,26 +57,17 @@ const taskSchema = new mongoose.Schema({
     enum: ['high', 'medium', 'low'],
     required: [true, 'Please provide a value for the priority field.'],
   },
-  assignee: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-    },
-  ],
   createdAt: {
     type: Date,
     default: Date.now(),
     immutable: true,
   },
-  deadline: {
+  lastModified: {
     type: Date,
-    validate: {
-      validator: (value) => {
-        return value > this.createdAt;
-      },
-      message: 'Please provide a valid deadline date.',
-    },
+    default: Date.now(),
   },
+
+  deadline: Date,
   description: {
     type: String,
     trim: true,
@@ -59,8 +76,44 @@ const taskSchema = new mongoose.Schema({
 
 // Virtual populate (logs)
 
-// Prevents duplicate project from a user
+// Prevents duplicate tasks from a user
 taskSchema.index({ name: 1, user: 1, project: 1 }, { unique: true });
+
+// Filters tasks
+taskSchema.query.filterTasks = function (type) {
+  let date = new Date();
+
+  switch (type.trim()) {
+    // returns tasks from the last seven days
+    case 'recent':
+      date.setDate(date.getDate() - 7);
+      return this.where('lastModified').gte(date);
+
+    // returns urgent tasks
+    case 'urgent':
+      return this.where({ priority: 'high' });
+
+    // returns assigned tasks
+    case 'assigned':
+      return this.where({ assigned: true });
+
+    // returns tasks whose deadline are far
+    case 'later':
+      date.setMonth(date.getMonth() + 1);
+      return this.where('deadline').gte(date);
+  }
+};
+
+// Validates deadline field
+taskSchema.pre('save', function (next) {
+  if (this.deadline < this.createdAt) {
+    return next(
+      new CustomError('Please provide a valid value for the deadline', 400)
+    );
+  }
+
+  next();
+});
 
 const Task = mongoose.model('Task', taskSchema);
 

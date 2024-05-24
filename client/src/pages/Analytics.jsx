@@ -78,9 +78,18 @@ const Analytics = () => {
     ],
     datasets: [
       {
-        label: '',
+        label: 'Created',
         data: [50, 37, 73, 29, 58, 23, 65, 78, 67, 12, 23, 54],
         backgroundColor: 'rgba(255,165,0,1)',
+        borderColor: 'rgba(255, 165, 0, 1)',
+        borderWidth: 1,
+        barThickness: 15,
+        borderRadius: 5,
+      },
+      {
+        label: 'Completed',
+        data: [50, 37, 73, 29, 58, 23, 65, 78, 67, 12, 23, 54],
+        backgroundColor: 'red',
         borderColor: 'rgba(255, 165, 0, 1)',
         borderWidth: 1,
         barThickness: 15,
@@ -107,17 +116,38 @@ const Analytics = () => {
         },
       },
     },
+    // responsive: false
   };
 
   const areaData = {
-    labels: ['January', 'February', 'March'],
+    labels: [
+      'January',
+      'February',
+      'March',
+      'February',
+      'March',
+      'March',
+      'March',
+
+      'March',
+    ],
     datasets: [
       {
         label: '',
-        data: [15, 39, 30],
+        data: [15, 39, 30, 50, 45, 15, 20, 43],
         fill: 'rgba(255, 165, 0, 1)',
         backgroundColor: 'orange',
         borderColor: 'orange',
+        borderWidth: 3,
+        pointRadius: 3,
+        tension: 0.4,
+      },
+      {
+        label: '',
+        data: [23, 23, 48, 19, 23, 56, 75, 17],
+        fill: 'red',
+        backgroundColor: 'red',
+        borderColor: 'red',
         borderWidth: 3,
         pointRadius: 3,
         tension: 0.4,

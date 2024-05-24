@@ -1,13 +1,4 @@
 import User from '../Models/userModel.js';
+import factory from '../Utils/handlerFactory.js';
 
-export const getAllUsers = async (req, res) => {
-  const users = await User.find().limit(0);
-
-  return res.status(200).json({
-    status: 'success',
-    length: users.length,
-    data: {
-      users,
-    },
-  });
-};
+export const getAllUsers = factory.getAll(User, 'users');
