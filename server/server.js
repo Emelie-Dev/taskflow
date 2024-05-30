@@ -26,10 +26,11 @@ import app from './app.js';
 
 // Connects to database
 
-(async () => {
-  await mongoose.connect(process.env.DB_LOCAL_CONN_STR, { autoIndex: false });
-  console.log('Database Connection successfull....');
-})();
+await mongoose.connect(process.env.DB_LOCAL_CONN_STR, {
+  autoIndex: false,
+});
+
+console.log('Database Connection successfull....');
 
 // Starting the server
 
@@ -40,7 +41,6 @@ const server = app.listen(port, () => {
 });
 
 // Handles Promise Rejections
-
 process.on('unhandledRejection', (err) => {
   console.log('\nError ', { name: err.name, message: err.message });
   console.log('\nUnhandled Rejection Occured! Shutting down....\n');
@@ -50,7 +50,6 @@ process.on('unhandledRejection', (err) => {
 });
 
 // Heroku specific
-
 process.on('SIGTERM', () => {
   console.log('\nSIGTERM RECEIVED. Shutting down....');
   server.close(() => {

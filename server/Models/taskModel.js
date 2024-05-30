@@ -74,8 +74,6 @@ const taskSchema = new mongoose.Schema({
   },
 });
 
-// Virtual populate (logs)
-
 // Prevents duplicate tasks from a user
 taskSchema.index({ name: 1, user: 1, project: 1 }, { unique: true });
 
@@ -108,7 +106,7 @@ taskSchema.query.filterTasks = function (type) {
 taskSchema.pre('save', function (next) {
   if (this.deadline < this.createdAt) {
     return next(
-      new CustomError('Please provide a valid value for the deadline', 400)
+      new CustomError('Please provide a valid value for the deadline!', 400)
     );
   }
 

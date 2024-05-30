@@ -6,36 +6,218 @@ import asyncErrorHandler from '../Utils/asyncErrorHandler.js';
 import factory from '../Utils/handlerFactory.js';
 import Project from '../Models/projectModel.js';
 import Notification from '../Models/notificationModel.js';
+import User from '../Models/userModel.js';
+
+export const filterValues = async (values, type, ...fields) => {
+  for (const value in values) {
+    let condition;
+
+    if (type === 'date') {
+      condition =
+        String(new Date(values[value].from)) ===
+        String(new Date(values[value].to));
+    } else {
+      condition = String(values[value].from) === String(values[value].to);
+    }
+
+    if (!fields.includes(value) || condition) delete values[value];
+  }
+
+  return values;
+};
 
 const generateNotifications = async (
   assigned,
-  fields,
-  mainTask,
-  assignedTask
+  fields = [],
+  values = {},
+  task,
+  owner,
+  project,
+  req
 ) => {
-  const notificationArray = [];
+  let notifications = [];
 
-  if (assigned) {
-    if (fields.includes('priority')) {
-      notificationArray.push({});
-    }
-    const assignedTaskNotification = {
-      user: req.user._id,
-      task: req.params.id,
-      type: 'activity',
-      action: 'transition',
-      state: [],
+  const user = await User.findById(req.user._id).select(
+    'username firstName lastName'
+  );
+
+  if (project === 'create') {
+    let notification = {
+      user,
+      project: task.project,
+      action: 'creation',
+      type: ['task'],
     };
+
+    notifications.push(notification);
+  } else if (project === 'delete') {
+    let notification;
+    if (assigned) {
+      notification = {
+        user: owner,
+        performer: user,
+        project: task.project,
+        action: 'deletion',
+        type: ['assignedTask'],
+      };
+    } else {
+      notification = {
+        user,
+        project: task.project,
+        action: 'deletion',
+        type: 'task',
+      };
+    }
+
+    notifications.push(notification);
+  } else if (assigned) {
+    if (fields.includes('priority')) {
+      if (values.priority.from !== values.priority.to) {
+        const notificationValue = { ...values };
+        delete notificationValue.status;
+
+        notifications.push({
+          user,
+          task: task._id,
+          action: 'transition',
+          type: ['priority'],
+          state: notificationValue,
+        });
+      }
+    }
+
+    if (fields.includes('status')) {
+      if (values.status.from !== values.status.to) {
+        const notificationValue = { ...values };
+        delete notificationValue.priority;
+
+        notifications.push({
+          user: owner,
+          performer: user,
+          task: task.mainTask,
+          action: 'transition',
+          type: ['status'],
+          state: notificationValue,
+        });
+      }
+    }
+  } else {
+    if (fields.includes('name') || fields.includes('description')) {
+      const notificationValues = await filterValues(
+        { ...values },
+        false,
+        'name',
+        'description'
+      );
+
+      const notification = {
+        user,
+        task: task._id,
+        action: 'update',
+        state: notificationValues,
+      };
+
+      notification.type = Object.keys(notification.state);
+
+      if (notification.type.length !== 0) notifications.push(notification);
+    }
+
+    if (fields.includes('status') || fields.includes('priority')) {
+      const notificationValues = await filterValues(
+        { ...values },
+        false,
+        'status',
+        'priority'
+      );
+
+      const notification = {
+        user,
+        performer: user,
+        task: task._id,
+        action: 'transition',
+        state: notificationValues,
+      };
+
+      notification.type = Object.keys(notification.state);
+
+      if (notification.type.length !== 0) notifications.push(notification);
+    }
+
+    if (fields.includes('deadline')) {
+      const notificationValues = await filterValues(
+        { ...values },
+        'date',
+        'deadline'
+      );
+
+      let action;
+
+      if (notificationValues.deadline) {
+        action =
+          new Date(notificationValues.deadline.from) >
+          new Date(notificationValues.deadline.to)
+            ? 'reduction'
+            : 'extension';
+      }
+
+      const notification = {
+        user,
+        task: task._id,
+        action,
+        state: notificationValues,
+      };
+
+      notification.type = Object.keys(notification.state);
+
+      if (notification.type.length !== 0) notifications.push(notification);
+    }
+
+    if (fields.includes('assignee')) {
+      notifications.push({
+        user,
+        task: task._id,
+        action: 'assignment',
+        state: values,
+        type: 'assignee',
+      });
+    }
   }
 
-  // const mainTaskNotification = {};
+  if (notifications.lengtsh !== 0) await Notification.insertMany(notifications);
+};
 
-  // await Notification.insertMany([
-  //   assignedTaskNotification,
-  //   mainTaskNotification,
-  // ]);
+const validateAssignee = async (projectId, assignees = []) => {
+  const project = await Project.findById(projectId);
 
-  console.log([assigned, fields, mainTask, assignedTask]);
+  const team = project.team.map((member) => String(member));
+
+  const leader = String(project.user);
+
+  let assigneesLength = assignees.length;
+
+  for (let i = 0; i < assigneesLength; i++) {
+    if (!team.includes(assignees[i])) {
+      const err = new CustomError(
+        `The number "${
+          i + 1
+        }" on your assignee list is not a member of your team. You can only assign tasks to the team members of you project!`,
+        400
+      );
+
+      return { valid: false, error: err };
+    } else {
+      if (assignees[i] === leader) {
+        const err = new CustomError(
+          `You cannot assign a task to the owner of the project!`,
+          403
+        );
+
+        return { valid: false, error: err };
+      }
+    }
+  }
+
+  return { valid: true };
 };
 
 export const createNewTask = asyncErrorHandler(async (req, res, next) => {
@@ -46,7 +228,7 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
   const project = await Project.findById(req.body.project);
 
   if (project) {
-    if (String(project.user) !== String(req.user._id)) {
+    if (String(project.user) !== String(req.body.user)) {
       const err = new CustomError(
         'You are not the owner of this project, so you cannot create this task!',
         403
@@ -61,13 +243,28 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  if (req.body.assigned) {
-    delete req.body.assignee;
-  } else {
-    if ('mainTask' in req.body) delete req.body.mainTask;
-  }
+  const excludeArray = [
+    'lastModified',
+    'assigned',
+    'mainTask',
+    'leader',
+    'assignee',
+  ];
+
+  excludeArray.forEach((value) => delete req.body[value]);
 
   const task = await Task.create(req.body);
+
+  // creates notification
+  await generateNotifications(
+    false,
+    undefined,
+    undefined,
+    task,
+    null,
+    'create',
+    req
+  );
 
   return res.status(201).json({
     status: 'success',
@@ -76,10 +273,6 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
     },
   });
 });
-
-export const getAllTasks = factory.getAll(Task, 'tasks');
-
-export const getMyTasks = factory.getMyData(Task, 'tasks');
 
 export const getAssignedTasks = asyncErrorHandler(async (req, res, next) => {
   const assignedTasks = await Task.find({
@@ -130,12 +323,12 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
       const fields = [];
       const values = {};
 
+      let mainTask;
+
       if (req.body.status) {
-        const mainTask = await Task.findById(task.mainTask);
+        mainTask = await Task.findById(task.mainTask);
 
         mainTask.status = req.body.status;
-
-        await mainTask.save();
 
         values.status = { from: task.status, to: req.body.status };
         task.status = req.body.status;
@@ -150,29 +343,80 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 
       await task.save();
 
-      await Task.updateMany(
-        { mainTask: task.mainTask },
-        {
-          status: req.body.status || task.status,
-        }
-      );
+      // Saves the main task and other assigned tasks
+      if (req.body.status) {
+        // To make sure the main task is saved after the assigned task for proper data validation
+        await mainTask.save();
 
-      generateNotifications(true, fields, task.mainTask, task._id);
+        await Task.updateMany(
+          { mainTask: task.mainTask },
+          {
+            status: req.body.status,
+          }
+        );
+      }
+
+      // creates notifications
+      await generateNotifications(
+        true,
+        fields,
+        values,
+        task,
+        mainTask.user,
+        req,
+        res
+      );
     } else {
-      excludeArray = ['lastModified', 'assigned', 'mainTask', 'leader'];
+      excludeArray = [
+        'lastModified',
+        'assigned',
+        'mainTask',
+        'leader',
+        'assignee',
+      ];
 
       excludeArray.forEach((value) => delete req.body[value]);
 
+      const values = {};
+      for (let value in req.body) {
+        values[value] = {};
+        values[value].from = task[value];
+        values[value].to = req.body[value];
+      }
+
+      const fields = Object.keys(req.body);
+
+      if (req.body.deadline) {
+        // validates deadline field
+        if (new Date(req.body.deadline) < new Date(task.createdAt)) {
+          return next(
+            new CustomError(
+              'Please provide a valid value for the deadline!',
+              400
+            )
+          );
+        }
+      }
+
+      // updates the task
       task = await Task.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
       });
 
-      excludeArray = ['assignee'];
-
-      excludeArray.forEach((value) => delete req.body[value]);
-
+      // updates assigned tasks
       await Task.updateMany({ mainTask: req.params.id }, req.body);
+
+      // creates notifications
+      await generateNotifications(
+        false,
+        fields,
+        values,
+        task,
+        task.user,
+        false,
+        req
+      );
     }
   }
 
@@ -218,6 +462,7 @@ export const deleteTask = asyncErrorHandler(async (req, res, next) => {
         mainTask.assignee = [...assignees];
         await mainTask.save();
       }
+
       // deletes the task
       await Task.findByIdAndDelete(req.params.id);
     } else {
@@ -229,8 +474,159 @@ export const deleteTask = asyncErrorHandler(async (req, res, next) => {
     }
   }
 
+  // creates notification
+  await generateNotifications(
+    task.assigned,
+    undefined,
+    undefined,
+    task,
+    task.leader,
+    'delete',
+    req
+  );
+
   return res.status(204).json({
     status: 'success',
     data: null,
   });
 });
+
+export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
+  const task = await Task.findById(req.params.id);
+
+  if (!task) {
+    const err = new CustomError('This task does not exist!', 404);
+    return next(err);
+  }
+
+  if (task.assigned) {
+    const err = new CustomError('An assigned task cannot have assignees.', 403);
+    return next(err);
+  }
+
+  if (String(req.user._id) !== String(task.user)) {
+    const err = new CustomError('This task does not exist!', 404);
+    return next(err);
+  }
+
+  if (!req.body.assignee) {
+    return next(new CustomError('Please provide an assignee field!', 400));
+  }
+
+  // Checks for valid team format
+  if (!Array.isArray(req.body.assignee)) {
+    return next(new CustomError('Invalid format for the assignee field!', 400));
+  }
+
+  const taskAssignees = task.assignee.map((value) => String(value));
+
+  const newAssignees = [];
+  const newAssigneesData = [];
+  const oldAssignees = [];
+  const oldAssigneesData = [];
+
+  // filters new assignees
+  for (let assignee of req.body.assignee) {
+    if (!taskAssignees.includes(assignee)) {
+      const userData = await User.findById(assignee).select(
+        'username firstName lastName'
+      );
+
+      newAssignees.push(assignee);
+      newAssigneesData.push(userData);
+    }
+  }
+
+  // filters old assignees
+  for (let assignee of taskAssignees) {
+    if (!req.body.assignee.includes(assignee)) {
+      const userData = await User.findById(assignee).select(
+        'username firstName lastName'
+      );
+
+      oldAssignees.push(assignee);
+      oldAssigneesData.push(userData);
+    }
+  }
+
+  // generates assigned tasks
+  const assignedTasks = newAssignees.map((assignee) => {
+    const newTask = {
+      name: task.name,
+      user: assignee,
+      leader: task.user,
+      assigned: true,
+      mainTask: task._id,
+      project: task.project,
+      status: task.status,
+      priority: task.priority,
+      deadline: task.deadline,
+      description: task.description,
+    };
+
+    return newTask;
+  });
+
+  // gets old assigned tasks
+  const oldAssignedTasksIds = await Promise.all(
+    oldAssignees.map(async (assignee) => {
+      const oldTask = await Task.findOne({
+        mainTask: task._id,
+        user: assignee,
+      });
+
+      return oldTask._id;
+    })
+  );
+
+  // validates assignee field
+  const { valid, error } = await validateAssignee(task.project, newAssignees);
+  if (!valid) return next(error);
+
+  const values = {
+    assignee: {
+      from: task.assignee,
+      to: req.body.assignee,
+      oldAssigneesData,
+      newAssigneesData,
+    },
+  };
+
+  // sets assignee field
+  task.assignee = [...new Set(req.body.assignee)];
+  await task.save();
+
+  // creates asigned tasks
+  await Task.insertMany(assignedTasks);
+
+  // deletes old assigned tasks
+  await Promise.all(
+    oldAssignedTasksIds.map(async (assignee) => {
+      await Task.findByIdAndDelete(assignee);
+    })
+  );
+
+  if (oldAssignees.length !== 0 || newAssignees.length !== 0) {
+    // creates notification
+    await generateNotifications(
+      false,
+      ['assignee'],
+      values,
+      task,
+      task.leader,
+      false,
+      req
+    );
+  }
+
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      task,
+    },
+  });
+});
+
+export const getAllTasks = factory.getAll(Task, 'tasks');
+
+export const getMyTasks = factory.getMyData(Task, 'tasks');

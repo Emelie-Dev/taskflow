@@ -5,6 +5,7 @@ import {
   getAllTasks,
   getAssignedTasks,
   getMyTasks,
+  updateAssignees,
   updateTask,
 } from '../Controllers/taskController.js';
 import { protectRoute } from '../Controllers/authController.js';
@@ -16,6 +17,8 @@ router.use(protectRoute);
 router.route('/').get(getAllTasks).post(createNewTask);
 
 router.route('/:id').patch(updateTask).delete(deleteTask);
+
+router.patch('/:id/assignees', updateAssignees);
 
 router.get('/assigned', getAssignedTasks);
 

@@ -34,15 +34,6 @@ const projectSchema = new mongoose.Schema(
       default: Date.now(),
       immutable: true,
     },
-    deadline: {
-      type: Date,
-      validate: {
-        validator: (value) => {
-          return value > this.createdAt;
-        },
-        message: 'Please provide a valid deadline date.',
-      },
-    },
     status: {
       type: String,
       enum: ['active', 'inactive'],
@@ -73,6 +64,7 @@ const projectSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    deadline: Date,
     progress: Number,
     openTasks: Number,
     completedTasks: Number,
@@ -93,6 +85,17 @@ projectSchema.virtual('tasks', {
   ref: 'Task',
   foreignField: 'project',
   localField: '_id',
+});
+
+// Validates deadline field
+projectSchema.pre('save', function (next) {
+  if (this.deadline < this.createdAt) {
+    return next(
+      new CustomError('Please provide a valid value for the deadline!', 400)
+    );
+  }
+
+  next();
 });
 
 projectSchema.pre('find', function (next) {

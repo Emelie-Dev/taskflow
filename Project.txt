@@ -51,11 +51,15 @@
 
         - Notifications
 
-            - An assigned task deleted
+            - An assigned task ✔
             - A project or task deleted
-            - A task created
-            - A task or project updated
-            
+            - A task created ✔
+            - A task or project updated ✔
+
+        - Email
+
+            - Membership confirmation
+
 
 => CLIENT
 
@@ -67,3 +71,8 @@
 
     - Enable confirmation of reset password
 
+=> DOCS
+
+    - The assigned tasks will be created with the update asignees route
+    - Respone to team invitation will be queried by notification Id.
+    - Notifications will be deleted on the server

@@ -6,24 +6,46 @@ const notificationSchema = new mongoose.Schema({
     ref: 'User',
     // required: [true, 'Notification must belong to a user.'],
   },
-  members: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      // required: [true, 'Notification must belong to a user.'],
-    },
-  ],
-  type: {
-    type: String,
-    enum: ['activity', 'login', 'group', 'private'],
-    required: [true, 'Please provide a value for the type field.'],
+  performer: {
+    type: {},
   },
   action: {
     type: String,
-    enum: ['transition', 'update', 'assignment', 'creation', 'deletion'],
+    enum: [
+      'transition',
+      'update',
+      'assignment',
+      'creation',
+      'deletion',
+      'extension',
+      'reduction',
+      'invitation',
+    ],
     // required: [true, 'Please provide a value for the action field.'],
   },
-  state: [String],
+  type: [
+    {
+      type: String,
+      enum: [
+        'priority',
+        'status',
+        'name',
+        'description',
+        'deadline',
+        'assignee',
+        'login',
+        'group',
+        'private',
+        'task',
+        'team',
+        'assignedTask',
+      ],
+      required: [true, 'Please provide a value for the type field.'],
+    },
+  ],
+  state: {
+    type: {},
+  },
   project: {
     type: mongoose.Schema.ObjectId,
     ref: 'Project',
@@ -35,6 +57,7 @@ const notificationSchema = new mongoose.Schema({
   time: {
     type: Date,
     default: Date.now(),
+    immutable: true,
     // required: [true, 'Please provide a value for the date field.'],
   },
   group: String,
