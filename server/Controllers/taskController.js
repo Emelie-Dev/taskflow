@@ -36,10 +36,11 @@ const generateNotifications = async (
   req
 ) => {
   let notifications = [];
+  // const user = await User.findById(req.user._id).select(
+  //   'username firstName lastName'
+  // );
 
-  const user = await User.findById(req.user._id).select(
-    'username firstName lastName'
-  );
+  const user = req.user._id;
 
   if (project === 'create') {
     let notification = {
@@ -55,7 +56,9 @@ const generateNotifications = async (
     if (assigned) {
       notification = {
         user: owner,
-        performer: user,
+        performer: await User.findById(req.user._id).select(
+          'username firstName lastName'
+        ),
         project: task.project,
         action: 'deletion',
         type: ['assignedTask'],
@@ -93,7 +96,9 @@ const generateNotifications = async (
 
         notifications.push({
           user: owner,
-          performer: user,
+          performer: await User.findById(req.user._id).select(
+            'username firstName lastName'
+          ),
           task: task.mainTask,
           action: 'transition',
           type: ['status'],
@@ -186,9 +191,7 @@ const generateNotifications = async (
   if (notifications.lengtsh !== 0) await Notification.insertMany(notifications);
 };
 
-const validateAssignee = async (projectId, assignees = []) => {
-  const project = await Project.findById(projectId);
-
+const validateAssignee = async (project, assignees = []) => {
   const team = project.team.map((member) => String(member));
 
   const leader = String(project.user);
@@ -520,12 +523,16 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
 
   const taskAssignees = task.assignee.map((value) => String(value));
 
+  const project = await Project.findById(task.project);
+
   const newAssignees = [];
   const newAssigneesData = [];
   const oldAssignees = [];
   const oldAssigneesData = [];
+  const assignedTasks = [];
+  const assignmentNotifications = [];
 
-  // filters new assignees
+  // filters new assignees and generates assigned tasks
   for (let assignee of req.body.assignee) {
     if (!taskAssignees.includes(assignee)) {
       const userData = await User.findById(assignee).select(
@@ -534,10 +541,44 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
 
       newAssignees.push(assignee);
       newAssigneesData.push(userData);
+
+      const newTask = {
+        name: task.name,
+        user: assignee,
+        leader: task.user,
+        assigned: true,
+        mainTask: task._id,
+        project: task.project,
+        status: task.status,
+        priority: task.priority,
+        deadline: task.deadline,
+        description: task.description,
+      };
+
+      assignedTasks.push(newTask);
+
+      assignmentNotifications.push({
+        user: assignee,
+        action: 'task',
+        performer: {
+          project: project.name,
+        },
+      });
     }
   }
 
-  // filters old assignees
+  // validates assignee field
+  const { valid, error } = await validateAssignee(project, newAssignees);
+  if (!valid) return next(error);
+
+  // creates asigned tasks
+  await Task.insertMany(assignedTasks);
+
+  // sets assignee field
+  task.assignee = [...new Set(req.body.assignee)];
+  await task.save();
+
+  // filters old assignees and deletes old assigned tasks
   for (let assignee of taskAssignees) {
     if (!req.body.assignee.includes(assignee)) {
       const userData = await User.findById(assignee).select(
@@ -546,42 +587,13 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
 
       oldAssignees.push(assignee);
       oldAssigneesData.push(userData);
-    }
-  }
 
-  // generates assigned tasks
-  const assignedTasks = newAssignees.map((assignee) => {
-    const newTask = {
-      name: task.name,
-      user: assignee,
-      leader: task.user,
-      assigned: true,
-      mainTask: task._id,
-      project: task.project,
-      status: task.status,
-      priority: task.priority,
-      deadline: task.deadline,
-      description: task.description,
-    };
-
-    return newTask;
-  });
-
-  // gets old assigned tasks
-  const oldAssignedTasksIds = await Promise.all(
-    oldAssignees.map(async (assignee) => {
-      const oldTask = await Task.findOne({
+      await Task.deleteOne({
         mainTask: task._id,
         user: assignee,
       });
-
-      return oldTask._id;
-    })
-  );
-
-  // validates assignee field
-  const { valid, error } = await validateAssignee(task.project, newAssignees);
-  if (!valid) return next(error);
+    }
+  }
 
   const values = {
     assignee: {
@@ -591,20 +603,6 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
       newAssigneesData,
     },
   };
-
-  // sets assignee field
-  task.assignee = [...new Set(req.body.assignee)];
-  await task.save();
-
-  // creates asigned tasks
-  await Task.insertMany(assignedTasks);
-
-  // deletes old assigned tasks
-  await Promise.all(
-    oldAssignedTasksIds.map(async (assignee) => {
-      await Task.findByIdAndDelete(assignee);
-    })
-  );
 
   if (oldAssignees.length !== 0 || newAssignees.length !== 0) {
     // creates notification
@@ -618,6 +616,10 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
       req
     );
   }
+
+  // Send the new assignees notifications
+
+  await Notification.insertMany(assignmentNotifications);
 
   return res.status(200).json({
     status: 'success',

@@ -14,12 +14,15 @@ const notificationSchema = new mongoose.Schema({
     enum: [
       'transition',
       'update',
-      'assignment',
-      'creation',
+      'assignment', // When tasks are assigned
+      'creation', // When tasks are created
       'deletion',
       'extension',
       'reduction',
       'invitation',
+      'addition', // When new team members are added
+      'response',
+      'task', // For private notification on task assignment
     ],
     // required: [true, 'Please provide a value for the action field.'],
   },
@@ -39,8 +42,9 @@ const notificationSchema = new mongoose.Schema({
         'task',
         'team',
         'assignedTask',
+        'project',
       ],
-      required: [true, 'Please provide a value for the type field.'],
+      // required: [true, 'Please provide a value for the type field.'],
     },
   ],
   state: {

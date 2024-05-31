@@ -52,7 +52,7 @@
         - Notifications
 
             - An assigned task ✔
-            - A project or task deleted
+            - A project or task deleted ✔
             - A task created ✔
             - A task or project updated ✔
 
@@ -76,3 +76,4 @@
     - The assigned tasks will be created with the update asignees route
     - Respone to team invitation will be queried by notification Id.
     - Notifications will be deleted on the server
+    - Project Leaders do not need to provide thier ids when updating their team
