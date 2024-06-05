@@ -41,12 +41,16 @@ const projectSchema = new mongoose.Schema(
     },
     files: [
       {
+        path: {
+          type: String,
+          required: [true, 'File must have a path.'],
+        },
         name: {
           type: String,
           required: [true, 'File must have a name.'],
         },
         size: {
-          type: String,
+          type: Number,
           required: [true, 'File must have a size.'],
         },
         time: {
@@ -54,15 +58,21 @@ const projectSchema = new mongoose.Schema(
           default: Date.now(),
         },
         sender: {
-          type: mongoose.Schema.ObjectId,
-          ref: 'User',
-          required: [true, 'File must belong to a sender.'],
+          type: {
+            userId: {
+              type: mongoose.Schema.ObjectId,
+              ref: 'User',
+            },
+            name: String,
+            lastName: String,
+            firstName: String,
+          },
         },
       },
     ],
-    enableVisibility: {
+    addFiles: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     deadline: Date,
     progress: Number,

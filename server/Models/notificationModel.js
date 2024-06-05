@@ -20,7 +20,7 @@ const notificationSchema = new mongoose.Schema({
       'extension',
       'reduction',
       'invitation',
-      'addition', // When new team members are added
+      'addition', // When new team members or files are added
       'response',
       'task', // For private notification on task assignment
     ],
@@ -43,6 +43,7 @@ const notificationSchema = new mongoose.Schema({
         'team',
         'assignedTask',
         'project',
+        'files',
       ],
       // required: [true, 'Please provide a value for the type field.'],
     },

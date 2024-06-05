@@ -8,6 +8,7 @@ import Notification from '../Models/notificationModel.js';
 import { filterValues } from './taskController.js';
 import User from '../Models/userModel.js';
 import multer from 'multer';
+import fs from 'fs';
 
 const generateNotifications = async (fields, values, project, req) => {
   let notifications = [];
@@ -89,18 +90,26 @@ const generateNotifications = async (fields, values, project, req) => {
   if (notifications.lengtsh !== 0) await Notification.insertMany(notifications);
 };
 
-const multerStorage = multer.memoryStorage();
+// Set up storage options
+const multerStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'Public/project-files');
+  },
+  filename: function (req, file, cb) {
+    const ext = file.originalname.slice(file.originalname.lastIndexOf('.'));
 
-const multerFilter = (req, file, cb) => {
-  cb(null, true);
-};
+    const fileName = `user-${Math.round(
+      Math.random() * 1e14
+    )}-${Date.now()}${ext}`;
 
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
+    cb(null, fileName);
+  },
 });
 
-export const uploadUserPhoto = upload.single('photo');
+// Initialize Multer with the storage and filter options
+const upload = multer({
+  storage: multerStorage,
+});
 
 export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
   const assignedProjects = await Task.aggregate([
@@ -188,11 +197,12 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
     'completedTasks',
     'user',
     'team',
+    'files',
   ];
   // name, desc, deadline,status, files, team
   excludeArray.forEach((value) => delete req.body[value]);
 
-  const project = await Project.findOne({
+  let project = await Project.findOne({
     _id: req.params.id,
     user: req.user._id,
   });
@@ -221,13 +231,14 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
   const fields = Object.keys(req.body);
 
   // updates the project
-  await Project.updateOne(
+  project = await Project.findOneAndUpdate(
     {
       _id: req.params.id,
       user: req.user._id,
     },
     req.body,
     {
+      new: true,
       runValidators: true,
     }
   );
@@ -238,8 +249,285 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
   return res.status(200).json({
     status: 'success',
     data: {
-      updatedProject: project,
+      project,
     },
+  });
+});
+
+export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
+  const project = await Project.findById(req.params.id);
+
+  // Check if project exist
+  if (!project) {
+    const err = new CustomError(`This project does not exist!`, 404);
+    return next(err);
+  }
+
+  // Validate request header
+  if (!req.headers['x-files-names']) {
+    return next(new CustomError('Invalid request!', 400));
+  }
+
+  const newFilesNames = JSON.parse(req.headers['x-files-names']);
+
+  if (!Array.isArray(newFilesNames) || newFilesNames.length === 0) {
+    return next(new CustomError('Invalid request!', 400));
+  }
+
+  // Convert the member ids to string
+  const team = project.team.map((value) => String(value));
+
+  // Check if the project does not belong to the user
+  if (String(project.user) !== String(req.user._id)) {
+    if (!team.includes(String(req.user._id))) {
+      return next(new CustomError(`This project does not exist!`, 404));
+    } else {
+      if (!project.addFiles) {
+        const err = new CustomError(
+          'You are not allowed to add files to this project!',
+          403
+        );
+
+        return next(err);
+      }
+    }
+  }
+
+  const fileNames = project.files.map((file) => file.name);
+
+  const lowerNewFilesNames = newFilesNames.map((name) =>
+    String(name).toLowerCase()
+  );
+
+  const filteredFilesNames = [...new Set(lowerNewFilesNames)];
+
+  // Check for duplicate file names
+  if (lowerNewFilesNames.length !== filteredFilesNames.length) {
+    return next(new CustomError('No duplicate file name!', 400));
+  }
+
+  // Check if the new file names already exist
+  for (let name of newFilesNames) {
+    if (fileNames.includes(name)) {
+      const err = new CustomError(
+        `You already have a file with the name - '${name}'.`,
+        400
+      );
+
+      return next(err);
+    }
+  }
+
+  // Calculate total size of project files
+  const projectFilesSize = project.files.reduce(
+    (total, value) => total + parseInt(value.size),
+    0
+  );
+
+  // Uploads the files
+  upload.array('files')(req, res, async (error) => {
+    if (error) {
+      const err = new CustomError('An error occurred during file upload!', 500);
+      return next(err);
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return next(new CustomError('The files list cannot be empty!', 400));
+    }
+
+    // Calculate the total size of all the uploaded files
+    const uploadedFilesSize = req.files.reduce(
+      (total, value) => total + parseInt(value.size),
+      0
+    );
+
+    // Add the uploaded files size and the project files size
+    const totalSize = uploadedFilesSize + projectFilesSize;
+
+    // Check if the total size is more than 5MB
+    if (totalSize > 5 * 1024 * 1024) {
+      const freeSpace = Number(
+        (5 * 1024 * 1024 - projectFilesSize) / (1024 * 1024)
+      ).toFixed(2);
+
+      const err = new CustomError(
+        `The total project size cannot exceed "5MB". You have ${freeSpace}MB left.`,
+        400
+      );
+
+      // Delete the files
+      const deletedFiles = req.files.map((file) => {
+        return new Promise((resolve, reject) => {
+          fs.unlink(file.path, (err) => {
+            if (err) reject();
+
+            resolve();
+          });
+        });
+      });
+
+      await Promise.allSettled(deletedFiles);
+
+      return next(err);
+    }
+
+    const filesData = req.files.map((file, index) => {
+      const data = {
+        path: file.path,
+        name: newFilesNames[index],
+        size: file.size,
+        sender: {
+          userId: req.user._id,
+          name: req.user.username,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+        },
+      };
+
+      return data;
+    });
+
+    const files = project.files.concat(filesData);
+
+    // Updates the files property of the project
+    project.files = files;
+
+    await project.save();
+
+    await Notification.create({
+      user: project.user,
+      performer: {
+        name: req.user.username,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+      },
+      project: project._id,
+      action: 'addition',
+      type: ['files'],
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'The file(s) were uploaded successfully.',
+    });
+  });
+});
+// Fix deleted files tomorrow
+export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
+  const project = await Project.findById(req.params.id);
+
+  // Check if project exist
+  if (!project) {
+    const err = new CustomError(`This project does not exist!`, 404);
+    return next(err);
+  }
+
+  // Check is the files from the request body is an array
+  if (!Array.isArray(req.body.files)) {
+    return next(new CustomError('Invalid request format', 400));
+  }
+
+  // Check if the length of the files is 0
+  if (req.body.files.length === 0) {
+    return next(new CustomError('The files list cannot be empty!', 400));
+  }
+
+  // Convert the member ids to string
+  const team = project.team.map((value) => String(value));
+
+  // Check if the project does not belong to the user
+  if (String(project.user) !== String(req.user._id)) {
+    if (!team.includes(String(req.user._id))) {
+      return next(new CustomError(`This project does not exist!`, 404));
+    }
+  }
+
+  // Check if the project has files
+  if (project.files.length === 0) {
+    return next(new CustomError('This project has no file.', 400));
+  }
+
+  const files = project.files.filter((file) =>
+    req.body.files.includes(file.name)
+  );
+
+  const errorFiles = [];
+  const restrictedFiles = [];
+
+  if (files.length === 0) {
+    return next(new CustomError('None of the provided files exist!', 404));
+  }
+
+  const deleteFiles = files.map((file) => {
+    return new Promise((resolve, reject) => {
+      if (
+        String(file.sender.userId) === String(req.user._id) ||
+        String(req.user._id) === String(project.user)
+      ) {
+        fs.unlink(file.path, (err) => {
+          if (err) {
+            errorFiles.push(file.name);
+            reject();
+          }
+
+          const index = project.files.findIndex(
+            (doc) => doc.name === file.name
+          );
+
+          project.files.splice(index, 1);
+          resolve();
+        });
+      } else {
+        restrictedFiles.push(file.name);
+        reject();
+      }
+    });
+  });
+
+  await Promise.allSettled(deleteFiles);
+
+  await project.save();
+
+  let message = '';
+
+  if (errorFiles.length !== 0) {
+    message += `An error occured when deleting these files - '${errorFiles.join(
+      ', '
+    )}'.\n`;
+  }
+
+  if (restrictedFiles.length !== 0) {
+    message += `You were unable to delete these files because you were not the sender - '${restrictedFiles.join(
+      ', '
+    )}'.\n`;
+  }
+
+  const otherFiles =
+    files.length - (errorFiles.length + restrictedFiles.length);
+
+  if (otherFiles !== 0) {
+    if (errorFiles.length !== 0 || restrictedFiles.length !== 0) {
+      message += 'The remaining file(s) were deleted succesfully.';
+    } else {
+      message += 'The file(s) were deleted succesfully.';
+    }
+
+    await Notification.create({
+      user: project.user,
+      performer: {
+        name: req.user.username,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+      },
+      project: project._id,
+      action: 'deletion',
+      type: ['files'],
+    });
+  }
+
+  return res.status(200).json({
+    status: 'success',
+    message,
   });
 });
 

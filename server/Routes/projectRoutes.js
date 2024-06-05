@@ -9,6 +9,8 @@ import {
   updateProject,
   updateTeam,
   respondToInvitation,
+  uploadProjectFiles,
+  deleteProjectFiles,
 } from '../Controllers/projectController.js';
 import { protectRoute } from '../Controllers/authController.js';
 import taskRouter from './taskRoutes.js';
@@ -26,6 +28,8 @@ router.route('/').get(getAllProjects).post(createNewProject);
 router.get('/assigned', getAssignedProjects);
 
 router.route('/:id').get(getProject).patch(updateProject).delete(deleteProject);
+
+router.route('/:id/files').patch(uploadProjectFiles).delete(deleteProjectFiles);
 
 router.get('/my_projects', getMyProjects);
 

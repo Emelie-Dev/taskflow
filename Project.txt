@@ -17,6 +17,8 @@
     - Encrypt admin
     - Resolve custom fields
     - Enable viewing project group chat from project item page
+    - Enable add files functionality for project members
+    - Update current project after each project update
     
  -- Data Design
 
@@ -77,3 +79,6 @@
     - Respone to team invitation will be queried by notification Id.
     - Notifications will be deleted on the server
     - Project Leaders do not need to provide thier ids when updating their team
+    - Files upload will be done differently from updating projects
+    - File names for upload will be sent in the request headers as an array
+    - Project leaders do not need to be added in the team project property
