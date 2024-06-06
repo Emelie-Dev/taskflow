@@ -1,3 +1,4 @@
+import User from '../Models/userModel.js';
 import { ApiFeatures, QueryFeatures } from './ApiFeatures.js';
 import CustomError from './CustomError.js';
 import asyncErrorHandler from './asyncErrorHandler.js';
@@ -52,7 +53,29 @@ const createOne = (Model, collection) =>
   asyncErrorHandler(async (req, res, next) => {
     if (!req.body.user) req.body.user = req.user._id;
 
-    const doc = await Model.create(req.body);
+    let doc;
+
+    if (collection === 'project') {
+      delete req.body.team;
+      delete req.body.files;
+      delete req.body.progress;
+      delete req.body.openTasks;
+      delete req.body.completedTasks;
+
+      doc = await Model.create(req.body);
+
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          currentProject: doc._id,
+        },
+        {
+          runValidators: true,
+        }
+      );
+    } else {
+      doc = await Model.create(req.body);
+    }
 
     return res.status(201).json({
       status: 'success',

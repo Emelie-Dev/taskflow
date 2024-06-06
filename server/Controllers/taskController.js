@@ -258,6 +258,21 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
 
   const task = await Task.create(req.body);
 
+  // Update the last modified property of the project
+  project.lastModified = Date.now();
+  await project.save();
+
+  // Update the user current project
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      currentProject: project._id,
+    },
+    {
+      runValidators: true,
+    }
+  );
+
   // creates notification
   await generateNotifications(
     false,
@@ -298,6 +313,8 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
   // -- validate assignee field, name, status, priority, deadline, desc, assignee
   let task = await Task.findById(req.params.id);
 
+  const project = await Project.findById(task.project);
+
   if (!task) {
     const err = new CustomError('This task does not exist!', 404);
     return next(err);
@@ -333,6 +350,9 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 
         mainTask.status = req.body.status;
 
+        // Update the last Modified property
+        mainTask.lastModified = Date.now();
+
         values.status = { from: task.status, to: req.body.status };
         task.status = req.body.status;
         fields.push('status');
@@ -343,6 +363,9 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
         task.priority = req.body.priority;
         fields.push('priority');
       }
+
+      // Update the last Modified property
+      task.lastModified = Date.now();
 
       await task.save();
 
@@ -355,9 +378,25 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
           { mainTask: task.mainTask },
           {
             status: req.body.status,
+            lastModified: Date.now(),
           }
         );
       }
+
+      // Update the last modified property of the project
+      project.lastModified = Date.now();
+      await project.save();
+
+      // Update the user current project
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          currentProject: project._id,
+        },
+        {
+          runValidators: true,
+        }
+      );
 
       // creates notifications
       await generateNotifications(
@@ -401,6 +440,9 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
         }
       }
 
+      // Adds the last Modified property to the request body
+      req.body.lastModified = Date.now();
+
       // updates the task
       task = await Task.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
@@ -433,6 +475,8 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 
 export const deleteTask = asyncErrorHandler(async (req, res, next) => {
   const task = await Task.findById(req.params.id);
+
+  const project = await Project.findById(task.project);
 
   if (!task) {
     const err = new CustomError('This task does not exist!', 404);
@@ -476,6 +520,24 @@ export const deleteTask = asyncErrorHandler(async (req, res, next) => {
       await Task.findByIdAndDelete(req.params.id);
     }
   }
+
+  // Update the last modified property of the project
+  project.lastModified = Date.now();
+  await project.save();
+
+  // Update the user current project
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      currentProject: project._id,
+    },
+    {
+      runValidators: true,
+    }
+  );
+
+  // Delete all notifications that belongs to the task
+  await Notification.deleteMany({ task: task._id });
 
   // creates notification
   await generateNotifications(
@@ -576,6 +638,10 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
 
   // sets assignee field
   task.assignee = [...new Set(req.body.assignee)];
+
+  // Update the last modified property of the task
+  task.lastModified = Date.now();
+
   await task.save();
 
   // filters old assignees and deletes old assigned tasks
@@ -617,8 +683,22 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  // Send the new assignees notifications
+  // Update the last modified property of the project
+  project.lastModified = Date.now();
+  await project.save();
 
+  // Update the user current project
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      currentProject: project._id,
+    },
+    {
+      runValidators: true,
+    }
+  );
+
+  // Send the new assignees notifications
   await Notification.insertMany(assignmentNotifications);
 
   return res.status(200).json({

@@ -2,7 +2,7 @@
 
  --Adjustments 
 
-    - Write enough comments 
+    - Write enough comments ✔
     - Add project activity to project item page
     - Add project active state when editing projects
     - Add projects and tasks created to the analytics page
@@ -17,8 +17,8 @@
     - Encrypt admin
     - Resolve custom fields
     - Enable viewing project group chat from project item page
-    - Enable add files functionality for project members
-    - Update current project after each project update
+    - Enable add files functionality for project members ✔
+    - Update current project after each project update ✔
     
  -- Data Design
 

@@ -75,6 +75,10 @@ const projectSchema = new mongoose.Schema(
       default: false,
     },
     deadline: Date,
+    lastModified: {
+      type: Date,
+      default: Date.now(),
+    },
     progress: Number,
     openTasks: Number,
     completedTasks: Number,
