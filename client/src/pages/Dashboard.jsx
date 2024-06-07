@@ -35,6 +35,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import NewTask from '../components/NewTask';
 
 ChartJS.register(
   CategoryScale,
@@ -52,6 +53,7 @@ const Dashboard = () => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [showNav, setShowNav] = useState(false);
   const [showUserBox, setShowUserBox] = useState(false);
+  const [addTask, setAddTask] = useState(false);
   const searchRef = useRef();
   const calenderRef = useRef();
   const navRef = useRef();
@@ -299,6 +301,8 @@ const Dashboard = () => {
           </li>
         </ul>
       </nav>
+
+      {addTask && <NewTask addTask={addTask} setAddTask={setAddTask} />}
 
       <section className={styles.section}>
         <header className={styles.header}>
@@ -651,7 +655,10 @@ const Dashboard = () => {
               </span>
             </div>
 
-            <button className={styles['add-task-button']}>
+            <button
+              className={styles['add-task-button']}
+              onClick={() => setAddTask(true)}
+            >
               <HiPlus className={styles['add-task-icon']} />
               Add Task
             </button>

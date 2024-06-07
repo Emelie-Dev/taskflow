@@ -250,7 +250,7 @@ const Projects = () => {
             />
           </span>
           <div className={styles['icon-div']}>
-            <Link className={styles['icon-container']}  to={'/notifications'}>
+            <Link className={styles['icon-container']} to={'/notifications'}>
               <IoIosNotifications className={styles['notification-icon']} />
             </Link>
             <span className={styles['icon-container']}>
@@ -276,6 +276,8 @@ const Projects = () => {
             </figure>
           </div>
         </header>
+        {/* 
+        <section className={styles['create-project-modal']}></section> */}
 
         <section className={styles['section-content']}>
           <div className={styles['section-head']}>

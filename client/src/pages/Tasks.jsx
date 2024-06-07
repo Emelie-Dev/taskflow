@@ -18,12 +18,14 @@ import TaskBox from '../components/TaskBox';
 import TaskBox2 from '../components/TaskBox2';
 import { HiPlus } from 'react-icons/hi';
 import { FaRegCircleUser } from 'react-icons/fa6';
+import NewTask from '../components/NewTask';
 
 const Tasks = () => {
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [taskType, setTaskType] = useState('personal');
+  const [addTask, setAddTask] = useState(false);
   const searchRef = useRef();
   const navRef = useRef();
 
@@ -192,6 +194,14 @@ const Tasks = () => {
         </ul>
       </nav>
 
+      {addTask && (
+        <NewTask
+          addTask={addTask}
+          setAddTask={setAddTask}
+          fixedProject={true}
+        />
+      )}
+
       <section className={styles.section}>
         <header className={styles.header}>
           <b className={styles['menu-icon-box']}>
@@ -221,7 +231,7 @@ const Tasks = () => {
             />
           </span>
           <div className={styles['icon-div']}>
-            <Link className={styles['icon-container']}  to={'/notifications'}>
+            <Link className={styles['icon-container']} to={'/notifications'}>
               <IoIosNotifications className={styles['notification-icon']} />
             </Link>
             <span className={styles['icon-container']}>
@@ -675,6 +685,7 @@ const Tasks = () => {
                 className={`${styles['add-task-btn']} ${
                   taskType === 'assigned' ? styles['hide-add-task'] : ''
                 }`}
+                onClick={() => setAddTask(true)}
               >
                 <HiPlus className={styles['add-task-icon']} />
                 Add task

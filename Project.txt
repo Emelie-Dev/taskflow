@@ -19,6 +19,7 @@
     - Enable viewing project group chat from project item page
     - Enable add files functionality for project members ✔
     - Update current project after each project update ✔
+    - Enable addition of task on projectitem page
     
  -- Data Design
 

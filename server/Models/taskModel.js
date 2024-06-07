@@ -66,7 +66,6 @@ const taskSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-
   deadline: Date,
   description: {
     type: String,
