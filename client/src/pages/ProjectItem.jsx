@@ -17,19 +17,32 @@ import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { FaRegCircleUser, FaFileImage } from 'react-icons/fa6';
 import { FaFileLines } from 'react-icons/fa6';
-import { BsFileEarmarkPdfFill, BsThreeDotsVertical } from 'react-icons/bs';
+import {
+  BsFileEarmarkPdfFill,
+  BsThreeDotsVertical,
+  BsPeopleFill,
+} from 'react-icons/bs';
 import { GrStatusGood } from 'react-icons/gr';
-import { RiContrastLine } from 'react-icons/ri';
-
+import { RiContrastLine, RiDeleteBin6Line } from 'react-icons/ri';
+import { GrUpdate } from 'react-icons/gr';
+import { RxUpdate } from 'react-icons/rx';
+import Project from '../components/Project';
 const ProjectItem = () => {
   const [showNav, setShowNav] = useState(false);
   const [taskCategory, setTaskCategory] = useState('all');
+  const [displayModal, setdisplayModal] = useState(false);
+  const [showFiles, setShowFiles] = useState(false);
   const navRef = useRef();
+  const fileRef = useRef();
 
   const hideNav = (e) => {
     if (e.target === navRef.current) {
       setShowNav(false);
     }
+  };
+
+  const displayFiles = () => {
+    alert(0);
   };
 
   return (
@@ -215,11 +228,30 @@ const ProjectItem = () => {
           </div>
         </header>
 
+        {displayModal && (
+          <Project
+            displayModal={displayModal}
+            setdisplayModal={setdisplayModal}
+            editProject={true}
+          />
+        )}
+
+        {showFiles && (
+          <section>
+            man <h1>m</h1>{' '}
+          </section>
+        )}
+
         <section className={styles['section-content']}>
           <h1 className={styles['project-name']}>Fitness App</h1>
 
           <div className={styles['edit-btn-div']}>
-            <button className={styles['edit-btn']}>Edit Project</button>
+            <button
+              className={styles['edit-btn']}
+              onClick={() => setdisplayModal(true)}
+            >
+              Edit Project
+            </button>
           </div>
 
           <div className={styles['project-container']}>
@@ -352,7 +384,23 @@ const ProjectItem = () => {
               </div>
 
               <div className={styles['files-conatiner']}>
-                <span className={styles['files-text']}>Uploaded Files</span>
+                <h1 className={styles['files-text']}>Uploaded Files</h1>
+
+                <div className={styles['add-files-box']}>
+                  <button
+                    className={styles['add-files-btn']}
+                    onClick={() => fileRef.current.click()}
+                  >
+                    Add Files
+                  </button>
+                  <input
+                    type="file"
+                    className={styles['add-file-input']}
+                    ref={fileRef}
+                    onChange={displayFiles}
+                    multiple
+                  />
+                </div>
 
                 <div className={styles['files-box']}>
                   <article className={styles['uploaded-file']}>
@@ -566,7 +614,101 @@ const ProjectItem = () => {
             </div>
           </div>
 
+          <div className={styles['activities-container']}>
+            <h1 className={styles['activity-head']}>Activities</h1>
+
+            <div className={styles['activity-table-container']}>
+              <table className={styles['activity-table']}>
+                <thead className={styles['table-head-row']}>
+                  <tr>
+                    <th className={styles['table-head']}>Activity</th>
+                    <th className={styles['table-head']}>Type</th>
+                    <th className={styles['table-head']}>Performed By</th>
+                    <th className={styles['table-head']}>Date</th>
+                    <th className={styles['table-head']}>Time</th>
+                    <th className={styles['table-head']}></th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td>A task was deleted</td>
+                    <td>
+                      <span
+                        className={`${styles['activity-type']} ${styles['activity-type1']}`}
+                      >
+                        <FaTasks className={styles['activity-type-icon']} />{' '}
+                        Task
+                      </span>
+                    </td>
+                    <td className={styles.performer}>Tyrion Lannister</td>
+                    <td>June 8, 2024</td>
+                    <td>
+                      11:00 <span className={styles['activity-time']}>am</span>
+                    </td>
+                    <td>
+                      <RiDeleteBin6Line
+                        className={styles['delete-activity-icon']}
+                        title="Delete Activity"
+                      />
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>A new member joined the team</td>
+                    <td>
+                      <span
+                        className={`${styles['activity-type']} ${styles['activity-type2']}`}
+                      >
+                        <BsPeopleFill
+                          className={styles['activity-type-icon']}
+                        />{' '}
+                        Team
+                      </span>
+                    </td>
+                    <td className={styles.performer}>Robert Baratheon</td>
+                    <td>June 5, 2024</td>
+                    <td>
+                      01:27 <span className={styles['activity-time']}>pm</span>
+                    </td>
+                    <td>
+                      <RiDeleteBin6Line
+                        className={styles['delete-activity-icon']}
+                        title="Delete Activity"
+                      />
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>The Project description was updated</td>
+                    <td>
+                      <span
+                        className={`${styles['activity-type']} ${styles['activity-type3']}`}
+                      >
+                        <RxUpdate className={styles['activity-type-icon']} />{' '}
+                        Update
+                      </span>
+                    </td>
+                    <td className={styles.performer}>Jon Snow</td>
+                    <td>May 27, 2024</td>
+                    <td>
+                      08:27 <span className={styles['activity-time']}>pm</span>
+                    </td>
+                    <td>
+                      <RiDeleteBin6Line
+                        className={styles['delete-activity-icon']}
+                        title="Delete Activity"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <div className={styles['task-container']}>
+            <h1 className={styles['task-head']}>Tasks</h1>
+
             <div className={styles['task-category-div']}>
               <ul className={styles['tasks-category-list']}>
                 <li

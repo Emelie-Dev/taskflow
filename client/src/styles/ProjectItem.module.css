@@ -386,6 +386,33 @@
 .files-text {
   font-weight: 700;
   font-size: 1.2rem;
+  margin: 0.5rem 0 0;
+}
+
+.add-files-box {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.add-files-btn {
+  border: none;
+  outline: none;
+  background: orange;
+  color: white;
+  border-radius: 5px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.add-files-btn:hover {
+  box-shadow: 1px 1px 8px -4px black;
+}
+
+.add-file-input {
+  display: none;
 }
 
 .files-box {
@@ -692,7 +719,7 @@
 }
 
 .task-container {
-  margin-top: 3rem;
+  margin-top: 1.5rem;
   padding: 0 0.5rem;
 }
 
@@ -823,6 +850,113 @@
 .task-item:hover .action-box {
   display: flex;
 }
+
+.activities-container {
+  margin-top: 3rem;
+  font-family: var(--general-font);
+}
+
+.activity-table-container {
+  max-height: 100vh;
+  overflow: auto;
+  white-space: nowrap;
+}
+
+.activity-head {
+  font-weight: 700;
+  font-size: 1.2rem;
+  font-family: var(--general-font);
+}
+
+.activity-table {
+  margin-top: 2rem;
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.table-head-row {
+  background: orange;
+}
+
+.activity-table tr:nth-child(even) {
+  background: rgba(128, 128, 128, 0.15);
+}
+
+.table-head {
+  font-family: var(--general-font);
+  text-align: left;
+  color: white;
+  font-weight: bold;
+  font-size: 1.05rem;
+  text-shadow: 1px 1px 2px black;
+  padding: 1rem;
+  cursor: auto;
+}
+
+td {
+  padding: 1rem;
+  text-align: left;
+  font-size: 1.02rem;
+  cursor: auto;
+}
+
+.performer {
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.activity-time {
+  font-variant: small-caps;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.delete-activity-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  transform: translateY(5px);
+  cursor: pointer;
+}
+
+.activity-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem 0.4rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.activity-type-icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-right: 0.5rem;
+  transform: translateY(1px);
+}
+
+.activity-type1 {
+  color: rgb(0, 158, 251);
+  background: rgba(0, 158, 251, 0.15);
+}
+
+.activity-type2 {
+  color: rgb(147, 104, 233);
+  background: rgba(147, 104, 233, 0.15);
+}
+
+.activity-type3 {
+  color: rgb(220, 20, 60);
+  background: rgba(220, 20, 60, 0.15);
+}
+
+.task-head {
+  font-weight: 700;
+  font-size: 1.2rem;
+  font-family: var(--general-font);
+  margin-bottom: 2rem;
+}
+
 /* Animations */
 
 @keyframes showNav {

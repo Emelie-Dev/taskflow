@@ -3,16 +3,16 @@
  --Adjustments 
 
     - Write enough comments ✔
-    - Add project activity to project item page
+    - Add project activity to project item page ✔
     - Add project active state when editing projects
     - Add projects and tasks created to the analytics page
     - Implement search functionality with queries
     - Remove leader from tasks
     - Show project leader on hover of leader img
-    - Add select year and month for projects and tasks
-    - Add fileds to hpp whitelist
+    - Add select year and month for projects and tasks 
+    - Add fields to hpp whitelist
     - Set all createdAt field to immutable
-    - Edit project page 
+    - Edit project page ✔
     - Modify nested routes
     - Encrypt admin
     - Resolve custom fields
@@ -20,6 +20,7 @@
     - Enable add files functionality for project members ✔
     - Update current project after each project update ✔
     - Enable addition of task on projectitem page
+    - Set limit for the performed by data(username length) in the activities table
     
  -- Data Design
 
@@ -83,3 +84,4 @@
     - Files upload will be done differently from updating projects
     - File names for upload will be sent in the request headers as an array
     - Project leaders do not need to be added in the team project property
+    - Project and tasks analytics will cover the page width

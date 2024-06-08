@@ -27,13 +27,14 @@ import { FaRegDotCircle } from 'react-icons/fa';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { IoCloseSharp } from 'react-icons/io5';
+import Project from '../components/Project';
 
 const Projects = () => {
   const [searchText, setSearchText] = useState('');
   const [currentAction, setCurrentAction] = useState(0);
   const [displayFormat, setDisplayFormat] = useState('grid');
   const [showNav, setShowNav] = useState(false);
-  const [createProject, setCreateProject] = useState(false);
+  const [displayModal, setdisplayModal] = useState(false);
   const searchRef = useRef();
   const actionRef = useRef();
   const menuRef = useRef();
@@ -78,14 +79,6 @@ const Projects = () => {
       setShowNav(false);
     }
   };
-
-  const hideCreateProject = (e) => {
-    e.target === e.currentTarget && setCreateProject(false);
-  };
-
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1;
-  const currentDate = new Date().getDate();
 
   return (
     <main className={styles.div}>
@@ -287,175 +280,11 @@ const Projects = () => {
           </div>
         </header>
 
-        {createProject && (
-          <section
-            className={styles['create-project-modal']}
-            onClick={hideCreateProject}
-          >
-            <div className={styles['modal-container']}>
-              <span
-                className={styles['close-modal']}
-                onClick={() => setCreateProject(false)}
-              >
-                <IoCloseSharp className={styles['close-modal-icon']} />
-              </span>
-              <h1 className={styles['modal-head']}>Create Project</h1>
-
-              <form className={styles.form}>
-                <div className={styles['modal-list']}>
-                  <div className={styles.category}>
-                    <span className={styles['label-box']}>
-                      <label
-                        className={styles['form-label']}
-                        htmlFor="project-name"
-                      >
-                        Project Name
-                      </label>
-                    </span>
-                    <input
-                      className={styles['form-input']}
-                      id="project-name"
-                      type="text"
-                    />
-                  </div>
-
-                  <div className={styles.category}>
-                    <span className={styles['label-box']}>
-                      <label className={styles['form-label']} htmlFor="status">
-                        Status
-                      </label>
-                    </span>
-
-                    <select className={styles['form-select']} id="status">
-                      <option>Active</option>
-                      <option>Inactive</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.category}>
-                    <span className={styles['label-box']}>
-                      <label
-                        className={styles['form-label']}
-                        htmlFor="deadline"
-                      >
-                        Deadline
-                      </label>
-                    </span>
-
-                    <input
-                      className={styles['form-input']}
-                      type="date"
-                      id="deadline"
-                      min={`${currentYear}-0${currentMonth}-0${currentDate}`}
-                    />
-                  </div>
-
-                  <div className={styles.category}>
-                    <span className={styles['label-box']}>
-                      <label className={styles['form-label']} htmlFor="team">
-                        Add Team Member
-                      </label>
-                    </span>
-
-                    <input
-                      className={styles['form-input']}
-                      type="text"
-                      id="team"
-                    />
-                  </div>
-
-                  <div
-                    className={`${styles.category} ${styles['assignees-category']}`}
-                  >
-                    <span className={styles['label-box']}>
-                      <label className={styles['form-label']} htmlFor="members">
-                        Team Members
-                      </label>
-                    </span>
-
-                    <div className={styles['assignees']}>
-                      <span className={styles['assignee-box']}>
-                        <IoCloseSharp className={styles['remove-assignee']} />
-                        <span className={styles['image-box']}>
-                          <span className={styles['assignee-name']}>
-                            Curtis Jones
-                          </span>
-
-                          <img
-                            className={styles['assignee-img']}
-                            src="../../public/assets/images/profile1.webp"
-                          />
-                        </span>
-                      </span>
-
-                      <span className={styles['assignee-box']}>
-                        <IoCloseSharp className={styles['remove-assignee']} />
-                        <span className={styles['image-box']}>
-                          <span className={styles['assignee-name']}>
-                            John Snow
-                          </span>
-
-                          <img
-                            className={styles['assignee-img']}
-                            src="../../public/assets/images/profile3.jpeg"
-                          />
-                        </span>
-                      </span>
-
-                      <span className={styles['assignee-box']}>
-                        <IoCloseSharp className={styles['remove-assignee']} />
-                        <span className={styles['image-box']}>
-                          <span className={styles['assignee-name']}>
-                            Tyrion Lannister
-                          </span>
-
-                          <img
-                            className={styles['assignee-img']}
-                            src="../../public/assets/images/pics1.jpg"
-                          />
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className={styles.category}>
-                    <span className={styles['label-box']}>
-                      <label
-                        className={styles['form-label']}
-                        htmlFor="description"
-                      >
-                        Description
-                      </label>
-                    </span>
-
-                    <textarea
-                      className={`${styles['form-input']} ${styles['project-description']}`}
-                      id="description"
-                      rows={10}
-                    ></textarea>
-                  </div>
-
-                  <div className={styles['add-files']}>
-                    <input
-                      className={styles['add-files-checkbox']}
-                      type="checkbox"
-                      id="add-files"
-                    />
-                    <label
-                      className={styles['add-files-label']}
-                      htmlFor="add-files"
-                    >
-                      Enable team members to add files.
-                    </label>
-                  </div>
-                </div>
-
-                <div className={styles['btn-box']}>
-                  <input className={styles['add-task-btn']} type="submit" />
-                </div>
-              </form>
-            </div>
-          </section>
+        {displayModal && (
+          <Project
+            displayModal={displayModal}
+            setdisplayModal={setdisplayModal}
+          />
         )}
 
         <section className={styles['section-content']}>
@@ -517,7 +346,7 @@ const Projects = () => {
               </span>
               <button
                 className={styles['create-project-btn']}
-                onClick={() => setCreateProject(true)}
+                onClick={() => setdisplayModal(true)}
               >
                 {' '}
                 <HiPlus className={styles['create-project-icon']} />
@@ -577,7 +406,7 @@ const Projects = () => {
 
             <button
               className={styles['alternate-project-btn']}
-              onClick={() => setCreateProject(true)}
+              onClick={() => setdisplayModal(true)}
             >
               {' '}
               <HiPlus className={styles['alternate-project-icon']} />
