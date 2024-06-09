@@ -353,6 +353,7 @@
   justify-content: space-between;
   width: 100%;
   align-items: flex-start;
+  padding: 0.2rem 0 0;
 }
 
 .category-div {
@@ -436,8 +437,9 @@
   display: flex;
   flex-direction: column;
   /* width: 34rem; */
-  padding: 1.75rem 1rem 1.5rem;
+  padding: 1.75rem 1.5rem 1.5rem;
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 .project-graph-div {
@@ -447,6 +449,8 @@
 .project-graph-container {
   width: 100%;
   overflow: auto;
+  padding: 0 0.5rem;
+  padding-right: 0;
 }
 
 .bottom-section {
@@ -457,10 +461,11 @@
 }
 
 .tasks-area-box {
-  width: 50%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .task-area-div {
@@ -469,6 +474,9 @@
 
 .task-area-container {
   width: 100%;
+  overflow: auto;
+  padding: 0 0.5rem;
+  padding-right: 0;
 }
 
 .pie-chart-container {
@@ -476,7 +484,9 @@
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
+  padding-top: 2rem;
 }
+
 .pie-chart-div {
   width: 100%;
   margin-top: 1rem;
@@ -715,11 +725,6 @@
   .category-div {
     padding: 2rem 1.5rem;
   }
-
-  .project-graph-box {
-    padding: 1.5rem;
-    padding-left: 0.5rem;
-  }
 }
 
 @media screen and (max-width: 999px) {
@@ -748,10 +753,6 @@
   }
   .task-category-item {
     margin-bottom: 1rem;
-  }
-
-  .project-graph-box {
-    padding: 2rem 1rem 1rem;
   }
 }
 
@@ -787,13 +788,6 @@
     margin-bottom: 1rem;
   }
 
-  .project-graph-box {
-    padding: 0rem 2rem;
-  }
-
-  .project-graph {
-    padding: 0 1rem;
-  }
   .rate-icon,
   .rate-icon-inverse {
     width: 3.5rem;
@@ -806,18 +800,9 @@
     justify-content: flex-start;
   }
 
-  .tasks-area-box {
-    width: 100%;
-    padding: 2.5rem 2rem 0;
-  }
-
-  .tasks-area-graph {
-    padding: 0 1rem;
-  }
-
   .pie-chart-container {
     width: 100%;
-    padding: 3rem 2rem 1rem;
+    padding: 1rem 1.5rem 2rem;
   }
 
   .pie-chart-div {
@@ -862,10 +847,11 @@
     display: none;
   }
 
-  .project-graph {
+  .project-graph-container {
     padding: 0;
   }
-  .tasks-area-graph {
+
+  .task-area-container {
     padding: 0;
   }
   .pie-chart-div {
@@ -883,17 +869,6 @@
   }
   .search {
     width: 13rem;
-  }
-
-  .project-graph-div,
-  .task-area-div {
-    overflow: auto;
-    padding: 0;
-  }
-
-  .project-graph-container,
-  .task-area-container {
-    width: 130%;
   }
 
   .pie-chart-div {
@@ -969,20 +944,21 @@
     grid-template-columns: auto auto;
   }
 
-  .project-graph-box {
-    padding: 0rem 1.5rem;
-  }
-  .tasks-area-box {
-    padding: 3rem 1.5rem 0;
-  }
-
-  .project-graph-container,
-  .task-area-container {
-    width: 150%;
-  }
-
   .pie-chart-box {
     width: 58%;
+  }
+
+  .tasks-area-box {
+    padding: 1.5rem 1rem;
+  }
+
+  .project-graph-box {
+    padding: 1.75rem 1rem 1.5rem;
+  }
+
+  .pie-chart-container {
+    padding: 1.5rem 1rem;
+    padding-top: 2rem;
   }
 }
 
@@ -1000,18 +976,13 @@
     fill: gray;
   }
 
-  .project-graph-container,
-  .task-area-container {
-    width: 180%;
-  }
-
   .task-category-list {
     display: grid;
     grid-template-columns: auto;
   }
 
   .pie-chart-container {
-    padding: 3rem 1.5rem 1rem;
+    padding: 1rem 1rem 2rem;
   }
 
   .pie-chart-box {
@@ -1040,26 +1011,25 @@
     padding: 0;
   }
 
-  .project-graph-div,
-  .task-area-div,
-  .pie-chart-div {
-    padding: 0 0.5rem;
+  .tasks-area-box {
+    padding: 1.5rem 0.5rem;
   }
 
-  .tasks-area-box {
-    padding: 2.5rem 1rem 0;
+  .project-graph-box {
+    padding: 1.75rem 0.5rem 1.5rem;
   }
 
   .pie-chart-container {
-    padding: 3rem 1rem 1rem;
+    padding: 1.5rem 0.5rem;
+    padding-top: 2rem;
   }
 
   .pie-chart-box {
     width: 70%;
   }
-  .project-graph-container,
-  .task-area-container {
-    width: 190%;
+
+  .pie-chart-div {
+    padding: 0 0.5rem;
   }
 }
 

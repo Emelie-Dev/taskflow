@@ -47,6 +47,14 @@ const Analytics = () => {
   const searchRef = useRef();
   const navRef = useRef();
 
+  useEffect(() => {
+    const deviceWidth = window.innerWidth;
+
+    console.log(navRef.current.offsetLeft);
+
+    return () => {};
+  }, []);
+
   const hideNav = (e) => {
     if (e.target === navRef.current) {
       setShowNav(false);
@@ -552,7 +560,7 @@ const Analytics = () => {
                     className={`${styles['project-graph']}`}
                     data={lineData}
                     options={lineOptions}
-                    width={1050}
+                    width={1060}
                     height={350}
                   />
                 </div>
@@ -576,6 +584,8 @@ const Analytics = () => {
                     className={styles['tasks-area-graph']}
                     data={areaData}
                     options={areaOptions}
+                    width={1050}
+                    height={350}
                   />
                 </div>
               </div>
