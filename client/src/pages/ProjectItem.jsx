@@ -28,6 +28,7 @@ import { RxUpdate } from 'react-icons/rx';
 import Project from '../components/Project';
 import { IoCloseSharp } from 'react-icons/io5';
 import { ToastContainer, toast } from 'react-toastify';
+import NewTask from '../components/NewTask';
 
 const ProjectItem = () => {
   const [showNav, setShowNav] = useState(false);
@@ -35,6 +36,7 @@ const ProjectItem = () => {
   const [displayModal, setdisplayModal] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
   const [files, setFiles] = useState([]);
+  const [addTask, setAddTask] = useState(false);
   const navRef = useRef();
   const fileRef = useRef();
 
@@ -382,6 +384,14 @@ const ProjectItem = () => {
               </div>
             </div>
           </section>
+        )}
+
+        {addTask && (
+          <NewTask
+            addTask={addTask}
+            setAddTask={setAddTask}
+            fixedProject={true}
+          />
         )}
 
         <section className={styles['section-content']}>
@@ -858,8 +868,16 @@ const ProjectItem = () => {
           </div>
 
           <div className={styles['task-container']}>
-            <h1 className={styles['task-head']}>Tasks</h1>
+            <div className={styles['task-head-div']}>
+              <h1 className={styles['task-head']}>Tasks</h1>
 
+              <button
+                className={styles['add-task-btn']}
+                onClick={() => setAddTask(true)}
+              >
+                Add Task
+              </button>
+            </div>
             <div className={styles['task-category-div']}>
               <ul className={styles['tasks-category-list']}>
                 <li

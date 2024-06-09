@@ -960,11 +960,32 @@ td {
   background: rgba(220, 20, 60, 0.15);
 }
 
+.task-head-div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
 .task-head {
   font-weight: 700;
   font-size: 1.2rem;
   font-family: var(--general-font);
-  margin-bottom: 2rem;
+}
+
+.add-task-btn {
+  border: none;
+  outline: none;
+  background: orange;
+  color: white;
+  border-radius: 5px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.add-task-btn:hover {
+  box-shadow: 1px 1px 8px -4px black;
 }
 
 .show-files-section {

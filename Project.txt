@@ -11,7 +11,7 @@
     - Show project leader on hover of leader img
     - Add select year and month for projects and tasks 
     - Add fields to hpp whitelist
-    - Set all createdAt field to immutable
+    - Set all createdAt field to immutable ✔
     - Edit project page ✔
     - Modify nested routes
     - Encrypt admin
@@ -19,7 +19,7 @@
     - Enable viewing project group chat from project item page
     - Enable add files functionality for project members ✔
     - Update current project after each project update ✔
-    - Enable addition of task on projectitem page
+    - Enable addition of task on projectitem page ✔
     - Set limit for the performed by data(username length) in the activities table
     - Enable limiting of response data
     
