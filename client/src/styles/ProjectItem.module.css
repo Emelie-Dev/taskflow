@@ -389,6 +389,16 @@
   margin: 0.5rem 0 0;
 }
 
+.files-size-left {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.files-size-unit {
+  font-variant: small-caps;
+  font-size: 1.2rem;
+}
+
 .add-files-box {
   display: flex;
   justify-content: flex-end;
@@ -957,6 +967,181 @@ td {
   margin-bottom: 2rem;
 }
 
+.show-files-section {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  z-index: 4;
+  cursor: pointer;
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+  overflow: auto;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 8px;
+  height: fit-content;
+  margin: 2rem 0;
+  font-family: var(--general-font);
+  padding: 2rem;
+  position: relative;
+  cursor: auto;
+  animation: fadeIn 0.4s ease-in-out 0s;
+  width: 50%;
+}
+
+.modal-head {
+  font-weight: 500;
+  font-size: 1.4rem;
+}
+
+.close-modal {
+  position: absolute;
+  right: 1.2rem;
+  top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(128, 128, 128, 0.2);
+  padding: 0.35rem;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.8);
+  transition: background 0.3s, color 0.25s;
+}
+
+.close-modal-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.close-modal:hover {
+  background: orange;
+  color: white;
+}
+
+.files-list {
+  list-style-type: none;
+  margin-top: 2rem;
+}
+
+.file-item {
+  display: flex;
+  font-family: var(--general-font);
+  width: 100%;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.file-no {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1rem;
+  width: 100%;
+}
+
+.file-info-box {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.2rem;
+  width: 100%;
+}
+
+.file-name-box {
+  align-items: flex-start;
+}
+
+.file-info-property {
+  color: gray;
+  font-weight: 600;
+  font-size: 1.03rem;
+  margin-right: 0.5rem;
+  white-space: nowrap;
+}
+
+.file-info-value {
+  font-weight: 500;
+  width: 70%;
+  background: red;
+  word-wrap: break-word;
+}
+
+.file-size-unit {
+  font-variant: small-caps;
+  font-size: 1.2rem;
+}
+
+.file-new-name {
+  outline: none;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 5px;
+  border: 1px solid rgba(128, 128, 128, 0.404);
+  transition: border 0.3s;
+  width: 70%;
+}
+
+.file-new-name:focus {
+  border: 1px solid orange;
+}
+
+.file-new-name::placeholder {
+  color: gray;
+  font-family: var(--general-font);
+  font-size: 0.95rem;
+}
+
+.btn-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.upload-btn {
+  outline: none;
+  font-family: var(--general-font);
+  background: orange;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.03rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 2px 2px 10px -5px orange;
+  transition: opacity 0.3s;
+}
+
+.upload-btn:hover {
+  opacity: 0.85;
+}
+
+.remove-file-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  position: absolute;
+  right: 4%;
+  top: 5%;
+  cursor: pointer;
+  color: gray;
+  transition: color 0.3s;
+}
+
+.remove-file-icon:hover {
+  color: orange;
+}
+
 /* Animations */
 
 @keyframes showNav {
@@ -968,6 +1153,17 @@ td {
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
 /* Media Queries */
 
 @media screen and (min-width: 1100px) {
@@ -976,12 +1172,19 @@ td {
   }
 }
 
-@media screen and (max-width: 1250px) {
+@media screen and (max-width: 1300px) {
+  .modal-container {
+    width: 55%;
+  }
 }
 
 @media screen and (max-width: 1174px) {
   .search {
     width: 22rem;
+  }
+
+  .modal-container {
+    width: 60%;
   }
 }
 
@@ -1017,11 +1220,19 @@ td {
     padding: 1.5rem 2rem;
     padding-bottom: 3.5rem;
   }
+
+  .modal-container {
+    width: 65%;
+  }
 }
 
 @media screen and (max-width: 999px) {
   .responsive-section {
     width: 28%;
+  }
+
+  .modal-container {
+    width: 73%;
   }
 }
 
@@ -1052,6 +1263,14 @@ td {
   .tasks-list {
     padding: 0;
   }
+
+  .modal-container {
+    width: 80%;
+  }
+
+  .file-info-value {
+    width: 69%;
+  }
 }
 
 @media screen and (max-width: 799px) {
@@ -1064,6 +1283,10 @@ td {
 
   .search {
     width: 18rem;
+  }
+
+  .file-info-value {
+    width: 65%;
   }
 }
 
@@ -1086,6 +1309,42 @@ td {
 
   .delete-icon-box {
     margin-left: 0.5rem;
+  }
+
+  .modal-container {
+    width: 85%;
+  }
+
+  .file-info-box {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 0.3rem;
+  }
+
+  .file-new-name {
+    width: 90%;
+  }
+
+  .file-info-value {
+    width: 90%;
+  }
+
+  .remove-file-icon {
+    right: 3%;
+    top: 5%;
+  }
+
+  .file-info-property {
+    margin-bottom: 0.2rem;
+  }
+
+  .file-size-box {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .file-info-size {
+    margin-bottom: 0;
   }
 }
 
@@ -1112,6 +1371,10 @@ td {
     width: 1rem;
     height: 1rem;
     flex-shrink: 0;
+  }
+
+  .remove-file-icon {
+    right: 2%;
   }
 }
 
@@ -1167,6 +1430,19 @@ td {
 
   .files-text {
     padding: 0 0.5rem;
+  }
+
+  .modal-container {
+    width: 90%;
+    padding: 2rem 1.5rem;
+  }
+
+  .remove-file-icon {
+    right: 1%;
+  }
+
+  .file-new-name::placeholder {
+    font-size: 0.9rem;
   }
 }
 
@@ -1224,6 +1500,33 @@ td {
     width: calc(100% - 4.8rem);
     margin-right: 0.5rem;
   }
+
+  .files-text {
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  .add-files-box {
+    justify-content: flex-start;
+    margin-right: 0;
+  }
+
+  .modal-container {
+    width: 95%;
+    padding: 2rem 1rem;
+  }
+
+  .file-new-name {
+    width: 100%;
+  }
+
+  .file-info {
+    margin-left: 0.5rem;
+  }
+
+  .remove-file-icon {
+    right: 0%;
+    top: 3%;
+  }
 }
 
 @media screen and (max-width: 329px) {
@@ -1238,6 +1541,30 @@ td {
 
   .tasks-category-list {
     width: 180%;
+  }
+
+  .modal-container {
+    width: 100%;
+    padding: 2rem 0.5rem;
+  }
+
+  .file-new-name {
+    width: 90%;
+    font-size: 0.9rem;
+  }
+
+  .file-info-value {
+    width: 90;
+    font-size: 0.95rem;
+  }
+
+  .remove-file-icon {
+    right: 0%;
+    top: 1%;
+  }
+
+  .file-info-property {
+    font-size: 1rem;
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/ProjectItem.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -24,16 +24,28 @@ import {
 } from 'react-icons/bs';
 import { GrStatusGood } from 'react-icons/gr';
 import { RiContrastLine, RiDeleteBin6Line } from 'react-icons/ri';
-import { GrUpdate } from 'react-icons/gr';
 import { RxUpdate } from 'react-icons/rx';
 import Project from '../components/Project';
+import { IoCloseSharp } from 'react-icons/io5';
+import { ToastContainer, toast } from 'react-toastify';
+
 const ProjectItem = () => {
   const [showNav, setShowNav] = useState(false);
   const [taskCategory, setTaskCategory] = useState('all');
   const [displayModal, setdisplayModal] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
+  const [files, setFiles] = useState([]);
   const navRef = useRef();
   const fileRef = useRef();
+
+  useEffect(() => {
+    if (!showFiles) {
+      fileRef.current.files = new DataTransfer().files;
+    }
+  }, [showFiles]);
+
+  const freeSpace = 3.65 * 1024 * 1024;
+  const toastId = 'toast-id';
 
   const hideNav = (e) => {
     if (e.target === navRef.current) {
@@ -41,8 +53,64 @@ const ProjectItem = () => {
     }
   };
 
-  const displayFiles = () => {
-    alert(0);
+  const hideFilesModal = (e) => {
+    e.target === e.currentTarget && setShowFiles(false);
+  };
+
+  const displayFiles = (e) => {
+    const newFiles = [...e.target.files];
+
+    const totalSize = newFiles.reduce((total, file) => total + file.size, 0);
+
+    if (totalSize > freeSpace) {
+      e.target.files = new DataTransfer().files;
+
+      return toast(`The total file size for uploads must be under 3.65mb`, {
+        toastId,
+      });
+    }
+
+    setShowFiles(true);
+    setFiles(newFiles);
+  };
+
+  const calculateSize = (size) => {
+    size = parseFloat(size) || 0;
+
+    let value, unit;
+
+    if (size > 1024 * 1024) {
+      value = Number(size / (1024 * 1024)).toFixed(2);
+      unit = 'mb';
+    } else if (size > 1024) {
+      value = Number(size / 1024).toFixed(2);
+      unit = 'kb';
+    } else {
+      value = size;
+      unit = 'b';
+    }
+
+    return { value: Number(value), unit };
+  };
+
+  const removeFile = (indexToRemove) => {
+    const files = fileRef.current.files;
+
+    const dataTransfer = new DataTransfer();
+
+    for (let i = 0; i < files.length; i++) {
+      if (i !== indexToRemove) {
+        dataTransfer.items.add(files[i]);
+      }
+    }
+
+    fileRef.current.files = dataTransfer.files;
+
+    const newFiles = [...fileRef.current.files];
+
+    setFiles(newFiles);
+
+    newFiles.length === 0 && setShowFiles(false);
   };
 
   return (
@@ -189,6 +257,8 @@ const ProjectItem = () => {
         </ul>
       </nav>
 
+      <ToastContainer autoClose={3000} />
+
       <section className={styles.section}>
         <header className={styles.header}>
           <b className={styles['menu-icon-box']}>
@@ -237,8 +307,80 @@ const ProjectItem = () => {
         )}
 
         {showFiles && (
-          <section>
-            man <h1>m</h1>{' '}
+          <section
+            className={styles['show-files-section']}
+            onClick={hideFilesModal}
+          >
+            <div className={styles['modal-container']}>
+              <span
+                className={styles['close-modal']}
+                onClick={() => setShowFiles(false)}
+              >
+                <IoCloseSharp className={styles['close-modal-icon']} />
+              </span>
+              <h1 className={styles['modal-head']}>Add Files</h1>
+
+              <ul className={styles['files-list']}>
+                {files.map((file, index) => (
+                  <li key={file.name} className={styles['file-item']}>
+                    <RiDeleteBin6Line
+                      className={styles['remove-file-icon']}
+                      title="Remove File"
+                      onClick={() => removeFile(index)}
+                    />
+
+                    <span className={styles['file-no']}>{index + 1}.</span>
+                    <div className={styles['file-info']}>
+                      <div
+                        className={`${styles['file-info-box']} ${styles['file-name-box']}`}
+                      >
+                        <span className={styles['file-info-property']}>
+                          Original Name:
+                        </span>
+                        <span className={styles['file-info-value']}>
+                          {file.name}
+                        </span>
+                      </div>
+
+                      <div className={styles['file-info-box']}>
+                        <label className={styles['file-info-property']}>
+                          New Name:
+                        </label>
+                        <input
+                          className={styles['file-new-name']}
+                          type="text"
+                          placeholder="Leave blank to use the original name"
+                        />
+                      </div>
+
+                      <div
+                        className={`${styles['file-info-box']} ${styles['file-size-box']}`}
+                      >
+                        <span
+                          className={`${styles['file-info-property']} ${styles['file-info-size']}`}
+                        >
+                          Size:
+                        </span>
+                        <span className={styles['file-info-value']}>
+                          {calculateSize(file.size).value}
+                          <span className={styles['file-size-unit']}>
+                            {calculateSize(file.size).unit}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <div className={styles['btn-box']}>
+                <input
+                  className={styles['upload-btn']}
+                  type="submit"
+                  value={'Upload'}
+                />
+              </div>
+            </div>
           </section>
         )}
 
@@ -384,7 +526,16 @@ const ProjectItem = () => {
               </div>
 
               <div className={styles['files-conatiner']}>
-                <h1 className={styles['files-text']}>Uploaded Files</h1>
+                <h1 className={styles['files-text']}>
+                  Project Files
+                  <span className={styles['files-size-left']}>
+                    {' '}
+                    (3.65<span className={styles['files-size-unit']}>
+                      mb
+                    </span>{' '}
+                    free)
+                  </span>
+                </h1>
 
                 <div className={styles['add-files-box']}>
                   <button

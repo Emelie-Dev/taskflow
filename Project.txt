@@ -21,6 +21,7 @@
     - Update current project after each project update ✔
     - Enable addition of task on projectitem page
     - Set limit for the performed by data(username length) in the activities table
+    - Enable limiting of response data
     
  -- Data Design
 
