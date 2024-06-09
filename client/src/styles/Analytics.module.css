@@ -437,7 +437,7 @@
   flex-direction: column;
   /* width: 34rem; */
   padding: 1.75rem 1rem 1.5rem;
-  width: 50%;
+  width: 100%;
 }
 
 .project-graph-div {
@@ -446,12 +446,12 @@
 
 .project-graph-container {
   width: 100%;
+  overflow: auto;
 }
 
 .bottom-section {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  flex-direction: column;
   width: 100%;
   padding-bottom: 1.5rem;
 }
