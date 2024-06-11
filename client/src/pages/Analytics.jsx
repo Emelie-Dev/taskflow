@@ -13,6 +13,7 @@ import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { AiOutlineRise } from 'react-icons/ai';
 import { GoDotFill } from 'react-icons/go';
 import { FaRegCircleUser } from 'react-icons/fa6';
+import useDebounce from '../hooks/useDebounce';
 
 import {
   Chart as ChartJS,
@@ -42,17 +43,60 @@ ChartJS.register(
 const Analytics = () => {
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
-  const [showDate, setShowDate] = useState(false);
+  const [showProjectSelect, setShowProjectSelect] = useState({
+    value: false,
+    type: '',
+  });
+
+  const [showTaskSelect, setShowTaskSelect] = useState({
+    value: false,
+    type: '',
+  });
+
+  const [showPieSelect, setShowPieSelect] = useState(false);
+
+  const [graphWidth, setGraphWidth] = useState(0);
+  const [displayGraph, setDisplayGraph] = useState(false);
 
   const searchRef = useRef();
   const navRef = useRef();
+  const mainNavRef = useRef();
 
   useEffect(() => {
-    const deviceWidth = window.innerWidth;
+    const resizeHandler = () => {
+      const wideScreen = window.matchMedia('(min-width: 1100px)');
 
-    console.log(navRef.current.offsetLeft);
+      const mediumScreen = window.matchMedia('(min-width: 700px)');
 
-    return () => {};
+      const deviceWidth = window.innerWidth;
+
+      let width;
+
+      setDisplayGraph(false);
+
+      if (wideScreen.matches) {
+        const navWidth = mainNavRef.current.offsetWidth;
+        width = deviceWidth * (510 / 121) + navWidth * (-2450 / 121);
+      } else if (mediumScreen.matches) {
+        width = deviceWidth * (400 / 399) + -3520 / 57;
+      } else {
+        width = 650;
+      }
+
+      setGraphWidth(width);
+
+      setTimeout(() => setDisplayGraph(true), 0);
+    };
+
+    resizeHandler();
+
+    const debouncedResizeHandler = useDebounce(resizeHandler, 200);
+
+    window.addEventListener('resize', debouncedResizeHandler);
+
+    return () => {
+      window.removeEventListener('resize', debouncedResizeHandler);
+    };
   }, []);
 
   const hideNav = (e) => {
@@ -64,9 +108,38 @@ const Analytics = () => {
   const handleSearchText = (e) => {
     setSearchText(e.target.value);
   };
+
   const clearSearchText = () => {
     setSearchText('');
     searchRef.current.focus();
+  };
+
+  const selectHandler = (e, type) => {
+    const value = `${e.target.value}`;
+
+    if (type === 'project') {
+      if (value === 'date') {
+        setShowProjectSelect({ value: true, type: 'date' });
+      } else if (value === 'month') {
+        setShowProjectSelect({ value: true, type: 'month' });
+      } else {
+        setShowProjectSelect({ value: false, type: '' });
+      }
+    } else if (type === 'task') {
+      if (value === 'date') {
+        setShowTaskSelect({ value: true, type: 'date' });
+      } else if (value === 'month') {
+        setShowTaskSelect({ value: true, type: 'month' });
+      } else {
+        setShowTaskSelect({ value: false, type: '' });
+      }
+    } else {
+      if (value === 'month') {
+        setShowPieSelect(true);
+      } else {
+        setShowPieSelect(false);
+      }
+    }
   };
 
   const lineData = {
@@ -107,11 +180,6 @@ const Analytics = () => {
   };
 
   const lineOptions = {
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
     scales: {
       x: {
         grid: {
@@ -141,7 +209,7 @@ const Analytics = () => {
     ],
     datasets: [
       {
-        label: '',
+        label: 'Created',
         data: [15, 39, 30, 50, 45, 15, 20, 43],
         fill: 'rgba(255, 165, 0, 1)',
         backgroundColor: 'orange',
@@ -151,7 +219,7 @@ const Analytics = () => {
         tension: 0.4,
       },
       {
-        label: '',
+        label: 'Completed',
         data: [23, 23, 48, 19, 23, 56, 75, 17],
         fill: 'red',
         backgroundColor: 'red',
@@ -171,11 +239,6 @@ const Analytics = () => {
       },
       y: {
         beginAtZero: false,
-      },
-    },
-    plugins: {
-      legend: {
-        display: false, // Hide legend
       },
     },
     responsive: false,
@@ -205,12 +268,6 @@ const Analytics = () => {
         display: false,
       },
     },
-  };
-
-  const selectHandler = (e) => {
-    const value = `${e.target.value}`;
-
-    value === 'date' ? setShowDate(true) : setShowDate(false);
   };
 
   return (
@@ -294,7 +351,7 @@ const Analytics = () => {
         </section>
       </nav>
 
-      <nav className={styles.nav}>
+      <nav className={styles.nav} ref={mainNavRef}>
         {' '}
         <div className={styles.head}>
           <span className={styles['icon-box']}>
@@ -474,12 +531,26 @@ const Analytics = () => {
             <div className={styles['pie-chart-container']}>
               <div className={styles['graph-head-box']}>
                 <span className={styles['graph-head']}>Tasks by Status</span>
-                <select className={styles['graph-select']}>
-                  <option value={'year'}>Last Year</option>
-                  <option value={'month'}>Last Month</option>
-                  <option value={'week'}>Last Week</option>
-                  <option value={'yesterday'}>Last 24hrs</option>
+                <select
+                  className={styles['graph-select']}
+                  onChange={(e) => selectHandler(e, 'pie')}
+                >
+                  <option value={'1y'}>1y</option>
+                  <option value={'1m'}>1m</option>
+                  <option value={'1w'}>1w</option>
+                  <option value={'1d'}>1d</option>
+                  <option value={'month'}>Select Month</option>
                 </select>
+              </div>
+
+              <div
+                className={`${styles['view-task-div']} ${
+                  !showPieSelect ? styles['hide-date-input'] : ''
+                }`}
+              >
+                <input className={styles['view-project-input']} type="month" />
+
+                <button className={styles['view-project-btn']}>View</button>
               </div>
 
               <div className={styles['pie-chart-div']}>
@@ -531,62 +602,158 @@ const Analytics = () => {
           <section className={styles['bottom-section']}>
             <div className={styles['project-graph-box']}>
               <div className={styles['graph-head-box']}>
-                <span className={styles['graph-head']}>Projects Done</span>
-                <select
-                  className={styles['graph-select']}
-                  onChange={selectHandler}
-                >
-                  <option value={'year'}>Last Year</option>
-                  <option value={'month'}>Last Month</option>
-                  <option value={'week'}>Last Week</option>
-                  <option value={'date'}>Select Date</option>
-                </select>
-                <div
-                  className={`${styles['view-project-div']} ${
-                    showDate === false ? styles['hide-date-input'] : ''
-                  }`}
-                >
+                <span className={styles['graph-head']}>Projects</span>
+
+                <div className={styles['graph-head-container']}>
+                  <select
+                    className={styles['graph-select']}
+                    onChange={(e) => selectHandler(e, 'project')}
+                  >
+                    <option value={'1y'}>1y</option>
+                    <option value={'1m'}>1m</option>
+                    <option value={'1w'}>1w</option>
+                    <option value={'1d'}>1d</option>
+                    <option value={'month'}>Select Month</option>
+                    <option value={'date'}>Select Date</option>
+                  </select>
+
+                  <div
+                    className={`${styles['view-project-div']} ${
+                      showProjectSelect.value === false
+                        ? styles['hide-date-input']
+                        : ''
+                    }`}
+                  >
+                    {showProjectSelect.type === 'month' && (
+                      <input
+                        className={styles['view-project-input']}
+                        type="month"
+                      />
+                    )}
+
+                    {showProjectSelect.type === 'date' && (
+                      <input
+                        className={styles['view-project-input']}
+                        type="date"
+                      />
+                    )}
+
+                    <button className={styles['view-project-btn']}>View</button>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`${styles['alt-view-project-div']} ${
+                  showProjectSelect.value === false
+                    ? styles['hide-date-input']
+                    : ''
+                }`}
+              >
+                {showProjectSelect.type === 'month' && (
                   <input
                     className={styles['view-project-input']}
                     type="month"
                   />
-                  <button className={styles['view-project-btn']}>View</button>
-                </div>
+                )}
+
+                {showProjectSelect.type === 'date' && (
+                  <input className={styles['view-project-input']} type="date" />
+                )}
+
+                <button className={styles['view-project-btn']}>View</button>
               </div>
 
               <div className={styles['project-graph-div']}>
                 <div className={styles['project-graph-container']}>
-                  <Bar
-                    className={`${styles['project-graph']}`}
-                    data={lineData}
-                    options={lineOptions}
-                    width={1060}
-                    height={350}
-                  />
+                  {displayGraph && (
+                    <Bar
+                      className={`${styles['project-graph']}`}
+                      data={lineData}
+                      options={lineOptions}
+                      width={graphWidth}
+                      height={350}
+                    />
+                  )}
                 </div>
               </div>
             </div>
 
             <div className={styles['tasks-area-box']}>
               <div className={styles['graph-head-box']}>
-                <span className={styles['graph-head']}>Tasks Done</span>
-                <select className={styles['graph-select']}>
-                  <option value={'year'}>Last Year</option>
-                  <option value={'month'}>Last Month</option>
-                  <option value={'week'}>Last Week</option>
-                  <option value={'yesterday'}>Last 24hrs</option>
-                </select>
+                <span className={styles['graph-head']}>Tasks</span>
+
+                <div className={styles['graph-head-container']}>
+                  <select
+                    className={styles['graph-select']}
+                    onChange={(e) => selectHandler(e, 'task')}
+                  >
+                    <option value={'1y'}>1y</option>
+                    <option value={'1m'}>1m</option>
+                    <option value={'1w'}>1w</option>
+                    <option value={'1d'}>1d</option>
+                    <option value={'month'}>Select Month</option>
+                    <option value={'date'}>Select Date</option>
+                  </select>
+
+                  <div
+                    className={`${styles['view-project-div']} ${
+                      showTaskSelect.value === false
+                        ? styles['hide-date-input']
+                        : ''
+                    }`}
+                  >
+                    {showTaskSelect.type === 'month' && (
+                      <input
+                        className={styles['view-project-input']}
+                        type="month"
+                      />
+                    )}
+
+                    {showTaskSelect.type === 'date' && (
+                      <input
+                        className={styles['view-project-input']}
+                        type="date"
+                      />
+                    )}
+
+                    <button className={styles['view-project-btn']}>View</button>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`${styles['alt-view-project-div']} ${
+                  showTaskSelect.value === false
+                    ? styles['hide-date-input']
+                    : ''
+                }`}
+              >
+                {showTaskSelect.type === 'month' && (
+                  <input
+                    className={styles['view-project-input']}
+                    type="month"
+                  />
+                )}
+
+                {showTaskSelect.type === 'date' && (
+                  <input className={styles['view-project-input']} type="date" />
+                )}
+
+                <button className={styles['view-project-btn']}>View</button>
               </div>
 
               <div className={styles['task-area-div']}>
                 <div className={styles['task-area-container']}>
-                  <Line
-                    className={styles['tasks-area-graph']}
-                    data={areaData}
-                    options={areaOptions}
-                    width={1050}
-                    height={350}
-                  />
+                  {displayGraph && (
+                    <Line
+                      className={styles['tasks-area-graph']}
+                      data={areaData}
+                      options={areaOptions}
+                      width={graphWidth}
+                      height={350}
+                    />
+                  )}
                 </div>
               </div>
             </div>

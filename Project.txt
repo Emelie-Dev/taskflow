@@ -5,11 +5,11 @@
     - Write enough comments ✔
     - Add project activity to project item page ✔
     - Add project active state when editing projects
-    - Add projects and tasks created to the analytics page
+    - Add projects and tasks created to the analytics page ✔
     - Implement search functionality with queries
     - Remove leader from tasks
     - Show project leader on hover of leader img
-    - Add select year and month for projects and tasks 
+    - Add select year and month for projects and tasks ✔
     - Add fields to hpp whitelist
     - Set all createdAt field to immutable ✔
     - Edit project page ✔

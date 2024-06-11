@@ -489,7 +489,7 @@
 
 .pie-chart-div {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   display: flex;
   justify-content: space-between;
 }
@@ -503,7 +503,11 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
-  position: relative;
+}
+
+.graph-head-container {
+  display: flex;
+  align-items: center;
 }
 
 .graph-head {
@@ -587,6 +591,14 @@
 .view-project-div {
   display: flex;
   align-items: center;
+  margin-left: 1rem;
+}
+
+.view-task-div {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
 }
 
 .view-project-input {
@@ -602,7 +614,7 @@
 }
 
 .hide-date-input {
-  display: none;
+  display: none !important;
 }
 
 .view-project-btn {
@@ -623,8 +635,11 @@
   opacity: 0.85;
 }
 
-.add-padding {
-  margin-top: 2rem;
+.alt-view-project-div {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 /* Animations */
@@ -646,17 +661,17 @@
   }
 }
 
+@media screen and (min-width: 600px) {
+  .alt-view-project-div {
+    display: none;
+  }
+}
+
 @media screen and (max-width: 1250px) {
   .rate-icon,
   .rate-icon-inverse {
     width: 3rem;
     height: 3rem;
-  }
-
-  .view-project-div {
-    position: absolute;
-    right: 0;
-    bottom: -150%;
   }
 
   .category-details {
@@ -816,10 +831,6 @@
   .pie-chart-box {
     width: 32%;
   }
-
-  .view-project-div {
-    position: static;
-  }
 }
 
 @media screen and (max-width: 799px) {
@@ -911,14 +922,12 @@
     margin-bottom: 1rem;
   }
 
-  .view-project-div {
-    position: absolute;
-    right: 0;
-    bottom: -150%;
-  }
-
   .bottom-section {
     padding-bottom: 1.5rem;
+  }
+
+  .view-project-div {
+    display: none;
   }
 }
 
