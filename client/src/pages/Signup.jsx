@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from '../styles/Signup.module.css';
 import { SiKashflow } from 'react-icons/si';
 import { MdOutlineMail } from 'react-icons/md';
@@ -11,14 +11,32 @@ import { IoPersonCircleSharp } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 
 import { ToastContainer, toast } from 'react-toastify';
+import axios from 'axios';
 
 import 'react-toastify/dist/ReactToastify.css';
+
+// axios.defaults.withCredentials = true;
 
 const AccountAccess = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data } = await axios.get('/api/v1/auth/auth-check');
+
+        if (data.status === 'success') {
+          navigate('/dashboard');
+        }
+      } catch (err) {}
+    };
+
+    checkAuth();
+  }, []);
 
   const handlePasswordVisiblity = () => {
     setShowPassword(!showPassword);
@@ -28,49 +46,94 @@ const AccountAccess = () => {
 
   const navigate = useNavigate();
 
-  const validate = () => {
+  const submitForm = async () => {
+    // For Username
     if (username.length === 0) {
-      toast('Username field cannot be empty.', {
+      return toast('Username field cannot be empty.', {
         toastId: customId,
       });
-      return;
     } else if (username.length > 30) {
-      toast('Username cannot exceed 30 characters.', {
+      return toast('Username cannot exceed 30 characters.', {
         toastId: customId,
       });
-      return;
     } else if (username.match(/\W/)) {
-      toast(
+      return toast(
         'Username must consist of letters, numbers, and underscores only.',
+        {
+          toastId: customId,
+          autoClose: 2500,
+        }
+      );
+    }
+
+    // For Email
+    if (email.length === 0) {
+      return toast('Email field cannot be empty.', {
+        toastId: customId,
+      });
+    }
+
+    // For Password
+    if (password.length === 0) {
+      return toast('Password field cannot be empty.', {
+        toastId: customId,
+      });
+    } else if (
+      !(
+        password.match(/[A-z]/) &&
+        password.match(/[0-9]/) &&
+        password.match(/\W/)
+      )
+    ) {
+      return toast(
+        'Password must consist of letter, digit, and special character.',
         {
           toastId: customId,
         }
       );
-      return;
+    } else if (password.length < 8) {
+      return toast('Password must be above 8 characters.', {
+        toastId: customId,
+        autoClose: 2500,
+      });
     }
 
-    if (password.length === 0) {
-      toast('Password field cannot be empty.', {
-        toastId: customId,
-      });
-      return;
-    } else if (password.length > 30) {
-      toast('Password cannot exceed 30 characters.', {
-        toastId: customId,
-      });
-      return;
-    } else if (
-      !password.match(/[A-z]/) ||
-      !password.match(/[0-9]/) ||
-      !password.match(/\W/)
-    ) {
-      toast('Password must consist of letter, digit, and special character.', {
-        toastId: customId,
-      });
-      return;
-    }
+    setIsProcessing(true);
 
-    navigate('/dashboard');
+    // Makes an api call to create a new account
+    try {
+      const { data } = await axios({
+        method: 'POST',
+        url: '/api/v1/auth/signup',
+        data: {
+          username,
+          email,
+          password,
+        },
+      });
+
+      if (data.status === 'success') {
+        toast(data.message, {
+          toastId: customId,
+          autoClose: 3000,
+        });
+
+        setTimeout(() => navigate('/login'), 3500);
+      }
+
+      return setIsProcessing(false);
+    } catch (err) {
+      toast(err.response.data.message, {
+        toastId: customId,
+        autoClose: 3000,
+      });
+
+      if (err.response.data.isSignup) {
+        setTimeout(() => navigate('/login'), 3500);
+      }
+
+      return setIsProcessing(false);
+    }
   };
 
   return (
@@ -146,7 +209,17 @@ const AccountAccess = () => {
           </div>
 
           <div className={styles['btn-div']}>
-            <button className={styles.button} onClick={validate}>
+            <button
+              className={`${styles.button} ${
+                isProcessing ? styles['disable-btn'] : ''
+              }`}
+              onClick={submitForm}
+            >
+              <SiKashflow
+                className={`${styles['process-icon']} ${
+                  isProcessing ? styles['show-process-icon'] : ''
+                }`}
+              />
               Sign up
             </button>
           </div>

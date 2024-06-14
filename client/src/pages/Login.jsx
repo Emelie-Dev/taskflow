@@ -9,6 +9,7 @@ import { FaFacebookF } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
+import axios from 'axios';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -16,6 +17,21 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data } = await axios.get('/api/v1/auth/auth-check');
+
+        if (data.status === 'success') {
+          navigate('/dashboard');
+        }
+      } catch (err) {}
+    };
+
+    checkAuth();
+  }, []);
 
   const handlePasswordVisiblity = () => {
     setShowPassword(!showPassword);
@@ -25,20 +41,50 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const validate = () => {
+  const submitForm = async () => {
     if (email.length === 0) {
-      toast('Email field cannot be empty.', {
+      return toast('Email field cannot be empty.', {
         toastId: customId,
       });
-      return;
     } else if (password.length === 0) {
-      toast('Password field cannot be empty.', {
+      return toast('Password field cannot be empty.', {
         toastId: customId,
       });
-      return;
     }
 
-    navigate('/dashboard');
+    setIsProcessing(true);
+
+    // Makes an api call to create a new account
+    try {
+      const { data } = await axios({
+        method: 'POST',
+        url: '/api/v1/auth/login',
+        data: {
+          email,
+          password,
+        },
+      });
+
+      if (data.status === 'success') {
+        if (data.message) {
+          toast(data.message, {
+            toastId: customId,
+            autoClose: 3000,
+          });
+        } else {
+          navigate('/dashboard');
+        }
+      }
+
+      return setIsProcessing(false);
+    } catch (err) {
+      toast(err.response.data.message, {
+        toastId: customId,
+        autoClose: 3000,
+      });
+
+      return setIsProcessing(false);
+    }
   };
 
   return (
@@ -102,7 +148,17 @@ const Login = () => {
           </div>
 
           <div className={styles['btn-div']}>
-            <button className={styles.button} onClick={validate}>
+            <button
+              className={`${styles.button} ${
+                isProcessing ? styles['disable-btn'] : ''
+              }`}
+              onClick={submitForm}
+            >
+              <SiKashflow
+                className={`${styles['process-icon']} ${
+                  isProcessing ? styles['show-process-icon'] : ''
+                }`}
+              />
               Login
             </button>
           </div>

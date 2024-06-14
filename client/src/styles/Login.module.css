@@ -59,7 +59,6 @@
   width: 2.5rem;
   height: 2.5rem;
   fill: orange;
-  animation: rotate 0.5s linear 0s infinite;
 }
 
 .input-div {
@@ -67,7 +66,6 @@
   flex-direction: column;
   margin: 2.5rem 4rem 0;
 }
-
 
 .input-box {
   position: relative;
@@ -155,11 +153,32 @@
   width: 70%;
   font-size: 1.2rem;
   color: white;
-  transition: box-shadow 0.3s;
+  transition: box-shadow 0.3s, opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .button:hover {
   box-shadow: 1px 1px 10px 2px black;
+}
+
+.disable-btn {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.process-icon {
+  width: 1.35em;
+  height: 1.35rem;
+  margin-right: 0.7rem;
+  opacity: 1;
+  animation: rotate 1s linear 0s infinite;
+  display: none;
+}
+
+.show-process-icon {
+  display: inline;
 }
 
 .options-div {
@@ -263,7 +282,6 @@
 }
 
 .custom-toast {
-
   color: red;
 }
 

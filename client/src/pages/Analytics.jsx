@@ -26,6 +26,7 @@ import {
   Tooltip,
   Legend,
   BarElement,
+  plugins,
 } from 'chart.js';
 
 ChartJS.register(

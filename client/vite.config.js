@@ -8,5 +8,12 @@ export default defineConfig({
     middleware: [
       historyApiFallback(), // Add this line to use connect-history-api-fallback
     ],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:2005',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 });

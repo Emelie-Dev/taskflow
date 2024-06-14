@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import styles from '../styles/Dashboard.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -22,7 +22,7 @@ import { MdOutlineDashboard } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import Calendar from '../components/Calendar';
-import { MdOutlineSegment } from 'react-icons/md';
+import { MdOutlineSegment, MdOutlineSignalWifiOff } from 'react-icons/md';
 import { FaSearch } from 'react-icons/fa';
 
 import {
@@ -36,6 +36,10 @@ import {
   Legend,
 } from 'chart.js';
 import NewTask from '../components/NewTask';
+import { AuthContext, ToastifyContext } from '../App';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import Loader from '../components/Loader';
 
 ChartJS.register(
   CategoryScale,
@@ -54,12 +58,16 @@ const Dashboard = () => {
   const [showNav, setShowNav] = useState(false);
   const [showUserBox, setShowUserBox] = useState(false);
   const [addTask, setAddTask] = useState(false);
+  const [userStats, setUserStats] = useState(null);
+  const { userData } = useContext(AuthContext);
+  const toastId = useContext(ToastifyContext);
   const searchRef = useRef();
   const calenderRef = useRef();
   const navRef = useRef();
   const userBoxRef = useRef();
   const imgRef = useRef();
 
+  // For log out box
   useEffect(() => {
     const handleUserBox = (e) => {
       if (showUserBox) {
@@ -81,6 +89,25 @@ const Dashboard = () => {
       window.removeEventListener('click', handleUserBox);
     };
   }, [showUserBox]);
+
+  // For user stats
+  useEffect(() => {
+    console.log(userData);
+    const fetchUserStats = async () => {
+      try {
+        const { data } = await axios.get('/api/v1/analytics?dashboard=true');
+        setUserStats(data);
+        console.log(data);
+      } catch {
+        setUserStats(false);
+        return toast('An error occured while fetching user stats.', {
+          toastId,
+        });
+      }
+    };
+
+    fetchUserStats();
+  }, []);
 
   const handleSearchText = (e) => {
     setSearchText(e.target.value);
@@ -159,8 +186,24 @@ const Dashboard = () => {
     }
   };
 
+  const timeOfTheDay = () => {
+    const hour = new Date().getHours();
+
+    if (hour <= 11) {
+      return 'Good Morning,';
+    } else if (hour <= 16) {
+      return 'Good Afternoon,';
+    } else if (hour <= 19) {
+      return 'Good Evening,';
+    } else {
+      return 'Welcome';
+    }
+  };
+
   return (
     <main className={styles.div}>
+      <ToastContainer autoClose={2000} />
+
       <nav
         ref={navRef}
         className={`${styles['responsive-nav']} ${
@@ -383,9 +426,16 @@ const Dashboard = () => {
         <section className={styles['left-section']}>
           <div className={styles['left-section-head']}>
             <div className={styles['username-box']}>
-              <span className={styles.username}>Good Evening, Vincent</span>
+              <span className={styles.username}>
+                {timeOfTheDay()} {userData.username}
+              </span>
+
               <span className={styles['user-text']}>
-                You have got 6 tasks today
+                {userStats
+                  ? `You have got ${userStats.data.todayTasks} ${
+                      userStats.data.todayTasks === 1 ? 'task' : 'tasks'
+                    } today`
+                  : ''}
               </span>
             </div>
 
@@ -398,54 +448,122 @@ const Dashboard = () => {
           </div>
 
           <div className={styles['article-box']}>
-            <article className={styles.article}>
-              <span
-                className={`${styles['article-icon-box']} ${styles['border-green']}`}
-              >
-                <HiMiniArrowTrendingUp
-                  className={`${styles['article-icon']} ${styles.green}`}
-                />
-              </span>
-
-              <div className={styles['article-details']}>
-                <span className={styles['article-name']}>Tasks</span>
-                <span className={styles['article-size']}>200+</span>
-                <span className={styles['article-increase']}>
+            {userStats === null ? (
+              <Loader
+                style={{ width: '2.5rem', height: '2.5rem', marginTop: '1rem' }}
+              />
+            ) : userStats ? (
+              <>
+                {' '}
+                <article className={styles.article}>
                   <span
-                    className={`${styles['article-increase-rate']} ${styles.green}`}
+                    className={`${styles['article-icon-box']} ${styles['border-green']}`}
                   >
-                    +20%{' '}
+                    <HiMiniArrowTrendingUp
+                      className={`${styles['article-icon']} ${styles.green}`}
+                    />
                   </span>
-                  more than last month.
-                </span>
-              </div>
-            </article>
 
-            <article className={styles.article}>
-              <span
-                className={`${styles['article-icon-box']} ${styles['border-red']}`}
-              >
-                <ImBrightnessContrast
-                  className={`${styles['article-icon']} ${styles.red}`}
-                />
-              </span>
-
-              <div className={styles['article-details']}>
-                <span className={styles['article-name']}>Current project</span>
-                <span className={styles['article-size']}>
-                  55<span className={styles['projects-size']}>/120</span>
-                </span>
-                <span className={styles['article-increase']}>
-                  Completed over{' '}
+                  <div className={styles['article-details']}>
+                    <span className={styles['article-name']}>Tasks</span>
+                    <span className={styles['article-size']}>
+                      {userStats.data.tasks > 500
+                        ? '500+'
+                        : userStats.data.tasks}{' '}
+                    </span>
+                    <span className={styles['article-increase']}>
+                      <span
+                        className={`${styles['article-increase-rate']} ${styles.green}`}
+                      >
+                        {userStats.data.dataPercent.tasks.created === 0
+                          ? 0
+                          : String(
+                              userStats.data.dataPercent.tasks.created
+                            ).startsWith('-')
+                          ? userStats.data.dataPercent.tasks.created
+                          : `+${userStats.data.dataPercent.tasks.created}`}
+                        %{' '}
+                      </span>
+                      more than last month.
+                    </span>{' '}
+                  </div>
+                </article>
+                <article className={styles.article}>
                   <span
-                    className={`${styles['article-increase-rate']} ${styles.red}`}
+                    className={`${styles['article-icon-box']} ${styles['border-red']}`}
                   >
-                    57%{' '}
+                    <ImBrightnessContrast
+                      className={`${styles['article-icon']} ${styles.red}`}
+                    />
                   </span>
-                  tasks.
-                </span>
-              </div>
-            </article>
+
+                  <div className={styles['article-details']}>
+                    <span className={styles['article-name']}>
+                      Current project
+                    </span>
+                    <span className={styles['article-size']}>
+                      {userStats.data.currentProject.completedTasks}
+                      <span className={styles['projects-size']}>
+                        / {userStats.data.currentProject.tasks}
+                      </span>
+                    </span>
+                    <span className={styles['article-increase']}>
+                      Completed over{' '}
+                      <span
+                        className={`${styles['article-increase-rate']} ${styles.red}`}
+                      >
+                        {userStats.data.currentProject.percent}%{' '}
+                      </span>
+                      tasks.
+                    </span>
+                  </div>
+                </article>
+              </>
+            ) : (
+              <>
+                {' '}
+                <article className={styles.article}>
+                  <span
+                    className={`${styles['article-icon-box']} ${styles['border-green']}`}
+                  >
+                    <HiMiniArrowTrendingUp
+                      className={`${styles['article-icon']} ${styles.green}`}
+                    />
+                  </span>
+
+                  <div className={styles['article-details']}>
+                    <span className={styles['article-name']}>Tasks</span>
+                    <span className={styles['article-fail-text']}>
+                      <MdOutlineSignalWifiOff
+                        className={styles['network-icon']}
+                      />{' '}
+                      Unable to retrieve data
+                    </span>
+                  </div>
+                </article>
+                <article className={styles.article}>
+                  <span
+                    className={`${styles['article-icon-box']} ${styles['border-red']}`}
+                  >
+                    <ImBrightnessContrast
+                      className={`${styles['article-icon']} ${styles.red}`}
+                    />
+                  </span>
+
+                  <div className={styles['article-details']}>
+                    <span className={styles['article-name']}>
+                      Current project
+                    </span>
+                    <span className={styles['article-fail-text']}>
+                      <MdOutlineSignalWifiOff
+                        className={styles['network-icon']}
+                      />{' '}
+                      Unable to retrieve data
+                    </span>
+                  </div>
+                </article>
+              </>
+            )}
           </div>
 
           <div className={styles['chart-box']}>
