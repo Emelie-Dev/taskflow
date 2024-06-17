@@ -17,28 +17,24 @@ const sendResponse = (user, statusCode, req, res) => {
 
   res.cookie('jwt', token, {
     maxAge: process.env.JWT_LOGIN_EXPIRES,
+
+    //  Prevents javascript access
     httpOnly: true,
+
     // Heroku specific
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+    // secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   });
 
-  if (process.env.NODE_ENV.trim() === 'development') {
-    return res.status(statusCode).json({
-      status: 'success',
-      token,
-      data: {
-        user,
-      },
-    });
-  } else {
-    return res.status(statusCode).json({
-      status: 'success',
-      token,
-    });
-  }
+  return res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
 };
 
-const sendEmailLink = async (user, req, res, next) => {
+const sendEmailLink = async (user, signup, req, res, next) => {
   // Gnerate email verification token
   const verificationToken = user.generateToken('email');
   await user.save({ validateBeforeSave: false });
@@ -55,7 +51,7 @@ const sendEmailLink = async (user, req, res, next) => {
     return res.status(200).json({
       status: 'success',
       message:
-        'A verification email has been sent to you. Click the link in the email to complete the signup process.',
+        'A verification email has been sent to you. Click the link in the email to complete your signup process.',
     });
   } catch (err) {
     // Removes verification token from user data
@@ -64,14 +60,31 @@ const sendEmailLink = async (user, req, res, next) => {
 
     await user.save({ validateBeforeSave: false });
 
-    return next(
-      new CustomError(
-        'There was an error sending verfication email. Please try again later.',
-        500
-      )
-    );
+    let message;
+
+    if (signup) {
+      message =
+        'There was an error sending verfication email. Please try logging in with the details you provided.';
+    } else {
+      message =
+        'There was an error sending verfication email. Please try again later.';
+    }
+
+    const error = new CustomError(message, 500);
+
+    error.isSignup = true;
+    return next(error);
   }
 };
+
+export const authConfirmed = asyncErrorHandler(async (req, res, next) => {
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      user: req.user,
+    },
+  });
+});
 
 export const protectRoute = asyncErrorHandler(async (req, res, next) => {
   // Read the token and check if it exists
@@ -96,7 +109,6 @@ export const protectRoute = asyncErrorHandler(async (req, res, next) => {
   );
 
   // if the user exists
-
   const user = await User.findById(decodedToken.id);
 
   if (!user) {
@@ -142,9 +154,9 @@ export const signup = asyncErrorHandler(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
   // Sends verification mail
-  // await sendEmailLink(newUser, req, res, next);
+  await sendEmailLink(newUser, true, req, res, next);
 
-  sendResponse(newUser, 201, req, res);
+  // sendResponse(newUser, 201, req, res);
 });
 
 export const verifyEmail = asyncErrorHandler(async (req, res, next) => {
@@ -183,7 +195,7 @@ export const verifyEmail = asyncErrorHandler(async (req, res, next) => {
     maxAge: process.env.JWT_LOGIN_EXPIRES,
     httpOnly: true,
     // Heroku specific
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+    // secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   });
 
   res.status(200).json({
@@ -219,7 +231,9 @@ export const login = asyncErrorHandler(async (req, res, next) => {
 
   // Sends verification mail
   if (!user.emailVerified && user.emailVerificationTokenExpires < Date.now()) {
-    return await sendEmailLink(user, req, res, next);
+    return await sendEmailLink(user, false, req, res, next);
+  } else if (!user.emailVerified && !user.emailVerificationTokenExpires) {
+    return await sendEmailLink(user, false, req, res, next);
   } else if (!user.emailVerified) {
     return res.status(200).json({
       status: 'success',

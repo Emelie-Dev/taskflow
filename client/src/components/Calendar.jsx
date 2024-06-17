@@ -8,6 +8,9 @@ const Calendar = ({
   setCurrentMonth,
   setCurrentYear,
   calenderRef,
+  setScheduledTasks,
+  scheduleDetails,
+  setScheduleDetails,
 }) => {
   const moveNextMonth = () => {
     if (currentMonth === 12) {
@@ -167,6 +170,38 @@ const Calendar = ({
     );
   };
 
+  const updateScheduledTasks = (e) => {
+    const { year, month, day } = scheduleDetails;
+
+    if (
+      year === currentYear &&
+      month === currentMonth &&
+      day === parseInt(e.target.textContent)
+    )
+      return;
+
+    setScheduleDetails({
+      year: currentYear,
+      month: currentMonth,
+      day: parseInt(e.target.textContent),
+    });
+    setScheduledTasks(null);
+  };
+
+  const checkScheduledDate = (input) => {
+    const { year, month, day } = scheduleDetails;
+
+    if (
+      year === currentYear &&
+      month === currentMonth &&
+      day === parseInt(input)
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   return (
     <div className={styles['calender-div']}>
       <h1
@@ -207,7 +242,12 @@ const Calendar = ({
                           checkCurrentDate(current)
                             ? styles['current-date']
                             : ''
+                        } ${
+                          checkScheduledDate(input)
+                            ? styles['scheduled-date']
+                            : ''
                         }`}
+                        onClick={(e) => updateScheduledTasks(e)}
                       >
                         {input}
                       </td>

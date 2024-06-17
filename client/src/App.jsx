@@ -16,7 +16,6 @@ import ProjectItem from './pages/ProjectItem';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export const AuthContext = createContext();
-export const ToastifyContext = createContext();
 
 const App = () => {
   const [userData, setUserData] = useState({});
@@ -26,48 +25,43 @@ const App = () => {
     <AuthContext.Provider
       value={{ userData, setUserData, isAuthenticated, setIsAuthenticated }}
     >
-      <ToastifyContext.Provider value={'custom-id'}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/dashboard"
-            element={<ProtectedRoute element={Dashboard} />}
-          />
-          <Route
-            path="/projects"
-            element={<ProtectedRoute element={Projects} />}
-          />
-          <Route path="/tasks" element={<ProtectedRoute element={Tasks} />} />
-          <Route
-            path="/calendar"
-            element={<ProtectedRoute element={CalendarPage} />}
-          />
-          <Route path="/chats" element={<ProtectedRoute element={Chats} />} />
-          <Route
-            path="/analytics"
-            element={<ProtectedRoute element={Analytics} />}
-          />
-          <Route
-            path="/settings"
-            element={<ProtectedRoute element={Settings} />}
-          />
-          <Route
-            path="/profile"
-            element={<ProtectedRoute element={Profile} />}
-          />
-          <Route
-            path="/notifications"
-            element={<ProtectedRoute element={Notifications} />}
-          />
-          <Route
-            path="/projectitem"
-            element={<ProtectedRoute element={ProjectItem} />}
-          />
-        </Routes>
-      </ToastifyContext.Provider>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/dashboard"
+          element={<ProtectedRoute element={Dashboard} />}
+        />
+        <Route
+          path="/projects"
+          element={<ProtectedRoute element={Projects} />}
+        />
+        <Route path="/tasks" element={<ProtectedRoute element={Tasks} />} />
+        <Route
+          path="/calendar"
+          element={<ProtectedRoute element={CalendarPage} />}
+        />
+        <Route path="/chats" element={<ProtectedRoute element={Chats} />} />
+        <Route
+          path="/analytics"
+          element={<ProtectedRoute element={Analytics} />}
+        />
+        <Route
+          path="/settings"
+          element={<ProtectedRoute element={Settings} />}
+        />
+        <Route path="/profile" element={<ProtectedRoute element={Profile} />} />
+        <Route
+          path="/notifications"
+          element={<ProtectedRoute element={Notifications} />}
+        />
+        <Route
+          path="/projectitem"
+          element={<ProtectedRoute element={ProjectItem} />}
+        />
+      </Routes>
     </AuthContext.Provider>
   );
 };

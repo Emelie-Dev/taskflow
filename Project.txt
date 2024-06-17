@@ -22,6 +22,12 @@
     - Enable addition of task on projectitem page ✔
     - Set limit for the performed by data(username length) in the activities table
     - Enable limiting of response data
+    - Handle errors effectively
+    - Limit user data been sent to the client
+    - When fetching tasks, remember assigned and not assigned
+    - Delete project files when deleting projects
+    - Complete links to other resources in each page
+
     
  -- Data Design
 

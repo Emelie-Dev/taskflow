@@ -55,7 +55,14 @@ config({ path: './config.env' });
 // Middlewares
 
 // Implements Cors
-app.use(cors());
+app.use(
+  cors()
+  // // For development only
+  // {
+  //   origin: 'http://localhost:5173', // URL of your React frontend
+  //   credentials: true,
+  // }
+);
 app.options('*', cors());
 
 // Render static files
@@ -73,7 +80,7 @@ const limiter = rateLimit({
   message:
     'We have received too many request from this IP. Please try after one hour.',
 });
-app.use('/api', limiter);
+// app.use('/api', limiter);
 
 // Parses request body
 app.use(express.json({ limit: '10kb' }));

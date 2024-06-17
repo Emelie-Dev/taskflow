@@ -12,7 +12,7 @@ const getAll = (Model, collection) =>
         filter = { project: req.params.projectId, assigned: { $ne: true } };
     }
 
-    const result = new ApiFeatures(Model.find(filter), req.query)
+    const result = new ApiFeatures(Model, Model.find(filter), req.query)
       .filter()
       .sort()
       .limitFields()
@@ -128,10 +128,29 @@ const deleteOne = (Model, collection) =>
 
 const getMyData = (Model, collection) =>
   asyncErrorHandler(async (req, res, next) => {
-    const excludeArray = ['month', 'year', 'range', 'day'];
+    const excludeArray = ['month', 'year', 'range', 'day', 'view'];
+
+    let modelQuery;
+    let graph = {};
+
+    if (collection === 'tasks') {
+      if (req.query.filter === 'assigned') {
+        modelQuery = Model.find({ user: req.user._id, assigned: true });
+      } else if (req.query.calendar) {
+        modelQuery = Model.find({ user: req.user._id });
+      } else {
+        modelQuery = Model.find({
+          user: req.user._id,
+          assigned: { $ne: true },
+        });
+      }
+    } else {
+      Model.find({ user: req.user._id });
+    }
 
     const result = new ApiFeatures(
-      Model.find({ user: req.user._id }),
+      Model,
+      modelQuery,
       req.query,
       ...excludeArray
     )
@@ -142,11 +161,11 @@ const getMyData = (Model, collection) =>
 
     let docs = await result.query;
 
-    let graph = {};
-
     // Filters tasks based on request query
     if (req.query.month || req.query.year || req.query.range || req.query.day) {
-      const result = new QueryFeatures(docs, req.query, collection)
+      const dateType = req.query.calendar ? 'deadline' : 'createdAt';
+
+      const result = new QueryFeatures(docs, req.query, collection, dateType)
         .getDate()
         .getRange();
 

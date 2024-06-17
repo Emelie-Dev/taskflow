@@ -40,8 +40,7 @@ const userSchema = new mongoose.Schema({
       },
       message: 'Password must consist of letter, digit, and special character.',
     },
-    minLength: [8, 'Password must be more than 8 characters.'],
-    maxLength: [30, 'Password cannot exceed 30 characters.'],
+    minLength: [8, 'Password must be above 8 characters.'],
   },
   photo: {
     type: String,

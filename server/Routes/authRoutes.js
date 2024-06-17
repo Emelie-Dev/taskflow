@@ -1,8 +1,10 @@
 import express from 'express';
 import {
+  authConfirmed,
   forgotPassword,
   login,
   logout,
+  protectRoute,
   resetPassword,
   signup,
   verifyEmail,
@@ -13,6 +15,8 @@ const router = express.Router();
 router.post('/signup', signup);
 
 router.get('/verify_email/:token', verifyEmail);
+
+router.get('/auth-check', protectRoute, authConfirmed);
 
 router.post('/login', login);
 

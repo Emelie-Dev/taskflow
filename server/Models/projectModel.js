@@ -99,6 +99,7 @@ projectSchema.virtual('tasks', {
   ref: 'Task',
   foreignField: 'project',
   localField: '_id',
+  match: { assigned: { $ne: true } },
 });
 
 // Validates deadline field
@@ -117,6 +118,9 @@ projectSchema.pre('find', function (next) {
     delete this.getFilter().calculateProgress;
 
     this.calculateProjectsProgress = true;
+    this.showTasks = this.getFilter().showTasks;
+
+    delete this.getFilter().showTasks;
 
     this.populate({
       path: 'tasks',
@@ -140,9 +144,10 @@ projectSchema.post('find', function (docs) {
 
       doc.openTasks = openTasks;
       doc.completedTasks = completedTasks;
-      doc.progress = Math.floor(
+      doc.progress = Math.round(
         (completedTasks / (doc.tasks.length || 1)) * 100
       );
+      doc.tasks = this.showTasks && doc.tasks;
     });
   }
 });

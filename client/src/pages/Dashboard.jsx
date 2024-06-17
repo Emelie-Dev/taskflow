@@ -36,7 +36,7 @@ import {
   Legend,
 } from 'chart.js';
 import NewTask from '../components/NewTask';
-import { AuthContext, ToastifyContext } from '../App';
+import { AuthContext } from '../App';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
@@ -51,6 +51,23 @@ ChartJS.register(
   Legend
 );
 
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+let currentHour = 0;
+
 const Dashboard = () => {
   const [searchText, setSearchText] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
@@ -60,10 +77,22 @@ const Dashboard = () => {
   const [addTask, setAddTask] = useState(false);
   const [userStats, setUserStats] = useState(null);
   const { userData } = useContext(AuthContext);
-  const toastId = useContext(ToastifyContext);
+  const [chartDetails, setChartDetails] = useState({ view: 0, option: '1m' });
+  const [chartData, setChartData] = useState(null);
+  const [taskCategory, setTaskCategory] = useState('recent');
+  const [userTasks, setUserTasks] = useState(null);
+  const [scheduledTasks, setScheduledTasks] = useState(null);
+  const [scheduleDetails, setScheduleDetails] = useState({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    day: new Date().getDate(),
+    page: 1,
+  });
+  const [scheduleData, setScheduleData] = useState(null);
   const searchRef = useRef();
   const calenderRef = useRef();
   const navRef = useRef();
+  const taskBoxRef = useRef();
   const userBoxRef = useRef();
   const imgRef = useRef();
 
@@ -92,22 +121,80 @@ const Dashboard = () => {
 
   // For user stats
   useEffect(() => {
-    console.log(userData);
     const fetchUserStats = async () => {
       try {
         const { data } = await axios.get('/api/v1/analytics?dashboard=true');
         setUserStats(data);
-        console.log(data);
       } catch {
         setUserStats(false);
         return toast('An error occured while fetching user stats.', {
-          toastId,
+          toastId: 'toast-id1',
         });
       }
     };
 
     fetchUserStats();
   }, []);
+
+  // For the Chart
+  useEffect(() => {
+    const getChartData = async () => {
+      try {
+        const { data } = await axios.get(
+          `/api/v1/tasks/my_tasks?range=${chartDetails.option}&view=${chartDetails.view}`
+        );
+        setChartData(data.data.graph);
+      } catch {
+        setChartData(false);
+        return toast('An error occured while fetching chart data.', {
+          toastId: 'toast-id2',
+        });
+      }
+    };
+
+    getChartData();
+  }, [chartDetails]);
+
+  // For user tasks category
+  useEffect(() => {
+    const getUserTasks = async () => {
+      try {
+        const { data } = await axios.get(
+          `/api/v1/tasks/my_tasks?filter=${taskCategory}&fields=name&sort=-lastModified&limit=4`
+        );
+        setUserTasks(data.data.tasks);
+      } catch {
+        setUserTasks(false);
+        return toast('An error occured while fetching user tasks.', {
+          toastId: 'toast-id3',
+        });
+      }
+    };
+
+    getUserTasks();
+  }, [taskCategory]);
+
+  // For user scheduled tasks
+  useEffect(() => {
+    const getScheduledTasks = async () => {
+      try {
+        const { year, month, day } = scheduleDetails;
+
+        const { data } = await axios.get(
+          `/api/v1/tasks/my_tasks?sort=deadline&fields=name,deadline,status,priority,assigned,leader,project,user&calendar=true&taskPage=1&taskLimit=10&year=${year}&month=${month}&day=${day}`
+        );
+        setScheduledTasks(data.data.tasks);
+        console.log(data);
+      } catch {
+        setScheduledTasks(false);
+        return toast('An error occured while fetching scheduled tasks.', {
+          toastId: 'toast-id4',
+        });
+      }
+    };
+
+    getScheduledTasks();
+  }, [scheduleDetails]);
 
   const handleSearchText = (e) => {
     setSearchText(e.target.value);
@@ -119,14 +206,14 @@ const Dashboard = () => {
   };
 
   const data = {
-    labels: ['8th Feb', '16th Feb', '24th Feb', '3rd Mar', '8th Mar'],
+    labels: chartData ? chartData.labels.labelsText : [],
     datasets: [
       {
-        label: 'Tasks Done',
-        data: [50, 37, 73, 29, 58],
+        label: 'Tasks Completed',
+        data: chartData ? chartData.values.completed : [],
         fill: false,
         borderColor: 'orange',
-        tension: 0.4,
+        tension: 0.5,
         pointRadius: 5,
       },
     ],
@@ -198,6 +285,45 @@ const Dashboard = () => {
     } else {
       return 'Welcome';
     }
+  };
+
+  const updateChartOption = (e, option) => {
+    setChartDetails({ view: 0, option });
+    setChartData(null);
+  };
+
+  const updateTaskCategory = (e, category) => {
+    setTaskCategory(category);
+    setUserTasks(null);
+  };
+
+  const generateName = (firstName, lastName, username) => {
+    if (!firstName && !lastName) {
+      return `@${username}`;
+    } else {
+      firstName = firstName || '';
+      lastName = lastName || '';
+
+      return `${firstName} ${lastName}`;
+    }
+  };
+
+  const scheduledTaskMessage = () => {
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth() + 1;
+    const day = new Date().getDate();
+
+    const currentDate = new Date(`${year}-${month}-${day}`);
+
+    const scheduledDate = new Date(
+      `${scheduleDetails.year}-${scheduleDetails.month}-${scheduleDetails.day}`
+    );
+
+    return Date.parse(scheduledDate) === Date.parse(currentDate)
+      ? 'No tasks are due today'
+      : scheduledDate > currentDate
+      ? 'No tasks are due on this date'
+      : 'No tasks were due on this date';
   };
 
   return (
@@ -447,7 +573,11 @@ const Dashboard = () => {
             </figure>
           </div>
 
-          <div className={styles['article-box']}>
+          <div
+            className={`${styles['article-box']} ${
+              userStats === null ? styles['loading-article-box'] : ''
+            }`}
+          >
             {userStats === null ? (
               <Loader
                 style={{ width: '2.5rem', height: '2.5rem', marginTop: '1rem' }}
@@ -465,7 +595,9 @@ const Dashboard = () => {
                   </span>
 
                   <div className={styles['article-details']}>
-                    <span className={styles['article-name']}>Tasks</span>
+                    <span className={styles['article-name']}>
+                      Tasks Created
+                    </span>
                     <span className={styles['article-size']}>
                       {userStats.data.tasks > 500
                         ? '500+'
@@ -499,7 +631,7 @@ const Dashboard = () => {
 
                   <div className={styles['article-details']}>
                     <span className={styles['article-name']}>
-                      Current project
+                      Current Project
                     </span>
                     <span className={styles['article-size']}>
                       {userStats.data.currentProject.completedTasks}
@@ -532,7 +664,9 @@ const Dashboard = () => {
                   </span>
 
                   <div className={styles['article-details']}>
-                    <span className={styles['article-name']}>Tasks</span>
+                    <span className={styles['article-name']}>
+                      Tasks Created
+                    </span>
                     <span className={styles['article-fail-text']}>
                       <MdOutlineSignalWifiOff
                         className={styles['network-icon']}
@@ -552,7 +686,7 @@ const Dashboard = () => {
 
                   <div className={styles['article-details']}>
                     <span className={styles['article-name']}>
-                      Current project
+                      Current Project
                     </span>
                     <span className={styles['article-fail-text']}>
                       <MdOutlineSignalWifiOff
@@ -568,25 +702,97 @@ const Dashboard = () => {
 
           <div className={styles['chart-box']}>
             <div className={styles['chart-head']}>
-              <h2 className={styles['chart-head-text']}>Tasks done</h2>
+              <h2 className={styles['chart-head-text']}>Tasks completed</h2>
               <ul className={styles['chart-head-list']}>
-                <li className={styles['chart-head-item']}>1d</li>
-                <li className={styles['chart-head-item']}>1w</li>
                 <li
-                  className={`${styles['chart-head-item']} ${styles['chart-head-current-item']}`}
+                  className={`${styles['chart-head-item']} ${
+                    chartDetails.option === '1d'
+                      ? styles['chart-head-current-item']
+                      : ''
+                  }`}
+                  onClick={(e) => updateChartOption(e, '1d')}
+                >
+                  1d
+                </li>
+                <li
+                  className={`${styles['chart-head-item']} ${
+                    chartDetails.option === '1w'
+                      ? styles['chart-head-current-item']
+                      : ''
+                  }`}
+                  onClick={(e) => updateChartOption(e, '1w')}
+                >
+                  1w
+                </li>
+                <li
+                  className={`${styles['chart-head-item']} ${
+                    chartDetails.option === '1m'
+                      ? styles['chart-head-current-item']
+                      : ''
+                  }`}
+                  onClick={(e) => updateChartOption(e, '1m')}
                 >
                   1m
                 </li>
-                <li className={styles['chart-head-item']}>6m</li>
-                <li className={styles['chart-head-item']}>1y</li>
+                {/* <li className={styles['chart-head-item']}>6m</li> */}
+                <li
+                  className={`${styles['chart-head-item']} ${
+                    chartDetails.option === '1y'
+                      ? styles['chart-head-current-item']
+                      : ''
+                  }`}
+                  onClick={(e) => updateChartOption(e, '1y')}
+                >
+                  1y
+                </li>
               </ul>
             </div>
 
-            <Line
-              className={styles['chart-container']}
-              data={data}
-              options={options}
-            />
+            {(chartDetails.option === '1m' || chartDetails.option === '1d') && (
+              <div className={styles['chart-view']}>
+                <span className={styles['chart-view-text']}>View:</span>
+                <select
+                  className={styles['chart-view-select']}
+                  value={chartDetails.view}
+                  onChange={(e) => {
+                    setChartDetails({
+                      view: e.target.value,
+                      option: chartDetails.option,
+                    });
+                    setChartData(null);
+                  }}
+                >
+                  <option value={0}>1st</option>
+                  <option value={1}>2nd</option>
+                  {chartDetails.option === '1m' && (
+                    <option value={2}>3rd</option>
+                  )}
+                </select>
+              </div>
+            )}
+
+            {chartData === null ? (
+              <div className={styles['loader-div']}>
+                {' '}
+                <Loader
+                  style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    margin: '3rem 0',
+                  }}
+                />{' '}
+              </div>
+            ) : chartData ? (
+              <Line
+                className={styles['chart-container']}
+                data={data}
+                options={options}
+              />
+            ) : (
+              <div className={styles['chart-error-msg']}>
+                Unable to retrieve data
+              </div>
+            )}
           </div>
 
           <div className={styles['tasks-box']}>
@@ -594,167 +800,179 @@ const Dashboard = () => {
 
             <ul className={styles['task-category']}>
               <li
-                className={`${styles['task-category-item']} ${styles['task-current-category']}`}
+                className={`${styles['task-category-item']} ${
+                  taskCategory === 'recent'
+                    ? styles['task-current-category']
+                    : ''
+                }`}
+                onClick={(e) => updateTaskCategory(e, 'recent')}
               >
                 Recent
               </li>
-              <li className={styles['task-category-item']}>Urgent</li>
-              <li className={styles['task-category-item']}>Assigned</li>
-              <li className={styles['task-category-item']}>Later</li>
+              <li
+                className={`${styles['task-category-item']} ${
+                  taskCategory === 'urgent'
+                    ? styles['task-current-category']
+                    : ''
+                }`}
+                onClick={(e) => updateTaskCategory(e, 'urgent')}
+              >
+                Urgent
+              </li>
+              <li
+                className={`${styles['task-category-item']} ${
+                  taskCategory === 'assigned'
+                    ? styles['task-current-category']
+                    : ''
+                }`}
+                onClick={(e) => updateTaskCategory(e, 'assigned')}
+              >
+                Assigned
+              </li>
+              <li
+                className={`${styles['task-category-item']} ${
+                  taskCategory === 'later'
+                    ? styles['task-current-category']
+                    : ''
+                }`}
+                onClick={(e) => updateTaskCategory(e, 'later')}
+              >
+                Later
+              </li>
             </ul>
 
-            <div className={styles['task-container']}>
-              <article className={styles['task-item']}>
-                <h1 className={styles['task-item-head']}>Fitness app</h1>
-
-                <p className={styles['task-item-details']}>
-                  Make a single landing page and dashboard.
-                </p>
-
-                <div className={styles['task-group-pics-box']}>
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile1.webp"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile2webp.webp"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile3.jpeg"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile4.jpeg"
+            <div
+              className={`${styles['task-container']} ${
+                !userTasks || userTasks.length === 0
+                  ? styles['loading-tasks']
+                  : ''
+              }`}
+              ref={taskBoxRef}
+            >
+              {userTasks === null ? (
+                <div className={styles['tasks-loader-div']}>
+                  <Loader
+                    style={{
+                      width: '2.5rem',
+                      height: '2.5rem',
+                      margin: '3rem 0',
+                    }}
                   />
                 </div>
-
-                <div className={styles['task-progress-div']}>
-                  <div className={styles['task-progress-box']}>
-                    <span className={styles['task-progress-text']}>
-                      Progress
-                    </span>
-                    <span className={styles['task-progress-value']}>75%</span>
-                  </div>
-
-                  <span className={styles['task-progress']}>&nbsp;</span>
+              ) : userTasks.length === 0 ? (
+                <div className={styles['user-tasks-text']}>
+                  No task available
                 </div>
-              </article>
+              ) : userTasks ? (
+                userTasks.map((task) => {
+                  return (
+                    <article key={task._id} className={styles['task-item']}>
+                      <h1 className={styles['task-item-head']}>
+                        <a href="#">{task.project.name}</a>
+                      </h1>
+                      <p className={styles['task-item-details']}>{task.name}</p>
 
-              <article className={styles['task-item']}>
-                <h1 className={styles['task-item-head']}>Fitness app</h1>
+                      {taskCategory !== 'assigned' && (
+                        <div className={styles['task-group-pics-box']}>
+                          {task.project.team.length > 5 ? (
+                            <>
+                              {' '}
+                              {task.project.team.slice(0, 4).map((member) => (
+                                <img
+                                  key={member._id}
+                                  className={styles['task-group-pic']}
+                                  src={`../../assets/images/users/${member.photo}`}
+                                />
+                              ))}
+                              ({' '}
+                              <span className={styles['team-icon-box']}>
+                                <span className={styles['plus-sign']}>+</span>
+                                {task.project.team.length - 4}
+                              </span>
+                              )
+                            </>
+                          ) : (
+                            task.project.team.map((member) => (
+                              <span
+                                key={member._id}
+                                className={styles['task-tooltip-box']}
+                              >
+                                <a href="#">
+                                  <img
+                                    key={member._id}
+                                    className={styles['task-group-pic']}
+                                    src={`../../assets/images/users/${member.photo}`}
+                                  />
+                                </a>
+                                <span
+                                  className={`${styles['task-tooltip-text']} ${styles['tooltip2']}`}
+                                >
+                                  {generateName(
+                                    member.firstName,
+                                    member.lastName,
+                                    member.username
+                                  )}
+                                </span>
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      )}
 
-                <p className={styles['task-item-details']}>
-                  Make a single landing page and dashboard.
-                </p>
+                      {taskCategory === 'assigned' && (
+                        <div className={styles['task-item-assigned-box']}>
+                          <span className={styles['task-item-assigned-text']}>
+                            Project Leader:
+                          </span>
+                          <span className={styles['task-tooltip-box']}>
+                            <a href="#">
+                              <img
+                                className={styles['task-item-assigned-img']}
+                                src={`../../assets/images/users/${task.leader.photo}`}
+                              />
+                            </a>
+                            <span className={styles['task-tooltip-text']}>
+                              {generateName(
+                                task.leader.firstName,
+                                task.leader.lastName,
+                                task.leader.username
+                              )}
+                            </span>
+                          </span>
+                        </div>
+                      )}
 
-                <div className={styles['task-group-pics-box']}>
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile1.webp"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile2webp.webp"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile3.jpeg"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile4.jpeg"
-                  />
+                      <div className={styles['task-progress-div']}>
+                        <div className={styles['task-progress-box']}>
+                          <span className={styles['task-progress-text']}>
+                            Progress
+                          </span>
+                          <span className={styles['task-progress-value']}>
+                            {task.project.progress}%
+                          </span>
+                        </div>
+
+                        <span
+                          className={styles['task-progress']}
+                          style={{
+                            background: `linear-gradient(to right, orange ${
+                              task.project.progress
+                            }%, rgba(128, 128, 128, 0.5) ${
+                              100 - task.project.progress
+                            }%)`,
+                          }}
+                        >
+                          &nbsp;
+                        </span>
+                      </div>
+                    </article>
+                  );
+                })
+              ) : (
+                <div className={styles['user-tasks-text']}>
+                  Unable to retrieve data
                 </div>
-
-                <div className={styles['task-progress-div']}>
-                  <div className={styles['task-progress-box']}>
-                    <span className={styles['task-progress-text']}>
-                      Progress
-                    </span>
-                    <span className={styles['task-progress-value']}>75%</span>
-                  </div>
-
-                  <span className={styles['task-progress']}>&nbsp;</span>
-                </div>
-              </article>
-
-              <article className={styles['task-item']}>
-                <h1 className={styles['task-item-head']}>Fitness app</h1>
-
-                <p className={styles['task-item-details']}>
-                  Make a single landing page and dashboard.
-                </p>
-
-                <div className={styles['task-group-pics-box']}>
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile1.webp"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile2webp.webp"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile3.jpeg"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile4.jpeg"
-                  />
-                </div>
-
-                <div className={styles['task-progress-div']}>
-                  <div className={styles['task-progress-box']}>
-                    <span className={styles['task-progress-text']}>
-                      Progress
-                    </span>
-                    <span className={styles['task-progress-value']}>75%</span>
-                  </div>
-
-                  <span className={styles['task-progress']}>&nbsp;</span>
-                </div>
-              </article>
-
-              <article className={styles['task-item']}>
-                <h1 className={styles['task-item-head']}>Fitness app</h1>
-
-                <p className={styles['task-item-details']}>
-                  Make a single landing page and dashboard.
-                </p>
-
-                <div className={styles['task-group-pics-box']}>
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile1.webp"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile2webp.webp"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile3.jpeg"
-                  />
-                  <img
-                    className={styles['task-group-pic']}
-                    src="../../assets/images/profile4.jpeg"
-                  />
-                </div>
-
-                <div className={styles['task-progress-div']}>
-                  <div className={styles['task-progress-box']}>
-                    <span className={styles['task-progress-text']}>
-                      Progress
-                    </span>
-                    <span className={styles['task-progress-value']}>75%</span>
-                  </div>
-
-                  <span className={styles['task-progress']}>&nbsp;</span>
-                </div>
-              </article>
+              )}
             </div>
           </div>
         </section>
@@ -769,7 +987,8 @@ const Dashboard = () => {
                 Today
               </span>
               <span className={styles['right-section-date']}>
-                March 9, 2023
+                {months[new Date().getMonth()]} {new Date().getDate()},{' '}
+                {new Date().getFullYear()}
               </span>
             </div>
 
@@ -788,160 +1007,128 @@ const Dashboard = () => {
             setCurrentMonth={setCurrentMonth}
             setCurrentYear={setCurrentYear}
             calenderRef={calenderRef}
+            setScheduledTasks={setScheduledTasks}
+            scheduleDetails={scheduleDetails}
+            setScheduleDetails={setScheduleDetails}
           />
 
           <div className={styles['scheduled-tasks-div']}>
-            <article className={`${styles['scheduled-task']} `}>
-              <time className={styles['scheduled-time']}>00:00</time>
-              <div
-                className={`${styles['scheduled-task-content']} ${styles['scheduled-task-green']}`}
-              >
-                <div className={styles['scheduled-task-box']}>
-                  <span className={styles['scheduled-task-name']}>
-                    Design Meeting
-                  </span>
-                  <span className={styles['scheduled-task-time-box']}>
-                    <FaRegClock className={styles['scheduled-task-icon']} />
-                    <span className={styles['scheduled-task-time']}>
-                      2 hours
-                    </span>
-                  </span>
-                </div>
-
-                <div className={styles['scheduled-task-pics-box']}>
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile1.webp"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile2webp.webp"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile3.jpeg"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile4.jpeg"
-                  />
-                </div>
+            {scheduledTasks === null ? (
+              <div className={styles['tasks-loader-div']}>
+                <Loader
+                  style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    margin: '3rem 0',
+                  }}
+                />
               </div>
-            </article>
-
-            <article className={`${styles['scheduled-task']}`}>
-              <time className={styles['scheduled-time']}>00:00</time>
-              <div
-                className={`${styles['scheduled-task-content']}  ${styles['scheduled-task-red']}`}
-              >
-                <div className={styles['scheduled-task-box']}>
-                  <span className={styles['scheduled-task-name']}>
-                    Design Meeting
-                  </span>
-                  <span className={styles['scheduled-task-time-box']}>
-                    <FaRegClock className={styles['scheduled-task-icon']} />
-                    <span className={styles['scheduled-task-time']}>
-                      2 hours
-                    </span>
-                  </span>
-                </div>
-
-                <div className={styles['scheduled-task-pics-box']}>
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile1.webp"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile2webp.webp"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile3.jpeg"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile4.jpeg"
-                  />
-                </div>
+            ) : scheduledTasks.length === 0 ? (
+              <div className={styles['scheduled-tasks-text']}>
+                {scheduledTaskMessage()}
               </div>
-            </article>
+            ) : scheduledTasks ? (
+              scheduledTasks.map((task) => {
+                const hour = new Date(task.deadline).getHours();
+                let showTime = false;
+                if (currentHour !== hour) {
+                  currentHour = hour;
+                  showTime = true;
+                }
+                return (
+                  <article
+                    key={task._id}
+                    className={`${styles['scheduled-task']} `}
+                  >
+                    <time
+                      className={`${styles['scheduled-time']} ${
+                        !showTime ? styles['hide-time'] : ''
+                      }`}
+                    >
+                      {String(hour).length === 1 ? `0${String(hour)}` : hour}:00
+                    </time>
+                    <div
+                      className={`${styles['scheduled-task-content']} ${
+                        styles[`scheduled-task-${task.priority}`]
+                      }`}
+                    >
+                      <div className={styles['scheduled-task-box']}>
+                        <span className={styles['scheduled-task-name']}>
+                          Design Meeting
+                        </span>
 
-            <article className={`${styles['scheduled-task']} `}>
-              <time className={styles['scheduled-time']}>00:00</time>
-              <div
-                className={`${styles['scheduled-task-content']} ${styles['scheduled-task-yellow']}`}
-              >
-                <div className={styles['scheduled-task-box']}>
-                  <span className={styles['scheduled-task-name']}>
-                    Design Meeting
-                  </span>
-                  <span className={styles['scheduled-task-time-box']}>
-                    <FaRegClock className={styles['scheduled-task-icon']} />
-                    <span className={styles['scheduled-task-time']}>
-                      2 hours
-                    </span>
-                  </span>
-                </div>
+                        <span className={styles['scheduled-task-property-box']}>
+                          <span
+                            className={styles['scheduled-task-property-name']}
+                          >
+                            Project:
+                          </span>
+                          <a
+                            href="#"
+                            className={styles['scheduled-task-project-name']}
+                          >
+                            {task.project.name}
+                          </a>
+                        </span>
 
-                <div className={styles['scheduled-task-pics-box']}>
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile1.webp"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile2webp.webp"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile3.jpeg"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile4.jpeg"
-                  />
-                </div>
+                        <span className={styles['scheduled-task-property-box']}>
+                          <span
+                            className={styles['scheduled-task-property-name']}
+                          >
+                            Status:
+                          </span>
+                          <span>{task.status}</span>
+                        </span>
+                      </div>
+
+                      <div className={styles['scheduled-task-pics-box']}>
+                        {task.assigned ? (
+                          <span className={styles['task-tooltip-box']}>
+                            <a href="#">
+                              <img
+                                className={styles['scheduled-task-pics']}
+                                src={`../../assets/images/users/${task.leader.photo}`}
+                              />
+                            </a>
+                            <span className={styles['task-tooltip-text']}>
+                              {generateName(
+                                task.leader.firstName,
+                                task.leader.lastName,
+                                task.leader.username
+                              )}
+                            </span>
+                          </span>
+                        ) : (
+                          <span className={styles['task-tooltip-box']}>
+                            <a href="#">
+                              <img
+                                className={styles['scheduled-task-pics']}
+                                src={`../../assets/images/users/${task.user.photo}`}
+                              />
+                            </a>
+                            <span className={styles['task-tooltip-text']}>
+                              {generateName(
+                                task.user.firstName,
+                                task.user.lastName,
+                                task.user.username
+                              )}
+                            </span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })
+            ) : (
+              <div className={styles['scheduled-tasks-text']}>
+                Unable to retrieve data
               </div>
-            </article>
+            )}
 
-            <article className={`${styles['scheduled-task']}`}>
-              <time className={styles['scheduled-time']}>00:00</time>
-              <div
-                className={`${styles['scheduled-task-content']}  ${styles['scheduled-task-red']}`}
-              >
-                <div className={styles['scheduled-task-box']}>
-                  <span className={styles['scheduled-task-name']}>
-                    Design Meeting
-                  </span>
-                  <span className={styles['scheduled-task-time-box']}>
-                    <FaRegClock className={styles['scheduled-task-icon']} />
-                    <span className={styles['scheduled-task-time']}>
-                      2 hours
-                    </span>
-                  </span>
-                </div>
-
-                <div className={styles['scheduled-task-pics-box']}>
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile1.webp"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile2webp.webp"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile3.jpeg"
-                  />
-                  <img
-                    className={styles['scheduled-task-pics']}
-                    src="../../assets/images/profile4.jpeg"
-                  />
-                </div>
-              </div>
-            </article>
+            <div className={styles['more-btn-box']}>
+              <button className={styles['more-task-btn']}>Show More</button>
+            </div>
           </div>
         </section>
       </section>

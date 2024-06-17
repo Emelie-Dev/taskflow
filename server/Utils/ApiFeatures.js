@@ -54,11 +54,12 @@ const getLabels = (month, days) => {
   return dataLabels;
 };
 
-const getRangeLabels = (type, year, month, date, hour) => {
+const getRangeLabels = (type, year, month, date, hour, view) => {
   const dataLabels = {
     labelsText: [],
     labelsNum: [],
   };
+
   const monthLabels = [
     'Jan',
     'Feb',
@@ -104,10 +105,31 @@ const getRangeLabels = (type, year, month, date, hour) => {
           dataLabels.labelsNum.push(i);
         }
       }
+
       dataLabels.labelsNum[dataLabels.labelsNum.length - 1] = date;
       dataLabels.labelsText[
         dataLabels.labelsText.length - 1
       ] = `${monthLabels[month]} ${date}`;
+
+      if (view === 1 || view === 2) {
+        const dateIndex = dataLabels.labelsText.findIndex((text) => {
+          const num = parseInt(text.replace(monthLabels[month], ''));
+          return text.startsWith(monthLabels[month]) && num > date - view;
+        });
+
+        if (dateIndex) {
+          dataLabels.labelsNum.splice(dateIndex);
+          dataLabels.labelsText.splice(dateIndex);
+
+          if (
+            dataLabels.labelsNum[dataLabels.labelsNum.length - 1] !==
+            date - view
+          ) {
+            dataLabels.labelsNum.push(date - view);
+            dataLabels.labelsText.push(`${monthLabels[month]} ${date - view}`);
+          }
+        }
+      }
 
       break;
 
@@ -137,10 +159,36 @@ const getRangeLabels = (type, year, month, date, hour) => {
         if (i > 23) {
           i = i - 26;
         } else {
-          const txt = i > 12 ? `${i - 12} PM` : `${i} AM`;
+          const txt =
+            i === 0
+              ? '12 AM'
+              : i === 12
+              ? '12 PM'
+              : i > 12
+              ? `${i - 12} PM`
+              : `${i} AM`;
+
           dataLabels.labelsNum.push(i);
           dataLabels.labelsText.push(`${txt}`);
         }
+      }
+
+      if (view === 1) {
+        const lastNum =
+          dataLabels.labelsNum[dataLabels.labelsNum.length - 1] - 1;
+
+        dataLabels.labelsNum[dataLabels.labelsNum.length - 1] = lastNum;
+
+        const txt =
+          lastNum === 0
+            ? '12 AM'
+            : lastNum === 12
+            ? '12 PM'
+            : lastNum > 12
+            ? `${lastNum - 12} PM`
+            : `${lastNum} AM`;
+
+        dataLabels.labelsText[dataLabels.labelsText.length - 1] = txt;
       }
   }
 
@@ -148,7 +196,8 @@ const getRangeLabels = (type, year, month, date, hour) => {
 };
 
 export class ApiFeatures {
-  constructor(query, queryString, ...excludeArray) {
+  constructor(Model, query, queryString, ...excludeArray) {
+    this.model = Model;
     this.query = query;
     this.queryString = queryString;
     this.excludeArray = [
@@ -158,6 +207,9 @@ export class ApiFeatures {
       'page',
       'limit',
       'filter',
+      'calendar',
+      'taskPage',
+      'taskLimit',
     ];
   }
 
@@ -177,9 +229,31 @@ export class ApiFeatures {
     // Filters model based on the filter value of the request query
     if (this.queryString.filter) {
       this.query.filterTasks(this.queryString.filter);
+      this.query
+        .find(queryOptions)
+        .populate({
+          path: 'project',
+          select: 'name',
+          match: { calculateProgress: true },
+          populate: {
+            path: 'team',
+            select: 'photo username firstName lastName',
+          },
+        })
+        .populate({
+          path: 'leader',
+          select: 'username firstName lastName photo',
+        });
+    } else {
+      this.query.find(queryOptions);
     }
 
-    this.query.find(queryOptions);
+    if (this.queryString.calendar) {
+      this.query.find(queryOptions).populate({
+        path: 'leader user project',
+        select: 'name username firstName lastName photo',
+      });
+    }
 
     return this;
   }
@@ -207,18 +281,17 @@ export class ApiFeatures {
   }
 
   paginate() {
-    const page = this.queryString.page || 1;
-    const limit = this.queryString.limit || 30;
-    const skip = (page - 1) * limit;
+    // const page = this.queryString.page || 1;
+    // const limit = this.queryString.limit || 30;
+    // const skip = (page - 1) * limit;
 
-    this.query = this.query.skip(skip).limit(limit);
+    // this.query = this.query.skip(skip).limit(limit);
 
-    // if (req.query.page) {
-    //   const moviesCount = await Movie.countDocuments();
+    // if (this.queryString.page) {
+    //   const docCount = await this.model.countDocuments({});
+    //   this.modelDetails.count = docCount;
 
-    //   if (skip >= moviesCount) {
-    //     throw new Error('This  data does not exist...');
-    //   }
+    //   if (skip >= docCount) this.modelDetails.lastPage = true;
     // }
 
     return this;
@@ -226,11 +299,12 @@ export class ApiFeatures {
 }
 
 export class QueryFeatures {
-  constructor(model, queryString, type) {
+  constructor(model, queryString, type, date) {
     this.model = model;
     this.queryString = queryString;
     this.graph = {};
     this.type = type;
+    this.date = date;
   }
 
   condition(doc) {
@@ -276,22 +350,26 @@ export class QueryFeatures {
           completed: new Array(12).fill(0),
         };
 
-        // Filter model and seperates each doc by month of creation
+        // Filter model and seperates each doc by date value
         this.model = this.model.filter((doc) => {
-          if (doc.createdAt.getFullYear() === year) {
-            const docMonth = doc.createdAt.getMonth();
+          if (doc[this.date]) {
+            if (doc[this.date].getFullYear() === year) {
+              const docMonth = doc[this.date].getMonth();
 
-            // stats for completed status
-            if (this.condition(doc)) {
-              this.graph.values.completed[docMonth] =
-                this.graph.values.completed[docMonth] + 1;
+              // stats for completed status
+              if (this.condition(doc)) {
+                this.graph.values.completed[docMonth] =
+                  this.graph.values.completed[docMonth] + 1;
+              }
+
+              // stats for all status
+              this.graph.values.created[docMonth] =
+                this.graph.values.created[docMonth] + 1;
             }
-
-            // stats for all status
-            this.graph.values.created[docMonth] =
-              this.graph.values.created[docMonth] + 1;
+            return doc[this.date].getFullYear() === year;
+          } else {
+            return false;
           }
-          return doc.createdAt.getFullYear() === year;
         });
       } else if (day === 0) {
         const days = maxDays(month, year);
@@ -303,31 +381,35 @@ export class QueryFeatures {
           completed: new Array(this.graph.labels.labelsNum.length).fill(0),
         };
 
-        // Filter model and seperates each doc by its day of creation
+        // Filter model and seperates each doc by the date value
         this.model = this.model.filter((doc) => {
-          const docMonth = doc.createdAt.getMonth() + 1;
-          const docYear = doc.createdAt.getFullYear();
-          const docDate = doc.createdAt.getDate();
+          if (doc[this.date]) {
+            const docMonth = doc[this.date].getMonth() + 1;
+            const docYear = doc[this.date].getFullYear();
+            const docDate = doc[this.date].getDate();
 
-          if (
-            docYear === year &&
-            docMonth === month &&
-            this.graph.labels.labelsNum.includes(docDate)
-          ) {
-            const index = Math.ceil(docDate / 3) - 1;
+            if (
+              docYear === year &&
+              docMonth === month &&
+              this.graph.labels.labelsNum.includes(docDate)
+            ) {
+              const index = Math.ceil(docDate / 3) - 1;
 
-            // stats for completed status
-            if (this.condition(doc)) {
-              this.graph.values.completed[index] =
-                this.graph.values.completed[index] + 1;
+              // stats for completed status
+              if (this.condition(doc)) {
+                this.graph.values.completed[index] =
+                  this.graph.values.completed[index] + 1;
+              }
+
+              // stats for all status
+              this.graph.values.created[index] =
+                this.graph.values.created[index] + 1;
             }
 
-            // stats for all status
-            this.graph.values.created[index] =
-              this.graph.values.created[index] + 1;
+            return docYear === year && docMonth === month;
+          } else {
+            return false;
           }
-
-          return docYear === year && docMonth === month;
         });
       } else {
         this.graph.labels = [];
@@ -339,31 +421,35 @@ export class QueryFeatures {
 
         // Filter model and seperates each doc by its time of creation
         this.model = this.model.filter((doc) => {
-          const docMonth = doc.createdAt.getMonth() + 1;
-          const docYear = doc.createdAt.getFullYear();
-          const docDate = doc.createdAt.getDate();
-          const docHour = doc.createdAt.getHours();
+          if (doc[this.date]) {
+            const docMonth = doc[this.date].getMonth() + 1;
+            const docYear = doc[this.date].getFullYear();
+            const docDate = doc[this.date].getDate();
+            const docHour = doc[this.date].getHours();
 
-          if (
-            docYear === year &&
-            docMonth === month &&
-            docDate === day &&
-            docHour % 2 === 0
-          ) {
-            const index = docHour / 2;
+            if (
+              docYear === year &&
+              docMonth === month &&
+              docDate === day &&
+              docHour % 2 === 0
+            ) {
+              const index = docHour / 2;
 
-            // stats for completed status
-            if (this.condition(doc)) {
-              this.graph.values.completed[index] =
-                this.graph.values.completed[index] + 1;
+              // stats for completed status
+              if (this.condition(doc)) {
+                this.graph.values.completed[index] =
+                  this.graph.values.completed[index] + 1;
+              }
+
+              // stats for all status
+              this.graph.values.created[index] =
+                this.graph.values.created[index] + 1;
             }
 
-            // stats for all status
-            this.graph.values.created[index] =
-              this.graph.values.created[index] + 1;
+            return docYear === year && docMonth === month && docDate === day;
+          } else {
+            return false;
           }
-
-          return docYear === year && docMonth === month && docDate === day;
         });
       }
     }
@@ -373,13 +459,14 @@ export class QueryFeatures {
   getRange() {
     if (this.queryString.range) {
       const range = this.queryString.range;
+      const view = parseInt(this.queryString.view) || 0;
       const allowedValues = ['1y', '1m', '1w', '1d'];
 
       if (allowedValues.includes(this.queryString.range)) {
         const currentYear = new Date().getFullYear();
         const currentMonth = new Date().getMonth();
-        const currentDate = new Date().getDate();
-        const currentHour = new Date().getHours();
+        let currentDate = new Date().getDate();
+        const currentHour = new Date().getHours() + view;
         const current = new Date(
           `${currentYear}-${currentMonth + 1}-${currentDate}`
         );
@@ -430,6 +517,8 @@ export class QueryFeatures {
             break;
 
           case '1m':
+            currentDate = currentDate + view;
+
             // check if current month is january
             if (currentMonth === 0) {
               previousYear = currentYear - 1;
@@ -439,7 +528,9 @@ export class QueryFeatures {
                 'm',
                 previousYear,
                 12,
-                currentDate
+                currentDate,
+                null,
+                view
               );
             } else {
               previousDate = new Date(
@@ -450,7 +541,9 @@ export class QueryFeatures {
                 'm',
                 currentYear,
                 currentMonth,
-                currentDate
+                currentDate,
+                null,
+                view
               );
             }
 
@@ -603,6 +696,7 @@ export class QueryFeatures {
           case '1d':
             previousDate = new Date();
             previousDate.setDate(currentDate - 1);
+            previousDate.setHours(currentHour);
             previousDate.setMinutes(0);
             previousDate.setSeconds(0);
             previousDate.setMilliseconds(0);
@@ -612,7 +706,8 @@ export class QueryFeatures {
               null,
               null,
               null,
-              currentHour
+              currentHour,
+              view
             );
 
             this.graph.values = {

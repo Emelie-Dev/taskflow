@@ -91,7 +91,7 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
 
               <input
                 className={styles['form-input']}
-                type="date"
+                type="datetime-local"
                 id="due-date"
                 min={`${currentYear}-0${currentMonth}-0${currentDate}`}
               />

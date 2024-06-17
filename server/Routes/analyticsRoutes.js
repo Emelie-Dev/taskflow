@@ -4,6 +4,6 @@ import { getMyStats } from '../Controllers/analyticsController.js';
 
 const router = express.Router();
 
-router.route('/').get(protectRoute, getMyStats);
+router.get('/', protectRoute, getMyStats);
 
 export default router;

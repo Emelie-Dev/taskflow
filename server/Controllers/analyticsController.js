@@ -8,8 +8,12 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
   if (req.query.tasks) {
     getTasksStats(req, res, next);
   } else {
+    const currentYear = new Date().getFullYear();
     const currentDate = new Date().getMonth();
+    const currentDay = new Date().getDate();
     let tasksStats = { completed: 0, open: 0, progress: 0 };
+    let todayTasks = 0;
+    let currentProject = {};
 
     let percent = {
       projects: {
@@ -27,6 +31,28 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
       Task.find({ user: req.user._id }),
     ]);
 
+    const personalTasks = tasks.filter((task) => !task.assigned);
+
+    if (req.query.dashboard) {
+      const currentProjectTasks = await Task.find({
+        project: req.user.currentProject,
+        assigned: { $ne: true },
+      });
+
+      const completedTasks = currentProjectTasks.filter(
+        (task) => task.status === 'complete'
+      );
+
+      const percentageCompleted =
+        (completedTasks.length / (currentProjectTasks.length || 1)) * 100;
+
+      currentProject = {
+        tasks: currentProjectTasks.length,
+        completedTasks: completedTasks.length,
+        percent: Math.round(percentageCompleted),
+      };
+    }
+
     const completedProjects = projects.filter((project) => {
       if (project.createdAt.getMonth() === currentDate - 1) {
         if (project.progress === 100) {
@@ -43,7 +69,7 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
       return project.progress === 100;
     }).length;
 
-    for (let task of tasks) {
+    for (let task of personalTasks) {
       if (task.createdAt.getMonth() === currentDate - 1) {
         if (task.status === 'complete') {
           percent.tasks.complete[0]++;
@@ -64,6 +90,19 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
         tasksStats.open++;
       }
     }
+
+    // For today tasks
+    tasks.forEach((task) => {
+      if (task.deadline) {
+        if (
+          task.deadline.getFullYear() === currentYear &&
+          task.deadline.getMonth() == currentDate &&
+          task.deadline.getDate() === currentDay
+        ) {
+          todayTasks++;
+        }
+      }
+    });
 
     const dataPercent = {
       projects: {
@@ -108,11 +147,13 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
       status: 'success',
       data: {
         projects: projects.length,
-        tasks: tasks.length,
+        tasks: personalTasks.length,
+        todayTasks,
         completedProjects,
         completedTasks: tasksStats.completed,
         dataPercent,
         tasksStats,
+        currentProject,
       },
     });
   }
@@ -120,7 +161,10 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
 
 // For the pie chart
 const getTasksStats = async (req, res, next) => {
-  const tasks = await Task.find({ user: req.user._id });
+  const tasks = await Task.find({
+    user: req.user._id,
+    assigned: { $ne: true },
+  });
 
   let tasksStats = { completed: 0, open: 0, progress: 0 };
 
