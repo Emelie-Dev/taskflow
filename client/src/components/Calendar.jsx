@@ -11,6 +11,7 @@ const Calendar = ({
   setScheduledTasks,
   scheduleDetails,
   setScheduleDetails,
+  setScheduleData,
 }) => {
   const moveNextMonth = () => {
     if (currentMonth === 12) {
@@ -184,8 +185,11 @@ const Calendar = ({
       year: currentYear,
       month: currentMonth,
       day: parseInt(e.target.textContent),
+      page: 1,
     });
     setScheduledTasks(null);
+
+    setScheduleData({ loading: true, lastPage: true });
   };
 
   const checkScheduledDate = (input) => {

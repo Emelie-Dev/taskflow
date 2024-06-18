@@ -162,7 +162,14 @@ const getMyData = (Model, collection) =>
     let docs = await result.query;
 
     // Filters tasks based on request query
-    if (req.query.month || req.query.year || req.query.range || req.query.day) {
+
+    if (req.query.calendar) {
+    } else if (
+      req.query.month ||
+      req.query.year ||
+      req.query.range ||
+      req.query.day
+    ) {
       const dateType = req.query.calendar ? 'deadline' : 'createdAt';
 
       const result = new QueryFeatures(docs, req.query, collection, dateType)

@@ -27,6 +27,8 @@
     - When fetching tasks, remember assigned and not assigned
     - Delete project files when deleting projects
     - Complete links to other resources in each page
+    - Make the header of all pages and the left nav bar, each a single component
+
 
     
  -- Data Design

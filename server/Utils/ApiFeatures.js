@@ -282,19 +282,18 @@ export class ApiFeatures {
 
   paginate() {
     if (this.queryString.page || this.queryString.limit) {
-      const page = this.queryString.page;
-      const limit = this.queryString.limit;
+      const page = this.queryString.page || 1;
+      const limit = this.queryString.limit || 30;
       const skip = (page - 1) * limit;
+
+      if (this.queryString.calendar) {
+        const { year, month, day } = this.queryString;
+
+        this.query = this.query.scheduledTasks(year, month, day);
+      }
 
       this.query = this.query.skip(skip).limit(limit);
     }
-
-    // if (this.queryString.page) {
-    //   const docCount = await this.model.countDocuments({});
-    //   this.modelDetails.count = docCount;
-
-    //   if (skip >= docCount) this.modelDetails.lastPage = true;
-    // }
 
     return this;
   }

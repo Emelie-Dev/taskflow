@@ -66,7 +66,7 @@ const months = [
   'December',
 ];
 
-let currentHour = 0;
+let currentHour = null;
 
 const Dashboard = () => {
   const [searchText, setSearchText] = useState('');
@@ -88,7 +88,10 @@ const Dashboard = () => {
     day: new Date().getDate(),
     page: 1,
   });
-  const [scheduleData, setScheduleData] = useState(null);
+  const [scheduleData, setScheduleData] = useState({
+    loading: true,
+    lastPage: true,
+  });
   const searchRef = useRef();
   const calenderRef = useRef();
   const navRef = useRef();
@@ -178,14 +181,24 @@ const Dashboard = () => {
   useEffect(() => {
     const getScheduledTasks = async () => {
       try {
-        const { year, month, day } = scheduleDetails;
+        const { year, month, day, page } = scheduleDetails;
 
         const { data } = await axios.get(
-          `/api/v1/tasks/my_tasks?sort=deadline&fields=name,deadline,status,priority,assigned,leader,project,user&calendar=true&taskPage=1&taskLimit=10&year=${year}&month=${month}&day=${day}`
+          `/api/v1/tasks/my_tasks?sort=deadline&fields=name,deadline,status,priority,assigned,leader,project,user&calendar=true&page=${page}&limit=10&year=${year}&month=${month}&day=${day}`
         );
-        setScheduledTasks(data.data.tasks);
-        console.log(data);
+
+        setScheduleData({
+          loading: false,
+          lastPage: data.data.tasks.length < 10,
+        });
+
+        if (page !== 1) {
+          setScheduledTasks([...scheduledTasks, ...data.data.tasks]);
+        } else {
+          setScheduledTasks(data.data.tasks);
+        }
       } catch {
+        setScheduleData({ loading: false, lastPage: true });
         setScheduledTasks(false);
         return toast('An error occured while fetching scheduled tasks.', {
           toastId: 'toast-id4',
@@ -261,6 +274,24 @@ const Dashboard = () => {
     setCurrentMonth(new Date().getMonth() + 1);
     setCurrentYear(new Date().getFullYear());
 
+    const { year, month, day } = scheduleDetails;
+
+    if (
+      year === currentYear &&
+      month === currentMonth &&
+      day === new Date().getDate()
+    )
+      return;
+
+    setScheduleDetails({
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+      day: new Date().getDate(),
+      page: 1,
+    });
+    setScheduledTasks(null);
+    setScheduleData({ loading: true, lastPage: true });
+
     calenderRef.current.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration: 400,
       iterations: 1,
@@ -324,6 +355,19 @@ const Dashboard = () => {
       : scheduledDate > currentDate
       ? 'No tasks are due on this date'
       : 'No tasks were due on this date';
+  };
+
+  const nextPage = () => {
+    const { year, month, day, page } = scheduleDetails;
+
+    setScheduleDetails({
+      year,
+      month,
+      day,
+      page: page + 1,
+    });
+
+    setScheduleData({ loading: true, lastPage: true });
   };
 
   return (
@@ -1010,19 +1054,16 @@ const Dashboard = () => {
             setScheduledTasks={setScheduledTasks}
             scheduleDetails={scheduleDetails}
             setScheduleDetails={setScheduleDetails}
+            setScheduleData={setScheduleData}
           />
 
-          <div className={styles['scheduled-tasks-div']}>
+          <div
+            className={`${styles['scheduled-tasks-div']} ${
+              scheduleData.lastPage ? styles['add-padding'] : ''
+            }`}
+          >
             {scheduledTasks === null ? (
-              <div className={styles['tasks-loader-div']}>
-                <Loader
-                  style={{
-                    width: '2.5rem',
-                    height: '2.5rem',
-                    margin: '3rem 0',
-                  }}
-                />
-              </div>
+              ''
             ) : scheduledTasks.length === 0 ? (
               <div className={styles['scheduled-tasks-text']}>
                 {scheduledTaskMessage()}
@@ -1054,7 +1095,7 @@ const Dashboard = () => {
                     >
                       <div className={styles['scheduled-task-box']}>
                         <span className={styles['scheduled-task-name']}>
-                          Design Meeting
+                          {task.name}
                         </span>
 
                         <span className={styles['scheduled-task-property-box']}>
@@ -1126,9 +1167,25 @@ const Dashboard = () => {
               </div>
             )}
 
-            <div className={styles['more-btn-box']}>
-              <button className={styles['more-task-btn']}>Show More</button>
-            </div>
+            {scheduleData.loading && (
+              <div className={styles['tasks-loader-div']}>
+                <Loader
+                  style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    margin: '3rem 0',
+                  }}
+                />
+              </div>
+            )}
+
+            {!scheduleData.lastPage && (
+              <div className={styles['more-btn-box']}>
+                <button className={styles['more-task-btn']} onClick={nextPage}>
+                  Show More
+                </button>
+              </div>
+            )}
           </div>
         </section>
       </section>

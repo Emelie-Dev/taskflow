@@ -62,6 +62,7 @@ const prodErrorHandler = (error, req, res) => {
 };
 
 export default (error, req, res, next) => {
+  console.log(error);
   error.status = error.status || 'error';
   error.statusCode = error.statusCode || 500;
 

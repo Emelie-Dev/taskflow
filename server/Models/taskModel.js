@@ -107,6 +107,19 @@ taskSchema.query.filterTasks = function (type) {
   }
 };
 
+// Filters scheduled tasks
+taskSchema.query.scheduledTasks = function (year, month, day) {
+  return this.where({
+    $expr: {
+      $and: [
+        { $eq: [{ $year: '$deadline' }, year] },
+        { $eq: [{ $month: '$deadline' }, month] },
+        { $eq: [{ $dayOfMonth: '$deadline' }, day] },
+      ],
+    },
+  });
+};
+
 // Validates deadline field
 taskSchema.pre('save', function (next) {
   if (this.deadline < this.createdAt) {
