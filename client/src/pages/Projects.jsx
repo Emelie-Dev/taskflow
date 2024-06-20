@@ -18,6 +18,7 @@ import {
   MdOutlineModeEditOutline,
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
+  MdOutlineSignalWifiOff,
 } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
@@ -28,35 +29,70 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { IoCloseSharp } from 'react-icons/io5';
 import Project from '../components/Project';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import Loader from '../components/Loader';
 
 const Projects = () => {
   const [searchText, setSearchText] = useState('');
-  const [currentAction, setCurrentAction] = useState(0);
   const [displayFormat, setDisplayFormat] = useState('grid');
   const [showNav, setShowNav] = useState(false);
   const [displayModal, setdisplayModal] = useState(false);
+  const [projects, setProjects] = useState(null);
+  const [projectsDetails, setProjectsDetails] = useState({
+    category: 'all',
+    sort: '-createdAt',
+    page: 1,
+  });
+  const [projectData, setProjectData] = useState({
+    loading: true,
+    lastPage: true,
+    error: false,
+  });
   const searchRef = useRef();
-  const actionRef = useRef();
-  const menuRef = useRef();
   const navRef = useRef();
 
+  // For the Projects
   useEffect(() => {
-    const hideAction = (e) => {
-      if (currentRef.current) {
-        if (!currentRef.current.contains(e.target)) {
-          setCurrentAction(0);
+    const getUserProjects = async () => {
+      const { category, sort, page } = projectsDetails;
+
+      try {
+        const { data } = await axios.get(
+          `/api/v1/projects/my_projects?category=${category}&sort=${sort}&page=${page}`
+        );
+
+        setProjectData({
+          loading: false,
+          lastPage: data.data.projects.length < 1,
+          error: false,
+        });
+
+        if (page !== 1) {
+          setProjects({
+            grid: [...projects.grid, ...data.data.projects],
+            table: data.data.projects,
+          });
+        } else {
+          setProjects({ grid: data.data.projects, table: data.data.projects });
         }
+
+        console.log(data.data.projects);
+      } catch {
+        if (page !== 1) {
+          setProjectData({ loading: false, lastPage: false, error: false });
+        } else {
+          setProjectData({ loading: false, lastPage: true, error: true });
+        }
+
+        return toast('An error occured while fetching projects.', {
+          toastId: 'toast-id1',
+        });
       }
     };
 
-    window.addEventListener('click', hideAction);
-
-    return () => {
-      window.removeEventListener('click', hideAction);
-    };
-  }, [currentAction]);
-
-  let currentRef = menuRef;
+    getUserProjects();
+  }, [projectsDetails]);
 
   const handleSearchText = (e) => {
     setSearchText(e.target.value);
@@ -67,21 +103,56 @@ const Projects = () => {
     searchRef.current.focus();
   };
 
-  const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0];
-
-  const handleAction = (index) => {
-    setCurrentAction(index + 1);
-    currentRef = actionRef;
-  };
-
   const hideNav = (e) => {
     if (e.target === navRef.current) {
       setShowNav(false);
     }
   };
 
+  const nextPage = () => {
+    const { category, sort, page } = projectsDetails;
+
+    setProjectsDetails({
+      category,
+      sort,
+      page: page + 1,
+    });
+
+    setProjectData({ loading: true, lastPage: true, error: false });
+  };
+
+  const changeCategory = (category) => {
+    const { sort } = projectsDetails;
+
+    setProjectsDetails({
+      category,
+      sort,
+      page: 1,
+    });
+
+    setProjects(null);
+
+    setProjectData({ loading: true, lastPage: true, error: false });
+  };
+
+  const changeSortBy = (e) => {
+    const { category } = projectsDetails;
+
+    setProjectsDetails({
+      category,
+      sort: e.target.value,
+      page: 1,
+    });
+
+    setProjects(null);
+
+    setProjectData({ loading: true, lastPage: true, error: false });
+  };
+
   return (
     <main className={styles.div}>
+      <ToastContainer autoClose={2000} />
+
       <nav
         ref={navRef}
         className={`${styles['responsive-nav']} ${
@@ -291,22 +362,54 @@ const Projects = () => {
           <div className={styles['section-head']}>
             <div className={styles['sort-div']}>
               <span className={styles['sort-text']}>Sort by:</span>
-              <select className={styles['sort-select']}>
-                <option value={'newest'}>Newest</option>
-                <option value={'oldest'}>Oldest</option>
-                <option value={'alphabetically'}>Alphabetically</option>
+              <select className={styles['sort-select']} onChange={changeSortBy}>
+                <option value={'-createdAt'}>Newest</option>
+                <option value={'createdAt'}>Oldest</option>
+                <option value={'name'}>Alphabetically</option>
               </select>
             </div>
 
             <div className={styles['filter-div']}>
               <button
-                className={`${styles['filter-btn']} ${styles['current-filter-btn']}`}
+                className={`${styles['filter-btn']} ${
+                  projectsDetails.category === 'all'
+                    ? styles['current-filter-btn']
+                    : ''
+                }`}
+                onClick={() => changeCategory('all')}
               >
                 All
               </button>
-              <button className={styles['filter-btn']}>Ongoing</button>
-              <button className={styles['filter-btn']}>Open</button>
-              <button className={styles['filter-btn']}>Completed</button>
+              <button
+                className={`${styles['filter-btn']} ${
+                  projectsDetails.category === 'progress'
+                    ? styles['current-filter-btn']
+                    : ''
+                }`}
+                onClick={() => changeCategory('progress')}
+              >
+                Ongoing
+              </button>
+              <button
+                className={`${styles['filter-btn']} ${
+                  projectsDetails.category === 'open'
+                    ? styles['current-filter-btn']
+                    : ''
+                }`}
+                onClick={() => changeCategory('open')}
+              >
+                Open
+              </button>
+              <button
+                className={`${styles['filter-btn']} ${
+                  projectsDetails.category === 'complete'
+                    ? styles['current-filter-btn']
+                    : ''
+                }`}
+                onClick={() => changeCategory('complete')}
+              >
+                Completed
+              </button>
             </div>
 
             <div className={styles['project-style-div']}>
@@ -415,127 +518,200 @@ const Projects = () => {
           </div>
 
           {displayFormat === 'grid' && (
-            <div className={styles['article-box']}>
-              {arr.map((value, index) => (
-                <article key={index} className={styles.article}>
-                  <div className={styles['menu-div']}>
-                    <BsThreeDotsVertical className={styles['grid-menu-icon']} />
-                    <ul className={styles['menu-action-list']}>
-                      <li className={styles['menu-action-item']}>
-                        <MdOutlineModeEditOutline
-                          className={styles['action-icon']}
-                        />
-                        Edit
-                      </li>
-                      <li className={styles['menu-action-item']}>
-                        <RiDeleteBin6Line className={styles['action-icon']} />{' '}
-                        Delete
-                      </li>
-                    </ul>
+            <>
+              <div
+                className={`${styles['article-box']} ${
+                  !projects
+                    ? ''
+                    : projects.grid.length === 0
+                    ? styles['empty-article-box']
+                    : ''
+                }`}
+              >
+                {projects === null ? (
+                  ''
+                ) : projects.grid.length === 0 ? (
+                  <div className={styles['no-projects-text']}>
+                    You currently don't have any projects yet.
                   </div>
+                ) : projects.grid ? (
+                  projects.grid.map((project) => (
+                    <article key={project._id} className={styles.article}>
+                      <div className={styles['menu-div']}>
+                        <BsThreeDotsVertical
+                          className={styles['grid-menu-icon']}
+                        />
+                        <ul className={styles['menu-action-list']}>
+                          <li className={styles['menu-action-item']}>
+                            <MdOutlineModeEditOutline
+                              className={styles['action-icon']}
+                            />
+                            Edit
+                          </li>
+                          <li className={styles['menu-action-item']}>
+                            <RiDeleteBin6Line
+                              className={styles['action-icon']}
+                            />{' '}
+                            Delete
+                          </li>
+                        </ul>
+                      </div>
 
-                  <h1 className={styles['project-name']}>Fitness App</h1>
-                  <span className={styles['project-tasks']}>
-                    <span className={styles['open-tasks']}>2</span> open tasks,{' '}
-                    <span className={styles['completed-tasks']}>9</span>{' '}
-                    completed
-                  </span>
-                  <p className={styles['project-details']}>
-                    A cutting-edge fitness application designed to revolutionize
-                    your health and wellness journey.
-                  </p>
+                      <h1 className={styles['project-name']}>Fitness App</h1>
+                      <span className={styles['project-tasks']}>
+                        <span className={styles['open-tasks']}>2</span> open
+                        tasks,{' '}
+                        <span className={styles['completed-tasks']}>9</span>{' '}
+                        completed
+                      </span>
+                      <p className={styles['project-details']}>
+                        A cutting-edge fitness application designed to
+                        revolutionize your health and wellness journey.
+                      </p>
 
-                  <div className={styles['property-div']}>
-                    <span className={styles['property-name']}>Deadline:</span>
-                    <span className={styles['deadline-value']}>
-                      18 Mar, 2024
-                    </span>
-                  </div>
-                  <div className={styles['property-div']}>
-                    <span className={styles['property-name']}>
-                      Project Leader:
-                    </span>
-                    <span className={styles['property-tooltip']}>
-                      <img
-                        className={styles['leader-img']}
-                        src="../../assets/images/download.jpeg"
-                      />
-                      <span className={styles['property-tooltip-text']}>
-                        John Snow
-                      </span>
-                    </span>
-                  </div>
-                  <div className={styles['property-div']}>
-                    <span className={styles['property-name']}>Team:</span>
-                    <div className={styles['team-pics-box']}>
-                      <span className={styles['team-pics-tooltip']}>
-                        <img
-                          src="../../assets/images/profile1.webp"
-                          className={styles['team-pics']}
-                        />
-                        <span className={styles['team-pics-tooltip-text']}>
-                          Rob Stark
+                      <div className={styles['property-div']}>
+                        <span className={styles['property-name']}>
+                          Deadline:
                         </span>
-                      </span>
-                      <span className={styles['team-pics-tooltip']}>
-                        <img
-                          src="../../assets/images/profile2webp.webp"
-                          className={styles['team-pics']}
-                        />
-                        <span className={styles['team-pics-tooltip-text']}>
-                          Sansa Stark
+                        <span className={styles['deadline-value']}>
+                          18 Mar, 2024
                         </span>
-                      </span>
-                      <span className={styles['team-pics-tooltip']}>
-                        <img
-                          src="../../assets/images/profile3.jpeg"
-                          className={styles['team-pics']}
-                        />
-                        <span className={styles['team-pics-tooltip-text']}>
-                          Ramsay Bolton
+                      </div>
+                      <div className={styles['property-div']}>
+                        <span className={styles['property-name']}>
+                          Project Leader:
                         </span>
-                      </span>
-                      <span className={styles['team-pics-tooltip']}>
-                        <img
-                          src="../../assets/images/profile4.jpeg"
-                          className={styles['team-pics']}
-                        />
-                        <span className={styles['team-pics-tooltip-text']}>
-                          Jamie Lannister
+                        <span className={styles['property-tooltip']}>
+                          <img
+                            className={styles['leader-img']}
+                            src="../../assets/images/download.jpeg"
+                          />
+                          <span className={styles['property-tooltip-text']}>
+                            John Snow
+                          </span>
                         </span>
-                      </span>
-                      <span className={styles['team-icon-box']}>
-                        <HiPlus className={styles['team-icon']} />
-                        <span className={styles['team-number']}>10</span>
-                      </span>
-                    </div>
-                  </div>
+                      </div>
+                      <div className={styles['property-div']}>
+                        <span className={styles['property-name']}>Team:</span>
+                        <div className={styles['team-pics-box']}>
+                          <span className={styles['team-pics-tooltip']}>
+                            <img
+                              src="../../assets/images/profile1.webp"
+                              className={styles['team-pics']}
+                            />
+                            <span className={styles['team-pics-tooltip-text']}>
+                              Rob Stark
+                            </span>
+                          </span>
+                          <span className={styles['team-pics-tooltip']}>
+                            <img
+                              src="../../assets/images/profile2webp.webp"
+                              className={styles['team-pics']}
+                            />
+                            <span className={styles['team-pics-tooltip-text']}>
+                              Sansa Stark
+                            </span>
+                          </span>
+                          <span className={styles['team-pics-tooltip']}>
+                            <img
+                              src="../../assets/images/profile3.jpeg"
+                              className={styles['team-pics']}
+                            />
+                            <span className={styles['team-pics-tooltip-text']}>
+                              Ramsay Bolton
+                            </span>
+                          </span>
+                          <span className={styles['team-pics-tooltip']}>
+                            <img
+                              src="../../assets/images/profile4.jpeg"
+                              className={styles['team-pics']}
+                            />
+                            <span className={styles['team-pics-tooltip-text']}>
+                              Jamie Lannister
+                            </span>
+                          </span>
+                          <span className={styles['team-icon-box']}>
+                            <HiPlus className={styles['team-icon']} />
+                            <span className={styles['team-number']}>10</span>
+                          </span>
+                        </div>
+                      </div>
 
-                  <div className={styles['progess-div']}>
-                    <div className={styles['progess-box']}>
-                      <span className={styles['progess-text']}>Progress</span>
-                      <span className={styles['progess-value']}>60%</span>
-                    </div>
+                      <div className={styles['progess-div']}>
+                        <div className={styles['progess-box']}>
+                          <span className={styles['progess-text']}>
+                            Progress
+                          </span>
+                          <span className={styles['progess-value']}>60%</span>
+                        </div>
 
-                    <div className={styles['progress-bar']}>&nbsp;</div>
-                  </div>
-                </article>
-              ))}
-            </div>
+                        <div className={styles['progress-bar']}>&nbsp;</div>
+                      </div>
+                    </article>
+                  ))
+                ) : (
+                  ''
+                )}
+              </div>
+
+              {projectData.error && (
+                <div className={styles['no-projects-text']}>
+                  <MdOutlineSignalWifiOff className={styles['network-icon']} />{' '}
+                  Unable to retrieve data
+                </div>
+              )}
+
+              {projectData.loading && (
+                <div className={styles['projects-loader-div']}>
+                  <Loader
+                    style={{
+                      width: '2.5rem',
+                      height: '2.5rem',
+                      margin: '0 0 3rem',
+                    }}
+                  />
+                </div>
+              )}
+
+              {!projectData.lastPage && (
+                <div className={styles['more-btn-box']}>
+                  <button
+                    className={styles['more-task-btn']}
+                    onClick={nextPage}
+                  >
+                    Show More
+                  </button>
+                </div>
+              )}
+            </>
           )}
 
           {displayFormat === 'table' && (
             <div className={styles['table-container']}>
-              <div className={styles['entry-box']}>
-                Show&nbsp;
-                <select className={styles['entry-select']}>
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-                &nbsp;entries
-              </div>
+              <header className={styles.footer}>
+                <div className={styles['footer-text']}>
+                  Showing <span className={styles['footer-entry-text']}>1</span>{' '}
+                  to <span className={styles['footer-entry-text']}>25</span> of{' '}
+                  <span className={styles['footer-entry-text']}>250</span>{' '}
+                  entries
+                </div>
+
+                <div className={styles['entry-navigation-box']}>
+                  <span className={styles['footer-content-box']}>
+                    <MdKeyboardDoubleArrowLeft
+                      className={styles['footer-icon']}
+                    />
+                  </span>
+                  <span className={styles['footer-content-box']}>1</span>
+                  <span className={styles['footer-content-box']}>2</span>
+                  <span className={styles['footer-content-box']}>3</span>
+                  <span className={styles['footer-content-box']}>
+                    <MdKeyboardDoubleArrowRight
+                      className={styles['footer-icon']}
+                    />
+                  </span>
+                </div>
+              </header>
 
               <div className={styles['table-div']}>
                 <table className={styles['project-table']}>
@@ -552,143 +728,123 @@ const Projects = () => {
                   </thead>
 
                   <tbody>
-                    {arr.map((value, index) => (
-                      <tr key={index}>
-                        <td className={styles['table-project-name']}>
-                          Fitness App
-                        </td>
-                        <td>
-                          <span className={styles['table-project-leader-box']}>
-                            <img
-                              className={styles['table-project-leader']}
-                              src="../../assets/images/download.jpeg"
-                            />
-                            <span
-                              className={styles['table-project-leader-name']}
-                            >
-                              John Snow
-                            </span>
-                          </span>
-                        </td>
-                        <td>
-                          <div className={styles['table-team-box']}>
-                            <span className={styles['table-team-pics-box']}>
-                              <img
-                                className={styles['table-team-pics']}
-                                src="../../assets/images/profile1.webp"
-                              />
-                              <span className={styles['table-team-name']}>
-                                Rob Stark
+                    {projects === null
+                      ? ''
+                      : projects
+                      ? projects.map((value, index) => (
+                          <tr key={index}>
+                            <td className={styles['table-project-name']}>
+                              Fitness App
+                            </td>
+                            <td>
+                              <span
+                                className={styles['table-project-leader-box']}
+                              >
+                                <img
+                                  className={styles['table-project-leader']}
+                                  src="../../assets/images/download.jpeg"
+                                />
+                                <span
+                                  className={
+                                    styles['table-project-leader-name']
+                                  }
+                                >
+                                  John Snow
+                                </span>
                               </span>
-                            </span>
-                            <span className={styles['table-team-pics-box']}>
-                              <img
-                                className={styles['table-team-pics']}
-                                src="../../assets/images/profile2webp.webp"
-                              />
-                              <span className={styles['table-team-name']}>
-                                Sansa Stark
+                            </td>
+                            <td>
+                              <div className={styles['table-team-box']}>
+                                <span className={styles['table-team-pics-box']}>
+                                  <img
+                                    className={styles['table-team-pics']}
+                                    src="../../assets/images/profile1.webp"
+                                  />
+                                  <span className={styles['table-team-name']}>
+                                    Rob Stark
+                                  </span>
+                                </span>
+                                <span className={styles['table-team-pics-box']}>
+                                  <img
+                                    className={styles['table-team-pics']}
+                                    src="../../assets/images/profile2webp.webp"
+                                  />
+                                  <span className={styles['table-team-name']}>
+                                    Sansa Stark
+                                  </span>
+                                </span>
+                                <span className={styles['table-team-pics-box']}>
+                                  <img
+                                    className={styles['table-team-pics']}
+                                    src="../../assets/images/profile3.jpeg"
+                                  />
+                                  <span className={styles['table-team-name']}>
+                                    Ramsay Bolton
+                                  </span>
+                                </span>
+                                <span className={styles['table-team-pics-box']}>
+                                  <img
+                                    className={styles['table-team-pics']}
+                                    src="../../assets/images/profile4.jpeg"
+                                  />
+                                  <span className={styles['table-team-name']}>
+                                    Jamie Lannister
+                                  </span>
+                                </span>
+                                <span className={styles['table-team-icon-box']}>
+                                  <HiPlus
+                                    className={styles['table-team-icon']}
+                                  />
+                                  <span className={styles['team-number']}>
+                                    10
+                                  </span>
+                                </span>
+                              </div>
+                            </td>
+                            <td className={styles['table-project-deadline']}>
+                              18 Mar, 2024
+                            </td>
+                            <td className={styles['table-project-progress']}>
+                              30%
+                            </td>
+                            <td>
+                              <select
+                                className={styles['table-project-select']}
+                                disabled={(index + 1) % 4 === 0 ? false : true}
+                              >
+                                <option value={'active'}>Active</option>
+                                <option value={'inactive'}>Inactive</option>
+                              </select>
+                            </td>
+                            <td className={styles['table-project-action']}>
+                              <span
+                                className={styles['table-project-action-box']}
+                              >
+                                <BsThreeDotsVertical
+                                  className={styles['table-project-menu']}
+                                />
+
+                                <ul className={`${styles['action-box']} `}>
+                                  <li className={styles['action-option']}>
+                                    <MdOutlineModeEditOutline
+                                      className={styles['action-icon']}
+                                    />
+                                    Edit
+                                  </li>
+                                  <li className={styles['action-option']}>
+                                    <RiDeleteBin6Line
+                                      className={styles['action-icon']}
+                                    />{' '}
+                                    Delete
+                                  </li>
+                                </ul>
                               </span>
-                            </span>
-                            <span className={styles['table-team-pics-box']}>
-                              <img
-                                className={styles['table-team-pics']}
-                                src="../../assets/images/profile3.jpeg"
-                              />
-                              <span className={styles['table-team-name']}>
-                                Ramsay Bolton
-                              </span>
-                            </span>
-                            <span className={styles['table-team-pics-box']}>
-                              <img
-                                className={styles['table-team-pics']}
-                                src="../../assets/images/profile4.jpeg"
-                              />
-                              <span className={styles['table-team-name']}>
-                                Jamie Lannister
-                              </span>
-                            </span>
-                            <span className={styles['table-team-icon-box']}>
-                              <HiPlus className={styles['table-team-icon']} />
-                              <span className={styles['team-number']}>10</span>
-                            </span>
-                          </div>
-                        </td>
-                        <td className={styles['table-project-deadline']}>
-                          18 Mar, 2024
-                        </td>
-                        <td className={styles['table-project-progress']}>
-                          30%
-                        </td>
-                        <td>
-                          <select
-                            className={styles['table-project-select']}
-                            disabled={(index + 1) % 4 === 0 ? false : true}
-                          >
-                            <option value={'active'}>Active</option>
-                            <option value={'inactive'}>Inactive</option>
-                          </select>
-                        </td>
-                        <td
-                          className={styles['table-project-action']}
-                          ref={currentAction === index + 1 ? menuRef : null}
-                        >
-                          <BsThreeDotsVertical
-                            className={styles['table-project-menu']}
-                            onClick={() => handleAction(index)}
-                          />
-                          <ul
-                            ref={currentAction === index + 1 ? actionRef : null}
-                            className={`${styles['action-box']} ${
-                              currentAction === index + 1
-                                ? styles['show-action-box']
-                                : ''
-                            }`}
-                          >
-                            <li className={styles['action-option']}>
-                              <MdOutlineModeEditOutline
-                                className={styles['action-icon']}
-                              />
-                              Edit
-                            </li>
-                            <li className={styles['action-option']}>
-                              <RiDeleteBin6Line
-                                className={styles['action-icon']}
-                              />{' '}
-                              Delete
-                            </li>
-                          </ul>
-                        </td>
-                      </tr>
-                    ))}
+                            </td>
+                          </tr>
+                        ))
+                      : ''}
                   </tbody>
                 </table>
-
-                <footer className={styles.footer}>
-                  <div className={styles['footer-text']}>
-                    Showing{' '}
-                    <span className={styles['footer-entry-text']}>1</span> to{' '}
-                    <span className={styles['footer-entry-text']}>25</span> of{' '}
-                    <span className={styles['footer-entry-text']}>250</span>{' '}
-                    entries
-                  </div>
-
-                  <div className={styles['entry-navigation-box']}>
-                    <span className={styles['footer-content-box']}>
-                      <MdKeyboardDoubleArrowLeft
-                        className={styles['footer-icon']}
-                      />
-                    </span>
-                    <span className={styles['footer-content-box']}>1</span>
-                    <span className={styles['footer-content-box']}>2</span>
-                    <span className={styles['footer-content-box']}>3</span>
-                    <span className={styles['footer-content-box']}>
-                      <MdKeyboardDoubleArrowRight
-                        className={styles['footer-icon']}
-                      />
-                    </span>
-                  </div>
-                </footer>
               </div>
             </div>
           )}

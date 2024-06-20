@@ -91,6 +91,7 @@ const Dashboard = () => {
   const [scheduleData, setScheduleData] = useState({
     loading: true,
     lastPage: true,
+    error: false,
   });
   const searchRef = useRef();
   const calenderRef = useRef();
@@ -180,9 +181,8 @@ const Dashboard = () => {
   // For user scheduled tasks
   useEffect(() => {
     const getScheduledTasks = async () => {
+      const { year, month, day, page } = scheduleDetails;
       try {
-        const { year, month, day, page } = scheduleDetails;
-
         const { data } = await axios.get(
           `/api/v1/tasks/my_tasks?sort=deadline&fields=name,deadline,status,priority,assigned,leader,project,user&calendar=true&page=${page}&limit=10&year=${year}&month=${month}&day=${day}`
         );
@@ -190,6 +190,7 @@ const Dashboard = () => {
         setScheduleData({
           loading: false,
           lastPage: data.data.tasks.length < 10,
+          error: false,
         });
 
         if (page !== 1) {
@@ -198,8 +199,12 @@ const Dashboard = () => {
           setScheduledTasks(data.data.tasks);
         }
       } catch {
-        setScheduleData({ loading: false, lastPage: true });
-        setScheduledTasks(false);
+        if (page !== 1) {
+          setScheduleData({ loading: false, lastPage: false, error: false });
+        } else {
+          setScheduleData({ loading: false, lastPage: true, error: true });
+        }
+
         return toast('An error occured while fetching scheduled tasks.', {
           toastId: 'toast-id4',
         });
@@ -290,7 +295,7 @@ const Dashboard = () => {
       page: 1,
     });
     setScheduledTasks(null);
-    setScheduleData({ loading: true, lastPage: true });
+    setScheduleData({ loading: true, lastPage: true, error: false });
 
     calenderRef.current.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration: 400,
@@ -367,7 +372,7 @@ const Dashboard = () => {
       page: page + 1,
     });
 
-    setScheduleData({ loading: true, lastPage: true });
+    setScheduleData({ loading: true, lastPage: true, error: false });
   };
 
   return (
@@ -992,21 +997,19 @@ const Dashboard = () => {
                             Progress
                           </span>
                           <span className={styles['task-progress-value']}>
-                            {task.project.progress}%
+                            {task.project.details.projectProgress}%
                           </span>
                         </div>
 
-                        <span
-                          className={styles['task-progress']}
-                          style={{
-                            background: `linear-gradient(to right, orange ${
-                              task.project.progress
-                            }%, rgba(128, 128, 128, 0.5) ${
-                              100 - task.project.progress
-                            }%)`,
-                          }}
-                        >
-                          &nbsp;
+                        <span className={styles['task-progress']}>
+                          <span
+                            className={styles['task-progress-bar']}
+                            style={{
+                              width: `${task.project.details.projectProgress}%`,
+                            }}
+                          >
+                            &nbsp;
+                          </span>
                         </span>
                       </div>
                     </article>
@@ -1069,13 +1072,16 @@ const Dashboard = () => {
                 {scheduledTaskMessage()}
               </div>
             ) : scheduledTasks ? (
-              scheduledTasks.map((task) => {
+              scheduledTasks.map((task, index) => {
                 const hour = new Date(task.deadline).getHours();
                 let showTime = false;
                 if (currentHour !== hour) {
                   currentHour = hour;
                   showTime = true;
                 }
+
+                if (index === scheduledTasks.length - 1) currentHour = null;
+
                 return (
                   <article
                     key={task._id}
@@ -1162,6 +1168,10 @@ const Dashboard = () => {
                 );
               })
             ) : (
+              ''
+            )}
+
+            {scheduleData.error === true && (
               <div className={styles['scheduled-tasks-text']}>
                 Unable to retrieve data
               </div>

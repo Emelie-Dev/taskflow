@@ -12,7 +12,7 @@ const getAll = (Model, collection) =>
         filter = { project: req.params.projectId, assigned: { $ne: true } };
     }
 
-    const result = new ApiFeatures(Model, Model.find(filter), req.query)
+    const result = new ApiFeatures(collection, Model.find(filter), req.query)
       .filter()
       .sort()
       .limitFields()
@@ -144,12 +144,12 @@ const getMyData = (Model, collection) =>
           assigned: { $ne: true },
         });
       }
-    } else {
-      Model.find({ user: req.user._id });
+    } else if (collection === 'projects') {
+      modelQuery = Model.find({ user: req.user._id });
     }
 
     const result = new ApiFeatures(
-      Model,
+      collection,
       modelQuery,
       req.query,
       ...excludeArray
@@ -161,8 +161,9 @@ const getMyData = (Model, collection) =>
 
     let docs = await result.query;
 
-    // Filters tasks based on request query
+    // Depopulates tasks from the result
 
+    // Filters tasks based on request query
     if (req.query.calendar) {
     } else if (
       req.query.month ||
@@ -176,7 +177,7 @@ const getMyData = (Model, collection) =>
         .getDate()
         .getRange();
 
-      docs = result.model;
+      docs = [];
       graph = result.graph;
     }
 

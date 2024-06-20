@@ -27,11 +27,11 @@ router.route('/').get(getAllProjects).post(createNewProject);
 // For getting assigned projects
 router.get('/assigned', getAssignedProjects);
 
+router.get('/my_projects', getMyProjects);
+
 router.route('/:id').get(getProject).patch(updateProject).delete(deleteProject);
 
 router.route('/:id/files').patch(uploadProjectFiles).delete(deleteProjectFiles);
-
-router.get('/my_projects', getMyProjects);
 
 router.patch('/:id/team', updateTeam);
 

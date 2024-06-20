@@ -201,6 +201,7 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
     'team',
     'files',
     'lastModified',
+    'details',
   ];
   // name, desc, deadline,status, files, team
   excludeArray.forEach((value) => delete req.body[value]);

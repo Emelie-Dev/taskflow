@@ -189,7 +189,7 @@ const Calendar = ({
     });
     setScheduledTasks(null);
 
-    setScheduleData({ loading: true, lastPage: true });
+    setScheduleData({ loading: true, lastPage: true, error: false });
   };
 
   const checkScheduledDate = (input) => {

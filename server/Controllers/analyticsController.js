@@ -49,7 +49,7 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
       currentProject = {
         tasks: currentProjectTasks.length,
         completedTasks: completedTasks.length,
-        percent: Math.round(percentageCompleted),
+        percent: Math.floor(percentageCompleted),
       };
     }
 
@@ -106,24 +106,24 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
 
     const dataPercent = {
       projects: {
-        completed: Math.round(
+        completed: Math.floor(
           ((percent.projects.complete[1] - percent.projects.complete[0]) /
             (percent.projects.complete[0] || 1)) *
             100
         ),
-        created: Math.round(
+        created: Math.floor(
           ((percent.projects.created[1] - percent.projects.created[0]) /
             (percent.projects.created[0] || 1)) *
             100
         ),
       },
       tasks: {
-        completed: Math.round(
+        completed: Math.floor(
           ((percent.tasks.complete[1] - percent.tasks.complete[0]) /
             (percent.tasks.complete[0] || 1)) *
             100
         ),
-        created: Math.round(
+        created: Math.floor(
           ((percent.tasks.created[1] - percent.tasks.created[0]) /
             (percent.tasks.created[0] || 1)) *
             100
@@ -131,15 +131,15 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
       },
     };
 
-    tasksStats.completedPercent = Math.round(
+    tasksStats.completedPercent = Math.floor(
       (tasksStats.completed / (tasks.length || 1)) * 100
     );
 
-    tasksStats.openPercent = Math.round(
+    tasksStats.openPercent = Math.floor(
       (tasksStats.open / (tasks.length || 1)) * 100
     );
 
-    tasksStats.progressPercent = Math.round(
+    tasksStats.progressPercent = Math.floor(
       (tasksStats.progress / (tasks.length || 1)) * 100
     );
 

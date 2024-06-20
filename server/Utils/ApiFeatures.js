@@ -196,8 +196,8 @@ const getRangeLabels = (type, year, month, date, hour, view) => {
 };
 
 export class ApiFeatures {
-  constructor(Model, query, queryString, ...excludeArray) {
-    this.model = Model;
+  constructor(collection, query, queryString, ...excludeArray) {
+    this.collection = collection;
     this.query = query;
     this.queryString = queryString;
     this.excludeArray = [
@@ -208,8 +208,7 @@ export class ApiFeatures {
       'limit',
       'filter',
       'calendar',
-      'taskPage',
-      'taskLimit',
+      'category',
     ];
   }
 
@@ -226,33 +225,49 @@ export class ApiFeatures {
       )
     );
 
-    // Filters model based on the filter value of the request query
-    if (this.queryString.filter) {
-      this.query.filterTasks(this.queryString.filter);
-      this.query
-        .find(queryOptions)
-        .populate({
-          path: 'project',
-          select: 'name',
-          match: { calculateProgress: true },
-          populate: {
-            path: 'team',
-            select: 'photo username firstName lastName',
-          },
-        })
-        .populate({
-          path: 'leader',
-          select: 'username firstName lastName photo',
-        });
+    // Filters model based on the value of the request query and collection
+    if (this.collection === 'tasks') {
+      if (this.queryString.filter) {
+        this.query.filterTasks(this.queryString.filter);
+        this.query
+          .find(queryOptions)
+          .populate({
+            path: 'project',
+            select: 'name details',
+            populate: {
+              path: 'team',
+              select: 'photo username firstName lastName',
+            },
+          })
+          .populate({
+            path: 'leader',
+            select: 'username firstName lastName photo',
+          });
+      } else if (this.queryString.calendar) {
+        const { year, month, day } = this.queryString;
+        this.query.scheduledTasks(year, month, day);
+        this.query
+          .find(queryOptions)
+          .populate({
+            path: 'leader user',
+            select: 'username firstName lastName photo',
+          })
+          .populate({
+            path: 'project',
+            select: 'name',
+          });
+      }
+    } else if (this.collection === 'projects') {
+      this.query.find(queryOptions).populate({
+        path: 'team',
+        select: 'username firstName lastName photo',
+      });
+
+      if (this.queryString.category) {
+        this.query.filterByCategory(this.queryString.category);
+      }
     } else {
       this.query.find(queryOptions);
-    }
-
-    if (this.queryString.calendar) {
-      this.query.find(queryOptions).populate({
-        path: 'leader user project',
-        select: 'name username firstName lastName photo',
-      });
     }
 
     return this;
@@ -283,14 +298,8 @@ export class ApiFeatures {
   paginate() {
     if (this.queryString.page || this.queryString.limit) {
       const page = this.queryString.page || 1;
-      const limit = this.queryString.limit || 30;
+      const limit = this.queryString.limit || 1;
       const skip = (page - 1) * limit;
-
-      if (this.queryString.calendar) {
-        const { year, month, day } = this.queryString;
-
-        this.query = this.query.scheduledTasks(year, month, day);
-      }
 
       this.query = this.query.skip(skip).limit(limit);
     }

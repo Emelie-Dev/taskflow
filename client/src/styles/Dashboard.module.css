@@ -596,6 +596,15 @@
   height: 0.2rem;
   border-radius: 20px;
   margin: 1rem 0;
+  background: rgba(128, 128, 128, 0.5);
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.task-progress-bar {
+  background: orange;
+  height: inherit;
 }
 
 .task-item-assigned-box {
