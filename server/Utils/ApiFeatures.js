@@ -263,9 +263,7 @@ export class ApiFeatures {
         select: 'username firstName lastName photo',
       });
 
-      if (this.queryString.category) {
-        this.query.filterByCategory(this.queryString.category);
-      }
+      this.query.filterByCategory(this.queryString.category);
     } else {
       this.query.find(queryOptions);
     }
@@ -298,7 +296,7 @@ export class ApiFeatures {
   paginate() {
     if (this.queryString.page || this.queryString.limit) {
       const page = this.queryString.page || 1;
-      const limit = this.queryString.limit || 1;
+      const limit = this.queryString.limit || 30;
       const skip = (page - 1) * limit;
 
       this.query = this.query.skip(skip).limit(limit);

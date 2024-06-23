@@ -483,12 +483,12 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 export const deleteTask = asyncErrorHandler(async (req, res, next) => {
   const task = await Task.findById(req.params.id);
 
-  const project = await Project.findById(task.project);
-
   if (!task) {
     const err = new CustomError('This task does not exist!', 404);
     return next(err);
   }
+
+  const project = await Project.findById(task.project);
 
   // If the user is not the task owner
   if (String(task.user) !== String(req.user._id)) {
@@ -519,33 +519,36 @@ export const deleteTask = asyncErrorHandler(async (req, res, next) => {
 
       // deletes the task
       await Task.findByIdAndDelete(req.params.id);
+
+      // Delete all notifications that belongs to the task
+      await Notification.deleteMany({ task: task._id });
     } else {
       // deletes assigned tasks
       await Task.deleteMany({ mainTask: req.params.id });
 
       // deletes the original task
       await Task.findByIdAndDelete(req.params.id);
+
+      // Updates the project details
+      project.updateDetails(task.status, null);
+      project.lastModified = Date.now();
+      await project.save();
+
+      // Update the user current project
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          currentProject: project._id,
+        },
+        {
+          runValidators: true,
+        }
+      );
+
+      // Delete all notifications that belongs to the task
+      await Notification.deleteMany({ task: task._id });
     }
   }
-
-  // Updates the project details
-  project.updateDetails(task.status, null);
-  project.lastModified = Date.now();
-  await project.save();
-
-  // Update the user current project
-  await User.findByIdAndUpdate(
-    req.user._id,
-    {
-      currentProject: project._id,
-    },
-    {
-      runValidators: true,
-    }
-  );
-
-  // Delete all notifications that belongs to the task
-  await Notification.deleteMany({ task: task._id });
 
   // creates notification
   await generateNotifications(

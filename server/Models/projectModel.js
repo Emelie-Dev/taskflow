@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import CustomError from '../Utils/CustomError.js';
 
 const projectSchema = new mongoose.Schema(
   {
@@ -134,23 +135,6 @@ projectSchema.virtual('tasks', {
   match: { assigned: { $ne: true } },
 });
 
-// Validates deadline field
-projectSchema.pre('save', function (next) {
-  if (this.deadline < this.createdAt) {
-    return next(
-      new CustomError('Please provide a valid value for the deadline!', 400)
-    );
-  }
-
-  const { open, progress, complete } = this.details;
-
-  this.details.projectProgress = Math.floor(
-    (complete / (open + complete + progress || 1)) * 100
-  );
-  console.log(Math.floor((progress / (open + complete + progress || 1)) * 100));
-  next();
-});
-
 // Filters the projects by progress
 projectSchema.query.filterByCategory = function (category) {
   switch (category) {
@@ -184,23 +168,45 @@ projectSchema.methods.updateDetails = function (oldValue, newValue) {
   }
 };
 
+// Validates deadline field
+projectSchema.pre('save', function (next) {
+  if (this.deadline) {
+    if (this.deadline < this.createdAt) {
+      return next(
+        new CustomError('Please provide a valid value for the deadline!', 400)
+      );
+    }
+
+    this.deadline.setMinutes(0);
+    this.deadline.setSeconds(0);
+    this.deadline.setMilliseconds(0);
+  }
+
+  const { open, progress, complete } = this.details;
+
+  this.details.projectProgress = Math.floor(
+    (complete / (open + complete + progress || 1)) * 100
+  );
+  console.log(Math.floor((progress / (open + complete + progress || 1)) * 100));
+  next();
+});
+
+projectSchema.pre('findOneAndUpdate', function (next) {
+  if (this.deadline) {
+    if (this.deadline < this.createdAt) {
+      return next(
+        new CustomError('Please provide a valid value for the deadline!', 400)
+      );
+    }
+
+    this.deadline.setMinutes(0);
+    this.deadline.setSeconds(0);
+    this.deadline.setMilliseconds(0);
+  }
+
+  next();
+});
+
 const Project = mongoose.model('Project', projectSchema);
 
 export default Project;
-
-// // Virtual fields
-// projectSchema.virtual('details').get(function () {
-//   let openTasks = 0;
-//   let completedTasks = 0;
-
-//   this.tasks.forEach((task) => {
-//     if (task.status === 'open') openTasks++;
-//     if (task.status === 'complete') completedTasks++;
-//   });
-
-//   return {
-//     openTasks,
-//     completedTasks,
-//     progress: Math.floor((completedTasks / (this.tasks.length || 1)) * 100),
-//   };
-// });

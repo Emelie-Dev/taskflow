@@ -324,24 +324,17 @@ const Dashboard = () => {
   };
 
   const updateChartOption = (e, option) => {
+    if (option === chartDetails.option) return;
+
     setChartDetails({ view: 0, option });
     setChartData(null);
   };
 
   const updateTaskCategory = (e, category) => {
+    if (category === taskCategory) return;
+
     setTaskCategory(category);
     setUserTasks(null);
-  };
-
-  const generateName = (firstName, lastName, username) => {
-    if (!firstName && !lastName) {
-      return `@${username}`;
-    } else {
-      firstName = firstName || '';
-      lastName = lastName || '';
-
-      return `${firstName} ${lastName}`;
-    }
   };
 
   const scheduledTaskMessage = () => {
@@ -922,8 +915,16 @@ const Dashboard = () => {
                       <p className={styles['task-item-details']}>{task.name}</p>
 
                       {taskCategory !== 'assigned' && (
-                        <div className={styles['task-group-pics-box']}>
-                          {task.project.team.length > 5 ? (
+                        <div
+                          className={`${styles['task-group-pics-box']} ${
+                            task.project.team.length === 0
+                              ? styles['no-team-box']
+                              : ''
+                          }`}
+                        >
+                          {task.project.team.length === 0 ? (
+                            <i>No team members</i>
+                          ) : task.project.team.length > 5 ? (
                             <>
                               {' '}
                               {task.project.team.slice(0, 4).map((member) => (
@@ -933,12 +934,10 @@ const Dashboard = () => {
                                   src={`../../assets/images/users/${member.photo}`}
                                 />
                               ))}
-                              ({' '}
                               <span className={styles['team-icon-box']}>
                                 <span className={styles['plus-sign']}>+</span>
                                 {task.project.team.length - 4}
                               </span>
-                              )
                             </>
                           ) : (
                             task.project.team.map((member) => (
@@ -1049,11 +1048,11 @@ const Dashboard = () => {
           </header>
 
           <Calendar
+            ref={calenderRef}
             currentMonth={currentMonth}
             currentYear={currentYear}
             setCurrentMonth={setCurrentMonth}
             setCurrentYear={setCurrentYear}
-            calenderRef={calenderRef}
             setScheduledTasks={setScheduledTasks}
             scheduleDetails={scheduleDetails}
             setScheduleDetails={setScheduleDetails}
@@ -1201,6 +1200,17 @@ const Dashboard = () => {
       </section>
     </main>
   );
+};
+
+export const generateName = (firstName, lastName, username) => {
+  if (!firstName && !lastName) {
+    return `@${username}`;
+  } else {
+    firstName = firstName || '';
+    lastName = lastName || '';
+
+    return `${firstName} ${lastName}`;
+  }
 };
 
 export default Dashboard;

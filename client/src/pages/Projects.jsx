@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/Projects.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,7 @@ import {
   IoMdClose,
   IoIosNotifications,
   IoMdGrid,
+  IoIosCloseCircleOutline,
 } from 'react-icons/io';
 
 import {
@@ -32,10 +33,31 @@ import Project from '../components/Project';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
+import { generateName } from './Dashboard';
+import { GrStatusGood } from 'react-icons/gr';
+import { AuthContext } from '../App';
+
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 const Projects = () => {
+  const { userData } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
-  const [displayFormat, setDisplayFormat] = useState('grid');
+  const [displayFormat, setDisplayFormat] = useState(
+    userData.personalization.defaultProjectView
+  );
   const [showNav, setShowNav] = useState(false);
   const [displayModal, setdisplayModal] = useState(false);
   const [projects, setProjects] = useState(null);
@@ -49,6 +71,8 @@ const Projects = () => {
     lastPage: true,
     error: false,
   });
+  const [tablePage, setTablePage] = useState(1);
+
   const searchRef = useRef();
   const navRef = useRef();
 
@@ -64,20 +88,25 @@ const Projects = () => {
 
         setProjectData({
           loading: false,
-          lastPage: data.data.projects.length < 1,
+          lastPage: data.data.projects.length < 30,
           error: false,
         });
 
         if (page !== 1) {
+          if (data.data.projects.length === 0) return projectsDetails.page--;
+
           setProjects({
             grid: [...projects.grid, ...data.data.projects],
-            table: data.data.projects,
+            table: [...projects.table, data.data.projects],
           });
-        } else {
-          setProjects({ grid: data.data.projects, table: data.data.projects });
-        }
 
-        console.log(data.data.projects);
+          setTablePage((page) => page + 1);
+        } else {
+          setProjects({
+            grid: data.data.projects,
+            table: [data.data.projects],
+          });
+        }
       } catch {
         if (page !== 1) {
           setProjectData({ loading: false, lastPage: false, error: false });
@@ -121,8 +150,36 @@ const Projects = () => {
     setProjectData({ loading: true, lastPage: true, error: false });
   };
 
+  const goToPage = (nextPage) => {
+    const { category, sort, page } = projectsDetails;
+
+    if (nextPage === tablePage) {
+      return;
+    } else if (projects.table[nextPage - 1]) {
+      setTablePage(nextPage);
+    } else {
+      setProjectsDetails({
+        category,
+        sort,
+        page: page + 1,
+      });
+
+      setProjectData({ loading: true, lastPage: true, error: false });
+    }
+  };
+
+  const isLastPage = () => {
+    if (projectData.lastPage) {
+      return projects.table.length === tablePage;
+    } else {
+      return projects.table.length + 1 === tablePage;
+    }
+  };
+
   const changeCategory = (category) => {
     const { sort } = projectsDetails;
+
+    if (projectsDetails.category === category) return;
 
     setProjectsDetails({
       category,
@@ -131,7 +188,6 @@ const Projects = () => {
     });
 
     setProjects(null);
-
     setProjectData({ loading: true, lastPage: true, error: false });
   };
 
@@ -145,8 +201,26 @@ const Projects = () => {
     });
 
     setProjects(null);
-
     setProjectData({ loading: true, lastPage: true, error: false });
+  };
+
+  const noProjectMessage = (category) => {
+    switch (category) {
+      case 'all':
+        return "You currently don't have any projects yet.";
+
+      case 'progress':
+        return 'You currently have no ongoing projects.';
+
+      case 'open':
+        return 'You currently have no open projects (projects with 0% progress).';
+
+      case 'complete':
+        return 'You currently have no complete projects.';
+
+      default:
+        return 'No projects available.';
+    }
   };
 
   return (
@@ -437,7 +511,10 @@ const Projects = () => {
                     : ''
                 }`}
                 title="Table Format"
-                onClick={() => setDisplayFormat('table')}
+                onClick={() => {
+                  setDisplayFormat('table');
+                  setTablePage(1);
+                }}
               >
                 <MdTableRows
                   className={`${styles['project-style-icon']} ${
@@ -460,13 +537,43 @@ const Projects = () => {
 
           <div className={styles['alternate-filter-div']}>
             <button
-              className={`${styles['alternate-filter-btn']} ${styles['alternate-current-filter-btn']}`}
+              className={`${styles['alternate-filter-btn']} ${
+                projectsDetails.category === 'all'
+                  ? styles['alternate-current-filter-btn']
+                  : ''
+              }`}
+              onClick={() => changeCategory('all')}
             >
               All
             </button>
-            <button className={styles['alternate-filter-btn']}>Ongoing</button>
-            <button className={styles['alternate-filter-btn']}>Open</button>
-            <button className={styles['alternate-filter-btn']}>
+            <button
+              className={`${styles['alternate-filter-btn']} ${
+                projectsDetails.category === 'progress'
+                  ? styles['alternate-current-filter-btn']
+                  : ''
+              }`}
+              onClick={() => changeCategory('progress')}
+            >
+              Ongoing
+            </button>
+            <button
+              className={`${styles['alternate-filter-btn']} ${
+                projectsDetails.category === 'open'
+                  ? styles['alternate-current-filter-btn']
+                  : ''
+              }`}
+              onClick={() => changeCategory('open')}
+            >
+              Open
+            </button>
+            <button
+              className={`${styles['alternate-filter-btn']} ${
+                projectsDetails.category === 'complete'
+                  ? styles['alternate-current-filter-btn']
+                  : ''
+              }`}
+              onClick={() => changeCategory('complete')}
+            >
               Completed
             </button>
           </div>
@@ -532,22 +639,27 @@ const Projects = () => {
                   ''
                 ) : projects.grid.length === 0 ? (
                   <div className={styles['no-projects-text']}>
-                    You currently don't have any projects yet.
+                    {noProjectMessage(projectsDetails.category)}
                   </div>
                 ) : projects.grid ? (
                   projects.grid.map((project) => (
-                    <article key={project._id} className={styles.article}>
+                    <article
+                      key={`${project._id}-${Date.now()}`}
+                      className={styles.article}
+                    >
                       <div className={styles['menu-div']}>
                         <BsThreeDotsVertical
                           className={styles['grid-menu-icon']}
                         />
                         <ul className={styles['menu-action-list']}>
-                          <li className={styles['menu-action-item']}>
-                            <MdOutlineModeEditOutline
-                              className={styles['action-icon']}
-                            />
-                            Edit
-                          </li>
+                          <a href="#" className={styles['menu-action-link']}>
+                            <li className={styles['menu-action-item']}>
+                              <MdOutlineModeEditOutline
+                                className={styles['action-icon']}
+                              />
+                              Edit
+                            </li>
+                          </a>
                           <li className={styles['menu-action-item']}>
                             <RiDeleteBin6Line
                               className={styles['action-icon']}
@@ -557,16 +669,28 @@ const Projects = () => {
                         </ul>
                       </div>
 
-                      <h1 className={styles['project-name']}>Fitness App</h1>
+                      <h1 className={styles['project-name']}>
+                        <span className={styles['project-name-value']}>
+                          <a href="#">{project.name}</a>
+                        </span>
+                      </h1>
                       <span className={styles['project-tasks']}>
-                        <span className={styles['open-tasks']}>2</span> open
-                        tasks,{' '}
-                        <span className={styles['completed-tasks']}>9</span>{' '}
+                        <span className={styles['open-tasks']}>
+                          {project.details.open}
+                        </span>{' '}
+                        open {project.details.open === 1 ? 'task' : 'tasks'},{' '}
+                        <span className={styles['completed-tasks']}>
+                          {' '}
+                          {project.details.complete}
+                        </span>{' '}
                         completed
                       </span>
                       <p className={styles['project-details']}>
-                        A cutting-edge fitness application designed to
-                        revolutionize your health and wellness journey.
+                        {project.description.length === 0 ? (
+                          <i>No project description</i>
+                        ) : (
+                          project.description
+                        )}
                       </p>
 
                       <div className={styles['property-div']}>
@@ -574,66 +698,86 @@ const Projects = () => {
                           Deadline:
                         </span>
                         <span className={styles['deadline-value']}>
-                          18 Mar, 2024
-                        </span>
-                      </div>
-                      <div className={styles['property-div']}>
-                        <span className={styles['property-name']}>
-                          Project Leader:
-                        </span>
-                        <span className={styles['property-tooltip']}>
-                          <img
-                            className={styles['leader-img']}
-                            src="../../assets/images/download.jpeg"
-                          />
-                          <span className={styles['property-tooltip-text']}>
-                            John Snow
-                          </span>
+                          {project.deadline ? (
+                            `${
+                              months[new Date(project.deadline).getMonth()]
+                            } ${new Date(
+                              project.deadline
+                            ).getDate()}, ${new Date(
+                              project.deadline
+                            ).getFullYear()}`
+                          ) : (
+                            <i>No deadline</i>
+                          )}
                         </span>
                       </div>
                       <div className={styles['property-div']}>
                         <span className={styles['property-name']}>Team:</span>
-                        <div className={styles['team-pics-box']}>
-                          <span className={styles['team-pics-tooltip']}>
-                            <img
-                              src="../../assets/images/profile1.webp"
-                              className={styles['team-pics']}
-                            />
-                            <span className={styles['team-pics-tooltip-text']}>
-                              Rob Stark
-                            </span>
-                          </span>
-                          <span className={styles['team-pics-tooltip']}>
-                            <img
-                              src="../../assets/images/profile2webp.webp"
-                              className={styles['team-pics']}
-                            />
-                            <span className={styles['team-pics-tooltip-text']}>
-                              Sansa Stark
-                            </span>
-                          </span>
-                          <span className={styles['team-pics-tooltip']}>
-                            <img
-                              src="../../assets/images/profile3.jpeg"
-                              className={styles['team-pics']}
-                            />
-                            <span className={styles['team-pics-tooltip-text']}>
-                              Ramsay Bolton
-                            </span>
-                          </span>
-                          <span className={styles['team-pics-tooltip']}>
-                            <img
-                              src="../../assets/images/profile4.jpeg"
-                              className={styles['team-pics']}
-                            />
-                            <span className={styles['team-pics-tooltip-text']}>
-                              Jamie Lannister
-                            </span>
-                          </span>
-                          <span className={styles['team-icon-box']}>
-                            <HiPlus className={styles['team-icon']} />
-                            <span className={styles['team-number']}>10</span>
-                          </span>
+                        <div
+                          className={`${styles['team-pics-box']} ${
+                            project.team.length === 0
+                              ? styles['no-team-box']
+                              : ''
+                          }`}
+                        >
+                          {project.team.length === 0 ? (
+                            <i>No team members</i>
+                          ) : project.team.length > 4 ? (
+                            <>
+                              {project.team.slice(0, 4).map((member) => (
+                                <span
+                                  key={member._id}
+                                  className={styles['team-pics-tooltip']}
+                                >
+                                  <a href="#">
+                                    <img
+                                      src={`../../assets/images/users/${member.photo}`}
+                                      className={styles['team-pics']}
+                                    />
+                                  </a>
+                                  <span
+                                    className={styles['team-pics-tooltip-text']}
+                                  >
+                                    {generateName(
+                                      member.firstName,
+                                      member.lastName,
+                                      member.username
+                                    )}
+                                  </span>
+                                </span>
+                              ))}
+
+                              <span className={styles['team-icon-box']}>
+                                <HiPlus className={styles['team-icon']} />
+                                <span className={styles['team-number']}>
+                                  {project.team.length - 4}
+                                </span>
+                              </span>
+                            </>
+                          ) : (
+                            project.team.map((member) => (
+                              <span
+                                key={member._id}
+                                className={styles['team-pics-tooltip']}
+                              >
+                                <a href="#">
+                                  <img
+                                    src={`../../assets/images/users/${member.photo}`}
+                                    className={styles['team-pics']}
+                                  />
+                                </a>
+                                <span
+                                  className={styles['team-pics-tooltip-text']}
+                                >
+                                  {generateName(
+                                    member.firstName,
+                                    member.lastName,
+                                    member.username
+                                  )}
+                                </span>
+                              </span>
+                            ))
+                          )}
                         </div>
                       </div>
 
@@ -642,10 +786,22 @@ const Projects = () => {
                           <span className={styles['progess-text']}>
                             Progress
                           </span>
-                          <span className={styles['progess-value']}>60%</span>
+
+                          <span className={styles['progess-value']}>
+                            {project.details.projectProgress}%
+                          </span>
                         </div>
 
-                        <div className={styles['progress-bar']}>&nbsp;</div>
+                        <div className={styles['progress-bar']}>
+                          <span
+                            className={styles['progress-bar-value']}
+                            style={{
+                              width: `${project.details.projectProgress}%`,
+                            }}
+                          >
+                            &nbsp;
+                          </span>
+                        </div>
                       </div>
                     </article>
                   ))
@@ -667,7 +823,7 @@ const Projects = () => {
                     style={{
                       width: '2.5rem',
                       height: '2.5rem',
-                      margin: '0 0 3rem',
+                      margin: '1rem 0 3rem',
                     }}
                   />
                 </div>
@@ -688,164 +844,301 @@ const Projects = () => {
 
           {displayFormat === 'table' && (
             <div className={styles['table-container']}>
-              <header className={styles.footer}>
-                <div className={styles['footer-text']}>
-                  Showing <span className={styles['footer-entry-text']}>1</span>{' '}
-                  to <span className={styles['footer-entry-text']}>25</span> of{' '}
-                  <span className={styles['footer-entry-text']}>250</span>{' '}
-                  entries
+              {projects === null ? (
+                ''
+              ) : projects.table[tablePage - 1].length === 0 ? (
+                <div className={styles['no-projects-text']}>
+                  {noProjectMessage(projectsDetails.category)}
                 </div>
+              ) : projects.table ? (
+                <>
+                  <header className={styles.footer}>
+                    <div className={styles['footer-text']}>
+                      Showing{' '}
+                      <span className={styles['footer-entry-text']}>
+                        {(tablePage - 1) * 30 + 1}
+                      </span>{' '}
+                      to{' '}
+                      <span className={styles['footer-entry-text']}>
+                        {(tablePage - 1) * 30 +
+                          projects.table[tablePage - 1].length}
+                      </span>{' '}
+                      of{' '}
+                      <span className={styles['footer-entry-text']}>
+                        {projects.grid.length}
+                      </span>{' '}
+                      {projects.grid.length === 1 ? 'entry' : 'entries'}
+                    </div>
 
-                <div className={styles['entry-navigation-box']}>
-                  <span className={styles['footer-content-box']}>
-                    <MdKeyboardDoubleArrowLeft
-                      className={styles['footer-icon']}
-                    />
-                  </span>
-                  <span className={styles['footer-content-box']}>1</span>
-                  <span className={styles['footer-content-box']}>2</span>
-                  <span className={styles['footer-content-box']}>3</span>
-                  <span className={styles['footer-content-box']}>
-                    <MdKeyboardDoubleArrowRight
-                      className={styles['footer-icon']}
-                    />
-                  </span>
-                </div>
-              </header>
+                    <div className={styles['entry-navigation-box']}>
+                      <span
+                        className={`${styles['footer-content-box']} ${
+                          styles['footer-arrow-box']
+                        } ${tablePage === 1 ? styles['disable-box'] : ''}`}
+                        onClick={() => goToPage(tablePage - 1)}
+                      >
+                        <MdKeyboardDoubleArrowLeft
+                          className={styles['footer-icon']}
+                        />
+                      </span>
 
-              <div className={styles['table-div']}>
-                <table className={styles['project-table']}>
-                  <thead>
-                    <tr className={styles['table-head-row']}>
-                      <th className={styles['table-head']}>Project</th>
-                      <th className={styles['table-head']}>Leader</th>
-                      <th className={styles['table-head']}>Team</th>
-                      <th className={styles['table-head']}>Deadline</th>
-                      <th className={styles['table-head']}>Progress</th>
-                      <th className={styles['table-head']}>Status</th>
-                      <th className={styles['table-head']}>Action</th>
-                    </tr>
-                  </thead>
+                      <div className={styles['pagination-box']}>
+                        <>
+                          {projects.table.map((page, index) => (
+                            <span
+                              key={index}
+                              className={`${styles['footer-content-box']} ${
+                                tablePage === index + 1
+                                  ? styles['current-page']
+                                  : ''
+                              }`}
+                              onClick={() => goToPage(index + 1)}
+                            >
+                              {index + 1}
+                            </span>
+                          ))}
 
-                  <tbody>
-                    {projects === null
-                      ? ''
-                      : projects
-                      ? projects.map((value, index) => (
-                          <tr key={index}>
-                            <td className={styles['table-project-name']}>
-                              Fitness App
-                            </td>
-                            <td>
-                              <span
-                                className={styles['table-project-leader-box']}
-                              >
-                                <img
-                                  className={styles['table-project-leader']}
-                                  src="../../assets/images/download.jpeg"
-                                />
-                                <span
-                                  className={
-                                    styles['table-project-leader-name']
-                                  }
-                                >
-                                  John Snow
-                                </span>
-                              </span>
-                            </td>
-                            <td>
-                              <div className={styles['table-team-box']}>
-                                <span className={styles['table-team-pics-box']}>
-                                  <img
-                                    className={styles['table-team-pics']}
-                                    src="../../assets/images/profile1.webp"
-                                  />
-                                  <span className={styles['table-team-name']}>
-                                    Rob Stark
-                                  </span>
-                                </span>
-                                <span className={styles['table-team-pics-box']}>
-                                  <img
-                                    className={styles['table-team-pics']}
-                                    src="../../assets/images/profile2webp.webp"
-                                  />
-                                  <span className={styles['table-team-name']}>
-                                    Sansa Stark
-                                  </span>
-                                </span>
-                                <span className={styles['table-team-pics-box']}>
-                                  <img
-                                    className={styles['table-team-pics']}
-                                    src="../../assets/images/profile3.jpeg"
-                                  />
-                                  <span className={styles['table-team-name']}>
-                                    Ramsay Bolton
-                                  </span>
-                                </span>
-                                <span className={styles['table-team-pics-box']}>
-                                  <img
-                                    className={styles['table-team-pics']}
-                                    src="../../assets/images/profile4.jpeg"
-                                  />
-                                  <span className={styles['table-team-name']}>
-                                    Jamie Lannister
-                                  </span>
-                                </span>
-                                <span className={styles['table-team-icon-box']}>
-                                  <HiPlus
-                                    className={styles['table-team-icon']}
-                                  />
-                                  <span className={styles['team-number']}>
-                                    10
-                                  </span>
-                                </span>
-                              </div>
-                            </td>
-                            <td className={styles['table-project-deadline']}>
-                              18 Mar, 2024
-                            </td>
-                            <td className={styles['table-project-progress']}>
-                              30%
-                            </td>
-                            <td>
-                              <select
-                                className={styles['table-project-select']}
-                                disabled={(index + 1) % 4 === 0 ? false : true}
-                              >
-                                <option value={'active'}>Active</option>
-                                <option value={'inactive'}>Inactive</option>
-                              </select>
-                            </td>
-                            <td className={styles['table-project-action']}>
-                              <span
-                                className={styles['table-project-action-box']}
-                              >
-                                <BsThreeDotsVertical
-                                  className={styles['table-project-menu']}
-                                />
+                          {!projectData.lastPage && (
+                            <span
+                              className={styles['footer-content-box']}
+                              onClick={() =>
+                                goToPage(projects.table.length + 1)
+                              }
+                            >
+                              {projects.table.length + 1}
+                            </span>
+                          )}
+                        </>
+                      </div>
 
-                                <ul className={`${styles['action-box']} `}>
-                                  <li className={styles['action-option']}>
-                                    <MdOutlineModeEditOutline
-                                      className={styles['action-icon']}
-                                    />
-                                    Edit
-                                  </li>
-                                  <li className={styles['action-option']}>
-                                    <RiDeleteBin6Line
-                                      className={styles['action-icon']}
-                                    />{' '}
-                                    Delete
-                                  </li>
-                                </ul>
-                              </span>
-                            </td>
+                      <span
+                        className={`${styles['footer-content-box']} ${
+                          styles['footer-arrow-box']
+                        } ${isLastPage() ? styles['disable-box'] : ''}`}
+                        onClick={() => goToPage(tablePage + 1)}
+                      >
+                        <MdKeyboardDoubleArrowRight
+                          className={styles['footer-icon']}
+                        />
+                      </span>
+                    </div>
+                  </header>
+
+                  {!projectData.loading && (
+                    <div className={styles['table-div']}>
+                      <table className={styles['project-table']}>
+                        <thead>
+                          <tr className={styles['table-head-row']}>
+                            <th className={styles['table-head']}>Project</th>
+                            <th className={styles['table-head']}>Team</th>
+                            <th className={styles['table-head']}>Deadline</th>
+                            <th className={styles['table-head']}>Progress</th>
+                            <th className={styles['table-head']}>Status</th>
+                            <th className={styles['table-head']}>Action</th>
                           </tr>
-                        ))
-                      : ''}
-                  </tbody>
-                </table>
-              </div>
+                        </thead>
+
+                        <tbody>
+                          {projects.table[tablePage - 1].map((project) => (
+                            <tr key={project._id}>
+                              <td className={styles['table-project-name']}>
+                                <a href="#">{project.name} </a>
+                              </td>
+
+                              <td>
+                                <div className={styles['table-team-box']}>
+                                  {project.team.length === 0 ? (
+                                    <i className={styles['no-team-text']}>
+                                      No team members
+                                    </i>
+                                  ) : project.team.length > 4 ? (
+                                    <>
+                                      {project.team
+                                        .slice(0, 4)
+                                        .map((member) => (
+                                          <span
+                                            key={member._id}
+                                            className={
+                                              styles['table-team-pics-box']
+                                            }
+                                          >
+                                            <a href="#">
+                                              <img
+                                                className={
+                                                  styles['table-team-pics']
+                                                }
+                                                src={`../../assets/images/users/${member.photo}`}
+                                              />
+                                            </a>
+                                            <span
+                                              className={
+                                                styles['table-team-name']
+                                              }
+                                            >
+                                              {generateName(
+                                                member.firstName,
+                                                member.lastName,
+                                                member.username
+                                              )}
+                                            </span>
+                                          </span>
+                                        ))}
+
+                                      <span
+                                        className={
+                                          styles['table-team-icon-box']
+                                        }
+                                      >
+                                        <HiPlus
+                                          className={styles['table-team-icon']}
+                                        />
+                                        <span className={styles['team-number']}>
+                                          {project.team.length - 4}
+                                        </span>
+                                      </span>
+                                    </>
+                                  ) : (
+                                    project.team.map((member) => (
+                                      <span
+                                        key={member._id}
+                                        className={
+                                          styles['table-team-pics-box']
+                                        }
+                                      >
+                                        <a href="#">
+                                          <img
+                                            className={
+                                              styles['table-team-pics']
+                                            }
+                                            src={`../../assets/images/users/${member.photo}`}
+                                          />
+                                        </a>
+                                        <span
+                                          className={styles['table-team-name']}
+                                        >
+                                          {generateName(
+                                            member.firstName,
+                                            member.lastName,
+                                            member.username
+                                          )}{' '}
+                                        </span>
+                                      </span>
+                                    ))
+                                  )}
+                                </div>
+                              </td>
+
+                              <td className={styles['table-project-deadline']}>
+                                {project.deadline ? (
+                                  `${
+                                    months[
+                                      new Date(project.deadline).getMonth()
+                                    ]
+                                  } ${new Date(
+                                    project.deadline
+                                  ).getDate()}, ${new Date(
+                                    project.deadline
+                                  ).getFullYear()}`
+                                ) : (
+                                  <i className={styles['no-deadline']}>
+                                    No deadline
+                                  </i>
+                                )}
+                              </td>
+                              <td
+                                className={`${
+                                  styles['table-project-progress']
+                                } ${
+                                  project.details.projectProgress < 40
+                                    ? styles['low-progress']
+                                    : project.details.projectProgress < 70
+                                    ? styles['medium-progress']
+                                    : project.details.projectProgress < 100
+                                    ? styles['high-progress']
+                                    : styles['complete-progress']
+                                }`}
+                              >
+                                {project.details.projectProgress}%
+                              </td>
+                              <td className={styles['table-project-status']}>
+                                {project.status === 'active' ? (
+                                  <span className={styles['active-project']}>
+                                    {' '}
+                                    <GrStatusGood
+                                      className={styles['active-project-icon']}
+                                    />{' '}
+                                    Active
+                                  </span>
+                                ) : (
+                                  <span className={styles['inactive-project']}>
+                                    {' '}
+                                    <IoIosCloseCircleOutline
+                                      className={
+                                        styles['inactive-project-icon']
+                                      }
+                                    />{' '}
+                                    Inactive
+                                  </span>
+                                )}
+                              </td>
+                              <td className={styles['table-project-action']}>
+                                <span
+                                  className={styles['table-project-action-box']}
+                                >
+                                  <BsThreeDotsVertical
+                                    className={styles['table-project-menu']}
+                                  />
+
+                                  <ul className={`${styles['action-box']} `}>
+                                    <a
+                                      href="#"
+                                      className={styles['menu-action-link']}
+                                    >
+                                      <li className={styles['action-option']}>
+                                        <MdOutlineModeEditOutline
+                                          className={styles['action-icon']}
+                                        />
+                                        Edit
+                                      </li>
+                                    </a>
+                                    <li className={styles['action-option']}>
+                                      <RiDeleteBin6Line
+                                        className={styles['action-icon']}
+                                      />{' '}
+                                      Delete
+                                    </li>
+                                  </ul>
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </>
+              ) : (
+                ''
+              )}
+
+              {projectData.error && (
+                <div className={styles['no-projects-text']}>
+                  <MdOutlineSignalWifiOff className={styles['network-icon']} />{' '}
+                  Unable to retrieve data
+                </div>
+              )}
+
+              {projectData.loading && (
+                <div className={styles['projects-loader-div']}>
+                  <Loader
+                    style={{
+                      width: '2.5rem',
+                      height: '2.5rem',
+                      margin: '3rem 0',
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
         </section>

@@ -121,14 +121,32 @@ taskSchema.query.scheduledTasks = function (year, month, day) {
 };
 
 // Validates deadline field
-taskSchema.pre('save', function (next) {
-  if (this.deadline < this.createdAt) {
-    return next(
-      new CustomError('Please provide a valid value for the deadline!', 400)
-    );
-  }
 
+const validateDeadline = function (next) {
+  if (this.deadline) {
+    if (this.deadline < this.createdAt) {
+      return next(
+        new CustomError('Please provide a valid value for the deadline!', 400)
+      );
+    }
+
+    this.deadline.setMinutes(0);
+    this.deadline.setSeconds(0);
+    this.deadline.setMilliseconds(0);
+  }
   next();
+};
+
+taskSchema.pre('save', function (next) {
+  validateDeadline.call(this, next);
+});
+
+taskSchema.pre('findOneAndUpdate', function (next) {
+  validateDeadline.call(this, next);
+});
+
+taskSchema.pre(/^update/, function (next) {
+  validateDeadline.call(this, next);
 });
 
 const Task = mongoose.model('Task', taskSchema);
