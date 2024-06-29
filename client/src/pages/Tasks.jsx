@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/Tasks.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -10,6 +10,7 @@ import {
   MdOutlineDashboard,
   MdOutlineSegment,
   MdKeyboardDoubleArrowDown,
+  MdOutlineSignalWifiOff,
 } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
@@ -19,15 +20,218 @@ import TaskBox2 from '../components/TaskBox2';
 import { HiPlus } from 'react-icons/hi';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import NewTask from '../components/NewTask';
+import { ToastContainer, toast } from 'react-toastify';
+import axios from 'axios';
+import Loader from '../components/Loader';
+import { AuthContext } from '../App';
+import { generateName } from './Dashboard';
 
 const Tasks = () => {
+  // Enable show more projects feature(include responsive)
+  const { userData } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [taskType, setTaskType] = useState('personal');
   const [addTask, setAddTask] = useState(false);
+  const [personalProjects, setPersonalProjects] = useState(null);
+  const [personalProjectsDetails, setPersonalProjectsDetails] = useState({
+    loading: true,
+    lastPage: true,
+    error: false,
+  });
+  const [assignedProjects, setAssignedProjects] = useState(null);
+  const [assignedProjectsDetails, setAssignedProjectsDetails] = useState({
+    loading: true,
+    lastPage: true,
+    error: false,
+  });
+  const [projectsPage, setProjectsPage] = useState({
+    personal: { current: true, value: 1 },
+    assigned: { current: true, value: 1 },
+  });
+  const [currentProject, setCurrentProject] = useState({
+    tasks: null,
+  });
+  const [currentProjectData, setCurrentProjectData] = useState({
+    id: null,
+    page: 1,
+    index: null,
+  });
+  const [currentProjectDetails, setCurrentProjectDetails] = useState({
+    loading: true,
+    lastPage: true,
+    error: false,
+  });
   const searchRef = useRef();
   const navRef = useRef();
+
+  // For personal tasks
+  useEffect(() => {
+    const getPersonalProjects = async () => {
+      if (projectsPage.personal.current) {
+        const page = projectsPage.personal.value;
+
+        try {
+          const { data } = await axios.get(
+            `/api/v1/projects/my_projects?page=${page}`
+          );
+
+          setPersonalProjectsDetails({
+            loading: false,
+            lastPage: data.data.projects.length < 30,
+            error: false,
+          });
+
+          if (page !== 1) {
+            setPersonalProjects([...personalProjects, ...data.data.projects]);
+          } else {
+            setPersonalProjects(data.data.projects);
+
+            if (data.data.projects.length !== 0) {
+              setCurrentProjectData({
+                id: data.data.projects[0]._id,
+                page: 1,
+                index: 0,
+              });
+            } else {
+              setCurrentProjectData({ id: false });
+            }
+          }
+        } catch {
+          if (page !== 1) {
+            setPersonalProjectsDetails({
+              loading: false,
+              lastPage: false,
+              error: true,
+            });
+          } else {
+            setPersonalProjectsDetails({
+              loading: false,
+              lastPage: true,
+              error: true,
+            });
+
+            setCurrentProjectDetails({
+              loading: false,
+              lastPage: true,
+              error: true,
+            });
+          }
+
+          return toast('An error occured while fetching personal projects.', {
+            toastId: 'toast-id1',
+          });
+        }
+      }
+    };
+
+    getPersonalProjects();
+  }, [projectsPage]);
+
+  // For assigned tasks
+  useEffect(() => {
+    const getAssignedProjects = async () => {
+      if (projectsPage.assigned.current) {
+        const page = projectsPage.assigned.value;
+
+        try {
+          const { data } = await axios.get(
+            `/api/v1/projects/assigned?page=${page}`
+          );
+
+          setAssignedProjectsDetails({
+            loading: false,
+            lastPage: data.data.assignedProjects.length < 30,
+            error: false,
+          });
+
+          if (page !== 1) {
+            setAssignedProjects([
+              ...assignedProjects,
+              ...data.data.assignedProjects,
+            ]);
+          } else {
+            setAssignedProjects(data.data.assignedProjects);
+          }
+        } catch {
+          if (page !== 1) {
+            setAssignedProjectsDetails({
+              loading: false,
+              lastPage: false,
+              error: true,
+            });
+          } else {
+            setAssignedProjectsDetails({
+              loading: false,
+              lastPage: true,
+              error: true,
+            });
+          }
+
+          return toast('An error occured while fetching assigned projects.', {
+            toastId: 'toast-id2',
+          });
+        }
+      }
+    };
+
+    getAssignedProjects();
+  }, [projectsPage]);
+
+  useEffect(() => {
+    const getProjectTasks = async () => {
+      const { id, page } = currentProjectData;
+
+      if (id === false) {
+        return setCurrentProject({ tasks: false });
+      } else if (id) {
+        try {
+          const { data } = await axios.get(
+            `/api/v1/projects/${id}/tasks${
+              taskType === 'assigned' ? '/assigned' : ''
+            }?page=${page}`
+          );
+
+          setCurrentProjectDetails({
+            loading: false,
+            lastPage: data.data.tasks.length < 30,
+            error: false,
+          });
+
+          if (page !== 1) {
+            setCurrentProject({
+              tasks: [...currentProject.tasks, ...data.data.tasks],
+            });
+          } else {
+            setCurrentProject({ tasks: data.data.tasks });
+          }
+
+          console.log(data.data.tasks);
+        } catch {
+          if (page !== 1) {
+            setCurrentProjectDetails({
+              loading: false,
+              lastPage: false,
+              error: true,
+            });
+          } else {
+            setCurrentProjectDetails({
+              loading: false,
+              lastPage: true,
+              error: true,
+            });
+          }
+
+          return toast('An error occured while fetching tasks.', {
+            toastId: 'toast-id3',
+          });
+        }
+      }
+    };
+
+    getProjectTasks();
+  }, [currentProjectData]);
 
   const hideNav = (e) => {
     if (e.target === navRef.current) {
@@ -47,10 +251,30 @@ const Tasks = () => {
     setShowProjects(!showProjects);
   };
 
-  const tasks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const changeProject = (type, id, page, index) => {
+    if (id === currentProjectData.id) return;
+
+    if (type === 'personal') {
+      setTaskType('personal');
+    } else {
+      setTaskType('assigned');
+    }
+
+    setCurrentProject({
+      tasks: null,
+    });
+    setCurrentProjectData({ id, page, index });
+    setCurrentProjectDetails({
+      loading: true,
+      lastPage: true,
+      error: false,
+    });
+  };
 
   return (
     <main className={styles.div}>
+      <ToastContainer autoClose={2000} />
+
       <nav
         ref={navRef}
         className={`${styles['responsive-nav']} ${
@@ -265,98 +489,112 @@ const Tasks = () => {
             {/* Personal Tasks */}
             <div className={styles['projects-div']}>
               <p className={styles['projects-head']}>Personal</p>
-              <ul className={styles['projects-list']}>
-                <li
-                  className={`${styles['projects-list-item']} ${
-                    taskType === 'personal'
-                      ? styles['current-project-list-item']
-                      : ''
-                  }`}
-                  onClick={() => setTaskType('personal')}
-                >
-                  <img
-                    src="../../assets/images/download.jpeg"
-                    className={styles['projects-item-img']}
-                  />
-                  <span
-                    className={`${styles['projects-item-details']} ${
-                      taskType === 'personal'
-                        ? styles['current-projects-item-details']
-                        : ''
-                    }`}
-                  >
-                    <span className={styles['projects-item-name']}>
-                      Fitness App
-                    </span>
-                    <span className={styles['projects-item-count']}>
-                      35 tasks
-                    </span>
-                  </span>
-                  <span className={styles['projects-item-action']}>
-                    <BsThreeDotsVertical
-                      className={`${styles['projects-item-menu']} ${
-                        taskType === 'personal'
-                          ? styles['current-projects-item-menu']
-                          : ''
-                      }`}
-                      onClick={(e) => e.stopPropagation()}
-                    />
 
-                    <span
-                      className={styles['view-project-link']}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      View Project
-                    </span>
-                  </span>
-                </li>
-                <li className={styles['projects-list-item']}>
-                  <img
-                    src="../../assets/images/download.jpeg"
-                    className={styles['projects-item-img']}
-                  />
-                  <span className={styles['projects-item-details']}>
-                    <span className={styles['projects-item-name']}>
-                      Fitness App
-                    </span>
-                    <span className={styles['projects-item-count']}>
-                      35 tasks
-                    </span>
-                  </span>
-                  <span className={styles['projects-item-action']}>
-                    <BsThreeDotsVertical
-                      className={styles['projects-item-menu']}
-                    />
+              <div className={styles['projects-box']}>
+                <ul className={styles['projects-list']}>
+                  {personalProjects === null
+                    ? ''
+                    : personalProjects.length === 0
+                    ? ''
+                    : personalProjects
+                    ? personalProjects.map((project, index) => (
+                        <li
+                          key={project._id}
+                          className={`${styles['projects-list-item']} ${
+                            currentProjectData.id === project._id
+                              ? styles['current-project-list-item']
+                              : ''
+                          }`}
+                          onClick={() =>
+                            changeProject('personal', project._id, 1, index)
+                          }
+                        >
+                          <img
+                            src={`../../assets/images/users/${userData.photo}`}
+                            className={styles['projects-item-img']}
+                          />
+                          <span
+                            className={`${styles['projects-item-details']} ${
+                              currentProjectData.id === project._id
+                                ? styles['current-projects-item-details']
+                                : ''
+                            }`}
+                          >
+                            <span className={styles['projects-item-name']}>
+                              {project.name}
+                            </span>
+                            <span className={styles['projects-item-count']}>
+                              {project.details.complete +
+                                project.details.open +
+                                project.details.progress ===
+                              1
+                                ? `1 task`
+                                : `${
+                                    project.details.complete +
+                                    project.details.open +
+                                    project.details.progress
+                                  } tasks`}{' '}
+                            </span>
+                          </span>
+                          <span className={styles['projects-item-action']}>
+                            <BsThreeDotsVertical
+                              className={`${styles['projects-item-menu']} ${
+                                currentProjectData.id === project._id
+                                  ? styles['current-projects-item-menu']
+                                  : ''
+                              }`}
+                              onClick={(e) => e.stopPropagation()}
+                            />
 
-                    <span className={styles['view-project-link']}>
-                      View Project
-                    </span>
-                  </span>
-                </li>
-                <li className={styles['projects-list-item']}>
-                  <img
-                    src="../../assets/images/download.jpeg"
-                    className={styles['projects-item-img']}
-                  />
-                  <span className={styles['projects-item-details']}>
-                    <span className={styles['projects-item-name']}>
-                      Fitness App
-                    </span>
-                    <span className={styles['projects-item-count']}>
-                      35 tasks
-                    </span>
-                  </span>
-                  <span className={styles['projects-item-action']}>
-                    <BsThreeDotsVertical
-                      className={styles['projects-item-menu']}
-                    />
+                            <a href="#" className={styles['']}>
+                              <span
+                                className={styles['view-project-link']}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                View Project
+                              </span>
+                            </a>
+                          </span>
+                        </li>
+                      ))
+                    : ''}
+                </ul>
 
-                    <span className={styles['view-project-link']}>
-                      View Project
-                    </span>
-                  </span>
-                </li>
-              </ul>
+                {personalProjectsDetails.loading && (
+                  <div className={styles['loader-box']}>
+                    <Loader
+                      style={{
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        margin: '2rem 0',
+                      }}
+                    />
+                  </div>
+                )}
+
+                {personalProjects !== null && personalProjects.length === 0 && (
+                  <div className={styles['no-projects-text']}>
+                    You currently don't have any projects yet.
+                  </div>
+                )}
+
+                {!personalProjectsDetails.lastPage && (
+                  <div className={styles['show-more-box']}>
+                    <button className={styles['show-more-btn']}>
+                      Show More
+                    </button>
+                  </div>
+                )}
+
+                {personalProjectsDetails.error && (
+                  <div className={styles['no-projects-text']}>
+                    <MdOutlineSignalWifiOff
+                      className={styles['network-icon']}
+                    />{' '}
+                    Unable to retrieve data
+                  </div>
+                )}
+              </div>
             </div>
 
             <br />
@@ -364,98 +602,117 @@ const Tasks = () => {
             {/* Assigned Tasks */}
             <div className={styles['projects-div']}>
               <p className={styles['projects-head']}>Assigned</p>
-              <ul className={styles['projects-list']}>
-                <li
-                  className={`${styles['projects-list-item']}  ${
-                    taskType === 'assigned'
-                      ? styles['current-project-list-item']
-                      : ''
-                  }`}
-                  onClick={() => setTaskType('assigned')}
-                >
-                  <img
-                    src="../../assets/images/profile1.webp"
-                    className={styles['projects-item-img']}
-                  />
-                  <span
-                    className={`${styles['projects-item-details']} ${
-                      taskType === 'assigned'
-                        ? styles['current-projects-item-details']
-                        : ''
-                    }`}
-                  >
-                    <span className={styles['projects-item-name']}>
-                      Fitness App
-                    </span>
-                    <span className={styles['projects-item-count']}>
-                      35 tasks
-                    </span>
-                  </span>
-                  <span className={styles['projects-item-action']}>
-                    <BsThreeDotsVertical
-                      className={`${styles['projects-item-menu']} ${
-                        taskType === 'assigned'
-                          ? styles['current-projects-item-menu']
-                          : ''
-                      }`}
-                      onClick={(e) => e.stopPropagation()}
-                    />
+              <div className={styles['projects-box']}>
+                <ul className={styles['projects-list']}>
+                  {assignedProjects === null
+                    ? ''
+                    : assignedProjects.length === 0
+                    ? ''
+                    : assignedProjects
+                    ? assignedProjects.map((project, index) => (
+                        <li
+                          key={project._id}
+                          className={`${styles['projects-list-item']}  ${
+                            currentProjectData.id === project._id
+                              ? styles['current-project-list-item']
+                              : ''
+                          }`}
+                          onClick={() =>
+                            changeProject('assigned', project._id, 1, index)
+                          }
+                        >
+                          <span className={styles['leader-box']}>
+                            <a href="#">
+                              <img
+                                src={`../../assets/images/users/${project.leaderPhoto}`}
+                                className={styles['projects-item-img']}
+                              />
+                              <span className={styles['leader-tooltip-text']}>
+                                {generateName(
+                                  project.firstName,
+                                  project.lastName,
+                                  project.username
+                                )}
+                              </span>
+                            </a>
+                          </span>
 
-                    <span
-                      className={styles['view-project-link']}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      View Project
-                    </span>
-                  </span>
-                </li>
-                <li className={styles['projects-list-item']}>
-                  <img
-                    src="../../assets/images/profile2webp.webp"
-                    className={styles['projects-item-img']}
-                  />
-                  <span className={styles['projects-item-details']}>
-                    <span className={styles['projects-item-name']}>
-                      Fitness App
-                    </span>
-                    <span className={styles['projects-item-count']}>
-                      35 tasks
-                    </span>
-                  </span>
-                  <span className={styles['projects-item-action']}>
-                    <BsThreeDotsVertical
-                      className={styles['projects-item-menu']}
-                    />
+                          <span
+                            className={`${styles['projects-item-details']} ${
+                              currentProjectData.id === project._id
+                                ? styles['current-projects-item-details']
+                                : ''
+                            }`}
+                          >
+                            <span className={styles['projects-item-name']}>
+                              {project.name}
+                            </span>
+                            <span className={styles['projects-item-count']}>
+                              {project.tasks === 1
+                                ? '1 task'
+                                : `${project.tasks} tasks`}
+                            </span>
+                          </span>
+                          <span className={styles['projects-item-action']}>
+                            <BsThreeDotsVertical
+                              className={`${styles['projects-item-menu']} ${
+                                currentProjectData.id === project._id
+                                  ? styles['current-projects-item-menu']
+                                  : ''
+                              }`}
+                              onClick={(e) => e.stopPropagation()}
+                            />
 
-                    <span className={styles['view-project-link']}>
-                      View Project
-                    </span>
-                  </span>
-                </li>
-                <li className={styles['projects-list-item']}>
-                  <img
-                    src="../../assets/images/profile4.jpeg"
-                    className={styles['projects-item-img']}
-                  />
-                  <span className={styles['projects-item-details']}>
-                    <span className={styles['projects-item-name']}>
-                      Fitness App
-                    </span>
-                    <span className={styles['projects-item-count']}>
-                      35 tasks
-                    </span>
-                  </span>
-                  <span className={styles['projects-item-action']}>
-                    <BsThreeDotsVertical
-                      className={styles['projects-item-menu']}
-                    />
+                            <a href="#">
+                              {' '}
+                              <span
+                                className={styles['view-project-link']}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                View Project
+                              </span>
+                            </a>
+                          </span>
+                        </li>
+                      ))
+                    : ''}
+                </ul>
 
-                    <span className={styles['view-project-link']}>
-                      View Project
-                    </span>
-                  </span>
-                </li>
-              </ul>
+                {assignedProjectsDetails.loading && (
+                  <div className={styles['loader-box']}>
+                    <Loader
+                      style={{
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        margin: '2rem 0',
+                      }}
+                    />
+                  </div>
+                )}
+
+                {assignedProjects !== null && assignedProjects.length === 0 && (
+                  <div className={styles['no-projects-text']}>
+                    You don't have any assigned tasks.
+                  </div>
+                )}
+
+                {!assignedProjectsDetails.lastPage && (
+                  <div className={styles['show-more-box']}>
+                    <button className={styles['show-more-btn']}>
+                      Show More
+                    </button>
+                  </div>
+                )}
+
+                {assignedProjectsDetails.error && (
+                  <div className={styles['no-projects-text']}>
+                    <MdOutlineSignalWifiOff
+                      className={styles['network-icon']}
+                    />{' '}
+                    Unable to retrieve data
+                  </div>
+                )}
+              </div>
             </div>
           </section>
 
@@ -482,98 +739,115 @@ const Tasks = () => {
 
                 <div className={styles['projects-div']}>
                   <p className={styles['projects-head']}>Personal</p>
-                  <ul className={styles['alt-projects-list']}>
-                    <li
-                      className={`${styles['alt-projects-list-item']} ${
-                        taskType === 'personal'
-                          ? styles['current-project-list-item']
-                          : ''
-                      }`}
-                      onClick={() => setTaskType('personal')}
-                    >
-                      <img
-                        src="../../assets/images/download.jpeg"
-                        className={styles['projects-item-img']}
-                      />
-                      <span
-                        className={`${styles['projects-item-details']} ${
-                          taskType === 'personal'
-                            ? styles['current-projects-item-details']
-                            : ''
-                        }`}
-                      >
-                        <span className={styles['projects-item-name']}>
-                          Fitness App
-                        </span>
-                        <span className={styles['projects-item-count']}>
-                          35 tasks
-                        </span>
-                      </span>
-                      <span className={styles['projects-item-action']}>
-                        <BsThreeDotsVertical
-                          className={`${styles['projects-item-menu']} ${
-                            taskType === 'personal'
-                              ? styles['current-projects-item-menu']
-                              : ''
-                          }`}
-                          onClick={(e) => e.stopPropagation()}
-                        />
 
-                        <span
-                          className={styles['view-project-link']}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          View Project
-                        </span>
-                      </span>
-                    </li>
-                    <li className={styles['alt-projects-list-item']}>
-                      <img
-                        src="../../assets/images/download.jpeg"
-                        className={styles['projects-item-img']}
-                      />
-                      <span className={styles['projects-item-details']}>
-                        <span className={styles['projects-item-name']}>
-                          Fitness App
-                        </span>
-                        <span className={styles['projects-item-count']}>
-                          35 tasks
-                        </span>
-                      </span>
-                      <span className={styles['projects-item-action']}>
-                        <BsThreeDotsVertical
-                          className={styles['projects-item-menu']}
-                        />
+                  <div className={styles['projects-box']}>
+                    <ul className={styles['alt-projects-list']}>
+                      {personalProjects === null
+                        ? ''
+                        : personalProjects.length === 0
+                        ? ''
+                        : personalProjects
+                        ? personalProjects.map((project, index) => (
+                            <li
+                              key={project._id}
+                              className={`${styles['alt-projects-list-item']} ${
+                                currentProjectData.id === project._id
+                                  ? styles['current-project-list-item']
+                                  : ''
+                              }`}
+                              onClick={() =>
+                                changeProject('personal', project._id, 1, index)
+                              }
+                            >
+                              <img
+                                src={`../../assets/images/users/${userData.photo}`}
+                                className={styles['projects-item-img']}
+                              />
+                              <span
+                                className={`${
+                                  styles['projects-item-details']
+                                } ${
+                                  currentProjectData.id === project._id
+                                    ? styles['current-projects-item-details']
+                                    : ''
+                                }`}
+                              >
+                                <span className={styles['projects-item-name']}>
+                                  {project.name}
+                                </span>
+                                <span className={styles['projects-item-count']}>
+                                  {project.details.complete +
+                                    project.details.open +
+                                    project.details.progress ===
+                                  1
+                                    ? `1 task`
+                                    : `${
+                                        project.details.complete +
+                                        project.details.open +
+                                        project.details.progress
+                                      } tasks`}{' '}
+                                </span>
+                              </span>
+                              <span className={styles['projects-item-action']}>
+                                <BsThreeDotsVertical
+                                  className={`${styles['projects-item-menu']} ${
+                                    currentProjectData.id === project._id
+                                      ? styles['current-projects-item-menu']
+                                      : ''
+                                  }`}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
 
-                        <span className={styles['view-project-link']}>
-                          View Project
-                        </span>
-                      </span>
-                    </li>
-                    <li className={styles['alt-projects-list-item']}>
-                      <img
-                        src="../../assets/images/download.jpeg"
-                        className={styles['projects-item-img']}
-                      />
-                      <span className={styles['projects-item-details']}>
-                        <span className={styles['projects-item-name']}>
-                          Fitness App
-                        </span>
-                        <span className={styles['projects-item-count']}>
-                          35 tasks
-                        </span>
-                      </span>
-                      <span className={styles['projects-item-action']}>
-                        <BsThreeDotsVertical
-                          className={styles['projects-item-menu']}
-                        />
+                                <a href="#" className={styles['']}>
+                                  <span
+                                    className={styles['view-project-link']}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    View Project
+                                  </span>
+                                </a>
+                              </span>
+                            </li>
+                          ))
+                        : ''}
+                    </ul>
 
-                        <span className={styles['view-project-link']}>
-                          View Project
-                        </span>
-                      </span>
-                    </li>
-                  </ul>
+                    {personalProjectsDetails.loading && (
+                      <div className={styles['loader-box']}>
+                        <Loader
+                          style={{
+                            width: '2.5rem',
+                            height: '2.5rem',
+                            margin: '2rem 0',
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {personalProjects !== null &&
+                      personalProjects.length === 0 && (
+                        <div className={styles['no-projects-text']}>
+                          You currently don't have any projects yet.
+                        </div>
+                      )}
+
+                    {!personalProjectsDetails.lastPage && (
+                      <div className={styles['show-more-box']}>
+                        <button className={styles['show-more-btn']}>
+                          Show More
+                        </button>
+                      </div>
+                    )}
+
+                    {personalProjectsDetails.error && (
+                      <div className={styles['no-projects-text']}>
+                        <MdOutlineSignalWifiOff
+                          className={styles['network-icon']}
+                        />{' '}
+                        Unable to retrieve data
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <br />
@@ -581,98 +855,125 @@ const Tasks = () => {
                 {/* Assigned Tasks */}
                 <div className={styles['projects-div']}>
                   <p className={styles['projects-head']}>Assigned</p>
-                  <ul className={styles['alt-projects-list']}>
-                    <li
-                      className={`${styles['alt-projects-list-item']}  ${
-                        taskType === 'assigned'
-                          ? styles['current-project-list-item']
-                          : ''
-                      }`}
-                      onClick={() => setTaskType('assigned')}
-                    >
-                      <img
-                        src="../../assets/images/profile1.webp"
-                        className={styles['projects-item-img']}
-                      />
-                      <span
-                        className={`${styles['projects-item-details']} ${
-                          taskType === 'assigned'
-                            ? styles['current-projects-item-details']
-                            : ''
-                        }`}
-                      >
-                        <span className={styles['projects-item-name']}>
-                          Fitness App
-                        </span>
-                        <span className={styles['projects-item-count']}>
-                          35 tasks
-                        </span>
-                      </span>
-                      <span className={styles['projects-item-action']}>
-                        <BsThreeDotsVertical
-                          className={`${styles['projects-item-menu']} ${
-                            taskType === 'assigned'
-                              ? styles['current-projects-item-menu']
-                              : ''
-                          }`}
-                          onClick={(e) => e.stopPropagation()}
-                        />
 
-                        <span
-                          className={styles['view-project-link']}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          View Project
-                        </span>
-                      </span>
-                    </li>
-                    <li className={styles['alt-projects-list-item']}>
-                      <img
-                        src="../../assets/images/profile2webp.webp"
-                        className={styles['projects-item-img']}
-                      />
-                      <span className={styles['projects-item-details']}>
-                        <span className={styles['projects-item-name']}>
-                          Fitness App
-                        </span>
-                        <span className={styles['projects-item-count']}>
-                          35 tasks
-                        </span>
-                      </span>
-                      <span className={styles['projects-item-action']}>
-                        <BsThreeDotsVertical
-                          className={styles['projects-item-menu']}
-                        />
+                  <div className={styles['projects-box']}>
+                    <ul className={styles['alt-projects-list']}>
+                      {assignedProjects === null
+                        ? ''
+                        : assignedProjects.length === 0
+                        ? ''
+                        : assignedProjects
+                        ? assignedProjects.map((project, index) => (
+                            <li
+                              key={project._id}
+                              className={`${
+                                styles['alt-projects-list-item']
+                              }  ${
+                                currentProjectData.id === project._id
+                                  ? styles['current-project-list-item']
+                                  : ''
+                              }`}
+                              onClick={() =>
+                                changeProject('assigned', project._id, 1, index)
+                              }
+                            >
+                              <span className={styles['leader-box']}>
+                                <a href="#">
+                                  <img
+                                    src={`../../assets/images/users/${project.leaderPhoto}`}
+                                    className={styles['projects-item-img']}
+                                  />
+                                  <span
+                                    className={styles['leader-tooltip-text']}
+                                  >
+                                    {generateName(
+                                      project.firstName,
+                                      project.lastName,
+                                      project.username
+                                    )}
+                                  </span>
+                                </a>
+                              </span>
 
-                        <span className={styles['view-project-link']}>
-                          View Project
-                        </span>
-                      </span>
-                    </li>
-                    <li className={styles['alt-projects-list-item']}>
-                      <img
-                        src="../../assets/images/profile4.jpeg"
-                        className={styles['projects-item-img']}
-                      />
-                      <span className={styles['projects-item-details']}>
-                        <span className={styles['projects-item-name']}>
-                          Fitness App
-                        </span>
-                        <span className={styles['projects-item-count']}>
-                          35 tasks
-                        </span>
-                      </span>
-                      <span className={styles['projects-item-action']}>
-                        <BsThreeDotsVertical
-                          className={styles['projects-item-menu']}
-                        />
+                              <span
+                                className={`${
+                                  styles['projects-item-details']
+                                } ${
+                                  currentProjectData.id === project._id
+                                    ? styles['current-projects-item-details']
+                                    : ''
+                                }`}
+                              >
+                                <span className={styles['projects-item-name']}>
+                                  {project.name}
+                                </span>
+                                <span className={styles['projects-item-count']}>
+                                  {project.tasks === 1
+                                    ? '1 task'
+                                    : `${project.tasks} tasks`}
+                                </span>
+                              </span>
+                              <span className={styles['projects-item-action']}>
+                                <BsThreeDotsVertical
+                                  className={`${styles['projects-item-menu']} ${
+                                    currentProjectData.id === project._id
+                                      ? styles['current-projects-item-menu']
+                                      : ''
+                                  }`}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
 
-                        <span className={styles['view-project-link']}>
-                          View Project
-                        </span>
-                      </span>
-                    </li>
-                  </ul>
+                                <a href="#">
+                                  {' '}
+                                  <span
+                                    className={styles['view-project-link']}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    View Project
+                                  </span>
+                                </a>
+                              </span>
+                            </li>
+                          ))
+                        : ''}
+                    </ul>
+
+                    {assignedProjectsDetails.loading && (
+                      <div className={styles['loader-box']}>
+                        <Loader
+                          style={{
+                            width: '2.5rem',
+                            height: '2.5rem',
+                            margin: '2rem 0',
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {assignedProjects !== null &&
+                      assignedProjects.length === 0 && (
+                        <div className={styles['no-projects-text']}>
+                          You don't have any assigned tasks.
+                        </div>
+                      )}
+
+                    {!assignedProjectsDetails.lastPage && (
+                      <div className={styles['show-more-box']}>
+                        <button className={styles['show-more-btn']}>
+                          Show More
+                        </button>
+                      </div>
+                    )}
+
+                    {assignedProjectsDetails.error && (
+                      <div className={styles['no-projects-text']}>
+                        <MdOutlineSignalWifiOff
+                          className={styles['network-icon']}
+                        />{' '}
+                        Unable to retrieve data
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -693,11 +994,68 @@ const Tasks = () => {
             </div>
 
             <div className={styles['article-box']}>
-              {taskType === 'personal' &&
-                tasks.map((task, index) => <TaskBox key={index} />)}
+              {currentProject.tasks === null ? (
+                ''
+              ) : currentProject.tasks.length === 0 ? (
+                <>
+                  {taskType === 'personal' && (
+                    <div className={styles['no-projects-text']}>
+                      You currently don't have any tasks on this project
+                    </div>
+                  )}
 
-              {taskType === 'assigned' &&
-                tasks.map((task, index) => <TaskBox2 key={index} />)}
+                  {taskType === 'assigned' && (
+                    <div className={styles['no-projects-text']}>
+                      You were not assigned any tasks on this project
+                    </div>
+                  )}
+                </>
+              ) : currentProject.tasks ? (
+                currentProject.tasks.map((task) =>
+                  taskType === 'personal' ? (
+                    <TaskBox
+                      key={task._id}
+                      task={task}
+                      project={personalProjects[currentProjectData.index]}
+                    />
+                  ) : (
+                    <TaskBox2
+                      key={task._id}
+                      task={task}
+                      project={assignedProjects[currentProjectData.index]}
+                    />
+                  )
+                )
+              ) : (
+                <div className={styles['no-projects-text']}>
+                  No tasks available
+                </div>
+              )}
+
+              {currentProjectDetails.loading && (
+                <div className={styles['loader-box']}>
+                  <Loader
+                    style={{
+                      width: '2.5rem',
+                      height: '2.5rem',
+                      margin: '2rem 0',
+                    }}
+                  />
+                </div>
+              )}
+
+              {!currentProjectDetails.lastPage && (
+                <div className={styles['show-more-box']}>
+                  <button className={styles['show-more-btn']}>Show More</button>
+                </div>
+              )}
+
+              {currentProjectDetails.error && (
+                <div className={styles['no-projects-text']}>
+                  <MdOutlineSignalWifiOff className={styles['network-icon']} />{' '}
+                  Unable to retrieve data
+                </div>
+              )}
             </div>
           </section>
         </section>

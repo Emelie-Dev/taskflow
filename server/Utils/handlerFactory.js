@@ -9,7 +9,11 @@ const getAll = (Model, collection) =>
 
     if (collection === 'tasks') {
       if (req.params.projectId)
-        filter = { project: req.params.projectId, assigned: { $ne: true } };
+        filter = {
+          user: req.user._id,
+          project: req.params.projectId,
+          assigned: { $ne: true },
+        };
     }
 
     const result = new ApiFeatures(collection, Model.find(filter), req.query)
@@ -17,6 +21,15 @@ const getAll = (Model, collection) =>
       .sort()
       .limitFields()
       .paginate();
+
+    if (req.params.projectId) {
+      result.query
+        .populate({
+          path: 'assignee',
+          select: 'username firstName lastName photo',
+        })
+        .populate({ path: 'activities', sort: '-time' });
+    }
 
     const data = await result.query;
 

@@ -319,7 +319,7 @@ export class QueryFeatures {
     if (this.type === 'tasks') {
       return doc.status === 'complete';
     } else {
-      return doc.progress === 100;
+      return doc.details.projectProgress === 100;
     }
   }
 

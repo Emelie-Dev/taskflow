@@ -71,13 +71,24 @@ const taskSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+      default: '',
     },
   },
-  { strictPopulate: false }
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
 // Prevents duplicate tasks from a user
 taskSchema.index({ name: 1, user: 1, project: 1 }, { unique: true });
+
+// Creates virtual field for activities
+taskSchema.virtual('activities', {
+  ref: 'Notification',
+  foreignField: 'task',
+  localField: '_id',
+});
 
 // Filters tasks
 taskSchema.query.filterTasks = function (type) {

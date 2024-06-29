@@ -363,6 +363,12 @@
   margin-bottom: 1rem;
 }
 
+.projects-box {
+  overflow: auto;
+  max-height: 35vh;
+  padding: 0;
+}
+
 .projects-head {
   font-weight: 500;
   color: gray;
@@ -373,8 +379,7 @@
 .projects-list {
   list-style-type: none;
   margin-top: 1rem;
-  overflow: auto;
-  max-height: 35vh;
+  /* overflow: auto; */
 }
 
 .projects-list-item {
@@ -390,6 +395,39 @@
 
 .projects-list-item:hover {
   border: 1px solid orange;
+}
+
+.leader-box {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.leader-tooltip-text {
+  position: absolute;
+  background: gray;
+  color: white;
+  font-family: var(--general-font);
+  border-radius: 5px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  top: -10%;
+  left: 20%;
+  font-weight: 500;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 3;
+  max-width: 12rem;
+}
+
+.leader-box:hover .leader-tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }
 
 .projects-item-img {
@@ -447,6 +485,7 @@
   font-size: 0.9rem;
   transition: background 0.2s;
   cursor: pointer;
+  color: black;
 }
 
 .view-project-link:hover {
@@ -618,6 +657,56 @@
 .hide-add-task {
   display: none;
 }
+
+.no-projects-text {
+  font-family: var(--general-font);
+  color: gray;
+  font-size: 1.05rem;
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.show-more-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.show-more-btn {
+  outline: none;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background: orange;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  text-align: center;
+  border-radius: 5px;
+  font-size: 1.03rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 1px 1px 10px -3px orange;
+  transition: opacity 0.3s;
+}
+
+.show-more-btn:hover {
+  opacity: 0.8;
+}
+
+.network-icon {
+  margin-right: 0.7rem;
+  transform: translateY(2px);
+}
+
 /* Animations */
 
 @keyframes showNav {

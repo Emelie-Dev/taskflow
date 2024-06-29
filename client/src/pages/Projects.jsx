@@ -37,7 +37,7 @@ import { generateName } from './Dashboard';
 import { GrStatusGood } from 'react-icons/gr';
 import { AuthContext } from '../App';
 
-const months = [
+export const months = [
   'January',
   'February',
   'March',

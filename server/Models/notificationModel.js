@@ -63,7 +63,6 @@ const notificationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
     immutable: true,
-    // required: [true, 'Please provide a value for the date field.'],
   },
   group: String,
   private: String,
@@ -74,14 +73,3 @@ const notificationSchema = new mongoose.Schema({
 const Notification = mongoose.model('Notification', notificationSchema);
 
 export default Notification;
-
-// notifications: [
-//   {
-//     type: {
-//       type: String,
-//       enum: ['login', 'group', 'private'],
-//       required: [true, 'Please provide a value for the type field.'],
-//     },
-//
-//   },
-// ],

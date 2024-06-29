@@ -108,13 +108,7 @@ const projectSchema = new mongoose.Schema(
     },
   },
   {
-    toJSON: {
-      virtuals: true,
-      // Deletes tasks before sending to user
-      transform: function (doc, ret, options) {
-        if (options.tasks) delete ret.tasks;
-      },
-    },
+    toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );

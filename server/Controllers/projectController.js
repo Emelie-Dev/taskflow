@@ -114,6 +114,9 @@ const upload = multer({
 });
 
 export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
+  const page = req.query.page || 1;
+  const skip = (page - 1) * 30;
+
   const assignedProjects = await Task.aggregate([
     { $match: { user: req.user._id, assigned: true } },
     {
@@ -143,16 +146,19 @@ export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
       $group: {
         _id: '$project._id',
         name: { $first: '$project.name' },
-        leaderName: { $first: '$projectLeader.username' },
+        username: { $first: '$projectLeader.username' },
+        firstName: { $first: '$projectLeader.firstName' },
+        lastName: { $first: '$projectLeader.lastName' },
         leaderPhoto: { $first: '$projectLeader.photo' },
         tasks: { $sum: 1 },
       },
     },
+    { $skip: skip },
+    { $limit: 30 },
   ]);
 
   return res.status(200).json({
     status: 'success',
-    length: assignedProjects.length,
     data: {
       assignedProjects,
     },

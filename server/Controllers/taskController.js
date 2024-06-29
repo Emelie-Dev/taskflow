@@ -246,13 +246,7 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  const excludeArray = [
-    'lastModified',
-    'assigned',
-    'mainTask',
-    'leader',
-    'assignee',
-  ];
+  const excludeArray = ['lastModified', 'assigned', 'mainTask', 'assignee'];
 
   excludeArray.forEach((value) => delete req.body[value]);
 
@@ -302,7 +296,6 @@ export const getAssignedTasks = asyncErrorHandler(async (req, res, next) => {
 
   return res.status(200).json({
     status: 'success',
-    length: assignedTasks.length,
     data: {
       tasks: assignedTasks,
     },
@@ -644,6 +637,15 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
   const { valid, error } = await validateAssignee(project, newAssignees);
   if (!valid) return next(error);
 
+  const values = {
+    assignee: {
+      from: task.assignee,
+      to: req.body.assignee,
+      oldAssigneesData,
+      newAssigneesData,
+    },
+  };
+
   // creates asigned tasks
   await Task.insertMany(assignedTasks);
 
@@ -671,15 +673,6 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
       });
     }
   }
-
-  const values = {
-    assignee: {
-      from: task.assignee,
-      to: req.body.assignee,
-      oldAssigneesData,
-      newAssigneesData,
-    },
-  };
 
   if (oldAssignees.length !== 0 || newAssignees.length !== 0) {
     // creates notification

@@ -1,4 +1,4 @@
-=> SERVER (powercfg batteryreport)
+=> SERVER (powercfg batteryreport, test@12345)
 
  --Adjustments 
 
@@ -30,6 +30,7 @@
     - Make the header of all pages and the left nav bar, each a single component
     - Add error boundary to the protected routes
     - Add delete project to project item page
+    - Use database calues for priority colors
 
 
     

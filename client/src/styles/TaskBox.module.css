@@ -33,13 +33,40 @@
   align-items: center;
   font-family: var(--general-font);
   font-weight: 500;
-  color: green;
+}
+
+.status-box {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .status-icon {
   width: 1.1rem;
   height: 1.1rem;
-  margin-right: 0.2rem;
+  margin-right: 0.3rem;
+  transform: translateY(2px);
+}
+
+.status-box1 {
+  color: green;
+}
+
+.status-box2 {
+  color: goldenrod;
+  font-weight: 600;
+}
+
+.progress-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-right: 0.3rem;
+  fill: goldenrod;
+  transform: translateY(2px);
+}
+
+.status-box3 {
+  color: red;
 }
 
 .priority-value {
@@ -48,20 +75,48 @@
   justify-content: center;
   font-family: var(--general-font);
   font-weight: 500;
-  color: red;
-  background: rgba(255, 0, 0, 0.1);
   padding: 0.2rem 0.5rem;
   font-size: 0.9rem;
-  border-radius: 10px;
+  border-radius: 8px;
+}
+
+.assignees-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .assignee-value {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   font-family: var(--general-font);
   font-weight: 500;
   color: black;
   font-size: 1.05rem;
+  margin-right: 0.8rem;
+}
+
+.assignee-name {
+  word-break: break-all;
+}
+
+.assignee-link {
+  display: flex;
+  align-items: center;
+  color: black;
+  text-decoration: none;
+}
+
+.assignee-link:hover {
+  text-decoration: underline;
+}
+
+.no-assignee-txt {
+  font-family: var(--general-font);
+  color: gray;
+  font-weight: 500;
+  font-size: 1.03rem;
 }
 
 .assignee-img {
@@ -71,6 +126,7 @@
   object-fit: cover;
   margin-right: 0.5rem;
   border: 1px solid orange;
+  flex-shrink: 0;
 }
 
 .details-btn-div {
@@ -167,6 +223,16 @@
   white-space: nowrap;
 }
 
+.no-recent-activity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--general-font);
+  color: gray;
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
 .cancel-edit-icon {
   position: absolute;
   right: 2%;
@@ -251,7 +317,8 @@
 }
 
 .status-select,
-.priority-select {
+.priority-select,
+.assignees-select {
   padding: 0.2rem;
   font-family: var(--general-font);
   border-radius: 10px;
@@ -262,6 +329,10 @@
   display: none;
 }
 
+.assignees-select {
+  max-width: calc(100% - 3.7rem);
+}
+
 .assignee-container {
   flex-wrap: wrap;
   align-items: flex-start;
@@ -269,9 +340,15 @@
 
 .assignee-div {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
   display: none;
+  width: calc(100% - 5rem);
+  margin-top: 0.5rem;
+}
+
+.members-container {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .assignee-box {
@@ -284,13 +361,14 @@
   height: 2rem;
   border-radius: 50%;
   opacity: 0.8;
+  margin-bottom: 0.5rem;
 }
 
 .remove-assignee-icon {
   position: absolute;
   right: -30%;
   z-index: 2;
-  top: -130%;
+  top: -15%;
   width: 1.2rem;
   height: 1.2rem;
   cursor: pointer;
@@ -300,6 +378,12 @@
 
 .remove-assignee-icon:hover {
   color: gray;
+}
+
+.add-assignee-container {
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
 }
 
 .add-assignee-btn {
@@ -445,6 +529,15 @@
 
   .due-date-input {
     padding: 0.2rem;
+  }
+
+  .assignee-div {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .assignees-select {
+    font-size: 0.9rem;
   }
 }
 
