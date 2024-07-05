@@ -10,15 +10,56 @@ import { AuthContext } from '../App';
 import { VscIssueReopened } from 'react-icons/vsc';
 import { generateName } from '../pages/Dashboard';
 import { months } from '../pages/Projects';
+import Loader from './Loader';
+import axios from 'axios';
 
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth();
 const currentDate = new Date().getDate();
 
-const TaskBox = ({ task, project }) => {
+const TaskBox = ({ task, project, toast }) => {
   const { userData } = useContext(AuthContext);
   const [showDetails, setShowDetails] = useState(false);
   const [editTask, setEditTask] = useState(false);
+  const [taskActivities, setTaskActivities] = useState(null);
+  const [activitiesPage, setActivitiesPage] = useState(1);
+  const [activitiesData, setActivitiesData] = useState({
+    loading: true,
+    lastPage: true,
+    error: false,
+  });
+
+  useEffect(() => {
+    const getActivities = async () => {
+      if (!taskActivities) {
+        setActivitiesData({
+          loading: false,
+          lastPage: false,
+          error: false,
+        });
+
+        setTaskActivities(task.activities);
+      } else {
+        try {
+          const { data } = await axios.get(
+            `/api/v1/tasks/${task._id}/activities?page=${activitiesPage}`
+          );
+        } catch (err) {
+          setActivitiesData({
+            loading: false,
+            lastPage: false,
+            error: false,
+          });
+
+          return toast('An error occured while fetching task activities.', {
+            toastId: 'toast-id1',
+          });
+        }
+      }
+    };
+
+    getActivities();
+  }, [activitiesPage]);
 
   const toggleDetails = () => {
     setShowDetails(!showDetails);
@@ -28,7 +69,213 @@ const TaskBox = ({ task, project }) => {
     setEditTask(!editTask);
   };
 
-  const getAssignmentActivity = (activity) => {};
+  const getActivityMessage = (activity) => {
+    // A user is assigned ✔
+    // A user is deassigned ✔
+    // A task is updated ✔
+    // A deadline is changed
+
+    if (activity.action === 'assignment') {
+      const newNames = activity.state.assignee.newAssigneesData.map(
+        ({ firstName, lastName, username }, index, array) => (
+          <a key={index} href="#" className={styles['activity-names']}>
+            {index !== 0 ? ' ' : ''}
+            {generateName(firstName, lastName, username)}
+            {index !== array.length - 1 ? ',' : ''}
+          </a>
+        )
+      );
+
+      const oldNames = activity.state.assignee.oldAssigneesData.map(
+        ({ firstName, lastName, username }, index, array) => (
+          <a key={index} href="#" className={styles['activity-names']}>
+            {index !== 0 ? ' ' : ''}
+            {generateName(firstName, lastName, username)}
+            {index !== array.length - 1 ? ',' : ''}
+          </a>
+        )
+      );
+
+      if (activity.state.assignee.oldAssigneesData.length === 0) {
+        return (
+          <>
+            {newNames}{' '}
+            {activity.state.assignee.newAssigneesData.length === 1
+              ? 'was'
+              : 'were'}{' '}
+            added to the assignees.
+          </>
+        );
+      } else if (activity.state.assignee.newAssigneesData.length === 0) {
+        return (
+          <>
+            {oldNames}{' '}
+            {activity.state.assignee.oldAssigneesData.length === 1
+              ? 'was'
+              : 'were'}{' '}
+            removed from the assignees.
+          </>
+        );
+      } else {
+        return (
+          <>
+            {newNames}{' '}
+            {activity.state.assignee.newAssigneesData.length === 1
+              ? 'was'
+              : 'were'}{' '}
+            added to the assignees while {oldNames}{' '}
+            {activity.state.assignee.oldAssigneesData.length === 1
+              ? 'was'
+              : 'were'}{' '}
+            removed from the assignees.
+          </>
+        );
+      }
+    } else if (
+      activity.action === 'deletion' &&
+      activity.type.includes('assignedTask')
+    ) {
+      return (
+        <>
+          <a key={index} href="#" className={styles['activity-names']}>
+            {generateName(
+              activity.performer.firstName,
+              activity.performer.lastName,
+              activity.performer.username
+            )}
+          </a>{' '}
+          deleted the task they were assigned.
+        </>
+      );
+    } else if (activity.action === 'update') {
+      return `The task's ${activity.type.includes('name') ? 'name' : ''} ${
+        activity.type.length > 1 ? 'and' : ''
+      } ${activity.type.includes('description') ? 'description' : ''} ${
+        activity.type.length > 1 ? 'were' : 'was'
+      }  updated.`;
+    } else if (activity.action === 'transition') {
+      if (!activity.performer) {
+        return (
+          <>
+            The task's
+            {activity.type.includes('status') ? (
+              <>
+                &nbsp;status was changed from{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.status.from === 'progress'
+                    ? 'ongoing'
+                    : activity.state.status.from === 'complete'
+                    ? 'completed'
+                    : activity.state.status.from}
+                </span>{' '}
+                to{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.status.to === 'progress'
+                    ? 'ongoing'
+                    : activity.state.status.to === 'complete'
+                    ? 'completed'
+                    : activity.state.status.to}
+                </span>
+              </>
+            ) : (
+              ''
+            )}
+            {activity.type.includes('priority') ? (
+              <>
+                {activity.type.length > 1 ? ` and it's` : ``} priority was
+                changed from{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.priority.from}
+                </span>{' '}
+                to{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.priority.to}
+                </span>
+              </>
+            ) : (
+              ''
+            )}
+            .
+          </>
+        );
+      } else {
+        return (
+          <>
+            {activity.type.includes('status') ? (
+              <>
+                <a href="#" className={styles['activity-names']}>
+                  {generateName(
+                    activity.performer.firstName,
+                    activity.performer.lastName,
+                    activity.performer.username
+                  )}
+                </a>{' '}
+                changed the task's status from{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.status.from === 'progress'
+                    ? 'ongoing'
+                    : activity.state.status.from === 'complete'
+                    ? 'completed'
+                    : activity.state.status.from}
+                </span>{' '}
+                to{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.status.to === 'progress'
+                    ? 'ongoing'
+                    : activity.state.status.to === 'complete'
+                    ? 'completed'
+                    : activity.state.status.to}
+                </span>
+              </>
+            ) : (
+              ''
+            )}
+            .
+          </>
+        );
+      }
+    } else if (
+      activity.action === 'reduction' ||
+      activity.action === 'extension'
+    ) {
+      let dateDfifference;
+
+      const timeDifference =
+        Date.parse(activity.state.deadline.to) -
+        Date.parse(activity.state.deadline.from);
+
+      if (timeDifference >= 86400000) {
+        dateDfifference = `${
+          Math.floor(timeDifference / 86400000) === 1
+            ? 'a day'
+            : `${Math.floor(timeDifference / 86400000)} days`
+        }`;
+      } else if (timeDifference >= 3600000) {
+        dateDfifference = `${
+          Math.floor(timeDifference / 3600000) === 1
+            ? 'an hour'
+            : `${Math.floor(timeDifference / 3600000)} hours`
+        }`;
+      }
+
+      return (
+        <>
+          The deadline was
+          {activity.action === 'reduction' ? ' shortened' : ' extended'}
+          <span className={styles['activity-text']}>
+            {dateDfifference ? ` by ${dateDfifference}` : ''}
+          </span>
+          .
+        </>
+      );
+    }
+  };
+
+  const nextActivitiesPage = () => {
+    setActivitiesPage((value) => value + 1);
+
+    setActivitiesData({ loading: true, lastPage: true, error: false });
+  };
 
   return (
     <article className={styles['task-box']}>
@@ -91,7 +338,7 @@ const TaskBox = ({ task, project }) => {
               >
                 <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM18 12C18 15.3137 15.3137 18 12 18V6C15.3137 6 18 8.68629 18 12Z"></path>
               </svg>
-              In Progress{' '}
+              Ongoing{' '}
             </span>
           ) : (
             <span
@@ -109,7 +356,7 @@ const TaskBox = ({ task, project }) => {
           defaultValue={task.status}
         >
           <option value={'open'}>Open</option>
-          <option value={'progress'}>In Progress</option>
+          <option value={'progress'}>Ongoing</option>
           <option value={'complete'}>Completed</option>
         </select>
       </div>
@@ -288,7 +535,16 @@ const TaskBox = ({ task, project }) => {
             {task.deadline ? (
               `${months[new Date(task.deadline).getMonth()]} ${new Date(
                 task.deadline
-              ).getDate()}, ${new Date(task.deadline).getFullYear()}`
+              ).getDate()} ${new Date(task.deadline).getFullYear()}, 
+              ${
+                new Date(task.deadline).getHours() === 0
+                  ? `12 AM`
+                  : new Date(task.deadline).getHours() === 12
+                  ? `12 PM`
+                  : new Date(task.deadline).getHours() > 12
+                  ? `${new Date(task.deadline).getHours() - 12} PM`
+                  : `${new Date(task.deadline).getHours()} AM`
+              }`
             ) : (
               <i className={styles['no-assignee-txt']}>No due date</i>
             )}
@@ -323,26 +579,31 @@ const TaskBox = ({ task, project }) => {
         >
           <span className={styles['property-name']}>Activity Log:</span>
           <div className={styles['activity-log']}>
-            {/* A user is assigned
-            A user is deassigned
-            A task is updated */}
-
-            {task.activities.length === 0 ? (
+            {taskActivities === null ? (
+              ''
+            ) : taskActivities.length === 0 ? (
               <i className={styles['no-recent-activity']}>No recent activity</i>
             ) : (
-              task.activities.map((activity) => (
+              taskActivities.map((activity) => (
                 <span key={activity._id} className={styles['activity-box']}>
                   {' '}
                   <span className={styles['activity-date']}>
                     - [{' '}
                     {activity.time ? (
-                      `${months[new Date(activity.time).getMonth()]} ${new Date(
+                      `${months[new Date(activity.time).getMonth()].slice(
+                        0,
+                        3
+                      )} ${new Date(activity.time).getDate()} ${new Date(
                         activity.time
-                      ).getDate()} ${new Date(
-                        activity.time
-                      ).getFullYear()}, ${new Date(
-                        activity.time
-                      ).getHours()}:${new Date(activity.time).getMinutes()}`
+                      ).getFullYear()}, ${
+                        new Date(activity.time).getHours() < 10
+                          ? `0${new Date(activity.time).getHours()}`
+                          : `${new Date(activity.time).getHours()}`
+                      }:${
+                        new Date(activity.time).getMinutes() < 10
+                          ? `0${new Date(activity.time).getMinutes()}`
+                          : `${new Date(activity.time).getMinutes()}`
+                      }`
                     ) : (
                       <i className={styles['no-assignee-txt']}>
                         No time available
@@ -350,57 +611,33 @@ const TaskBox = ({ task, project }) => {
                     )}
                     ]
                   </span>{' '}
-                  <span>
-                    {activity.action === 'assignment'
-                      ? getAssignmentActivity(activity)
-                      : ''}
+                  <span className={styles['activity-data']}>
+                    {getActivityMessage(activity)}
                   </span>
                 </span>
               ))
             )}
 
-            {/* 
-            <span className={styles['activity-box']}>
+            {activitiesData.loading && (
+              <div className={styles['loader-box']}>
+                <Loader
+                  style={{
+                    width: '2rem',
+                    height: '2rem',
+                  }}
+                />
+              </div>
+            )}
+
+            <div className={styles['more-activity-box']}>
               {' '}
-              <span className={styles['activity-date']}>
-                - [March 24 2024, 12:30]
-              </span>{' '}
-              <span>
-                <b className={styles['activity-names']}>John&nbsp;</b>
-                changed the status to ongoing.
-              </span>
-            </span>
-            <span className={styles['activity-box']}>
-              {' '}
-              <span className={styles['activity-date']}>
-                - [March 26 2024, 14:27]
-              </span>{' '}
-              <span>
-                <b className={styles['activity-names']}>John&nbsp;</b> assigned
-                the task to{' '}
-                <b className={styles['activity-names']}>&nbsp;Anita</b>.
-              </span>
-            </span>
-            <span className={styles['activity-box']}>
-              {' '}
-              <span className={styles['activity-date']}>
-                - [March 27 2024, 09:30]
-              </span>{' '}
-              <span>
-                <b className={styles['activity-names']}>Anita&nbsp;</b> updated
-                the task description.
-              </span>
-            </span>
-            <span className={styles['activity-box']}>
-              {' '}
-              <span className={styles['activity-date']}>
-                - [March 29 2024, 15:45]
-              </span>{' '}
-              <span>
-                <b className={styles['activity-names']}>John&nbsp;</b> set the
-                status to completed.
-              </span>
-            </span> */}
+              <button
+                className={styles['more-activity-btn']}
+                onClick={nextActivitiesPage}
+              >
+                Show More
+              </button>
+            </div>
           </div>
         </div>
 

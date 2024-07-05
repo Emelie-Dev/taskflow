@@ -60,12 +60,12 @@ const taskSchema = new mongoose.Schema(
     },
     createdAt: {
       type: Date,
-      default: Date.now(),
+      default: Date.now,
       immutable: true,
     },
     lastModified: {
       type: Date,
-      default: Date.now(),
+      default: Date.now,
     },
     deadline: Date,
     description: {
@@ -133,7 +133,7 @@ taskSchema.query.scheduledTasks = function (year, month, day) {
 
 // Validates deadline field
 
-const validateDeadline = function (next) {
+function validateDeadline(next) {
   if (this.deadline) {
     if (this.deadline < this.createdAt) {
       return next(
@@ -146,7 +146,7 @@ const validateDeadline = function (next) {
     this.deadline.setMilliseconds(0);
   }
   next();
-};
+}
 
 taskSchema.pre('save', function (next) {
   validateDeadline.call(this, next);

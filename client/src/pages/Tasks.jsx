@@ -1017,12 +1017,14 @@ const Tasks = () => {
                       key={task._id}
                       task={task}
                       project={personalProjects[currentProjectData.index]}
+                      toast={toast}
                     />
                   ) : (
                     <TaskBox2
                       key={task._id}
                       task={task}
                       project={assignedProjects[currentProjectData.index]}
+                      toast={toast}
                     />
                   )
                 )

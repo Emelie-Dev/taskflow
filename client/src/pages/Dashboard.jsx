@@ -651,14 +651,15 @@ const Dashboard = () => {
                       >
                         {userStats.data.dataPercent.tasks.created === 0
                           ? 0
-                          : String(
-                              userStats.data.dataPercent.tasks.created
-                            ).startsWith('-')
+                          : userStats.data.dataPercent.tasks.created < 0
                           ? userStats.data.dataPercent.tasks.created
                           : `+${userStats.data.dataPercent.tasks.created}`}
                         %{' '}
                       </span>
-                      more than last month.
+                      {userStats.data.dataPercent.tasks.created < 0
+                        ? 'fewer'
+                        : 'more'}{' '}
+                      than last month.
                     </span>{' '}
                   </div>
                 </article>

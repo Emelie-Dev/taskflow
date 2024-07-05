@@ -5,6 +5,7 @@ import {
   getAllTasks,
   getAssignedTasks,
   getMyTasks,
+  getTaskActivities,
   updateAssignees,
   updateTask,
 } from '../Controllers/taskController.js';
@@ -19,6 +20,8 @@ router.route('/').get(getAllTasks).post(createNewTask);
 router.route('/:id').patch(updateTask).delete(deleteTask);
 
 router.patch('/:id/assignees', updateAssignees);
+
+router.get('/:id/activities', getTaskActivities);
 
 router.get('/assigned', getAssignedTasks);
 

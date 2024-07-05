@@ -28,7 +28,7 @@ const getAll = (Model, collection) =>
           path: 'assignee',
           select: 'username firstName lastName photo',
         })
-        .populate({ path: 'activities', sort: '-time' });
+        .populate({ path: 'activities', options: { sort: { time: -1 } } });
     }
 
     const data = await result.query;

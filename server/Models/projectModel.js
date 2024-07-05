@@ -32,7 +32,7 @@ const projectSchema = new mongoose.Schema(
     },
     createdAt: {
       type: Date,
-      default: Date.now(),
+      default: Date.now,
       immutable: true,
     },
     status: {
@@ -56,7 +56,8 @@ const projectSchema = new mongoose.Schema(
         },
         time: {
           type: Date,
-          default: Date.now(),
+          default: Date.now,
+          immutable: true,
         },
         sender: {
           type: {
@@ -78,7 +79,7 @@ const projectSchema = new mongoose.Schema(
     deadline: Date,
     lastModified: {
       type: Date,
-      default: Date.now(),
+      default: Date.now,
     },
     details: {
       type: {
@@ -155,10 +156,10 @@ projectSchema.methods.updateDetails = function (oldValue, newValue) {
   if (oldValue === null) {
     this.details[newValue]++;
   } else if (newValue === null) {
-    this.details[oldValue]--;
+    if (this.details[oldValue] > 0) this.details[oldValue]--;
   } else {
     this.details[newValue]++;
-    this.details[oldValue]--;
+    if (this.details[oldValue] > 0) this.details[oldValue]--;
   }
 };
 
@@ -181,7 +182,7 @@ projectSchema.pre('save', function (next) {
   this.details.projectProgress = Math.floor(
     (complete / (open + complete + progress || 1)) * 100
   );
-  console.log(Math.floor((progress / (open + complete + progress || 1)) * 100));
+
   next();
 });
 

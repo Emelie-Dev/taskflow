@@ -13,7 +13,6 @@ export const configEnv = () => config({ path: './config.env' });
 configEnv();
 
 // Handles uncaught exceptions(No business with the server)
-
 process.on('uncaughtException', (err) => {
   console.log('\nError ', { name: err.name, message: err.message });
   console.log('\nUncaught Exception Occured! Shutting down....\n');
@@ -34,7 +33,7 @@ console.log('Database Connection successfull....');
 
 // Starting the server
 
-const port = process.env.PORT || 3500;
+const port = process.env.PORT || 2005;
 
 const server = app.listen(port, () => {
   console.log(`App is running on port - ${port}`);

@@ -14,8 +14,8 @@ export const filterValues = async (values, type, ...fields) => {
 
     if (type === 'date') {
       condition =
-        String(new Date(values[value].from)) ===
-        String(new Date(values[value].to));
+        Date.parse(new Date(values[value].from)) ===
+        Date.parse(new Date(values[value].to));
     } else {
       condition = String(values[value].from) === String(values[value].to);
     }
@@ -59,7 +59,7 @@ const generateNotifications = async (
         performer: await User.findById(req.user._id).select(
           'username firstName lastName'
         ),
-        project: task.project,
+        task: task._id,
         action: 'deletion',
         type: ['assignedTask'],
       };
@@ -68,7 +68,7 @@ const generateNotifications = async (
         user,
         project: task.project,
         action: 'deletion',
-        type: 'task',
+        type: ['task'],
       };
     }
 
@@ -137,7 +137,6 @@ const generateNotifications = async (
 
       const notification = {
         user,
-        performer: user,
         task: task._id,
         action: 'transition',
         state: notificationValues,
@@ -398,8 +397,8 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
         values,
         task,
         mainTask.user,
-        req,
-        res
+        null,
+        req
       );
     } else {
       excludeArray = [
@@ -709,6 +708,37 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
     status: 'success',
     data: {
       task,
+    },
+  });
+});
+
+export const getTaskActivities = asyncErrorHandler(async (req, res, next) => {
+  const task = await Task.findById(req.params.id);
+
+  // Checks if the task exists
+  if (!task) {
+    const err = new CustomError('This task does not exist!', 404);
+    return next(err);
+  }
+
+  // Checks if the task belongs to the user
+  if (String(task.user) !== String(req.user._id)) {
+    const err = new CustomError('This task does not exist!', 404);
+    return next(err);
+  }
+
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 50;
+  const skip = (page - 1) * limit;
+
+  const activities = await Notification.find({ task: req.params.id })
+    .skip(skip)
+    .limit(limit);
+
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      activities,
     },
   });
 });
