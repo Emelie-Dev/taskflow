@@ -28,7 +28,10 @@ const getAll = (Model, collection) =>
           path: 'assignee',
           select: 'username firstName lastName photo',
         })
-        .populate({ path: 'activities', options: { sort: { time: -1 } } });
+        .populate({
+          path: 'activities',
+          options: { sort: { time: -1 }, perDocumentLimit: 50 },
+        });
     }
 
     const data = await result.query;

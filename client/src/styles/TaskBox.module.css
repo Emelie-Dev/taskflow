@@ -1,10 +1,14 @@
 .task-box {
   box-shadow: 1px 1px 8px -4px black;
   border-radius: 5px;
-  padding: 1rem 1.5rem;
+  /* padding: 1rem 1.5rem; */
   width: 95%;
   margin-bottom: 1.5rem;
   position: relative;
+}
+
+.task-container {
+  padding: 1rem 1.5rem;
 }
 
 .task-name {
@@ -437,6 +441,9 @@
 
 .save-btn {
   outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--general-font);
   background: orange;
   color: white;
@@ -494,6 +501,35 @@
 
 .more-activity-btn:hover {
   opacity: 0.8;
+}
+
+.disable-save-btn {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.updating-btn {
+  opacity: 0.7 !important;
+  pointer-events: none;
+}
+
+.updating-icon {
+  margin-right: 0.5rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  animation: rotate 1s linear 0s infinite normal both;
+}
+
+/* Animation */
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Media Queries */

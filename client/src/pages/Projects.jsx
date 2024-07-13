@@ -70,6 +70,7 @@ const Projects = () => {
     loading: true,
     lastPage: true,
     error: false,
+    pageError: false,
   });
   const [tablePage, setTablePage] = useState(1);
 
@@ -90,6 +91,7 @@ const Projects = () => {
           loading: false,
           lastPage: data.data.projects.length < 30,
           error: false,
+          pageError: false,
         });
 
         if (page !== 1) {
@@ -109,9 +111,19 @@ const Projects = () => {
         }
       } catch {
         if (page !== 1) {
-          setProjectData({ loading: false, lastPage: false, error: false });
+          setProjectData({
+            loading: false,
+            lastPage: false,
+            error: false,
+            pageError: true,
+          });
         } else {
-          setProjectData({ loading: false, lastPage: true, error: true });
+          setProjectData({
+            loading: false,
+            lastPage: true,
+            error: true,
+            pageError: false,
+          });
         }
 
         return toast('An error occured while fetching projects.', {
@@ -141,13 +153,26 @@ const Projects = () => {
   const nextPage = () => {
     const { category, sort, page } = projectsDetails;
 
-    setProjectsDetails({
-      category,
-      sort,
-      page: page + 1,
-    });
+    if (projectData.pageError) {
+      setProjectsDetails({
+        category,
+        sort,
+        page,
+      });
+    } else {
+      setProjectsDetails({
+        category,
+        sort,
+        page: page + 1,
+      });
+    }
 
-    setProjectData({ loading: true, lastPage: true, error: false });
+    setProjectData({
+      loading: true,
+      lastPage: true,
+      error: false,
+      pageError: false,
+    });
   };
 
   const goToPage = (nextPage) => {
@@ -158,13 +183,26 @@ const Projects = () => {
     } else if (projects.table[nextPage - 1]) {
       setTablePage(nextPage);
     } else {
-      setProjectsDetails({
-        category,
-        sort,
-        page: page + 1,
-      });
+      if (projectData.pageError) {
+        setProjectsDetails({
+          category,
+          sort,
+          page,
+        });
+      } else {
+        setProjectsDetails({
+          category,
+          sort,
+          page: page + 1,
+        });
+      }
 
-      setProjectData({ loading: true, lastPage: true, error: false });
+      setProjectData({
+        loading: true,
+        lastPage: true,
+        error: false,
+        pageError: false,
+      });
     }
   };
 

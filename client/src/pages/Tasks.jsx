@@ -16,7 +16,6 @@ import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import TaskBox from '../components/TaskBox';
-import TaskBox2 from '../components/TaskBox2';
 import { HiPlus } from 'react-icons/hi';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import NewTask from '../components/NewTask';
@@ -39,12 +38,14 @@ const Tasks = () => {
     loading: true,
     lastPage: true,
     error: false,
+    pageError: false,
   });
   const [assignedProjects, setAssignedProjects] = useState(null);
   const [assignedProjectsDetails, setAssignedProjectsDetails] = useState({
     loading: true,
     lastPage: true,
     error: false,
+    pageError: false,
   });
   const [projectsPage, setProjectsPage] = useState({
     personal: { current: true, value: 1 },
@@ -62,7 +63,9 @@ const Tasks = () => {
     loading: true,
     lastPage: true,
     error: false,
+    pageError: false,
   });
+  const [deleteCount, setDeleteCount] = useState(0);
   const searchRef = useRef();
   const navRef = useRef();
 
@@ -81,6 +84,7 @@ const Tasks = () => {
             loading: false,
             lastPage: data.data.projects.length < 30,
             error: false,
+            pageError: false,
           });
 
           if (page !== 1) {
@@ -103,19 +107,22 @@ const Tasks = () => {
             setPersonalProjectsDetails({
               loading: false,
               lastPage: false,
-              error: true,
+              error: false,
+              pageError: true,
             });
           } else {
             setPersonalProjectsDetails({
               loading: false,
               lastPage: true,
               error: true,
+              pageError: false,
             });
 
             setCurrentProjectDetails({
               loading: false,
               lastPage: true,
               error: true,
+              pageError: false,
             });
           }
 
@@ -139,11 +146,11 @@ const Tasks = () => {
           const { data } = await axios.get(
             `/api/v1/projects/assigned?page=${page}`
           );
-
           setAssignedProjectsDetails({
             loading: false,
             lastPage: data.data.assignedProjects.length < 30,
             error: false,
+            pageError: false,
           });
 
           if (page !== 1) {
@@ -160,12 +167,14 @@ const Tasks = () => {
               loading: false,
               lastPage: false,
               error: true,
+              pageError: true,
             });
           } else {
             setAssignedProjectsDetails({
               loading: false,
               lastPage: true,
               error: true,
+              pageError: false,
             });
           }
 
@@ -184,19 +193,27 @@ const Tasks = () => {
       const { id, page } = currentProjectData;
 
       if (id === false) {
+        setCurrentProjectDetails({
+          loading: false,
+          lastPage: true,
+          error: false,
+          pageError: false,
+        });
+
         return setCurrentProject({ tasks: false });
       } else if (id) {
         try {
           const { data } = await axios.get(
             `/api/v1/projects/${id}/tasks${
               taskType === 'assigned' ? '/assigned' : ''
-            }?page=${page}`
+            }?page=${page}&deleteCount=${deleteCount}`
           );
 
           setCurrentProjectDetails({
             loading: false,
             lastPage: data.data.tasks.length < 30,
             error: false,
+            pageError: false,
           });
 
           if (page !== 1) {
@@ -206,20 +223,20 @@ const Tasks = () => {
           } else {
             setCurrentProject({ tasks: data.data.tasks });
           }
-
-          console.log(data.data.tasks);
         } catch {
           if (page !== 1) {
             setCurrentProjectDetails({
               loading: false,
               lastPage: false,
               error: true,
+              pageError: true,
             });
           } else {
             setCurrentProjectDetails({
               loading: false,
               lastPage: true,
               error: true,
+              pageError: false,
             });
           }
 
@@ -260,6 +277,7 @@ const Tasks = () => {
       setTaskType('assigned');
     }
 
+    setDeleteCount(0);
     setCurrentProject({
       tasks: null,
     });
@@ -268,7 +286,66 @@ const Tasks = () => {
       loading: true,
       lastPage: true,
       error: false,
+      pageError: false,
     });
+  };
+
+  // Fix details property of projects
+  const nextPage = (type) => {
+    if (type === 'personal') {
+      if (personalProjectsDetails.pageError) {
+        setProjectsPage({
+          personal: { current: true, value: projectsPage.personal.value },
+          assigned: { current: false, value: projectsPage.assigned.value },
+        });
+      } else {
+        setProjectsPage({
+          personal: { current: true, value: projectsPage.personal.value + 1 },
+          assigned: { current: false, value: projectsPage.assigned.value },
+        });
+      }
+
+      setPersonalProjectsDetails({
+        loading: true,
+        lastPage: true,
+        error: false,
+        pageError: false,
+      });
+    } else if (type === 'assigned') {
+      if (assignedProjectsDetails.pageError) {
+        setProjectsPage({
+          assigned: { current: true, value: projectsPage.assigned.value },
+          personal: { current: false, value: projectsPage.personal.value },
+        });
+      } else {
+        setProjectsPage({
+          assigned: { current: true, value: projectsPage.assigned.value + 1 },
+          personal: { current: false, value: projectsPage.personal.value },
+        });
+      }
+
+      setAssignedProjectsDetails({
+        loading: true,
+        lastPage: true,
+        error: false,
+        pageError: false,
+      });
+    } else if (type === 'tasks') {
+      const { id, page, index } = currentProjectData;
+
+      if (currentProjectDetails.pageError) {
+        setCurrentProjectData({ id, page, index });
+      } else {
+        setCurrentProjectData({ id, page: page + 1, index });
+      }
+
+      setCurrentProjectDetails({
+        loading: true,
+        lastPage: true,
+        error: false,
+        pageError: false,
+      });
+    }
   };
 
   return (
@@ -580,7 +657,10 @@ const Tasks = () => {
 
                 {!personalProjectsDetails.lastPage && (
                   <div className={styles['show-more-box']}>
-                    <button className={styles['show-more-btn']}>
+                    <button
+                      className={styles['show-more-btn']}
+                      onClick={() => nextPage('personal')}
+                    >
                       Show More
                     </button>
                   </div>
@@ -698,7 +778,10 @@ const Tasks = () => {
 
                 {!assignedProjectsDetails.lastPage && (
                   <div className={styles['show-more-box']}>
-                    <button className={styles['show-more-btn']}>
+                    <button
+                      className={styles['show-more-btn']}
+                      onClick={() => nextPage('assigned')}
+                    >
                       Show More
                     </button>
                   </div>
@@ -833,7 +916,10 @@ const Tasks = () => {
 
                     {!personalProjectsDetails.lastPage && (
                       <div className={styles['show-more-box']}>
-                        <button className={styles['show-more-btn']}>
+                        <button
+                          className={styles['show-more-btn']}
+                          onClick={() => nextPage('personal')}
+                        >
                           Show More
                         </button>
                       </div>
@@ -959,7 +1045,10 @@ const Tasks = () => {
 
                     {!assignedProjectsDetails.lastPage && (
                       <div className={styles['show-more-box']}>
-                        <button className={styles['show-more-btn']}>
+                        <button
+                          className={styles['show-more-btn']}
+                          onClick={() => nextPage('assigned')}
+                        >
                           Show More
                         </button>
                       </div>
@@ -1015,15 +1104,23 @@ const Tasks = () => {
                   taskType === 'personal' ? (
                     <TaskBox
                       key={task._id}
+                      assigned={false}
                       task={task}
                       project={personalProjects[currentProjectData.index]}
+                      currentProject={currentProject}
+                      setCurrentProject={setCurrentProject}
+                      setDeleteCount={setDeleteCount}
                       toast={toast}
                     />
                   ) : (
-                    <TaskBox2
+                    <TaskBox
                       key={task._id}
+                      assigned={true}
                       task={task}
                       project={assignedProjects[currentProjectData.index]}
+                      currentProject={currentProject}
+                      setCurrentProject={setCurrentProject}
+                      setDeleteCount={setDeleteCount}
                       toast={toast}
                     />
                   )
@@ -1048,7 +1145,12 @@ const Tasks = () => {
 
               {!currentProjectDetails.lastPage && (
                 <div className={styles['show-more-box']}>
-                  <button className={styles['show-more-btn']}>Show More</button>
+                  <button
+                    className={styles['show-more-btn']}
+                    onClick={() => nextPage('tasks')}
+                  >
+                    Show More
+                  </button>
                 </div>
               )}
 

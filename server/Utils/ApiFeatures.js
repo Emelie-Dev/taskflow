@@ -209,6 +209,7 @@ export class ApiFeatures {
       'filter',
       'calendar',
       'category',
+      'deleteCount',
     ];
   }
 
@@ -297,7 +298,8 @@ export class ApiFeatures {
     if (this.queryString.page || this.queryString.limit) {
       const page = this.queryString.page || 1;
       const limit = this.queryString.limit || 30;
-      const skip = (page - 1) * limit;
+      const deleteCount = this.queryString.deleteCount || 0;
+      const skip = (page - 1) * limit - deleteCount;
 
       this.query = this.query.skip(skip).limit(limit);
     }

@@ -17,7 +17,8 @@ export const filterValues = async (values, type, ...fields) => {
         Date.parse(new Date(values[value].from)) ===
         Date.parse(new Date(values[value].to));
     } else {
-      condition = String(values[value].from) === String(values[value].to);
+      condition =
+        String(values[value].from).trim() === String(values[value].to).trim();
     }
 
     if (!fields.includes(value) || condition) delete values[value];
@@ -104,6 +105,14 @@ const generateNotifications = async (
           type: ['status'],
           state: notificationValue,
         });
+
+        notifications.push({
+          user,
+          task: task._id,
+          action: 'transition',
+          type: ['status'],
+          state: notificationValue,
+        });
       }
     }
   } else {
@@ -182,7 +191,7 @@ const generateNotifications = async (
         task: task._id,
         action: 'assignment',
         state: values,
-        type: 'assignee',
+        type: ['assignee'],
       });
     }
   }
@@ -287,11 +296,23 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const getAssignedTasks = asyncErrorHandler(async (req, res, next) => {
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 30;
+  const deleteCount = req.query.deleteCount || 0;
+  const skip = (page - 1) * limit - deleteCount;
+
   const assignedTasks = await Task.find({
     user: req.user._id,
-    assigned: true,
     project: req.params.projectId,
-  });
+    assigned: true,
+  })
+    .populate({
+      path: 'activities',
+      options: { sort: { time: -1 }, perDocumentLimit: 50 },
+    })
+    .sort('-createdAt')
+    .skip(skip)
+    .limit(limit);
 
   return res.status(200).json({
     status: 'success',
@@ -306,12 +327,12 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
   // -- validate assignee field, name, status, priority, deadline, desc, assignee
   let task = await Task.findById(req.params.id);
 
-  const project = await Project.findById(task.project);
-
   if (!task) {
     const err = new CustomError('This task does not exist!', 404);
     return next(err);
   }
+
+  const project = await Project.findById(task.project);
 
   // If the user is not the task owner
   if (String(task.user) !== String(req.user._id)) {
@@ -339,11 +360,6 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
       let mainTask;
 
       if (req.body.status) {
-        mainTask = await Task.findById(task.mainTask);
-
-        // Update the last Modified property
-        mainTask.lastModified = Date.now();
-
         values.status = { from: task.status, to: req.body.status };
         task.status = req.body.status;
         fields.push('status');
@@ -361,6 +377,8 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 
       // Saves the main task and other assigned tasks
       if (req.body.status) {
+        mainTask = await Task.findById(task.mainTask);
+
         // Updates the project details
         project.updateDetails(mainTask.status, req.body.status);
         project.lastModified = Date.now();
@@ -368,6 +386,10 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 
         // To make sure the main task is saved after the assigned task for proper data validation
         mainTask.status = req.body.status;
+
+        // Update the last Modified property
+        mainTask.lastModified = Date.now();
+
         await mainTask.save();
 
         await Task.updateMany(
@@ -396,7 +418,7 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
         fields,
         values,
         task,
-        mainTask.user,
+        mainTask && mainTask.user,
         null,
         req
       );
@@ -422,7 +444,10 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 
       if (req.body.deadline) {
         // validates deadline field
-        if (new Date(req.body.deadline) < new Date(task.createdAt)) {
+        if (
+          Date.parse(new Date(req.body.deadline)) <
+          Date.parse(new Date(task.createdAt))
+        ) {
           return next(
             new CustomError(
               'Please provide a valid value for the deadline!',
@@ -430,19 +455,31 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
             )
           );
         }
+
+        req.body.deadline = new Date(req.body.deadline);
+
+        req.body.deadline.setMinutes(0);
+        req.body.deadline.setSeconds(0);
+        req.body.deadline.setMilliseconds(0);
       }
 
       // Adds the last Modified property to the request body
       req.body.lastModified = Date.now();
 
-      // Updates the project details
-      project.updateDetails(task.status, req.body.status);
+      if (req.body.status) {
+        // Updates the project details
+        project.updateDetails(task.status, req.body.status);
+      }
+
       project.lastModified = Date.now();
 
       // updates the task
       task = await Task.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
+      }).populate({
+        path: 'assignee',
+        select: 'username firstName lastName photo',
       });
 
       // updates assigned tasks
@@ -450,6 +487,17 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 
       // Saves the project
       await project.save();
+
+      // Update the user current project
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          currentProject: project._id,
+        },
+        {
+          runValidators: true,
+        }
+      );
 
       // creates notifications
       await generateNotifications(
@@ -467,7 +515,7 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
   return res.status(200).json({
     status: 'success',
     data: {
-      updatedTask: task,
+      task,
     },
   });
 });
@@ -560,7 +608,7 @@ export const deleteTask = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
-  const task = await Task.findById(req.params.id);
+  let task = await Task.findOne({ _id: req.params.id, user: req.user._id });
 
   if (!task) {
     const err = new CustomError('This task does not exist!', 404);
@@ -569,11 +617,6 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
 
   if (task.assigned) {
     const err = new CustomError('An assigned task cannot have assignees.', 403);
-    return next(err);
-  }
-
-  if (String(req.user._id) !== String(task.user)) {
-    const err = new CustomError('This task does not exist!', 404);
     return next(err);
   }
 
@@ -648,13 +691,15 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
   // creates asigned tasks
   await Task.insertMany(assignedTasks);
 
-  // sets assignee field
-  task.assignee = [...new Set(req.body.assignee)];
-
-  // Update the last modified property of the task
-  task.lastModified = Date.now();
-
-  await task.save();
+  // Update the task
+  task = await Task.findByIdAndUpdate(
+    task._id,
+    { assignee: [...new Set(req.body.assignee)], lastModified: Date.now() },
+    { new: true, runValidators: true }
+  ).populate({
+    path: 'assignee',
+    select: 'username firstName lastName photo',
+  });
 
   // filters old assignees and deletes old assigned tasks
   for (let assignee of taskAssignees) {
@@ -680,7 +725,7 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
       ['assignee'],
       values,
       task,
-      task.leader,
+      null,
       false,
       req
     );
@@ -713,16 +758,10 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const getTaskActivities = asyncErrorHandler(async (req, res, next) => {
-  const task = await Task.findById(req.params.id);
+  const task = await Task.findOne({ _id: req.params.id, user: req.user._id });
 
   // Checks if the task exists
   if (!task) {
-    const err = new CustomError('This task does not exist!', 404);
-    return next(err);
-  }
-
-  // Checks if the task belongs to the user
-  if (String(task.user) !== String(req.user._id)) {
     const err = new CustomError('This task does not exist!', 404);
     return next(err);
   }
@@ -732,6 +771,7 @@ export const getTaskActivities = asyncErrorHandler(async (req, res, next) => {
   const skip = (page - 1) * limit;
 
   const activities = await Notification.find({ task: req.params.id })
+    .sort('-time')
     .skip(skip)
     .limit(limit);
 

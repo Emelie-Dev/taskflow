@@ -92,6 +92,7 @@ const Dashboard = () => {
     loading: true,
     lastPage: true,
     error: false,
+    pageError: false,
   });
   const searchRef = useRef();
   const calenderRef = useRef();
@@ -191,6 +192,7 @@ const Dashboard = () => {
           loading: false,
           lastPage: data.data.tasks.length < 10,
           error: false,
+          pageError: false,
         });
 
         if (page !== 1) {
@@ -200,9 +202,19 @@ const Dashboard = () => {
         }
       } catch {
         if (page !== 1) {
-          setScheduleData({ loading: false, lastPage: false, error: false });
+          setScheduleData({
+            loading: false,
+            lastPage: false,
+            error: false,
+            pageError: true,
+          });
         } else {
-          setScheduleData({ loading: false, lastPage: true, error: true });
+          setScheduleData({
+            loading: false,
+            lastPage: true,
+            error: true,
+            pageError: false,
+          });
         }
 
         return toast('An error occured while fetching scheduled tasks.', {
@@ -358,12 +370,21 @@ const Dashboard = () => {
   const nextPage = () => {
     const { year, month, day, page } = scheduleDetails;
 
-    setScheduleDetails({
-      year,
-      month,
-      day,
-      page: page + 1,
-    });
+    if (scheduleData.pageError) {
+      setScheduleDetails({
+        year,
+        month,
+        day,
+        page,
+      });
+    } else {
+      setScheduleDetails({
+        year,
+        month,
+        day,
+        page: page + 1,
+      });
+    }
 
     setScheduleData({ loading: true, lastPage: true, error: false });
   };

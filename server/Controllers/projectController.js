@@ -9,6 +9,7 @@ import { filterValues } from './taskController.js';
 import User from '../Models/userModel.js';
 import multer from 'multer';
 import fs from 'fs';
+import { group } from 'console';
 
 // Update current Project
 
@@ -141,10 +142,11 @@ export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
     {
       $unwind: '$projectLeader',
     },
-    { $sort: { ['project.createdAt']: -1 } },
+    { $sort: { createdAt: -1 } },
     {
       $group: {
         _id: '$project._id',
+        assignedDate: { $first: '$createdAt' },
         name: { $first: '$project.name' },
         username: { $first: '$projectLeader.username' },
         firstName: { $first: '$projectLeader.firstName' },
@@ -153,6 +155,7 @@ export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
         tasks: { $sum: 1 },
       },
     },
+    { $sort: { assignedDate: -1 } },
     { $skip: skip },
     { $limit: 30 },
   ]);
