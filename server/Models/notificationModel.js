@@ -21,6 +21,7 @@ const notificationSchema = new mongoose.Schema({
       'reduction',
       'invitation',
       'addition', // When new team members or files are added
+      'removal', // When members are removed
       'response',
       'task', // For private notification on task assignment
     ],

@@ -497,9 +497,12 @@ const Tasks = () => {
 
       {addTask && (
         <NewTask
-          addTask={addTask}
           setAddTask={setAddTask}
           fixedProject={true}
+          projects={personalProjects}
+          currentProjectIndex={currentProjectData.index}
+          currentProject={currentProject}
+          setCurrentProject={setCurrentProject}
         />
       )}
 
@@ -1089,13 +1092,13 @@ const Tasks = () => {
                 <>
                   {taskType === 'personal' && (
                     <div className={styles['no-projects-text']}>
-                      You currently don't have any tasks on this project
+                      You currently don't have any task on this project
                     </div>
                   )}
 
                   {taskType === 'assigned' && (
                     <div className={styles['no-projects-text']}>
-                      You were not assigned any tasks on this project
+                      You were not assigned any task on this project
                     </div>
                   )}
                 </>

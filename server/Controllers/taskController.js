@@ -60,7 +60,7 @@ const generateNotifications = async (
         performer: await User.findById(req.user._id).select(
           'username firstName lastName'
         ),
-        task: task._id,
+        task: task.mainTask,
         action: 'deletion',
         type: ['assignedTask'],
       };
@@ -101,14 +101,6 @@ const generateNotifications = async (
             'username firstName lastName'
           ),
           task: task.mainTask,
-          action: 'transition',
-          type: ['status'],
-          state: notificationValue,
-        });
-
-        notifications.push({
-          user,
-          task: task._id,
           action: 'transition',
           type: ['status'],
           state: notificationValue,
@@ -196,7 +188,7 @@ const generateNotifications = async (
     }
   }
 
-  if (notifications.lengtsh !== 0) await Notification.insertMany(notifications);
+  if (notifications.length !== 0) await Notification.insertMany(notifications);
 };
 
 const validateAssignee = async (project, assignees = []) => {
@@ -260,6 +252,15 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
 
   const task = await Task.create(req.body);
 
+  await task.populate({
+    path: 'activities',
+    options: { sort: { time: -1 }, perDocumentLimit: 50 },
+    populate: {
+      path: 'user',
+      select: 'username firstName lastName',
+    },
+  });
+
   // Update project details
   project.updateDetails(null, task.status);
   project.lastModified = Date.now();
@@ -306,10 +307,6 @@ export const getAssignedTasks = asyncErrorHandler(async (req, res, next) => {
     project: req.params.projectId,
     assigned: true,
   })
-    .populate({
-      path: 'activities',
-      options: { sort: { time: -1 }, perDocumentLimit: 50 },
-    })
     .sort('-createdAt')
     .skip(skip)
     .limit(limit);
@@ -481,6 +478,9 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
         path: 'assignee',
         select: 'username firstName lastName photo',
       });
+
+      // Prevents updating the priority field of the assigned tasks
+      delete req.body.priority;
 
       // updates assigned tasks
       await Task.updateMany({ mainTask: req.params.id }, req.body);
@@ -770,10 +770,33 @@ export const getTaskActivities = asyncErrorHandler(async (req, res, next) => {
   const limit = req.query.limit || 50;
   const skip = (page - 1) * limit;
 
-  const activities = await Notification.find({ task: req.params.id })
-    .sort('-time')
-    .skip(skip)
-    .limit(limit);
+  let activities;
+
+  if (task.assigned) {
+    activities = await Notification.find({
+      $or: [
+        { task: req.params.id },
+        { task: task.mainTask, 'type.0': { $ne: 'priority' } },
+      ],
+      time: { $gte: task.createdAt },
+    })
+      .populate({
+        path: 'user',
+        select: 'username firstName lastName',
+      })
+      .sort('-time')
+      .skip(skip)
+      .limit(limit);
+  } else {
+    activities = await Notification.find({ task: req.params.id })
+      .populate({
+        path: 'user',
+        select: 'username firstName lastName',
+      })
+      .sort('-time')
+      .skip(skip)
+      .limit(limit);
+  }
 
   return res.status(200).json({
     status: 'success',

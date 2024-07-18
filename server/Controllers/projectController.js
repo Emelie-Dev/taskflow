@@ -665,7 +665,7 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
         user: member,
         performer: {
           name: req.user.username,
-          id: req.user._id,
+          owner: req.user._id,
           firstName: req.user.firstName,
           lastName: req.user.lastName,
           project: project._id,
@@ -685,6 +685,30 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
       );
 
       oldMembers.push(user);
+
+      notifications.push({
+        user: member,
+        performer: {
+          owner: req.user._id,
+          name: req.user.username,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          project: project._id,
+        },
+        action: 'removal',
+        type: ['team'],
+      });
+
+      await Task.updateMany(
+        {
+          user: req.user._id,
+          project: req.params.id,
+          assignee: `${member}`,
+        },
+        {
+          $pull: { assignee: `${member}` },
+        }
+      );
 
       // Deletes tasks assigned to old members
       await Task.deleteMany({ user: member, project: req.params.id });

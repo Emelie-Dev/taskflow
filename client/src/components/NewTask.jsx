@@ -1,18 +1,194 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from '../styles/NewTask.module.css';
 import { IoCloseSharp } from 'react-icons/io5';
+import { generateName } from '../pages/Dashboard';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import { SiKashflow } from 'react-icons/si';
 
-const NewTask = ({ addTask, setAddTask, fixedProject }) => {
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth();
+const currentDate = new Date().getDate();
+
+const NewTask = ({
+  setAddTask,
+  fixedProject,
+  projects,
+  currentProjectIndex,
+  currentProject,
+  setCurrentProject,
+}) => {
+  const [taskData, setTaskData] = useState({
+    name: '',
+    project: projects[currentProjectIndex]._id,
+    priority: 'high',
+    status: 'open',
+    get deadline() {
+      const date = new Date();
+      date.setMinutes(0, 0, 0);
+
+      return date;
+    },
+    assignees: new Set(),
+    description: '',
+  });
+
+  const [assigneesData, setAssigneesData] = useState([]);
+  const [validAssignee, setValidAssignee] = useState(false);
+  const [enableSubmit, setEnableSubmit] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const assigneeRef = useRef();
+
+  const initialData = useRef({
+    name: '',
+    project: projects[currentProjectIndex]._id,
+    priority: 'high',
+    status: 'open',
+    get deadline() {
+      const date = new Date();
+      date.setMinutes(0, 0, 0);
+
+      return date;
+    },
+    assignees: new Set(),
+    description: '',
+  }).current;
+
+  useEffect(() => {
+    let count = 0;
+
+    for (const prop in taskData) {
+      if (prop === 'assignees') {
+        if (String([...taskData[prop]]) !== String([...initialData[prop]]))
+          count++;
+      } else {
+        if (String(taskData[prop]) !== String(initialData[prop])) count++;
+      }
+    }
+
+    if (count !== 0) {
+      setEnableSubmit(true);
+    } else {
+      setEnableSubmit(false);
+    }
+  }, [taskData]);
+
   const hideComponent = (e) => {
     e.target === e.currentTarget && setAddTask(false);
   };
 
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1;
-  const currentDate = new Date().getDate();
+  const changeDeadline = (e) => {
+    let deadline = new Date(e.target.value);
+
+    if (Date.parse(deadline) < Date.parse(new Date())) deadline = new Date();
+    deadline.setMinutes(0, 0, 0);
+
+    setTaskData({ ...taskData, deadline });
+  };
+
+  const deadlineValue = () => {
+    const date = new Date(taskData.deadline);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    const hours = String(date.getHours()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:00`;
+  };
+
+  const addAssignee = () => {
+    const name = assigneeRef.current.value;
+
+    const assignees = new Set([...taskData.assignees]);
+
+    const assignee = projects[currentProjectIndex].team.find(
+      (member) =>
+        generateName(member.firstName, member.lastName, member.username) ===
+        name
+    );
+
+    if (!assignee) return;
+
+    if (taskData.assignees.has(assignee._id)) return;
+
+    assignees.add(assignee._id);
+
+    setTaskData({ ...taskData, assignees });
+    setAssigneesData([...assigneesData, assignee]);
+  };
+
+  const removeAssignee = (index) => {
+    const assignee = assigneesData[index]._id;
+
+    const assignees = new Set([...taskData.assignees]);
+    assignees.delete(assignee);
+
+    const assigneesArray = [...assigneesData];
+    assigneesArray.splice(index, 1);
+
+    setTaskData({ ...taskData, assignees });
+    setAssigneesData(assigneesArray);
+  };
+
+  const validateAssignee = (e) => {
+    const value = e.target.value;
+
+    const assignee = projects[currentProjectIndex].team.find(
+      (member) =>
+        generateName(member.firstName, member.lastName, member.username) ===
+        value
+    );
+
+    if (assignee) {
+      setValidAssignee(true);
+    } else {
+      setValidAssignee(false);
+    }
+  };
+
+  // Add assignees to request and create count and enable project count update
+  const createTask = async (e) => {
+    e.preventDefault();
+
+    if (taskData.name.trim() === '') {
+      return toast('The name field cannot be empty.', {
+        toastId: 'toast-id1',
+      });
+    }
+
+    const body = { ...taskData };
+    delete body.assignees;
+    setIsProcessing(true);
+
+    try {
+      const { data } = await axios.post(`/api/v1/tasks`, body);
+
+      setAddTask(false);
+      setCurrentProject({
+        tasks: [data.data.task, ...currentProject.tasks],
+      });
+    } catch (err) {
+      if (!err.response.data) {
+        return toast('An error occured while creating task.', {
+          toastId: 'toast-id2',
+        });
+      }
+
+      return toast(err.response.data.message, {
+        toastId: 'toast-id2',
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <section className={styles.section} onClick={hideComponent}>
+      <ToastContainer autoClose={2000} />
+
       <div className={styles['modal-container']}>
         <span
           className={styles['close-modal']}
@@ -22,7 +198,7 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
         </span>
         <h1 className={styles['modal-head']}>Add Task</h1>
 
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={createTask}>
           <div className={styles['modal-list']}>
             <div className={styles.category}>
               <span className={styles['label-box']}>
@@ -34,6 +210,10 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
                 className={styles['form-input']}
                 id="task-name"
                 type="text"
+                value={taskData.name}
+                onChange={(e) =>
+                  setTaskData({ ...taskData, name: e.target.value })
+                }
               />
             </div>
 
@@ -47,11 +227,17 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
               <select
                 className={styles['form-select']}
                 id="project"
+                value={taskData.project}
+                onChange={(e) =>
+                  setTaskData({ ...taskData, project: e.target.value })
+                }
                 disabled={fixedProject}
               >
-                <option>Fitness App</option>
-                <option>Media Player</option>
-                <option>Taskflow</option>
+                {projects.map((project) => (
+                  <option key={project._id} value={project._id}>
+                    {project.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -61,10 +247,17 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
                   Priority
                 </label>
               </span>
-              <select className={styles['form-select']} id="priority">
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
+              <select
+                className={styles['form-select']}
+                id="priority"
+                value={taskData.priority}
+                onChange={(e) =>
+                  setTaskData({ ...taskData, priority: e.target.value })
+                }
+              >
+                <option value={'high'}>High</option>
+                <option value={'medium'}>Medium</option>
+                <option value={'low'}>Low</option>
               </select>
             </div>
 
@@ -75,10 +268,17 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
                 </label>
               </span>
 
-              <select className={styles['form-select']} id="status">
-                <option>Open</option>
-                <option>In Progress</option>
-                <option>Completed</option>
+              <select
+                className={styles['form-select']}
+                id="status"
+                value={taskData.status}
+                onChange={(e) =>
+                  setTaskData({ ...taskData, status: e.target.value })
+                }
+              >
+                <option value={'open'}>Open</option>
+                <option value={'progress'}>In Progress</option>
+                <option value={'complete'}>Completed</option>
               </select>
             </div>
 
@@ -93,7 +293,9 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
                 className={styles['form-input']}
                 type="datetime-local"
                 id="due-date"
-                min={`${currentYear}-0${currentMonth}-0${currentDate}`}
+                min={`${currentYear}-0${currentMonth + 1}-${currentDate}T00:00`}
+                value={deadlineValue()}
+                onChange={changeDeadline}
               />
             </div>
 
@@ -104,16 +306,36 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
                 </label>
               </span>
 
-              <input
-                className={styles['form-input']}
-                list="team"
-                id="assignee"
-              />
+              <span className={styles['assignees-box']}>
+                <input
+                  className={`${styles['form-input']} ${styles['assignee-input']}`}
+                  list="team"
+                  id="assignee"
+                  ref={assigneeRef}
+                  onChange={(e) => validateAssignee(e)}
+                />
+
+                <button
+                  className={`${styles['add-assignee-btn']} ${
+                    !validAssignee ? styles['disable-btn'] : ''
+                  }`}
+                  onClick={addAssignee}
+                >
+                  Add
+                </button>
+              </span>
 
               <datalist id="team">
-                <option value={'Jon Snow'} />
-                <option value={'Arya Stark'} />
-                <option value={'Tyrion Lannister'} />
+                {projects[currentProjectIndex].team.map((member) => (
+                  <option
+                    key={member._id}
+                    value={generateName(
+                      member.firstName,
+                      member.lastName,
+                      member.username
+                    )}
+                  />
+                ))}
               </datalist>
             </div>
 
@@ -121,49 +343,38 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
               className={`${styles.category} ${styles['assignees-category']}`}
             >
               <span className={styles['label-box']}>
-                <label className={styles['form-label']}>Assignee(s)</label>
+                <label className={styles['form-label']}>
+                  {assigneesData.length === 1 ? 'Assignee' : 'Assignees'}
+                </label>
               </span>
 
               <div className={styles['assignees']}>
-                <span className={styles['assignee-box']}>
-                  <IoCloseSharp className={styles['remove-assignee']} />
-                  <span className={styles['image-box']}>
-                    <span className={styles['assignee-name']}>
-                      Curtis Jones
+                {assigneesData.length === 0 ? (
+                  <i className={styles['no-assignees-txt']}>No Assignees</i>
+                ) : (
+                  assigneesData.map((assignee, index) => (
+                    <span key={assignee._id} className={styles['assignee-box']}>
+                      <IoCloseSharp
+                        className={styles['remove-assignee']}
+                        onClick={() => removeAssignee(index)}
+                      />
+                      <span className={styles['image-box']}>
+                        <span className={styles['assignee-name']}>
+                          {generateName(
+                            assignee.firstName,
+                            assignee.lastName,
+                            assignee.username
+                          )}
+                        </span>
+
+                        <img
+                          className={styles['assignee-img']}
+                          src={`../../assets/images/users/${assignee.photo}`}
+                        />
+                      </span>
                     </span>
-
-                    <img
-                      className={styles['assignee-img']}
-                      src="../../public/assets/images/profile1.webp"
-                    />
-                  </span>
-                </span>
-
-                <span className={styles['assignee-box']}>
-                  <IoCloseSharp className={styles['remove-assignee']} />
-                  <span className={styles['image-box']}>
-                    <span className={styles['assignee-name']}>John Snow</span>
-
-                    <img
-                      className={styles['assignee-img']}
-                      src="../../public/assets/images/profile3.jpeg"
-                    />
-                  </span>
-                </span>
-
-                <span className={styles['assignee-box']}>
-                  <IoCloseSharp className={styles['remove-assignee']} />
-                  <span className={styles['image-box']}>
-                    <span className={styles['assignee-name']}>
-                      Tyrion Lannister
-                    </span>
-
-                    <img
-                      className={styles['assignee-img']}
-                      src="../../public/assets/images/pics1.jpg"
-                    />
-                  </span>
-                </span>
+                  ))
+                )}
               </div>
             </div>
 
@@ -178,12 +389,30 @@ const NewTask = ({ addTask, setAddTask, fixedProject }) => {
                 className={`${styles['form-input']} ${styles['task-description']}`}
                 id="description"
                 rows={5}
+                value={taskData.description}
+                onChange={(e) =>
+                  setTaskData({ ...taskData, description: e.target.value })
+                }
               ></textarea>
             </div>
           </div>
 
           <div className={styles['btn-box']}>
-            <input className={styles['add-task-btn']} type="submit" />
+            <button
+              className={`${styles['add-task-btn']} ${
+                !enableSubmit ? styles['disable-btn'] : ''
+              } ${isProcessing ? styles['creating-button'] : ''}`}
+              type="submit"
+            >
+              {isProcessing ? (
+                <>
+                  <SiKashflow className={styles['creating-icon']} />{' '}
+                  Processing....
+                </>
+              ) : (
+                'Submit'
+              )}
+            </button>
           </div>
         </form>
       </div>

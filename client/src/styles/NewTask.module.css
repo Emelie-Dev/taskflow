@@ -196,6 +196,9 @@
 
 .add-task-btn {
   outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--general-font);
   background: orange;
   color: white;
@@ -213,6 +216,63 @@
   opacity: 0.85;
 }
 
+.assignees-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.add-assignee-btn {
+  outline: none;
+  font-family: var(--general-font);
+  background: orange;
+  color: white;
+  padding: 0.6rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.92rem;
+  cursor: pointer;
+  box-shadow: 1px 1px 10px -3px orange;
+  transition: opacity 0.3s;
+  margin-left: 1rem;
+}
+
+.add-assignee-btn:hover {
+  opacity: 0.85;
+}
+
+.assignee-input {
+  width: 100%;
+}
+
+.no-assignees-txt {
+  color: gray;
+  margin: 0.5rem 0 0.8rem;
+}
+
+.disable-btn {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.creating-button {
+  pointer-events: none;
+  opacity: 0.7 !important;
+}
+
+.creating-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.creating-icon {
+  margin-right: 0.5rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  animation: rotate 1s linear 0s infinite normal both;
+}
+
 /* Animations */
 
 @keyframes fadeIn {
@@ -223,6 +283,16 @@
   to {
     opacity: 1;
     transform: translateY(0px);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
 

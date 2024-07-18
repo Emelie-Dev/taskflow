@@ -31,6 +31,10 @@ const getAll = (Model, collection) =>
         .populate({
           path: 'activities',
           options: { sort: { time: -1 }, perDocumentLimit: 50 },
+          populate: {
+            path: 'user',
+            select: 'username firstName lastName',
+          },
         });
     }
 
@@ -74,9 +78,7 @@ const createOne = (Model, collection) =>
     if (collection === 'project') {
       delete req.body.team;
       delete req.body.files;
-      delete req.body.progress;
-      delete req.body.openTasks;
-      delete req.body.completedTasks;
+      delete req.body.details;
 
       doc = await Model.create(req.body);
 

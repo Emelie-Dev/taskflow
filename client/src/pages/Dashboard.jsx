@@ -673,7 +673,9 @@ const Dashboard = () => {
                         {userStats.data.dataPercent.tasks.created === 0
                           ? 0
                           : userStats.data.dataPercent.tasks.created < 0
-                          ? userStats.data.dataPercent.tasks.created
+                          ? String(
+                              userStats.data.dataPercent.tasks.created
+                            ).replace('-', '')
                           : `+${userStats.data.dataPercent.tasks.created}`}
                         %{' '}
                       </span>

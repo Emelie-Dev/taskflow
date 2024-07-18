@@ -135,15 +135,16 @@ taskSchema.query.scheduledTasks = function (year, month, day) {
 taskSchema.pre('save', function (next) {
   if (this.assigned) return next();
   if (this.deadline) {
-    if (
-      Date.parse(new Date(this.deadline)) < Date.parse(new Date(this.createdAt))
-    ) {
+    this.deadline.setMinutes(0, 0, 0);
+
+    const createdAt = new Date(this.createdAt);
+    createdAt.setMinutes(0, 0, 0);
+
+    if (Date.parse(new Date(this.deadline)) < Date.parse(new Date(createdAt))) {
       return next(
         new CustomError('Please provide a valid value for the deadline!', 400)
       );
     }
-
-    this.deadline.setMinutes(0, 0, 0);
   }
   next();
 });

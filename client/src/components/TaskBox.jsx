@@ -67,7 +67,7 @@ const TaskBox = ({
   // For fetching task activities
   useEffect(() => {
     const getActivities = async () => {
-      if (!taskActivities) {
+      if (!assigned && !taskActivities) {
         setActivitiesData({
           loading: false,
           lastPage: taskObj.activities.length < 50,
@@ -259,6 +259,254 @@ const TaskBox = ({
     setActivitiesData({ loading: true, lastPage: true, error: false });
   };
 
+  const getActivityMessage = (activity) => {
+    // A user is assigned ✔
+    // A user is deassigned ✔
+    // A task is updated ✔
+    // A deadline is changed ✔
+
+    if (activity.action === 'assignment') {
+      const newNames = activity.state.assignee.newAssigneesData.map(
+        ({ _id, firstName, lastName, username }, index, array) => (
+          <a key={index} href="#" className={styles['activity-names']}>
+            {index !== 0 ? ' ' : ''}
+            {_id === userData._id
+              ? 'You'
+              : generateName(firstName, lastName, username)}
+            {index !== array.length - 1 ? ',' : ''}
+          </a>
+        )
+      );
+
+      // Update activities message
+      const oldNames = activity.state.assignee.oldAssigneesData.map(
+        ({ firstName, lastName, username }, index, array) => (
+          <a key={index} href="#" className={styles['activity-names']}>
+            {index !== 0 ? ' ' : ''}
+            {generateName(firstName, lastName, username)}
+            {index !== array.length - 1 ? ',' : ''}
+          </a>
+        )
+      );
+
+      if (activity.state.assignee.oldAssigneesData.length === 0) {
+        return (
+          <>
+            {newNames}{' '}
+            {activity.state.assignee.newAssigneesData.length === 1 &&
+            activity.state.assignee.to[0] === userData._id
+              ? 'were'
+              : activity.state.assignee.newAssigneesData.length === 1
+              ? 'was'
+              : 'were'}{' '}
+            added to the assignees.
+          </>
+        );
+      } else if (activity.state.assignee.newAssigneesData.length === 0) {
+        return (
+          <>
+            {oldNames}{' '}
+            {activity.state.assignee.oldAssigneesData.length === 1
+              ? 'was'
+              : 'were'}{' '}
+            removed from the assignees.
+          </>
+        );
+      } else {
+        return (
+          <>
+            {newNames}{' '}
+            {activity.state.assignee.newAssigneesData.length === 1 &&
+            activity.state.assignee.to[0] === userData._id
+              ? 'were'
+              : activity.state.assignee.newAssigneesData.length === 1
+              ? 'was'
+              : 'were'}{' '}
+            added to the assignees while {oldNames}{' '}
+            {activity.state.assignee.oldAssigneesData.length === 1
+              ? 'was'
+              : 'were'}{' '}
+            removed from the assignees.
+          </>
+        );
+      }
+    } else if (
+      activity.action === 'deletion' &&
+      activity.type.includes('assignedTask')
+    ) {
+      return (
+        <>
+          <a href="#" className={styles['activity-names']}>
+            {generateName(
+              activity.performer.firstName,
+              activity.performer.lastName,
+              activity.performer.username
+            )}
+          </a>{' '}
+          deleted the task they were assigned.
+        </>
+      );
+    } else if (activity.action === 'update') {
+      return (
+        <>
+          {userData._id === activity.user._id ? (
+            'You'
+          ) : (
+            <a href="#" className={styles['activity-names']}>
+              {generateName(
+                activity.user.firstName,
+                activity.user.lastName,
+                activity.user.username
+              )}
+            </a>
+          )}{' '}
+          updated the task's {activity.type.includes('name') ? 'name' : ''}
+          {activity.type.length > 1 ? ' and ' : ''}
+          {activity.type.includes('description') ? 'description' : ''}.
+        </>
+      );
+    } else if (activity.action === 'transition') {
+      if (!activity.performer) {
+        return (
+          <>
+            {userData._id === activity.user._id ? (
+              'You'
+            ) : (
+              <a href="#" className={styles['activity-names']}>
+                {generateName(
+                  activity.user.firstName,
+                  activity.user.lastName,
+                  activity.user.username
+                )}{' '}
+              </a>
+            )}{' '}
+            changed the task's
+            {activity.type.includes('status') ? (
+              <>
+                &nbsp;status from{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.status.from === 'progress'
+                    ? 'ongoing'
+                    : activity.state.status.from === 'complete'
+                    ? 'completed'
+                    : activity.state.status.from}
+                </span>{' '}
+                to{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.status.to === 'progress'
+                    ? 'ongoing'
+                    : activity.state.status.to === 'complete'
+                    ? 'completed'
+                    : activity.state.status.to}
+                </span>
+              </>
+            ) : (
+              ''
+            )}
+            {activity.type.includes('priority') &&
+            activity.user._id === userData._id ? (
+              <>
+                {activity.type.length > 1 ? ` and it's` : ``} priority from{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.priority.from}
+                </span>{' '}
+                to{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.priority.to}
+                </span>
+              </>
+            ) : (
+              ''
+            )}
+            .
+          </>
+        );
+      } else {
+        return (
+          <>
+            {activity.type.includes('status') ? (
+              <>
+                {userData._id === activity.performer._id ? (
+                  'You '
+                ) : (
+                  <a href="#" className={styles['activity-names']}>
+                    {generateName(
+                      activity.performer.firstName,
+                      activity.performer.lastName,
+                      activity.performer.username
+                    )}{' '}
+                  </a>
+                )}
+                changed the task's status from{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.status.from === 'progress'
+                    ? 'ongoing'
+                    : activity.state.status.from === 'complete'
+                    ? 'completed'
+                    : activity.state.status.from}
+                </span>{' '}
+                to{' '}
+                <span className={styles['activity-text']}>
+                  {activity.state.status.to === 'progress'
+                    ? 'ongoing'
+                    : activity.state.status.to === 'complete'
+                    ? 'completed'
+                    : activity.state.status.to}
+                </span>
+              </>
+            ) : (
+              ''
+            )}
+            .
+          </>
+        );
+      }
+    } else if (
+      activity.action === 'reduction' ||
+      activity.action === 'extension'
+    ) {
+      let dateDfifference;
+
+      const timeDifference = Math.abs(
+        Date.parse(activity.state.deadline.to) -
+          Date.parse(activity.state.deadline.from)
+      );
+
+      if (timeDifference >= 86400000) {
+        dateDfifference = `${
+          Math.floor(timeDifference / 86400000) === 1
+            ? 'a day'
+            : `${Math.floor(timeDifference / 86400000)} days`
+        }`;
+      } else if (timeDifference >= 3600000) {
+        dateDfifference = `${
+          Math.floor(timeDifference / 3600000) === 1
+            ? 'an hour'
+            : `${Math.floor(timeDifference / 3600000)} hours`
+        }`;
+      }
+
+      return (
+        <>
+          {userData._id === activity.user._id
+            ? 'You'
+            : generateName(
+                activity.user.firstName,
+                activity.user.lastName,
+                activity.user.username
+              )}
+          {activity.action === 'reduction' ? ' shortened' : ' extended'} the
+          deadline
+          {dateDfifference ? ' by ' : ''}
+          <span className={styles['activity-text']}>
+            {dateDfifference ? `${dateDfifference}` : ''}
+          </span>
+          .
+        </>
+      );
+    }
+  };
+
   const deadlineValue = () => {
     const date = new Date(taskData.deadline);
 
@@ -267,7 +515,7 @@ const TaskBox = ({
     const day = String(date.getDate()).padStart(2, '0');
 
     const hours =
-      date.getHours() < new Date().getHours()
+      Date.parse(date) < Date.parse(new Date())
         ? String(new Date().getHours()).padStart(2, '0')
         : String(date.getHours()).padStart(2, '0');
 
@@ -779,210 +1027,6 @@ const TaskBox = ({
       </div>{' '}
     </article>
   );
-};
-
-export const getActivityMessage = (activity) => {
-  // A user is assigned ✔
-  // A user is deassigned ✔
-  // A task is updated ✔
-  // A deadline is changed ✔
-
-  if (activity.action === 'assignment') {
-    const newNames = activity.state.assignee.newAssigneesData.map(
-      ({ firstName, lastName, username }, index, array) => (
-        <a key={index} href="#" className={styles['activity-names']}>
-          {index !== 0 ? ' ' : ''}
-          {generateName(firstName, lastName, username)}
-          {index !== array.length - 1 ? ',' : ''}
-        </a>
-      )
-    );
-
-    const oldNames = activity.state.assignee.oldAssigneesData.map(
-      ({ firstName, lastName, username }, index, array) => (
-        <a key={index} href="#" className={styles['activity-names']}>
-          {index !== 0 ? ' ' : ''}
-          {generateName(firstName, lastName, username)}
-          {index !== array.length - 1 ? ',' : ''}
-        </a>
-      )
-    );
-
-    if (activity.state.assignee.oldAssigneesData.length === 0) {
-      return (
-        <>
-          {newNames}{' '}
-          {activity.state.assignee.newAssigneesData.length === 1
-            ? 'was'
-            : 'were'}{' '}
-          added to the assignees.
-        </>
-      );
-    } else if (activity.state.assignee.newAssigneesData.length === 0) {
-      return (
-        <>
-          {oldNames}{' '}
-          {activity.state.assignee.oldAssigneesData.length === 1
-            ? 'was'
-            : 'were'}{' '}
-          removed from the assignees.
-        </>
-      );
-    } else {
-      return (
-        <>
-          {newNames}{' '}
-          {activity.state.assignee.newAssigneesData.length === 1
-            ? 'was'
-            : 'were'}{' '}
-          added to the assignees while {oldNames}{' '}
-          {activity.state.assignee.oldAssigneesData.length === 1
-            ? 'was'
-            : 'were'}{' '}
-          removed from the assignees.
-        </>
-      );
-    }
-  } else if (
-    activity.action === 'deletion' &&
-    activity.type.includes('assignedTask')
-  ) {
-    return (
-      <>
-        <a key={index} href="#" className={styles['activity-names']}>
-          {generateName(
-            activity.performer.firstName,
-            activity.performer.lastName,
-            activity.performer.username
-          )}
-        </a>{' '}
-        deleted the task they were assigned.
-      </>
-    );
-  } else if (activity.action === 'update') {
-    return `The task's ${activity.type.includes('name') ? 'name' : ''} ${
-      activity.type.length > 1 ? 'and' : ''
-    } ${activity.type.includes('description') ? 'description' : ''} ${
-      activity.type.length > 1 ? 'were' : 'was'
-    }  updated.`;
-  } else if (activity.action === 'transition') {
-    if (!activity.performer) {
-      return (
-        <>
-          The task's
-          {activity.type.includes('status') ? (
-            <>
-              &nbsp;status was changed from{' '}
-              <span className={styles['activity-text']}>
-                {activity.state.status.from === 'progress'
-                  ? 'ongoing'
-                  : activity.state.status.from === 'complete'
-                  ? 'completed'
-                  : activity.state.status.from}
-              </span>{' '}
-              to{' '}
-              <span className={styles['activity-text']}>
-                {activity.state.status.to === 'progress'
-                  ? 'ongoing'
-                  : activity.state.status.to === 'complete'
-                  ? 'completed'
-                  : activity.state.status.to}
-              </span>
-            </>
-          ) : (
-            ''
-          )}
-          {activity.type.includes('priority') ? (
-            <>
-              {activity.type.length > 1 ? ` and it's` : ``} priority was changed
-              from{' '}
-              <span className={styles['activity-text']}>
-                {activity.state.priority.from}
-              </span>{' '}
-              to{' '}
-              <span className={styles['activity-text']}>
-                {activity.state.priority.to}
-              </span>
-            </>
-          ) : (
-            ''
-          )}
-          .
-        </>
-      );
-    } else {
-      return (
-        <>
-          {activity.type.includes('status') ? (
-            <>
-              <a href="#" className={styles['activity-names']}>
-                {generateName(
-                  activity.performer.firstName,
-                  activity.performer.lastName,
-                  activity.performer.username
-                )}
-              </a>{' '}
-              changed the task's status from{' '}
-              <span className={styles['activity-text']}>
-                {activity.state.status.from === 'progress'
-                  ? 'ongoing'
-                  : activity.state.status.from === 'complete'
-                  ? 'completed'
-                  : activity.state.status.from}
-              </span>{' '}
-              to{' '}
-              <span className={styles['activity-text']}>
-                {activity.state.status.to === 'progress'
-                  ? 'ongoing'
-                  : activity.state.status.to === 'complete'
-                  ? 'completed'
-                  : activity.state.status.to}
-              </span>
-            </>
-          ) : (
-            ''
-          )}
-          .
-        </>
-      );
-    }
-  } else if (
-    activity.action === 'reduction' ||
-    activity.action === 'extension'
-  ) {
-    let dateDfifference;
-
-    const timeDifference = Math.abs(
-      Date.parse(activity.state.deadline.to) -
-        Date.parse(activity.state.deadline.from)
-    );
-
-    if (timeDifference >= 86400000) {
-      dateDfifference = `${
-        Math.floor(timeDifference / 86400000) === 1
-          ? 'a day'
-          : `${Math.floor(timeDifference / 86400000)} days`
-      }`;
-    } else if (timeDifference >= 3600000) {
-      dateDfifference = `${
-        Math.floor(timeDifference / 3600000) === 1
-          ? 'an hour'
-          : `${Math.floor(timeDifference / 3600000)} hours`
-      }`;
-    }
-
-    return (
-      <>
-        The deadline was
-        {activity.action === 'reduction' ? ' shortened' : ' extended'}
-        {dateDfifference ? ' by ' : ''}
-        <span className={styles['activity-text']}>
-          {dateDfifference ? `${dateDfifference}` : ''}
-        </span>
-        .
-      </>
-    );
-  }
 };
 
 export default TaskBox;
