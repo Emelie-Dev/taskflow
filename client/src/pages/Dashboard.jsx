@@ -40,6 +40,8 @@ import { AuthContext } from '../App';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
+import Tasks from './Tasks';
+import Projects from './Projects';
 
 ChartJS.register(
   CategoryScale,
@@ -94,6 +96,12 @@ const Dashboard = () => {
     error: false,
     pageError: false,
   });
+  const [projects, setProjects] = useState([]);
+  const [projectsDetails, setProjectsDetails] = useState({
+    page: 1,
+    error: false,
+  });
+  const [reloadProject, setReloadProject] = useState(Symbol('false'));
   const searchRef = useRef();
   const calenderRef = useRef();
   const navRef = useRef();
@@ -225,6 +233,28 @@ const Dashboard = () => {
 
     getScheduledTasks();
   }, [scheduleDetails]);
+
+  // For user projects
+  useEffect(() => {
+    getUserProjects(projectsDetails.page);
+  }, [reloadProject]);
+
+  const getUserProjects = async (page) => {
+    try {
+      let data = await axios.get(`/api/v1/projects/my_projects?page=${page}`);
+      setProjects([...projects, ...data.data.data.projects]);
+
+      setProjectsDetails({ page, error: false });
+
+      while (data.data.data.projects.length >= 30) {
+        page++;
+        data = await axios.get(`/api/v1/projects/my_projects?page=${page}`);
+        setProjects([...projects, ...data.data.data.projects]);
+      }
+    } catch {
+      setProjectsDetails({ page, error: true });
+    }
+  };
 
   const handleSearchText = (e) => {
     setSearchText(e.target.value);
@@ -386,7 +416,12 @@ const Dashboard = () => {
       });
     }
 
-    setScheduleData({ loading: true, lastPage: true, error: false });
+    setScheduleData({
+      loading: true,
+      lastPage: true,
+      error: false,
+      pageError: false,
+    });
   };
 
   return (
@@ -534,7 +569,17 @@ const Dashboard = () => {
         </ul>
       </nav>
 
-      {addTask && <NewTask addTask={addTask} setAddTask={setAddTask} />}
+      {addTask && (
+        <NewTask
+          setAddTask={setAddTask}
+          fixedProject={false}
+          projects={projects}
+          setScheduleDetails={setScheduleDetails}
+          setScheduleData={setScheduleData}
+          projectsDetails={projectsDetails}
+          setReloadProject={setReloadProject}
+        />
+      )}
 
       <section className={styles.section}>
         <header className={styles.header}>
@@ -1147,7 +1192,13 @@ const Dashboard = () => {
                           >
                             Status:
                           </span>
-                          <span>{task.status}</span>
+                          <span>
+                            {task.status === 'open'
+                              ? 'Open'
+                              : task.status === 'progress'
+                              ? 'In progress'
+                              : 'Completed'}
+                          </span>
                         </span>
                       </div>
 

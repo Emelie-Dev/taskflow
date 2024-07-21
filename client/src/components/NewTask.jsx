@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from '../styles/NewTask.module.css';
 import { IoCloseSharp } from 'react-icons/io5';
 import { generateName } from '../pages/Dashboard';
@@ -17,10 +17,22 @@ const NewTask = ({
   currentProjectIndex,
   currentProject,
   setCurrentProject,
+  setCreateCount,
+  setScheduleDetails,
+  setScheduleData,
+  projectsDetails,
+  setReloadProject,
 }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [taskData, setTaskData] = useState({
     name: '',
-    project: projects[currentProjectIndex]._id,
+    project: `${
+      fixedProject
+        ? projects[currentProjectIndex]._id
+        : projects.length === 0
+        ? ''
+        : projects[currentIndex]._id
+    }`,
     priority: 'high',
     status: 'open',
     get deadline() {
@@ -40,39 +52,24 @@ const NewTask = ({
 
   const assigneeRef = useRef();
 
-  const initialData = useRef({
-    name: '',
-    project: projects[currentProjectIndex]._id,
-    priority: 'high',
-    status: 'open',
-    get deadline() {
-      const date = new Date();
-      date.setMinutes(0, 0, 0);
-
-      return date;
-    },
-    assignees: new Set(),
-    description: '',
-  }).current;
-
   useEffect(() => {
-    let count = 0;
-
-    for (const prop in taskData) {
-      if (prop === 'assignees') {
-        if (String([...taskData[prop]]) !== String([...initialData[prop]]))
-          count++;
-      } else {
-        if (String(taskData[prop]) !== String(initialData[prop])) count++;
-      }
-    }
-
-    if (count !== 0) {
+    if (
+      String(taskData.name).trim() !== '' &&
+      String(taskData.project).trim() !== ''
+    ) {
       setEnableSubmit(true);
     } else {
       setEnableSubmit(false);
     }
   }, [taskData]);
+
+  useEffect(() => {
+    if (!fixedProject) {
+      if (!projectsDetails.error) {
+        setTaskData({ ...taskData, project: projects[currentIndex]._id });
+      }
+    }
+  }, [projectsDetails]);
 
   const hideComponent = (e) => {
     e.target === e.currentTarget && setAddTask(false);
@@ -104,7 +101,7 @@ const NewTask = ({
 
     const assignees = new Set([...taskData.assignees]);
 
-    const assignee = projects[currentProjectIndex].team.find(
+    const assignee = projects[currentProjectIndex || currentIndex].team.find(
       (member) =>
         generateName(member.firstName, member.lastName, member.username) ===
         name
@@ -136,11 +133,15 @@ const NewTask = ({
   const validateAssignee = (e) => {
     const value = e.target.value;
 
-    const assignee = projects[currentProjectIndex].team.find(
-      (member) =>
-        generateName(member.firstName, member.lastName, member.username) ===
-        value
-    );
+    let assignee = false;
+
+    if (projects[currentProjectIndex || currentIndex]) {
+      assignee = projects[currentProjectIndex || currentIndex].team.find(
+        (member) =>
+          generateName(member.firstName, member.lastName, member.username) ===
+          value
+      );
+    }
 
     if (assignee) {
       setValidAssignee(true);
@@ -149,12 +150,11 @@ const NewTask = ({
     }
   };
 
-  // Add assignees to request and create count and enable project count update
   const createTask = async (e) => {
     e.preventDefault();
 
     if (taskData.name.trim() === '') {
-      return toast('The name field cannot be empty.', {
+      return toast('Please provide a value for the name field.', {
         toastId: 'toast-id1',
       });
     }
@@ -164,12 +164,62 @@ const NewTask = ({
     setIsProcessing(true);
 
     try {
-      const { data } = await axios.post(`/api/v1/tasks`, body);
+      let response = await axios.post(`/api/v1/tasks`, body);
+
+      let task = response.data.data.task;
+
+      if (taskData.assignees.size !== 0) {
+        try {
+          response = await axios.patch(`/api/v1/tasks/${task._id}/assignees`, {
+            assignee: [...taskData.assignees],
+          });
+
+          if (fixedProject) {
+            const { data } = await axios.get(
+              `/api/v1/tasks/${task._id}/activities?page=1`
+            );
+
+            task = response.data.data.task;
+            task.activities = data.data.activities;
+          }
+        } catch (err) {
+          if (!err.response.data || err.response.status === 500) {
+            toast('An error occured while assigning the task.', {
+              toastId: 'toast-id2',
+            });
+          } else {
+            toast(err.response.data.message, {
+              toastId: 'toast-id2',
+            });
+          }
+        }
+      }
 
       setAddTask(false);
-      setCurrentProject({
-        tasks: [data.data.task, ...currentProject.tasks],
-      });
+
+      if (fixedProject) {
+        setCurrentProject({
+          tasks: [task, ...currentProject.tasks],
+        });
+        projects[currentProjectIndex].details[task.status]++;
+        setCreateCount((prevCount) => prevCount + 1);
+      } else {
+        if (new Date(task.deadline).getDate() === new Date().getDate()) {
+          setScheduleDetails({
+            year: new Date().getFullYear(),
+            month: new Date().getMonth() + 1,
+            day: new Date().getDate(),
+            page: 1,
+          });
+
+          setScheduleData({
+            loading: true,
+            lastPage: true,
+            error: false,
+            pageError: false,
+          });
+        }
+      }
     } catch (err) {
       if (!err.response.data) {
         return toast('An error occured while creating task.', {
@@ -228,9 +278,10 @@ const NewTask = ({
                 className={styles['form-select']}
                 id="project"
                 value={taskData.project}
-                onChange={(e) =>
-                  setTaskData({ ...taskData, project: e.target.value })
-                }
+                onChange={(e) => {
+                  setCurrentIndex(e.target.selectedIndex);
+                  setTaskData({ ...taskData, project: e.target.value });
+                }}
                 disabled={fixedProject}
               >
                 {projects.map((project) => (
@@ -239,6 +290,21 @@ const NewTask = ({
                   </option>
                 ))}
               </select>
+
+              {!fixedProject && projectsDetails.error && (
+                <span className={styles['project-error-box']}>
+                  <i className={styles['project-error-text']}>
+                    Unable to load some projects
+                  </i>{' '}
+                  <button
+                    type="button"
+                    className={styles['project-reload-btn']}
+                    onClick={() => setReloadProject(Symbol('true'))}
+                  >
+                    Retry
+                  </button>
+                </span>
+              )}
             </div>
 
             <div className={styles.category}>
@@ -316,6 +382,7 @@ const NewTask = ({
                 />
 
                 <button
+                  type="button"
                   className={`${styles['add-assignee-btn']} ${
                     !validAssignee ? styles['disable-btn'] : ''
                   }`}
@@ -326,16 +393,19 @@ const NewTask = ({
               </span>
 
               <datalist id="team">
-                {projects[currentProjectIndex].team.map((member) => (
-                  <option
-                    key={member._id}
-                    value={generateName(
-                      member.firstName,
-                      member.lastName,
-                      member.username
-                    )}
-                  />
-                ))}
+                {projects[currentProjectIndex || currentIndex] &&
+                  projects[currentProjectIndex || currentIndex].team.map(
+                    (member) => (
+                      <option
+                        key={member._id}
+                        value={generateName(
+                          member.firstName,
+                          member.lastName,
+                          member.username
+                        )}
+                      />
+                    )
+                  )}
               </datalist>
             </div>
 

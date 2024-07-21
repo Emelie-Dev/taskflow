@@ -66,6 +66,7 @@ const Tasks = () => {
     pageError: false,
   });
   const [deleteCount, setDeleteCount] = useState(0);
+  const [createCount, setCreateCount] = useState(0);
   const searchRef = useRef();
   const navRef = useRef();
 
@@ -206,7 +207,7 @@ const Tasks = () => {
           const { data } = await axios.get(
             `/api/v1/projects/${id}/tasks${
               taskType === 'assigned' ? '/assigned' : ''
-            }?page=${page}&deleteCount=${deleteCount}`
+            }?page=${page}&deleteCount=${deleteCount}&createCount=${createCount}`
           );
 
           setCurrentProjectDetails({
@@ -278,6 +279,7 @@ const Tasks = () => {
     }
 
     setDeleteCount(0);
+    setCreateCount(0);
     setCurrentProject({
       tasks: null,
     });
@@ -290,7 +292,6 @@ const Tasks = () => {
     });
   };
 
-  // Fix details property of projects
   const nextPage = (type) => {
     if (type === 'personal') {
       if (personalProjectsDetails.pageError) {
@@ -346,6 +347,27 @@ const Tasks = () => {
         pageError: false,
       });
     }
+  };
+
+  const taskLength = (project, projectType = 'personal') => {
+    let length;
+
+    if (projectType === 'personal') {
+      length =
+        project.details.complete +
+        project.details.open +
+        project.details.progress;
+    } else {
+      length = project.tasks;
+    }
+
+    if (project._id === currentProjectData.id) {
+      if (currentProject.tasks) {
+        length = currentProject.tasks.length;
+      }
+    }
+
+    return `${length === 1 ? '1 task' : `${length} tasks`}`;
   };
 
   return (
@@ -503,6 +525,7 @@ const Tasks = () => {
           currentProjectIndex={currentProjectData.index}
           currentProject={currentProject}
           setCurrentProject={setCurrentProject}
+          setCreateCount={setCreateCount}
         />
       )}
 
@@ -604,16 +627,7 @@ const Tasks = () => {
                               {project.name}
                             </span>
                             <span className={styles['projects-item-count']}>
-                              {project.details.complete +
-                                project.details.open +
-                                project.details.progress ===
-                              1
-                                ? `1 task`
-                                : `${
-                                    project.details.complete +
-                                    project.details.open +
-                                    project.details.progress
-                                  } tasks`}{' '}
+                              {taskLength(project)}
                             </span>
                           </span>
                           <span className={styles['projects-item-action']}>
@@ -731,9 +745,7 @@ const Tasks = () => {
                               {project.name}
                             </span>
                             <span className={styles['projects-item-count']}>
-                              {project.tasks === 1
-                                ? '1 task'
-                                : `${project.tasks} tasks`}
+                              {taskLength(project, 'assigned')}
                             </span>
                           </span>
                           <span className={styles['projects-item-action']}>
@@ -862,16 +874,7 @@ const Tasks = () => {
                                   {project.name}
                                 </span>
                                 <span className={styles['projects-item-count']}>
-                                  {project.details.complete +
-                                    project.details.open +
-                                    project.details.progress ===
-                                  1
-                                    ? `1 task`
-                                    : `${
-                                        project.details.complete +
-                                        project.details.open +
-                                        project.details.progress
-                                      } tasks`}{' '}
+                                  {taskLength(project)}
                                 </span>
                               </span>
                               <span className={styles['projects-item-action']}>
@@ -997,9 +1000,7 @@ const Tasks = () => {
                                   {project.name}
                                 </span>
                                 <span className={styles['projects-item-count']}>
-                                  {project.tasks === 1
-                                    ? '1 task'
-                                    : `${project.tasks} tasks`}
+                                  {taskLength(project, 'assigned')}
                                 </span>
                               </span>
                               <span className={styles['projects-item-action']}>
@@ -1074,21 +1075,25 @@ const Tasks = () => {
 
             <div className={styles['add-task-btn-div']}>
               <h1 className={styles['tasks-section-text']}>Tasks</h1>
-              <button
-                className={`${styles['add-task-btn']} ${
-                  taskType === 'assigned' ? styles['hide-add-task'] : ''
-                }`}
-                onClick={() => setAddTask(true)}
-              >
-                <HiPlus className={styles['add-task-icon']} />
-                Add task
-              </button>
+
+              {personalProjects && personalProjects.length !== 0 && (
+                <button
+                  className={`${styles['add-task-btn']} ${
+                    taskType === 'assigned' ? styles['hide-add-task'] : ''
+                  }`}
+                  onClick={() => setAddTask(true)}
+                >
+                  <HiPlus className={styles['add-task-icon']} />
+                  Add task
+                </button>
+              )}
             </div>
 
             <div className={styles['article-box']}>
               {currentProject.tasks === null ? (
                 ''
-              ) : currentProject.tasks.length === 0 ? (
+              ) : currentProject.tasks.length === 0 &&
+                currentProjectDetails.lastPage ? (
                 <>
                   {taskType === 'personal' && (
                     <div className={styles['no-projects-text']}>

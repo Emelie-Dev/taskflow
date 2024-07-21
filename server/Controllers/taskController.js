@@ -300,7 +300,9 @@ export const getAssignedTasks = asyncErrorHandler(async (req, res, next) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 30;
   const deleteCount = req.query.deleteCount || 0;
-  const skip = (page - 1) * limit - deleteCount;
+  const createCount = req.query.createCount || 0;
+  const skip =
+    (page - 1) * Number(limit) - Number(deleteCount) + Number(createCount);
 
   const assignedTasks = await Task.find({
     user: req.user._id,

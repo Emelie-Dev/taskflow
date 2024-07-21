@@ -234,6 +234,12 @@ const TaskBox = ({
         tasks: currentProject.tasks.filter((obj) => obj._id !== taskObj._id),
       });
       setDeleteCount((prevCount) => prevCount + 1);
+
+      if (!assigned) {
+        project.details[task.status]--;
+      } else {
+        project.tasks--;
+      }
     } catch (err) {
       setDeleting(false);
 
@@ -628,7 +634,7 @@ const TaskBox = ({
                 >
                   <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM18 12C18 15.3137 15.3137 18 12 18V6C15.3137 6 18 8.68629 18 12Z"></path>
                 </svg>
-                Ongoing{' '}
+                In Progress{' '}
               </span>
             ) : (
               <span
@@ -649,7 +655,7 @@ const TaskBox = ({
             }
           >
             <option value={'open'}>Open</option>
-            <option value={'progress'}>Ongoing</option>
+            <option value={'progress'}>In progress</option>
             <option value={'complete'}>Completed</option>
           </select>
         </div>
