@@ -4,6 +4,7 @@ import {
   deleteTask,
   getAllTasks,
   getAssignedTasks,
+  getCalendarDetails,
   getMyTasks,
   getTaskActivities,
   updateAssignees,
@@ -26,5 +27,7 @@ router.get('/:id/activities', getTaskActivities);
 router.get('/assigned', getAssignedTasks);
 
 router.get('/my_tasks', getMyTasks);
+
+router.get('/calendar', getCalendarDetails);
 
 export default router;

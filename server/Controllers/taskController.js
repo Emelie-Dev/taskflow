@@ -8,6 +8,25 @@ import Project from '../Models/projectModel.js';
 import Notification from '../Models/notificationModel.js';
 import User from '../Models/userModel.js';
 
+const maxDays = (currentMonth) => {
+  const month = currentMonth;
+  const arr30 = [4, 6, 9, 11];
+  let days = 0;
+
+  if (month === 2) {
+    if (currentYear % 4 === 0) {
+      days = 29;
+    } else {
+      days = 28;
+    }
+  } else if (arr30.includes(month)) {
+    days = 30;
+  } else {
+    days = 31;
+  }
+  return days;
+};
+
 export const filterValues = async (values, type, ...fields) => {
   for (const value in values) {
     let condition;
@@ -804,6 +823,49 @@ export const getTaskActivities = asyncErrorHandler(async (req, res, next) => {
     status: 'success',
     data: {
       activities,
+    },
+  });
+});
+
+export const getCalendarDetails = asyncErrorHandler(async (req, res, next) => {
+  const { month, year } = req.query;
+
+  if (!month || !year) {
+    return next(new CustomError('Please provide a valid year and month.', 400));
+  }
+
+  const tasks = await Task.find({
+    user: req.user._id,
+    $expr: {
+      $and: [
+        { $eq: [{ $year: '$deadline' }, year] },
+        { $eq: [{ $month: '$deadline' }, month] },
+      ],
+    },
+  });
+
+  const days = maxDays(month);
+
+  const tasksData = [];
+
+  for (let i = 0; i < days; i++) {
+    tasksData[i] = {
+      high: 0,
+      medium: 0,
+      low: 0,
+    };
+  }
+
+  tasks.forEach((task) => {
+    const day = new Date(task.deadline).getDate() - 1;
+
+    tasksData[day][task.priority]++;
+  });
+
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      tasksData,
     },
   });
 });

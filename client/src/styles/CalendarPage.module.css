@@ -525,17 +525,13 @@
   margin-right: 0.2rem;
 }
 
-.red {
-  color: red;
+.loading-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4rem 0 2rem;
 }
 
-.yellow {
-  color: gold;
-}
-
-.green {
-  color: green;
-}
 /* Animations */
 
 @keyframes showNav {

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useContext, useMemo } from 'react';
 import styles from '../styles/CalendarPage.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -12,15 +12,69 @@ import { GoProjectTemplate } from 'react-icons/go';
 import { GrStatusGood } from 'react-icons/gr';
 import BigCalendar from '../components/BigCalendar';
 import { FaRegCircleUser } from 'react-icons/fa6';
+import colorNames from 'css-color-names';
+import axios from 'axios';
+import Loader from '../components/Loader';
+import { AuthContext } from '../App';
 
 const CalendarPage = () => {
+  const { userData } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState({ status: true, error: false });
+  const [tasksData, setTasksData] = useState(null);
+
   const searchRef = useRef();
   const navRef = useRef();
   const calenderRef = useRef();
+
+  const priorityColors = userData.personalization.priorityColors;
+
+  const priorityColorsName = useMemo(() => {
+    const colors = { ...priorityColors };
+
+    const values = Object.values(colorNames);
+    const keys = Object.keys(colorNames);
+
+    for (const prop in priorityColors) {
+      if (values.indexOf(priorityColors[prop]) !== -1) {
+        colors[prop] = keys[values.indexOf(priorityColors[prop])];
+      }
+    }
+
+    return colors;
+  }, []);
+
+  useEffect(() => {
+    const getCalendarDetails = async () => {
+      try {
+        const { data } = await axios.get(
+          `/api/v1/tasks/calendar?year=${currentYear}&month=${currentMonth}`
+        );
+
+        setLoading({ status: false, error: false });
+        console.log(data.data.tasksData);
+        setTasksData(data.data.tasksData);
+      } catch (err) {
+        setLoading({ status: false, error: true });
+        setTasksData(null);
+
+        if (!err.response.data) {
+          return toast('An error occured while fetching calendar details.', {
+            toastId: 'toast-id1',
+          });
+        }
+
+        return toast(err.response.data.message, {
+          toastId: 'toast-id1',
+        });
+      }
+    };
+
+    getCalendarDetails();
+  }, [currentYear, currentMonth]);
 
   const hideNav = (e) => {
     if (e.target === navRef.current) {
@@ -34,43 +88,6 @@ const CalendarPage = () => {
   const clearSearchText = () => {
     setSearchText('');
     searchRef.current.focus();
-  };
-
-  const maxDays = (currentMonth) => {
-    const month = currentMonth;
-    const arr30 = [4, 6, 9, 11];
-    let days = 0;
-
-    if (month === 2) {
-      if (currentYear % 4 === 0) {
-        days = 29;
-      } else {
-        days = 28;
-      }
-    } else if (arr30.includes(month)) {
-      days = 30;
-    } else {
-      days = 31;
-    }
-    return days;
-  };
-
-  const maxRows = () => {
-    const maxNumber = maxDays(currentMonth);
-    const firstDay = new Date(`${currentYear}-${currentMonth}-1`).getDay();
-    let rows = 4;
-
-    if (maxNumber === 30) {
-      if (firstDay === 0) {
-        rows = 5;
-      }
-    } else if (maxNumber === 31) {
-      if (firstDay === 0 || firstDay === 6) {
-        rows = 5;
-      }
-    }
-
-    return rows;
   };
 
   const month = [
@@ -91,6 +108,9 @@ const CalendarPage = () => {
   const moveToToday = () => {
     setCurrentMonth(new Date().getMonth() + 1);
     setCurrentYear(new Date().getFullYear());
+
+    setLoading({ status: true, error: false });
+
     calenderRef.current.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration: 400,
       iterations: 1,
@@ -321,10 +341,32 @@ const CalendarPage = () => {
                   </button>
                 </h1>
                 <p className={styles['calendar-text']}>
-                  This displays task deadlines with color-coded priorities: red
-                  for <span className={styles.red}>high</span>, yellow for{' '}
-                  <span className={styles.yellow}>medium</span>, and green for{' '}
-                  <span className={styles.green}>low</span>.
+                  This displays task deadlines with color-coded priorities:{' '}
+                  {priorityColorsName.high} for{' '}
+                  <span
+                    style={{
+                      color: priorityColors.high,
+                    }}
+                  >
+                    high
+                  </span>
+                  , {priorityColorsName.medium} for{' '}
+                  <span
+                    style={{
+                      color: priorityColors.medium,
+                    }}
+                  >
+                    medium
+                  </span>
+                  , and {priorityColorsName.low} for{' '}
+                  <span
+                    style={{
+                      color: priorityColors.low,
+                    }}
+                  >
+                    low
+                  </span>
+                  .
                 </p>
               </div>
               <div className={styles['today-btn-div']}>
@@ -339,13 +381,28 @@ const CalendarPage = () => {
               </div>
             </div>
 
-            <BigCalendar
-              currentMonth={currentMonth}
-              currentYear={currentYear}
-              setCurrentMonth={setCurrentMonth}
-              setCurrentYear={setCurrentYear}
-              calenderRef={calenderRef}
-            />
+            {loading.status ? (
+              <div className={styles['loading-box']}>
+                {' '}
+                <Loader
+                  style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                  }}
+                />
+              </div>
+            ) : (
+              <BigCalendar
+                currentMonth={currentMonth}
+                currentYear={currentYear}
+                setCurrentMonth={setCurrentMonth}
+                setCurrentYear={setCurrentYear}
+                calenderRef={calenderRef}
+                tasksData={tasksData}
+                setLoading={setLoading}
+                priorityColors={priorityColors}
+              />
+            )}
           </section>
 
           <section className={styles['tasks-section']}>

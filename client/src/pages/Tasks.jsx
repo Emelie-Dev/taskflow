@@ -26,7 +26,6 @@ import { AuthContext } from '../App';
 import { generateName } from './Dashboard';
 
 const Tasks = () => {
-  // Enable show more projects feature(include responsive)
   const { userData } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);

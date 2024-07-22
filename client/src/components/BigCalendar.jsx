@@ -3,6 +3,7 @@ import styles from '../styles/BigCalendar.module.css';
 
 import { MdArrowForwardIos, MdArrowBackIosNew } from 'react-icons/md';
 import { FaCircle } from 'react-icons/fa';
+import { ToastContainer, toast } from 'react-toastify';
 
 const BigCalendar = ({
   currentMonth,
@@ -10,6 +11,9 @@ const BigCalendar = ({
   setCurrentMonth,
   setCurrentYear,
   calenderRef,
+  tasksData,
+  setLoading,
+  priorityColors,
 }) => {
   const maxDays = (currentMonth) => {
     const month = currentMonth;
@@ -134,6 +138,8 @@ const BigCalendar = ({
       setCurrentMonth((prev) => prev + 1);
     }
 
+    setLoading({ status: true, error: false });
+
     calenderRef.current.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration: 400,
       iterations: 1,
@@ -147,6 +153,9 @@ const BigCalendar = ({
     } else {
       setCurrentMonth((prev) => prev - 1);
     }
+
+    setLoading({ status: true, error: false });
+
     calenderRef.current.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration: 400,
       iterations: 1,
@@ -163,6 +172,8 @@ const BigCalendar = ({
 
   return (
     <div className={styles['table-container']}>
+      <ToastContainer autoClose={2000} />
+
       <span
         className={styles['prev-arrow-box']}
         title="Previous Month"
@@ -188,9 +199,9 @@ const BigCalendar = ({
           <tbody>
             {tableData(currentMonth, currentYear).map((data, index) => (
               <tr key={index}>
-                {data.map(({ input, current, member }, index) => (
+                {data.map(({ input, current, member }, dataIndex) => (
                   <td
-                    key={index}
+                    key={dataIndex}
                     className={`${styles['table-data']} ${
                       member ? '' : styles['prev-month']
                     } ${
@@ -200,26 +211,49 @@ const BigCalendar = ({
                     <div className={styles['data-box']}>
                       <span>{input}</span>
 
-                      {member && (
+                      {member && tasksData && (
                         <div className={styles['priority-div']}>
-                          <span className={`${styles['priority-box']} `}>
-                            <FaCircle
-                              className={`${styles['priority-icon']} ${styles['high-priority']}`}
-                            />
-                            1
-                          </span>
-                          <span className={`${styles['priority-box']}`}>
-                            <FaCircle
-                              className={`${styles['priority-icon']}  ${styles['mid-priority']} `}
-                            />
-                            2
-                          </span>
-                          <span className={`${styles['priority-box']}`}>
-                            <FaCircle
-                              className={`${styles['priority-icon']}  ${styles['low-priority']}`}
-                            />
-                            3
-                          </span>
+                          {tasksData[parseInt(input) - 1].high ? (
+                            <span className={`${styles['priority-box']} `}>
+                              <FaCircle
+                                className={`${styles['priority-icon']}`}
+                                style={{
+                                  color: priorityColors.high,
+                                }}
+                              />
+                              {tasksData[parseInt(input) - 1].high}
+                            </span>
+                          ) : (
+                            ''
+                          )}
+
+                          {tasksData[parseInt(input) - 1].medium ? (
+                            <span className={`${styles['priority-box']} `}>
+                              <FaCircle
+                                className={`${styles['priority-icon']}`}
+                                style={{
+                                  color: priorityColors.medium,
+                                }}
+                              />
+                              {tasksData[parseInt(input) - 1].medium}
+                            </span>
+                          ) : (
+                            ''
+                          )}
+
+                          {tasksData[parseInt(input) - 1].low ? (
+                            <span className={`${styles['priority-box']} `}>
+                              <FaCircle
+                                className={`${styles['priority-icon']}`}
+                                style={{
+                                  color: priorityColors.low,
+                                }}
+                              />
+                              {tasksData[parseInt(input) - 1].low}
+                            </span>
+                          ) : (
+                            ''
+                          )}
                         </div>
                       )}
                     </div>

@@ -47,6 +47,7 @@ import notificationRouter from './Routes/notificationRoutes.js';
 import analyticsRouter from './Routes/analyticsRoutes.js';
 
 import dashboardRouter from './Routes/dashboardRoutes.js';
+import { getCalendarDetails } from './Controllers/taskController.js';
 
 const app = express();
 
