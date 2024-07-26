@@ -248,6 +248,7 @@ export class ApiFeatures {
       } else if (this.queryString.calendar) {
         const { year, month, day } = this.queryString;
         this.query.scheduledTasks(year, month, day);
+
         this.query
           .find(queryOptions)
           .populate({
@@ -762,6 +763,30 @@ export class QueryFeatures {
         }
       }
     }
+    return this;
+  }
+
+  sortByHour() {
+    if (this.queryString.calendar === 'big') {
+      const hours = [];
+
+      const tasks = [...this.model];
+
+      tasks.forEach((task) => {
+        const hour = new Date(task.deadline).getHours();
+
+        const index = hours.findIndex((obj) => obj.hour === hour);
+
+        if (index === -1) {
+          hours.push({ hour, tasks: [task] });
+        } else {
+          hours[index].tasks.push(task);
+        }
+      });
+
+      this.model = hours;
+    }
+
     return this;
   }
 }

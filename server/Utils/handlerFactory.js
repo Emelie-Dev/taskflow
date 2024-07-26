@@ -183,6 +183,16 @@ const getMyData = (Model, collection) =>
 
     // Filters tasks based on request query
     if (req.query.calendar) {
+      if (req.query.calendar === 'big') {
+        const result = new QueryFeatures(
+          docs,
+          req.query,
+          collection,
+          null
+        ).sortByHour();
+
+        docs = result.model;
+      }
     } else if (
       req.query.month ||
       req.query.year ||

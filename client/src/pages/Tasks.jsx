@@ -166,7 +166,7 @@ const Tasks = () => {
             setAssignedProjectsDetails({
               loading: false,
               lastPage: false,
-              error: true,
+              error: false,
               pageError: true,
             });
           } else {
@@ -228,7 +228,7 @@ const Tasks = () => {
             setCurrentProjectDetails({
               loading: false,
               lastPage: false,
-              error: true,
+              error: false,
               pageError: true,
             });
           } else {

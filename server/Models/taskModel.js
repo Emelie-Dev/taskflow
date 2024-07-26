@@ -120,14 +120,13 @@ taskSchema.query.filterTasks = function (type) {
 
 // Filters scheduled tasks
 taskSchema.query.scheduledTasks = function (year, month, day) {
+  const startDate = new Date(`${year}-${month}-${day}`);
+
+  const endDate = new Date(`${year}-${month}-${day}`);
+  endDate.setDate(parseInt(day) + 1);
+
   return this.where({
-    $expr: {
-      $and: [
-        { $eq: [{ $year: '$deadline' }, year] },
-        { $eq: [{ $month: '$deadline' }, month] },
-        { $eq: [{ $dayOfMonth: '$deadline' }, day] },
-      ],
-    },
+    deadline: { $gte: startDate, $lt: endDate },
   });
 };
 

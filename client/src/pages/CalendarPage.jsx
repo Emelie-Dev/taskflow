@@ -6,7 +6,11 @@ import { Link } from 'react-router-dom';
 import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
 import { IoIosSearch, IoMdClose, IoIosNotifications } from 'react-icons/io';
 
-import { MdOutlineDashboard, MdOutlineSegment } from 'react-icons/md';
+import {
+  MdOutlineDashboard,
+  MdOutlineSegment,
+  MdOutlineSignalWifiOff,
+} from 'react-icons/md';
 import { FaTasks, FaCalendarAlt, FaSearch, FaCircle } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { GrStatusGood } from 'react-icons/gr';
@@ -16,6 +20,8 @@ import colorNames from 'css-color-names';
 import axios from 'axios';
 import Loader from '../components/Loader';
 import { AuthContext } from '../App';
+import { ToastContainer, toast } from 'react-toastify';
+import { generateName } from './Dashboard';
 
 const CalendarPage = () => {
   const { userData } = useContext(AuthContext);
@@ -25,6 +31,21 @@ const CalendarPage = () => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState({ status: true, error: false });
   const [tasksData, setTasksData] = useState(null);
+
+  const [requestData, setRequestData] = useState({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    day: new Date().getDate(),
+    page: 1,
+  });
+
+  const [tasks, setTasks] = useState(null);
+  const [tasksDetails, setTasksDetails] = useState({
+    loading: true,
+    lastPage: true,
+    error: false,
+    pageError: false,
+  });
 
   const searchRef = useRef();
   const navRef = useRef();
@@ -55,7 +76,6 @@ const CalendarPage = () => {
         );
 
         setLoading({ status: false, error: false });
-        console.log(data.data.tasksData);
         setTasksData(data.data.tasksData);
       } catch (err) {
         setLoading({ status: false, error: true });
@@ -76,6 +96,72 @@ const CalendarPage = () => {
     getCalendarDetails();
   }, [currentYear, currentMonth]);
 
+  useEffect(() => {
+    const getTasks = async () => {
+      const { year, month, day, page } = requestData;
+
+      try {
+        const { data } = await axios.get(
+          `/api/v1/tasks/my_tasks?sort=deadline&calendar=big&page=${page}&year=${year}&month=${month}&day=${day}`
+        );
+
+        setTasksDetails({
+          loading: false,
+          lastPage: data.data.tasks.length < 30,
+          error: false,
+          pageError: false,
+        });
+
+        if (page === 1) {
+          setTasks(data.data.tasks);
+        } else {
+          const categories = [...data.data.tasks];
+
+          const oldTasks = [...tasks];
+
+          categories.forEach((category) => {
+            const index = oldTasks.findIndex(
+              (task) => task.hour === category.hour
+            );
+
+            if (index === -1) {
+              setTasks([...tasks, category]);
+            } else {
+              oldTasks[index].tasks = [
+                ...oldTasks[index].tasks,
+                ...category.tasks,
+              ];
+
+              setTasks(oldTasks);
+            }
+          });
+        }
+      } catch (err) {
+        if (page === 1) {
+          setTasksDetails({
+            loading: false,
+            lastPage: true,
+            error: true,
+            pageError: false,
+          });
+        } else {
+          setTasksDetails({
+            loading: false,
+            lastPage: false,
+            error: false,
+            pageError: true,
+          });
+        }
+
+        return toast('An error occured while fetching tasks.', {
+          toastId: 'toast-id1',
+        });
+      }
+    };
+
+    getTasks();
+  }, [requestData]);
+
   const hideNav = (e) => {
     if (e.target === navRef.current) {
       setShowNav(false);
@@ -85,6 +171,7 @@ const CalendarPage = () => {
   const handleSearchText = (e) => {
     setSearchText(e.target.value);
   };
+
   const clearSearchText = () => {
     setSearchText('');
     searchRef.current.focus();
@@ -124,8 +211,49 @@ const CalendarPage = () => {
     return year === currentYear && month === currentMonth;
   };
 
+  const nextPage = () => {
+    if (tasksDetails.pageError) {
+      setRequestData({
+        ...requestData,
+        page: requestData.page,
+      });
+    } else {
+      setRequestData({
+        ...requestData,
+        page: requestData.page + 1,
+      });
+    }
+
+    setTasksDetails({
+      loading: true,
+      lastPage: true,
+      error: false,
+      pageError: false,
+    });
+  };
+
+  const scheduledTaskMessage = () => {
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth() + 1;
+    const day = new Date().getDate();
+
+    const currentDate = new Date(`${year}-${month}-${day}`);
+
+    const scheduledDate = new Date(
+      `${requestData.year}-${requestData.month}-${requestData.day}`
+    );
+
+    return Date.parse(scheduledDate) === Date.parse(currentDate)
+      ? 'No tasks are due today'
+      : scheduledDate > currentDate
+      ? 'No tasks are due on this date'
+      : 'No tasks were due on this date';
+  };
+
   return (
     <main className={styles.div}>
+      <ToastContainer autoClose={2000} />
+
       <nav
         ref={navRef}
         className={`${styles['responsive-nav']} ${
@@ -381,7 +509,7 @@ const CalendarPage = () => {
               </div>
             </div>
 
-            {loading.status ? (
+            {loading.status && (
               <div className={styles['loading-box']}>
                 {' '}
                 <Loader
@@ -391,269 +519,178 @@ const CalendarPage = () => {
                   }}
                 />
               </div>
-            ) : (
-              <BigCalendar
-                currentMonth={currentMonth}
-                currentYear={currentYear}
-                setCurrentMonth={setCurrentMonth}
-                setCurrentYear={setCurrentYear}
-                calenderRef={calenderRef}
-                tasksData={tasksData}
-                setLoading={setLoading}
-                priorityColors={priorityColors}
-              />
             )}
+
+            <BigCalendar
+              currentMonth={currentMonth}
+              currentYear={currentYear}
+              setCurrentMonth={setCurrentMonth}
+              setCurrentYear={setCurrentYear}
+              calenderRef={calenderRef}
+              tasksData={tasksData}
+              loading={loading}
+              setLoading={setLoading}
+              priorityColors={priorityColors}
+              requestData={requestData}
+              setRequestData={setRequestData}
+              setTasksDetails={setTasksDetails}
+              setTasks={setTasks}
+            />
           </section>
 
           <section className={styles['tasks-section']}>
             <h1 className={styles['task-section-head']}>Tasks</h1>
 
             <div className={styles['task-container']}>
-              <article className={styles.article}>
-                <div className={styles['task-time']}>12:00</div>
-                <div className={styles['task-box']}>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboards
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
-                    </div>
-                  </div>
+              {tasks === null ? (
+                ''
+              ) : tasks.length === 0 ? (
+                <div className={styles['scheduled-tasks-text']}>
+                  {scheduledTaskMessage()}
                 </div>
-              </article>
-              <article className={styles.article}>
-                <div className={styles['task-time']}>12:00</div>
-                <div className={styles['task-box']}>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
+              ) : (
+                tasks.map((task) => (
+                  <div key={task.hour} className={styles['hour-category']}>
+                    <time className={styles['scheduled-time']}>
+                      {task.hour}:00
+                    </time>
+
+                    <div className={styles['article-box']}>
+                      {task.tasks.map((elem) => (
+                        <article
+                          key={elem._id}
+                          className={`${styles['scheduled-task']} `}
+                        >
+                          <div
+                            className={`${styles['scheduled-task-content']}`}
+                            style={{
+                              borderTop: `0.18rem solid ${
+                                priorityColors[elem.priority]
+                              }`,
+                            }}
+                          >
+                            <div className={styles['scheduled-task-box']}>
+                              <span className={styles['scheduled-task-name']}>
+                                {elem.name}
+                              </span>
+
+                              <span
+                                className={
+                                  styles['scheduled-task-property-box']
+                                }
+                              >
+                                <span
+                                  className={
+                                    styles['scheduled-task-property-name']
+                                  }
+                                >
+                                  Project:
+                                </span>
+                                <a
+                                  href="#"
+                                  className={
+                                    styles['scheduled-task-project-name']
+                                  }
+                                >
+                                  {elem.project.name}
+                                </a>
+                              </span>
+
+                              <span
+                                className={
+                                  styles['scheduled-task-property-box']
+                                }
+                              >
+                                <span
+                                  className={
+                                    styles['scheduled-task-property-name']
+                                  }
+                                >
+                                  Status:
+                                </span>
+                                <span>
+                                  {' '}
+                                  {elem.status === 'open'
+                                    ? 'Open'
+                                    : task.status === 'progress'
+                                    ? 'In progress'
+                                    : 'Completed'}
+                                </span>
+                              </span>
+                            </div>
+
+                            <div className={styles['scheduled-task-pics-box']}>
+                              {elem.assigned ? (
+                                <span className={styles['task-tooltip-box']}>
+                                  <a href="#">
+                                    <img
+                                      className={styles['scheduled-task-pics']}
+                                      src={`../../assets/images/users/${elem.leader.photo}`}
+                                    />
+                                  </a>
+                                  <span className={styles['task-tooltip-text']}>
+                                    {generateName(
+                                      elem.leader.firstName,
+                                      elem.leader.lastName,
+                                      elem.leader.username
+                                    )}
+                                  </span>
+                                </span>
+                              ) : (
+                                <span className={styles['task-tooltip-box']}>
+                                  <a href="#">
+                                    <img
+                                      className={styles['scheduled-task-pics']}
+                                      src={`../../assets/images/users/${elem.user.photo}`}
+                                    />
+                                  </a>
+                                  <span className={styles['task-tooltip-text']}>
+                                    {generateName(
+                                      elem.user.firstName,
+                                      elem.user.lastName,
+                                      elem.user.username
+                                    )}
+                                  </span>
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </article>
+                      ))}
                     </div>
                   </div>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
-                    </div>
-                  </div>
+                ))
+              )}
+
+              {tasksDetails.loading && (
+                <div className={styles['loading-tasks-box']}>
+                  {' '}
+                  <Loader
+                    style={{
+                      width: '2.5rem',
+                      height: '2.5rem',
+                    }}
+                  />
                 </div>
-              </article>
-              <article className={styles.article}>
-                <div className={styles['task-time']}>12:00</div>
-                <div className={styles['task-box']}>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
-                    </div>
-                  </div>
+              )}
+
+              {!tasksDetails.lastPage && (
+                <div className={styles['show-more-box']}>
+                  <button
+                    className={styles['show-more-btn']}
+                    onClick={nextPage}
+                  >
+                    Show More
+                  </button>
                 </div>
-              </article>
-              <article className={styles.article}>
-                <div className={styles['task-time']}>12:00</div>
-                <div className={styles['task-box']}>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
-                    </div>
-                  </div>
+              )}
+
+              {tasksDetails.error && (
+                <div className={styles['no-projects-text']}>
+                  <MdOutlineSignalWifiOff className={styles['network-icon']} />{' '}
+                  Unable to retrieve data
                 </div>
-              </article>
-              <article className={styles.article}>
-                <div className={styles['task-time']}>12:00</div>
-                <div className={styles['task-box']}>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                  <div className={styles['task-item']}>
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <div className={styles['task-details']}>
-                      <span className={styles['task-priority-box']}>
-                        Priority:
-                        <span className={styles['task-priority-value']}>
-                          High
-                        </span>
-                      </span>
-                      <span className={styles['task-status-box']}>
-                        Status:{' '}
-                        <span className={styles['task-status-value']}>
-                          <GrStatusGood
-                            className={styles['task-status-icon']}
-                          />
-                          Completed
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </article>
+              )}
             </div>
           </section>
         </section>
@@ -661,5 +698,7 @@ const CalendarPage = () => {
     </main>
   );
 };
+
+// The 31'st date is throwing error
 
 export default CalendarPage;

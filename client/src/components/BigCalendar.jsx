@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '../styles/BigCalendar.module.css';
 
 import { MdArrowForwardIos, MdArrowBackIosNew } from 'react-icons/md';
@@ -12,8 +12,13 @@ const BigCalendar = ({
   setCurrentYear,
   calenderRef,
   tasksData,
+  loading,
   setLoading,
   priorityColors,
+  requestData,
+  setRequestData,
+  setTasksDetails,
+  setTasks,
 }) => {
   const maxDays = (currentMonth) => {
     const month = currentMonth;
@@ -170,8 +175,38 @@ const BigCalendar = ({
     );
   };
 
+  const changeDate = (newDay) => {
+    const { year, month, day } = requestData;
+
+    if (
+      year === currentYear &&
+      month === currentMonth &&
+      day === parseInt(newDay)
+    )
+      return;
+
+    setTasks(null);
+    setRequestData({
+      year: currentYear,
+      month: currentMonth,
+      day: parseInt(newDay),
+      page: 1,
+    });
+
+    setTasksDetails({
+      loading: true,
+      lastPage: true,
+      error: false,
+      pageError: false,
+    });
+  };
+
   return (
-    <div className={styles['table-container']}>
+    <div
+      className={`${styles['table-container']} ${
+        loading.status ? styles['hide-table-box'] : ''
+      }`}
+    >
       <ToastContainer autoClose={2000} />
 
       <span
@@ -185,14 +220,14 @@ const BigCalendar = ({
       <div className={styles['table-box']}>
         <table className={styles.table} ref={calenderRef}>
           <thead className={styles.thead}>
-            <tr>
+            <tr className={styles['table-head-box']}>
               <th className={styles['table-head']}>mon</th>
               <th className={styles['table-head']}>tue</th>
               <th className={styles['table-head']}>wed</th>
               <th className={styles['table-head']}>thu</th>
               <th className={styles['table-head']}>fri</th>
               <th className={styles['table-head']}>sat</th>
-              <th className={styles['table-head']}>Sun</th>
+              <th className={styles['table-head']}>sun</th>
             </tr>
           </thead>
 
@@ -207,6 +242,7 @@ const BigCalendar = ({
                     } ${
                       checkCurrentDate(current) ? styles['current-date'] : ''
                     }`}
+                    onClick={member ? () => changeDate(input) : null}
                   >
                     <div className={styles['data-box']}>
                       <span>{input}</span>

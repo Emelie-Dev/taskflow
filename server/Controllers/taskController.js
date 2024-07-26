@@ -834,14 +834,13 @@ export const getCalendarDetails = asyncErrorHandler(async (req, res, next) => {
     return next(new CustomError('Please provide a valid year and month.', 400));
   }
 
+  const startDate = new Date(`${year}-${month}`);
+  const endDate = new Date(`${year}-${month}`);
+  endDate.setMonth(parseInt(month) + 1);
+
   const tasks = await Task.find({
     user: req.user._id,
-    $expr: {
-      $and: [
-        { $eq: [{ $year: '$deadline' }, year] },
-        { $eq: [{ $month: '$deadline' }, month] },
-      ],
-    },
+    deadline: { $gte: startDate, $lt: endDate },
   });
 
   const days = maxDays(month);

@@ -13,6 +13,10 @@
   width: auto;
 }
 
+.hide-table-box {
+  visibility: hidden;
+}
+
 .table {
   border-spacing: 2rem 1.5rem;
   user-select: none;
@@ -25,14 +29,19 @@
   background: white;
 }
 
+.table-head-box {
+  width: 100%;
+}
+
 .table-head {
   text-transform: uppercase;
-  font-family: var(--general-font);
+  font-family: monospace;
   color: gray;
   padding-right: 4rem;
   padding-bottom: 1rem;
   padding-top: 0;
   z-index: 2;
+  font-size: 1.2rem;
 }
 
 .table-data {
@@ -48,15 +57,17 @@
 }
 
 .table-data:hover {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .current-date {
-  background: rgba(255, 166, 0, 0.2);
+  background: rgba(255, 166, 0, 0.37);
+  transition: opacity 0.25s;
 }
 
 .current-date:hover {
-  background: rgba(255, 166, 0, 0.2);
+  background: rgba(255, 166, 0, 0.37);
+  opacity: 0.8;
 }
 
 .prev-month {

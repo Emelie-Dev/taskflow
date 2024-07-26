@@ -366,6 +366,7 @@
   display: flex;
   flex-direction: column;
   font-family: var(--general-font);
+
   width: 50%;
 }
 
@@ -438,98 +439,205 @@
   display: flex;
   flex-direction: column;
   padding: 2rem 2rem 0;
-}
-
-.article {
-  display: flex;
   margin-bottom: 1rem;
-}
-
-.task-box {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid rgba(128, 128, 128);
-  width: 85%;
-  padding-top: 1rem;
-}
-
-.task-time {
-  color: gray;
-  font-weight: bold;
-  font-size: 1.2rem;
-  font-family: monospace;
-  margin-right: 2rem;
-}
-
-.task-item {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-}
-
-.task-name {
-  font-family: var(--general-font);
-  font-size: 1.1rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  word-wrap: break-word;
-}
-
-.task-details {
-  display: flex;
-  align-items: center;
-}
-
-.task-priority-box {
-  display: flex;
-  align-items: center;
-  font-family: var(--general-font);
-  color: gray;
-  font-weight: 500;
-  margin-right: 2rem;
-  font-size: 1.05rem;
-}
-
-.task-priority-value {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: red;
-  background: rgba(255, 0, 0, 0.1);
-  padding: 0.2rem 0.5rem;
-  font-size: 0.9rem;
-  border-radius: 10px;
-  margin-left: 0.5rem;
-  font-size: 1rem;
-}
-
-.task-status-box {
-  display: flex;
-  align-items: center;
-  font-family: var(--general-font);
-  color: gray;
-  font-weight: 500;
-  font-size: 1.05rem;
-}
-
-.task-status-value {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 0.5rem;
-  color: green;
-  font-size: 1rem;
-}
-
-.task-status-icon {
-  margin-right: 0.2rem;
 }
 
 .loading-box {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 4rem 0 2rem;
+  margin: 6rem 0 2rem;
+}
+
+.loading-tasks-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem 0 3rem;
+}
+
+.show-more-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0 3rem;
+}
+
+.show-more-btn {
+  outline: none;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background: orange;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  text-align: center;
+  border-radius: 5px;
+  font-size: 1.03rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 1px 1px 10px -3px orange;
+  transition: opacity 0.3s;
+}
+
+.show-more-btn:hover {
+  opacity: 0.8;
+}
+
+.no-projects-text {
+  font-family: var(--general-font);
+  color: gray;
+  font-size: 1.1rem;
+  margin: 1.5rem 0 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.network-icon {
+  margin-right: 0.7rem;
+  transform: translateY(2px);
+}
+
+.hour-category {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.scheduled-tasks-text {
+  font-family: var(--general-font);
+  color: gray;
+  font-size: 1.1rem;
+  margin: 1.5rem 0 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+.scheduled-time {
+  color: gray;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 600;
+  font-size: 1.09rem;
+  margin-right: 1.5rem;
+  width: 3rem;
+}
+
+.article-box {
+  width: calc(100% - 3rem);
+  display: grid;
+  grid-template-columns: calc(50% - 1.5rem) calc(50% - 1.5rem);
+  justify-content: space-between;
+  align-content: start;
+  column-gap: 3rem;
+}
+
+.scheduled-task {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.scheduled-task-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 1px 1px 20px -11px black;
+  padding: 1rem;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.scheduled-task-box {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 3rem);
+}
+
+.scheduled-task-name {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scheduled-task-property-box {
+  display: flex;
+  align-items: center;
+  font-family: var(--general-font);
+  margin-top: 0.7rem;
+}
+
+.scheduled-task-property-name {
+  color: gray;
+  font-weight: 600;
+  margin-right: 0.3rem;
+}
+
+.scheduled-task-project-name {
+  color: black;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scheduled-task-project-name:hover {
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.scheduled-task-pics-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scheduled-task-pics {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.task-tooltip-box {
+  position: relative;
+}
+
+.task-tooltip-text {
+  position: absolute;
+  background: gray;
+  color: white;
+  font-family: var(--general-font);
+  border-radius: 5px;
+  text-align: center;
+  max-width: 12.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  top: -75%;
+  right: -20%;
+  font-weight: 500;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip2 {
+  max-width: 6.5rem;
+  right: -100%;
+}
+
+.task-tooltip-box:hover .task-tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }
 
 /* Animations */
@@ -554,6 +662,11 @@
 @media screen and (max-width: 1174px) {
   .search {
     width: 22rem;
+  }
+
+  .tasks-section {
+    padding: 1.5rem 0.5rem;
+    padding-bottom: 1rem;
   }
 }
 
@@ -601,6 +714,16 @@
   .current-month {
     font-size: 1.75rem;
   }
+
+  .tasks-section {
+    padding: 1.5rem 0;
+    padding-bottom: 1rem;
+  }
+
+  .article-box {
+    column-gap: 2rem;
+    grid-template-columns: calc(50% - 1rem) calc(50% - 1rem);
+  }
 }
 
 @media screen and (max-width: 899px) {
@@ -623,9 +746,6 @@
     margin: 0 1rem;
   }
 
-  .task-box {
-    width: 90%;
-  }
   .calendar-details {
     width: 60%;
   }
@@ -646,6 +766,21 @@
   .today-btn-div {
     margin-right: 0;
   }
+
+  .tasks-section {
+    padding: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .article-box {
+    width: calc(90% - 3rem);
+    grid-template-columns: 100%;
+    column-gap: 0;
+  }
+
+  .hour-category {
+    padding: 0 2rem;
+  }
 }
 
 @media screen and (max-width: 699px) {
@@ -663,6 +798,16 @@
   }
   .task-section-head {
     margin: 0;
+  }
+
+  .article-box {
+    width: calc(90% - 3rem);
+    grid-template-columns: 100%;
+    column-gap: 0;
+  }
+
+  .hour-category {
+    padding: 0 1rem;
   }
 }
 
@@ -694,6 +839,10 @@
   .current-month {
     margin-bottom: 1rem;
   }
+
+  .hour-category {
+    padding: 0;
+  }
 }
 
 @media screen and (max-width: 499px) {
@@ -716,26 +865,13 @@
     padding-bottom: 1rem;
   }
 
-  .task-time {
-    font-size: 1.1rem;
-
-    margin-right: 1.5rem;
+  .article-box {
+    width: calc(100% - 3rem);
+    grid-template-columns: 100%;
   }
 
-  .task-box {
-    width: 100%;
-  }
-
-  .task-priority-box {
+  .scheduled-time {
     margin-right: 1rem;
-  }
-
-  .task-priority-value {
-    font-size: 0.9rem;
-  }
-
-  .task-status-value {
-    font-size: 0.9rem;
   }
 }
 
@@ -757,24 +893,6 @@
     flex-direction: column;
   }
 
-  .task-time {
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-  }
-
-  .task-name {
-    font-size: 1.05rem;
-  }
-
-  .task-priority-box {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .task-status-box {
-    font-size: 1rem;
-  }
-
   .alt-today-btn {
     padding: 0.5rem 1rem;
     font-size: 1rem;
@@ -784,14 +902,10 @@
     font-size: 1.3rem;
   }
 
-  .task-details {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .tasks-section {
-    padding: 1.5rem;
-    padding-bottom: 1rem;
+  .scheduled-time {
+    font-size: 1rem;
+    margin-right: 0.8rem;
+    width: 2.8rem;
   }
 }
 
@@ -809,6 +923,20 @@
 
   .task-status-box {
     font-size: 0.95rem;
+  }
+
+  .hour-category {
+    flex-direction: column;
+    margin-bottom: 1rem;
+    width: 100%;
+  }
+
+  .scheduled-time {
+    margin-bottom: 1rem;
+  }
+
+  .article-box {
+    width: 100%;
   }
 }
 
