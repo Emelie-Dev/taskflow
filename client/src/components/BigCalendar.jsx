@@ -201,6 +201,14 @@ const BigCalendar = ({
     });
   };
 
+  const isClickedDate = (input) => {
+    const { year, month, day } = requestData;
+
+    input = parseInt(input);
+
+    return year === currentYear && month === currentMonth && day === input;
+  };
+
   return (
     <div
       className={`${styles['table-container']} ${
@@ -239,9 +247,9 @@ const BigCalendar = ({
                     key={dataIndex}
                     className={`${styles['table-data']} ${
                       member ? '' : styles['prev-month']
-                    } ${
+                    } ${isClickedDate(input) ? styles['clickedDate'] : ''} ${
                       checkCurrentDate(current) ? styles['current-date'] : ''
-                    }`}
+                    } `}
                     onClick={member ? () => changeDate(input) : null}
                   >
                     <div className={styles['data-box']}>

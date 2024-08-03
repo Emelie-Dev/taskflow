@@ -55,18 +55,18 @@ export const getMyStats = asyncErrorHandler(async (req, res, next) => {
 
     const completedProjects = projects.filter((project) => {
       if (project.createdAt.getMonth() === currentDate - 1) {
-        if (project.progress === 100) {
+        if (project.details.projectProgress === 100) {
           percent.projects.complete[0]++;
         }
         percent.projects.created[0]++;
       } else if (project.createdAt.getMonth() === currentDate) {
-        if (project.progress === 100) {
+        if (project.details.projectProgress === 100) {
           percent.projects.complete[1]++;
         }
         percent.projects.created[1]++;
       }
 
-      return project.progress === 100;
+      return project.details.projectProgress === 100;
     }).length;
 
     for (let task of personalTasks) {
@@ -166,7 +166,7 @@ const getTasksStats = async (req, res, next) => {
     assigned: { $ne: true },
   });
 
-  let tasksStats = { completed: 0, open: 0, progress: 0 };
+  let tasksStats = { completed: 0, open: 0, progress: 0, matchLength: 0 };
 
   const { month: queryMonth, year: queryYear, range } = req.query;
 
@@ -188,6 +188,7 @@ const getTasksStats = async (req, res, next) => {
     if (month === 0) {
       tasks.forEach((task) => {
         if (task.createdAt.getFullYear() === year) {
+          tasksStats.matchLength++;
           if (task.status === 'complete') {
             tasksStats.completed++;
           } else if (task.status === 'progress') {
@@ -203,6 +204,7 @@ const getTasksStats = async (req, res, next) => {
           task.createdAt.getFullYear() === year &&
           task.createdAt.getMonth() + 1 === month
         ) {
+          tasksStats.matchLength++;
           if (task.status === 'complete') {
             tasksStats.completed++;
           } else if (task.status === 'progress') {
@@ -272,16 +274,47 @@ const getTasksStats = async (req, res, next) => {
   }
 
   tasksStats.completedPercent = Math.round(
-    (tasksStats.completed / (tasks.length || 1)) * 100
+    (tasksStats.completed / (tasksStats.matchLength || 1)) * 100
   );
 
   tasksStats.openPercent = Math.round(
-    (tasksStats.open / (tasks.length || 1)) * 100
+    (tasksStats.open / (tasksStats.matchLength || 1)) * 100
   );
 
   tasksStats.progressPercent = Math.round(
-    (tasksStats.progress / (tasks.length || 1)) * 100
+    (tasksStats.progress / (tasksStats.matchLength || 1)) * 100
   );
+
+  const values = {
+    completedPercent: tasksStats.completedPercent,
+    openPercent: tasksStats.openPercent,
+    progressPercent: tasksStats.progressPercent,
+  };
+
+  if (
+    tasksStats.completedPercent +
+      tasksStats.openPercent +
+      tasksStats.progressPercent >
+    100
+  ) {
+    const diff =
+      tasksStats.completedPercent +
+      tasksStats.openPercent +
+      tasksStats.progressPercent -
+      100;
+
+    const max = Math.max(
+      tasksStats.completedPercent,
+      tasksStats.openPercent,
+      tasksStats.progressPercent
+    );
+
+    for (const prop in values) {
+      if (values[prop] === max) {
+        tasksStats[prop] = tasksStats[prop] - diff;
+      }
+    }
+  }
 
   return res.status(200).json({
     status: 'success',
@@ -292,10 +325,11 @@ const getTasksStats = async (req, res, next) => {
 };
 
 const filter = (tasks, date) => {
-  let tasksStats = { completed: 0, open: 0, progress: 0 };
+  let tasksStats = { completed: 0, open: 0, progress: 0, matchLength: 0 };
 
   tasks.forEach((task) => {
     if (task.createdAt >= date && task.createdAt <= Date.now()) {
+      tasksStats.matchLength++;
       if (task.status === 'complete') {
         tasksStats.completed++;
       } else if (task.status === 'progress') {

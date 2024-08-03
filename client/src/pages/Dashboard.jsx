@@ -40,8 +40,6 @@ import { AuthContext } from '../App';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
-import Tasks from './Tasks';
-import Projects from './Projects';
 
 ChartJS.register(
   CategoryScale,
@@ -715,19 +713,21 @@ const Dashboard = () => {
                       <span
                         className={`${styles['article-increase-rate']} ${styles.green}`}
                       >
-                        {userStats.data.dataPercent.tasks.created === 0
-                          ? 0
+                        {userStats.data.tasks === 0
+                          ? ''
+                          : userStats.data.dataPercent.tasks.created === 0
+                          ? '0% '
                           : userStats.data.dataPercent.tasks.created < 0
-                          ? String(
+                          ? `${String(
                               userStats.data.dataPercent.tasks.created
-                            ).replace('-', '')
-                          : `${userStats.data.dataPercent.tasks.created}`}
-                        %{' '}
+                            ).replace('-', '')}% `
+                          : `${userStats.data.dataPercent.tasks.created}% `}
                       </span>
-                      {userStats.data.dataPercent.tasks.created < 0
-                        ? 'fewer'
-                        : 'more'}{' '}
-                      than last month.
+                      {userStats.data.tasks === 0
+                        ? ''
+                        : userStats.data.dataPercent.tasks.created < 0
+                        ? 'fewer than last month.'
+                        : 'more than last month.'}
                     </span>{' '}
                   </div>
                 </article>
@@ -751,13 +751,21 @@ const Dashboard = () => {
                       </span>
                     </span>
                     <span className={styles['article-increase']}>
-                      Completed over{' '}
-                      <span
-                        className={`${styles['article-increase-rate']} ${styles.red}`}
-                      >
-                        {userStats.data.currentProject.percent}%{' '}
-                      </span>
-                      tasks.
+                      {userStats.data.currentProject.completedTasks === 0 ? (
+                        'Completed zero tasks.'
+                      ) : userStats.data.currentProject.percent === 100 ? (
+                        'Completed all tasks.'
+                      ) : (
+                        <>
+                          Completed over{' '}
+                          <span
+                            className={`${styles['article-increase-rate']} ${styles.red}`}
+                          >
+                            {userStats.data.currentProject.percent}%{' '}
+                          </span>
+                          tasks.
+                        </>
+                      )}
                     </span>
                   </div>
                 </article>

@@ -1,3 +1,18 @@
+const monthLabels = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
 const maxDays = (month, year) => {
   const arr30 = [4, 6, 9, 11];
   let days = 0;
@@ -16,41 +31,44 @@ const maxDays = (month, year) => {
   return days;
 };
 
-const getLabels = (month, days) => {
+const getLabels = (type, month, days, view = 0) => {
   const dataLabels = {
     labelsText: [],
     labelsNum: [],
   };
 
-  const monthLabels = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+  if (type === 'month') {
+    let lastLabel = 0;
 
-  let lastLabel = 0;
+    for (let i = 1 + view; i <= days; i += 3) {
+      lastLabel = i;
+      dataLabels.labelsNum.push(i);
+      dataLabels.labelsText.push(`${monthLabels[month - 1]} ${i}`);
+    }
 
-  for (let i = 1; i <= days; i += 3) {
-    lastLabel = i;
-    dataLabels.labelsNum.push(i);
-    dataLabels.labelsText.push(`${monthLabels[month - 1]} ${i}`);
+    if (lastLabel < days) {
+      const diff = days - lastLabel;
+      dataLabels.labelsNum.push(lastLabel + diff);
+      dataLabels.labelsText.push(
+        `${monthLabels[month - 1]} ${lastLabel + diff}`
+      );
+    }
+  } else {
+    for (let i = 0 + view; i <= 23; i += 2) {
+      dataLabels.labelsNum.push(i);
+
+      const txt =
+        i === 0
+          ? '12 AM'
+          : i === 12
+          ? `12 PM`
+          : i > 12
+          ? `${i - 12} PM`
+          : `${i} AM`;
+
+      dataLabels.labelsText.push(txt);
+    }
   }
-
-  if (lastLabel < days) {
-    const diff = days - lastLabel;
-    dataLabels.labelsNum.push(lastLabel + diff);
-    dataLabels.labelsText.push(`${monthLabels[month - 1]} ${lastLabel + diff}`);
-  }
-
   return dataLabels;
 };
 
@@ -59,21 +77,6 @@ const getRangeLabels = (type, year, month, date, hour, view) => {
     labelsText: [],
     labelsNum: [],
   };
-
-  const monthLabels = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
 
   switch (type) {
     case 'y':
@@ -338,26 +341,30 @@ export class QueryFeatures {
       let month = parseInt(this.queryString.month);
       let year = parseInt(this.queryString.year);
       let day = parseInt(this.queryString.day);
+      const view = parseInt(this.queryString.view) || 0;
 
       if (isNaN(month) || isNaN(year) || isNaN(day)) return this;
 
       delete this.queryString.range;
 
       if (month === 0 && day === 0) {
-        this.graph.labels = [
-          'Jan',
-          'Feb',
-          'Mar',
-          'Apr',
-          'May',
-          'Jun',
-          'Jul',
-          'Aug',
-          'Sep',
-          'Oct',
-          'Nov',
-          'Dec',
-        ];
+        this.graph.labels = {
+          labels: [],
+          labelsText: [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+          ],
+        };
 
         this.graph.values = {
           created: new Array(12).fill(0),
@@ -388,7 +395,7 @@ export class QueryFeatures {
       } else if (day === 0) {
         const days = maxDays(month, year);
 
-        this.graph.labels = getLabels(month, days);
+        this.graph.labels = getLabels('month', month, days, view);
 
         this.graph.values = {
           created: new Array(this.graph.labels.labelsNum.length).fill(0),
@@ -426,7 +433,7 @@ export class QueryFeatures {
           }
         });
       } else {
-        this.graph.labels = [];
+        this.graph.labels = getLabels('date', null, null, view);
 
         this.graph.values = {
           created: new Array(12).fill(0),
@@ -445,7 +452,7 @@ export class QueryFeatures {
               docYear === year &&
               docMonth === month &&
               docDate === day &&
-              docHour % 2 === 0
+              this.graph.labels.labelsNum.includes(docHour)
             ) {
               const index = docHour / 2;
 

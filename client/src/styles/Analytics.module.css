@@ -356,6 +356,14 @@
   padding: 0.2rem 0 0;
 }
 
+.loader-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  margin: auto;
+}
+
 .category-div {
   display: grid;
   grid-template-columns: auto auto;
@@ -393,12 +401,15 @@
   color: gray;
   font-weight: 600;
   font-size: 1rem;
+  width: 105%;
 }
 
 .category-number {
   font-weight: 700;
   font-size: 1.5rem;
   margin: 0.2rem 0 0.8rem;
+  word-break: break-all;
+  margin-right: 10%;
 }
 
 .category-rate {
@@ -431,6 +442,17 @@
   fill: red;
   width: 3.5rem;
   height: 3.5rem;
+}
+
+.article-fail-text {
+  color: gray;
+  display: flex;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.network-icon {
+  margin-right: 0.5rem;
 }
 
 .project-graph-box {
@@ -588,58 +610,121 @@
   font-size: 0.95rem;
 }
 
-.view-project-div {
+.hide-pie-chart {
+  visibility: hidden;
+}
+
+.pie-loader-box {
+  margin: auto;
+}
+
+.pie-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.pie-fail-text {
+  position: absolute;
+  top: 35%;
+  right: calc(50% - 5.8rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  font-family: var(--general-font);
+  white-space: nowrap;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+}
+
+.request-input {
+  padding: 0.2rem;
+  outline: none;
+  border: 2px solid orange;
+  font-family: var(--general-font);
+  font-size: 1rem;
+  color: gray;
+  font-weight: bold;
+  border-radius: 10px;
+  margin-left: 1rem;
+}
+
+.year-input {
+  width: 6rem;
+}
+
+.load-chart {
+  outline: none;
+  border: none;
+  font-family: var(--general-font);
+  background: orange;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 1rem;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+.load-chart:hover {
+  opacity: 0.8;
+}
+
+.view-box {
   display: flex;
   align-items: center;
   margin-left: 1rem;
 }
 
-.view-task-div {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-bottom: 0.5rem;
-}
-
-.view-project-input {
-  padding: 0.2rem;
-  outline: none;
-  border: 2px solid orange;
-  font-family: var(--general-font);
-  font-size: 0.95rem;
+.view-text {
   color: gray;
-  font-weight: bold;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.hide-date-input {
-  display: none !important;
-}
-
-.view-project-btn {
-  outline: none;
-  font-family: var(--general-font);
-  border: none;
-  background: orange;
-  color: white;
-  border-radius: 5px;
-  padding: 0.5rem;
-  margin-left: 0.5rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  font-family: var(--general-font);
+  margin-right: 0.5rem;
 }
 
-.view-project-btn:hover {
-  opacity: 0.85;
+.disable-chart-load {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
-.alt-view-project-div {
+.chart-loader-box {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  margin-bottom: 0.5rem;
+  justify-content: center;
+  margin: 4rem 0;
+}
+
+.chart-fail-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  font-family: var(--general-font);
+  margin: 4rem 0;
+  font-size: 1.1rem;
+}
+
+.chart-network-icon {
+  transform: translateY(1px);
+}
+
+.task-head-container {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.task-input-container {
+  margin-top: 1rem;
 }
 
 /* Animations */
@@ -657,12 +742,6 @@
 
 @media screen and (min-width: 1100px) {
   .responsive-nav {
-    display: none;
-  }
-}
-
-@media screen and (min-width: 600px) {
-  .alt-view-project-div {
     display: none;
   }
 }
@@ -768,6 +847,10 @@
   }
   .task-category-item {
     margin-bottom: 1rem;
+  }
+
+  .category-number {
+    margin-right: 15%;
   }
 }
 
@@ -926,8 +1009,19 @@
     padding-bottom: 1.5rem;
   }
 
-  .view-project-div {
-    display: none;
+  .graph-head-container {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .input-container {
+    margin-top: 1rem;
+  }
+
+  .graph-select,
+  .request-input {
+    padding: 0.1rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -1004,6 +1098,16 @@
 
   .task-category-list {
     padding: 0rem 0rem 1rem;
+  }
+
+  .input-container {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .view-box,
+  .load-chart {
+    margin-top: 1rem;
   }
 }
 
