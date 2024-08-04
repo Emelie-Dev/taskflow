@@ -131,12 +131,12 @@ app.all('/api/*', (req, res, next) => {
   next(error);
 });
 
-// Serve static files from the React frontend app
-app.use(express.static(join(__dirname, 'dist')));
+// // Serve static files from the React frontend app
+// app.use(express.static(join(__dirname, 'dist')));
 
 // Route all requests to the React app
 app.get('*', (req, res) => {
-  res.sendFile(resolve(__dirname, 'dist', 'index.html'));
+  res.sendFile(resolve(__dirname, '../dist', 'index.html'));
 });
 
 // Error middleware
