@@ -112,6 +112,9 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Serve static files from the React frontend app
+app.use(express.static(join(__dirname, '../dist')));
+
 // Route handlers
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
@@ -130,9 +133,6 @@ app.all('/api/*', (req, res, next) => {
 
   next(error);
 });
-
-// // Serve static files from the React frontend app
-// app.use(express.static(join(__dirname, 'dist')));
 
 // Route all requests to the React app
 app.get('*', (req, res) => {
