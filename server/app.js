@@ -67,9 +67,9 @@ app.use(
 app.options('*', cors());
 
 // Render static files
-app.use(
-  express.static(join(dirname(fileURLToPath(import.meta.url)), 'Public'))
-);
+// app.use(
+//   express.static(join(dirname(fileURLToPath(import.meta.url)), 'Public'))
+// );
 
 // Adds security headers
 app.use(helmet());
@@ -109,8 +109,10 @@ app.use(compression());
 // Displays response details in terminal
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
-// Route handlers
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
+// Route handlers
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/projects', projectRouter);
@@ -120,14 +122,21 @@ app.use('/api/v1/analytics', analyticsRouter);
 app.use('/api/v1/dashboard', dashboardRouter);
 
 // For wrong endpoints
-
-app.all('*', (req, res, next) => {
+app.all('/api/*', (req, res, next) => {
   const error = new CustomError(
     `Cant find ${req.originalUrl} on the server.`,
     404
   );
 
   next(error);
+});
+
+// Serve static files from the React frontend app
+app.use(express.static(join(__dirname, 'dist')));
+
+// Route all requests to the React app
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
 });
 
 // Error middleware
