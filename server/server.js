@@ -24,17 +24,16 @@ process.on('uncaughtException', (err) => {
 import app from './app.js';
 
 // Connects to database
-
-const connectionString =
-  process.env.NODE_ENV === 'production'
-    ? process.env.DB_CONN_STR
-    : process.env.DB_LOCAL_CONN_STR;
-
-console.log(connectionString);
-
-await mongoose.connect(connectionString, {
-  autoIndex: false,
-});
+await mongoose.connect(
+  `${
+    process.env.NODE_ENV === 'production'
+      ? process.env.DB_CONN_STR
+      : process.env.DB_LOCAL_CONN_STR
+  }`,
+  {
+    autoIndex: false,
+  }
+);
 
 console.log('Database Connection successfull....');
 
