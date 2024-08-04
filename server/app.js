@@ -107,7 +107,7 @@ app.use(
 app.use(compression());
 
 // Displays response details in terminal
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // Route handlers
 
