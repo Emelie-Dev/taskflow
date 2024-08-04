@@ -113,7 +113,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Serve static files from the React frontend app
-app.use(express.static(join(__dirname, '../dist')));
+app.use(express.static(join(__dirname, '../../dist')));
 
 // Route handlers
 app.use('/api/v1/users', userRouter);
@@ -136,7 +136,7 @@ app.all('/api/*', (req, res, next) => {
 
 // Route all requests to the React app
 app.get('*', (req, res) => {
-  res.sendFile(resolve(__dirname, '../dist', 'index.html'));
+  res.sendFile(resolve(__dirname, '../../dist', 'index.html'));
 });
 
 // Error middleware
