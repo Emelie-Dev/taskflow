@@ -30,7 +30,7 @@ const connectionString =
     ? process.env.DB_CONN_STR
     : process.env.DB_LOCAL_CONN_STR;
 
-console.log(process.env.NODE_ENV, process.env.DB_CONN_STR);
+console.log(connectionString);
 
 await mongoose.connect(connectionString, {
   autoIndex: false,
