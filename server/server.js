@@ -25,11 +25,9 @@ import app from './app.js';
 
 // Connects to database
 await mongoose.connect(
-  `${
-    process.env.NODE_ENV === 'production'
-      ? process.env.DB_CONN_STR
-      : process.env.DB_LOCAL_CONN_STR
-  }`,
+  process.env.NODE_ENV === 'production'
+    ? process.env.DB_CONN_STR
+    : process.env.DB_LOCAL_CONN_STR,
   {
     autoIndex: false,
   }
