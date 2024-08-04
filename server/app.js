@@ -2,7 +2,7 @@
 
 import { fileURLToPath } from 'url';
 
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 
 // Third party Modules
 
@@ -136,7 +136,7 @@ app.use(express.static(join(__dirname, 'dist')));
 
 // Route all requests to the React app
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+  res.sendFile(resolve(__dirname, 'dist', 'index.html'));
 });
 
 // Error middleware
