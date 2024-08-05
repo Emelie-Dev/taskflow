@@ -17,6 +17,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 export const AuthContext = createContext();
 
+console.log(process.env.NODE_ENV);
+
 const App = () => {
   const [userData, setUserData] = useState({});
   const [isAuthenticated, setIsAuthenticated] = useState(null);
