@@ -65,6 +65,8 @@ const Login = () => {
         },
       });
 
+      console.log(data);
+
       if (data.status === 'success') {
         if (data.message) {
           toast(data.message, {
