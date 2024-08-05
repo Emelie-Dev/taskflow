@@ -56,7 +56,7 @@ const Login = () => {
 
     // Makes an api call to create a new account
     try {
-      const { data } = await axios({
+      const request = await axios({
         method: 'POST',
         url: '/api/v1/auth/login',
         data: {
@@ -65,7 +65,9 @@ const Login = () => {
         },
       });
 
-      console.log(data);
+      const data = request.data;
+
+      console.log(request);
 
       if (data.status === 'success') {
         if (data.message) {
