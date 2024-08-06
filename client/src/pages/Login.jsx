@@ -68,7 +68,6 @@ const Login = () => {
       });
 
       if (data.status === 'success') {
-        navigate('/dashboard');
         if (data.message) {
           toast(data.message, {
             toastId: customId,
