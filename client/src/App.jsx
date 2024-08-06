@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
 import ProjectItem from './pages/ProjectItem';
 import ProtectedRoute from './components/ProtectedRoute';
+import axios from 'axios';
 
 export const AuthContext = createContext();
 
