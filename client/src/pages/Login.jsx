@@ -13,7 +13,7 @@ import axios from 'axios';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-axios.defaults.withCredentials = true;
+console.log(process.env.NODE_ENV);
 
 const Login = () => {
   const [password, setPassword] = useState('');
@@ -80,7 +80,6 @@ const Login = () => {
 
       return setIsProcessing(false);
     } catch (err) {
-      console.log(err);
       toast(err.response.data.message, {
         toastId: customId,
         autoClose: 3000,
