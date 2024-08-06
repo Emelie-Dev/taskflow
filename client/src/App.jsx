@@ -23,7 +23,7 @@ export const apiClient = axios.create({
     import.meta.env.MODE === 'production'
       ? 'https://taskflow-vuni.onrender.com'
       : 'http://localhost:2005',
-  withCredentials: true,
+  // withCredentials: true,
 });
 
 const App = () => {
