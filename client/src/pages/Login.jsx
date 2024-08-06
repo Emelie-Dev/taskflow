@@ -81,6 +81,7 @@ const Login = () => {
 
       return setIsProcessing(false);
     } catch (err) {
+      console.log(err);
       toast(err.response.data.message, {
         toastId: customId,
         autoClose: 3000,
