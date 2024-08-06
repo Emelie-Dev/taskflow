@@ -10,10 +10,7 @@ export default defineConfig({
     ],
     proxy: {
       '/api': {
-        target:
-          process.env.NODE_ENV === 'production'
-            ? 'https://taskflow-vuni.onrender.com'
-            : 'http://localhost:2005',
+        target: 'http://localhost:2005',
         changeOrigin: true,
         secure: false,
       },
