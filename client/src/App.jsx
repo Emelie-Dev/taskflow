@@ -17,6 +17,14 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 export const AuthContext = createContext();
 
+export const apiClient = axios.create({
+  baseURL:
+    import.meta.env.MODE === 'production'
+      ? 'https://taskflow-vuni.onrender.com'
+      : 'http://localhost:2005',
+  withCredentials: true,
+});
+
 const App = () => {
   const [userData, setUserData] = useState({});
   const [isAuthenticated, setIsAuthenticated] = useState(null);

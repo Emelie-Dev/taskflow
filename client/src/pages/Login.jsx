@@ -13,6 +13,8 @@ import axios from 'axios';
 
 import 'react-toastify/dist/ReactToastify.css';
 
+import { apiClient } from '../App';
+
 const Login = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -56,7 +58,7 @@ const Login = () => {
 
     // Makes an api call to create a new account
     try {
-      const { data } = await axios({
+      const { data } = await apiClient({
         method: 'POST',
         url: '/api/v1/auth/login',
         data: {
