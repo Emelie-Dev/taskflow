@@ -58,7 +58,7 @@ const Login = () => {
 
     // Makes an api call to create a new account
     try {
-      const request = await axios({
+      const { data } = await axios({
         method: 'POST',
         url: '/api/v1/auth/login',
         data: {
@@ -67,11 +67,8 @@ const Login = () => {
         },
       });
 
-      const data = request.data;
-
-      console.log(request);
-
       if (data.status === 'success') {
+        navigate('/dashboard');
         if (data.message) {
           toast(data.message, {
             toastId: customId,
