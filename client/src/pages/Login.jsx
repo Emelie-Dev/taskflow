@@ -13,6 +13,8 @@ import axios from 'axios';
 
 import 'react-toastify/dist/ReactToastify.css';
 
+axios.defaults.withCredentials = true;
+
 const Login = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
