@@ -863,6 +863,14 @@
     width: 20rem;
   }
 
+  .loader-box {
+    margin-top: 5rem;
+  }
+
+  .pie-loader-box {
+    margin: auto 35%;
+  }
+
   .top-section {
     flex-direction: column;
     justify-content: flex-start;
@@ -924,6 +932,10 @@
     margin-left: 2rem;
   }
 
+  .pie-loader-box {
+    margin: auto 30%;
+  }
+
   .search {
     width: 18rem;
   }
@@ -939,6 +951,10 @@
   }
   .profile-box {
     display: none;
+  }
+
+  .pie-loader-box {
+    margin: auto 27%;
   }
 
   .project-graph-container {
@@ -963,6 +979,10 @@
   }
   .search {
     width: 13rem;
+  }
+
+  .pie-loader-box {
+    margin: auto 35%;
   }
 
   .pie-chart-div {

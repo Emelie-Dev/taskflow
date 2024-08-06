@@ -11,11 +11,9 @@ import { IoPersonCircleSharp } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 
 import { ToastContainer, toast } from 'react-toastify';
-import axios from 'axios';
 
 import 'react-toastify/dist/ReactToastify.css';
-
-// axios.defaults.withCredentials = true;
+import { apiClient } from '../App';
 
 const AccountAccess = () => {
   const [username, setUsername] = useState('');
@@ -27,7 +25,7 @@ const AccountAccess = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data } = await axios.get('/api/v1/auth/auth-check');
+        const { data } = await apiClient('/api/v1/auth/auth-check');
 
         if (data.status === 'success') {
           navigate('/dashboard');
@@ -102,7 +100,7 @@ const AccountAccess = () => {
 
     // Makes an api call to create a new account
     try {
-      const { data } = await axios({
+      const { data } = await apiClient({
         method: 'POST',
         url: '/api/v1/auth/signup',
         data: {

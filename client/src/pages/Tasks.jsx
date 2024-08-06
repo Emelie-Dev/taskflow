@@ -20,9 +20,8 @@ import { HiPlus } from 'react-icons/hi';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import NewTask from '../components/NewTask';
 import { ToastContainer, toast } from 'react-toastify';
-import axios from 'axios';
 import Loader from '../components/Loader';
-import { AuthContext } from '../App';
+import { apiClient, AuthContext } from '../App';
 import { generateName } from './Dashboard';
 
 const Tasks = () => {
@@ -76,7 +75,7 @@ const Tasks = () => {
         const page = projectsPage.personal.value;
 
         try {
-          const { data } = await axios.get(
+          const { data } = await apiClient(
             `/api/v1/projects/my_projects?page=${page}`
           );
 
@@ -143,7 +142,7 @@ const Tasks = () => {
         const page = projectsPage.assigned.value;
 
         try {
-          const { data } = await axios.get(
+          const { data } = await apiClient(
             `/api/v1/projects/assigned?page=${page}`
           );
           setAssignedProjectsDetails({
@@ -203,7 +202,7 @@ const Tasks = () => {
         return setCurrentProject({ tasks: false });
       } else if (id) {
         try {
-          const { data } = await axios.get(
+          const { data } = await apiClient(
             `/api/v1/projects/${id}/tasks${
               taskType === 'assigned' ? '/assigned' : ''
             }?page=${page}&deleteCount=${deleteCount}&createCount=${createCount}`

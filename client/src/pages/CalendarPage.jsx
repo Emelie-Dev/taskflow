@@ -17,9 +17,8 @@ import { GrStatusGood } from 'react-icons/gr';
 import BigCalendar from '../components/BigCalendar';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import colorNames from 'css-color-names';
-import axios from 'axios';
 import Loader from '../components/Loader';
-import { AuthContext } from '../App';
+import { apiClient, AuthContext } from '../App';
 import { ToastContainer, toast } from 'react-toastify';
 import { generateName } from './Dashboard';
 
@@ -71,7 +70,7 @@ const CalendarPage = () => {
   useEffect(() => {
     const getCalendarDetails = async () => {
       try {
-        const { data } = await axios.get(
+        const { data } = await apiClient(
           `/api/v1/tasks/calendar?year=${currentYear}&month=${currentMonth}`
         );
 
@@ -101,7 +100,7 @@ const CalendarPage = () => {
       const { year, month, day, page } = requestData;
 
       try {
-        const { data } = await axios.get(
+        const { data } = await apiClient(
           `/api/v1/tasks/my_tasks?sort=deadline&calendar=big&page=${page}&year=${year}&month=${month}&day=${day}`
         );
 

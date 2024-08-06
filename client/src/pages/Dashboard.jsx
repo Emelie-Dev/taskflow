@@ -36,8 +36,7 @@ import {
   Legend,
 } from 'chart.js';
 import NewTask from '../components/NewTask';
-import { AuthContext } from '../App';
-import axios from 'axios';
+import { apiClient, AuthContext } from '../App';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
 
@@ -134,7 +133,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        const { data } = await axios.get('/api/v1/analytics?dashboard=true');
+        const { data } = await apiClient('/api/v1/analytics?dashboard=true');
         setUserStats(data);
       } catch {
         setUserStats(false);
@@ -151,7 +150,7 @@ const Dashboard = () => {
   useEffect(() => {
     const getChartData = async () => {
       try {
-        const { data } = await axios.get(
+        const { data } = await apiClient(
           `/api/v1/tasks/my_tasks?range=${chartDetails.option}&view=${chartDetails.view}`
         );
         setChartData(data.data.graph);
@@ -170,7 +169,7 @@ const Dashboard = () => {
   useEffect(() => {
     const getUserTasks = async () => {
       try {
-        const { data } = await axios.get(
+        const { data } = await apiClient(
           `/api/v1/tasks/my_tasks?filter=${taskCategory}&fields=name&sort=-lastModified&limit=4`
         );
         setUserTasks(data.data.tasks);
@@ -190,7 +189,7 @@ const Dashboard = () => {
     const getScheduledTasks = async () => {
       const { year, month, day, page } = scheduleDetails;
       try {
-        const { data } = await axios.get(
+        const { data } = await apiClient(
           `/api/v1/tasks/my_tasks?sort=deadline&fields=name,deadline,status,priority,assigned,leader,project,user&calendar=true&page=${page}&limit=10&year=${year}&month=${month}&day=${day}`
         );
 
@@ -239,14 +238,14 @@ const Dashboard = () => {
 
   const getUserProjects = async (page) => {
     try {
-      let data = await axios.get(`/api/v1/projects/my_projects?page=${page}`);
+      let data = await apiClient(`/api/v1/projects/my_projects?page=${page}`);
       setProjects([...projects, ...data.data.data.projects]);
 
       setProjectsDetails({ page, error: false });
 
       while (data.data.data.projects.length >= 30) {
         page++;
-        data = await axios.get(`/api/v1/projects/my_projects?page=${page}`);
+        data = await apiClient(`/api/v1/projects/my_projects?page=${page}`);
         setProjects([...projects, ...data.data.data.projects]);
       }
     } catch {

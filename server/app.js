@@ -55,15 +55,27 @@ config({ path: './config.env' });
 // Middlewares
 
 // Implements Cors
-app.use(
-  cors()
-  // // For development only
-  // {
-  //   origin: 'http://localhost:5173', // URL of your React frontend
-  //   credentials: true,
-  // }
-);
-app.options('*', cors());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://godfather-task-management.vercel.app',
+  'https://taskflow-266v.onrender.com',
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Check if the origin is in the allowedOrigins array or is undefined (same-origin or server-side requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(
+        new Error('You are not allowed to make the request because of CORS.')
+      );
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Render static files
 app.use(
@@ -78,7 +90,7 @@ const limiter = rateLimit({
   max: 1000,
   windowMs: 60 * 60 * 1000,
   message:
-    'We have received too many request from this IP. Please try after one hour.',
+    'We have received too many request from this IP address. Please try after one hour.',
 });
 // app.use('/api', limiter);
 

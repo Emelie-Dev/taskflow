@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styles from '../styles/BigCalendar.module.css';
 
 import { MdArrowForwardIos, MdArrowBackIosNew } from 'react-icons/md';

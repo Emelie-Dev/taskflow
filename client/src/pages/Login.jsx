@@ -9,7 +9,6 @@ import { FaFacebookF } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import axios from 'axios';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -24,7 +23,7 @@ const Login = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data } = await axios.get('/api/v1/auth/auth-check');
+        const { data } = await apiClient('/api/v1/auth/auth-check');
 
         if (data.status === 'success') {
           navigate('/dashboard');

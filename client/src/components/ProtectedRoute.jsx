@@ -1,6 +1,5 @@
-import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../App';
+import React, { useContext, useEffect } from 'react';
+import { apiClient, AuthContext } from '../App';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ element: Component, ...prop }) => {
@@ -10,7 +9,7 @@ const ProtectedRoute = ({ element: Component, ...prop }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data } = await axios.get('/api/v1/auth/auth-check');
+        const { data } = await apiClient.get('/api/v1/auth/auth-check');
 
         if (data.status === 'success') {
           setIsAuthenticated(true);

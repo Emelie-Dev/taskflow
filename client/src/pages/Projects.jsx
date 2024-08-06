@@ -30,12 +30,11 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { IoCloseSharp } from 'react-icons/io5';
 import Project from '../components/Project';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
 import { generateName } from './Dashboard';
 import { GrStatusGood } from 'react-icons/gr';
-import { AuthContext } from '../App';
+import { apiClient, AuthContext } from '../App';
 
 export const months = [
   'January',
@@ -83,7 +82,7 @@ const Projects = () => {
       const { category, sort, page } = projectsDetails;
 
       try {
-        const { data } = await axios.get(
+        const { data } = await apiClient(
           `/api/v1/projects/my_projects?category=${category}&sort=${sort}&page=${page}`
         );
 

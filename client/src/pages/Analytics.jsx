@@ -18,9 +18,9 @@ import { AiOutlineRise } from 'react-icons/ai';
 import { GoDotFill } from 'react-icons/go';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import useDebounce from '../hooks/useDebounce';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
+import { apiClient } from '../App';
 
 import {
   Chart as ChartJS,
@@ -134,7 +134,7 @@ const Analytics = () => {
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        const { data } = await axios.get('/api/v1/analytics');
+        const { data } = await apiClient.get('/api/v1/analytics');
 
         setUserStats(data.data);
       } catch {
@@ -157,11 +157,11 @@ const Analytics = () => {
         let request;
 
         if (range) {
-          request = await axios.get(
+          request = await apiClient(
             `/api/v1/analytics?tasks=true&range=${range}`
           );
         } else {
-          request = await axios.get(
+          request = await apiClient(
             `/api/v1/analytics?tasks=true&year=${year}&month=${month}`
           );
         }
@@ -215,11 +215,11 @@ const Analytics = () => {
         let request;
 
         if (range) {
-          request = await axios.get(
+          request = await apiClient(
             `/api/v1/projects/my_projects?range=${range}&view=${view}`
           );
         } else {
-          request = await axios.get(
+          request = await apiClient(
             `/api/v1/projects/my_projects?year=${year}&month=${month}&day=${day}&view=${view}`
           );
         }
@@ -297,11 +297,11 @@ const Analytics = () => {
         let request;
 
         if (range) {
-          request = await axios.get(
+          request = await apiClient(
             `/api/v1/tasks/my_tasks?range=${range}&view=${view}`
           );
         } else {
-          request = await axios.get(
+          request = await apiClient(
             `/api/v1/tasks/my_tasks?year=${year}&month=${month}&day=${day}&view=${view}`
           );
         }

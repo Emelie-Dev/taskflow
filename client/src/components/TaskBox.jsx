@@ -6,12 +6,11 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 
 import { MdOutlineModeEditOutline } from 'react-icons/md';
 import { BsThreeDotsVertical } from 'react-icons/bs';
-import { AuthContext } from '../App';
+import { apiClient, AuthContext } from '../App';
 import { VscIssueReopened } from 'react-icons/vsc';
 import { generateName } from '../pages/Dashboard';
 import { months } from '../pages/Projects';
 import Loader from './Loader';
-import axios from 'axios';
 import { SiKashflow } from 'react-icons/si';
 import DeleteModal from './DeleteModal';
 
@@ -77,7 +76,7 @@ const TaskBox = ({
         setTaskActivities(taskObj.activities);
       } else {
         try {
-          const { data } = await axios.get(
+          const { data } = await apiClient.get(
             `/api/v1/tasks/${taskObj._id}/activities?page=${activitiesDetails.page}`
           );
 
@@ -174,12 +173,12 @@ const TaskBox = ({
       if (body.otherFields) {
         delete body.otherFields;
 
-        response = await axios.patch(`/api/v1/tasks/${taskObj._id}`, body);
+        response = await apiClient.patch(`/api/v1/tasks/${taskObj._id}`, body);
       }
 
       if (body.assignees) {
         try {
-          response = await axios.patch(
+          response = await apiClient.patch(
             `/api/v1/tasks/${taskObj._id}/assignees`,
             {
               assignee: [...body.assignees],
@@ -226,7 +225,7 @@ const TaskBox = ({
     try {
       setDeleting(true);
 
-      await axios.delete(`/api/v1/tasks/${task._id}`);
+      await apiClient.delete(`/api/v1/tasks/${task._id}`);
 
       setDeleting(false);
 

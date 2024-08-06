@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from '../styles/NewTask.module.css';
 import { IoCloseSharp } from 'react-icons/io5';
 import { generateName } from '../pages/Dashboard';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import { SiKashflow } from 'react-icons/si';
+import { apiClient } from '../App';
 
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth();
@@ -164,18 +164,21 @@ const NewTask = ({
     setIsProcessing(true);
 
     try {
-      let response = await axios.post(`/api/v1/tasks`, body);
+      let response = await apiClient.post(`/api/v1/tasks`, body);
 
       let task = response.data.data.task;
 
       if (taskData.assignees.size !== 0) {
         try {
-          response = await axios.patch(`/api/v1/tasks/${task._id}/assignees`, {
-            assignee: [...taskData.assignees],
-          });
+          response = await apiClient.patch(
+            `/api/v1/tasks/${task._id}/assignees`,
+            {
+              assignee: [...taskData.assignees],
+            }
+          );
 
           if (fixedProject) {
-            const { data } = await axios.get(
+            const { data } = await apiClient.get(
               `/api/v1/tasks/${task._id}/activities?page=1`
             );
 
