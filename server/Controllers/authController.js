@@ -15,14 +15,16 @@ const signToken = (id) => {
 const sendResponse = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
+  console.log(req.secure);
+
   res.cookie('jwt', token, {
     maxAge: process.env.JWT_LOGIN_EXPIRES,
 
     //  Prevents javascript access
     httpOnly: true,
 
-    // Heroku specific
-    // secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+    secure: process.env.NODE_ENV === 'production' ? true : false,
+    sameSite: 'None',
   });
 
   return res.status(statusCode).json({
@@ -230,9 +232,12 @@ export const login = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Sends verification mail
-  if (!user.emailVerified && user.emailVerificationTokenExpires < Date.now()) {
+  if (!user.emailVerified && !user.emailVerificationTokenExpires) {
     return await sendEmailLink(user, false, req, res, next);
-  } else if (!user.emailVerified && !user.emailVerificationTokenExpires) {
+  } else if (
+    !user.emailVerified &&
+    user.emailVerificationTokenExpires < Date.now()
+  ) {
     return await sendEmailLink(user, false, req, res, next);
   } else if (!user.emailVerified) {
     return res.status(200).json({
