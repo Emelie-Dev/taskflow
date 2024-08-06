@@ -58,7 +58,7 @@ const Login = () => {
     try {
       const { data } = await axios({
         method: 'POST',
-        url: 'https://taskflow-vuni.onrender.com/api/v1/auth/login',
+        url: '/api/v1/auth/login',
         data: {
           email,
           password,
