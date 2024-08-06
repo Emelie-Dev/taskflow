@@ -28,7 +28,9 @@ const Login = () => {
         if (data.status === 'success') {
           navigate('/dashboard');
         }
-      } catch {}
+      } catch (err) {
+        console.log(err);
+      }
     };
 
     checkAuth();
