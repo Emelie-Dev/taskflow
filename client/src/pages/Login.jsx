@@ -13,8 +13,6 @@ import axios from 'axios';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-console.log(process.env.NODE_ENV);
-
 const Login = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -60,7 +58,7 @@ const Login = () => {
     try {
       const { data } = await axios({
         method: 'POST',
-        url: '/api/v1/auth/login',
+        url: 'https://taskflow-vuni.onrender.com/api/v1/auth/login',
         data: {
           email,
           password,
