@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useContext } from 'react';
 import styles from '../styles/Profile.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -12,8 +12,11 @@ import { FaTasks, FaCalendarAlt } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { MdOutlineSegment, MdEdit } from 'react-icons/md';
 import { FaSearch } from 'react-icons/fa';
+import { AuthContext } from '../App';
+import { months } from './Dashboard';
 
 const Profile = () => {
+  const { userData } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const searchRef = useRef();
@@ -33,6 +36,26 @@ const Profile = () => {
       setShowNav(false);
     }
   };
+
+  const getValue = (property) => {
+    if (property === 'dob') {
+      if (!userData.dob) return <i style={{ color: 'gray' }}>Not specified</i>;
+
+      const date = new Date(userData.dob);
+
+      return `${
+        months[date.getMonth()]
+      } ${date.getDate()}, ${date.getFullYear()}`;
+    } else {
+      return userData[property] ? (
+        userData[property]
+      ) : (
+        <i style={{ color: 'gray' }}>Not specified</i>
+      );
+    }
+  };
+
+  console.log(userData);
 
   return (
     <main className={styles.div}>
@@ -208,7 +231,7 @@ const Profile = () => {
             />
           </span>
           <div className={styles['icon-div']}>
-            <Link className={styles['icon-container']}  to={'/notifications'}>
+            <Link className={styles['icon-container']} to={'/notifications'}>
               <IoIosNotifications className={styles['notification-icon']} />
             </Link>
             <span className={styles['icon-container']}>
@@ -237,25 +260,29 @@ const Profile = () => {
 
         <section className={styles['section-content']}>
           <div className={styles['profile-container']}>
-            <Link
+            {/* <Link
               to={'/settings'}
               className={styles['edit-profile-link']}
               title="Edit Profile"
             >
               <MdEdit className={styles['edit-profile-icon']} />
-            </Link>
+            </Link> */}
 
             <div className={styles['left-section']}>
               <figure className={styles['profile-pics-box']}>
                 <img
-                  src="../../assets/images/download.jpeg"
+                  src={`../../assets/images/users/${userData.photo}`}
                   className={styles['profile-pics']}
                 />
               </figure>
 
-              <span className={styles['username']}>Ofoka Vincent</span>
+              <span className={styles['username']}>
+                {userData.firstName} {userData.lastName}
+              </span>
 
-              <span className={styles['user-title']}>Web Developer</span>
+              <span className={styles['user-title']}>
+                {userData.occupation}
+              </span>
 
               <div className={styles['profile-btn-div']}>
                 <button className={styles['message-btn']}>Send message</button>
@@ -266,31 +293,50 @@ const Profile = () => {
             <div className={styles['right-section']}>
               <div className={styles['property-box']}>
                 <span className={styles['property-name']}>Username:</span>
-                <span className={styles['property-value']}>Godfather</span>
+                <span className={styles['property-value']}>
+                  {getValue('username')}
+                </span>
               </div>
               <div className={styles['property-box']}>
                 <span className={styles['property-name']}>Phone Number:</span>
-                <span className={styles['property-value']}>09039382783</span>
+                <span className={styles['property-value']}>
+                  {getValue('mobileNumber')}
+                </span>
               </div>
               <div className={styles['property-box']}>
                 <span className={styles['property-name']}>Birthday:</span>
-                <span className={styles['property-value']}>10th December</span>
+                <span className={styles['property-value']}>
+                  {' '}
+                  {getValue('dob')}
+                </span>
               </div>
               <div className={styles['property-box']}>
                 <span className={styles['property-name']}>Email:</span>
-                <span className={styles['property-value']}>abc@gmail.com</span>
-              </div>{' '}
+                <span className={styles['property-value']}>
+                  {getValue('email')}
+                </span>
+              </div>
               <div className={styles['property-box']}>
                 <span className={styles['property-name']}>Country:</span>
-                <span className={styles['property-value']}>Nigeria</span>
-              </div>{' '}
+                <span className={styles['property-value']}>
+                  {getValue('country')}
+                </span>
+              </div>
               <div className={styles['property-box']}>
                 <span className={styles['property-name']}>Language:</span>
-                <span className={styles['property-value']}>English</span>
+                <span className={styles['property-value']}>
+                  {getValue('language')}
+                </span>
               </div>
               <div className={styles['property-box']}>
                 <span className={styles['property-name']}>Gender:</span>
-                <span className={styles['property-value']}>Male</span>
+                <span className={styles['property-value']}>
+                  {getValue('gender') === 'nil' ? (
+                    <i style={{ color: 'gray' }}>Not specified</i>
+                  ) : (
+                    getValue('gender')
+                  )}
+                </span>
               </div>
             </div>
           </div>

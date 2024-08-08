@@ -33,14 +33,14 @@ await mongoose.connect(
   }
 );
 
-console.log('Database Connection successfull....');
+console.log('\nDatabase Connection successfull....');
 
 // Starting the server
 
 const port = process.env.PORT || 2005;
 
 const server = app.listen(port, () => {
-  console.log(`App is running on port - ${port}`);
+  console.log(`App is running on port - ${port}\n`);
 });
 
 // Handles Promise Rejections

@@ -111,7 +111,7 @@ export const protectRoute = asyncErrorHandler(async (req, res, next) => {
   );
 
   // if the user exists
-  const user = await User.findById(decodedToken.id);
+  const user = await User.findById(decodedToken.id).select('-password');
 
   if (!user) {
     const error = new CustomError(

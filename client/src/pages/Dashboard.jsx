@@ -50,7 +50,7 @@ ChartJS.register(
   Legend
 );
 
-const months = [
+export const months = [
   'January',
   'February',
   'March',
