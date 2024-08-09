@@ -31,6 +31,8 @@
     - Add error boundary to the protected routes
     - Add delete project to project item page
     - Use database calues for priority colors ✔
+    - Limit user data been sent to the client as response payload
+    - Add loader in protected route page
 
 
  -- Data Design

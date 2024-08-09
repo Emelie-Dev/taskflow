@@ -15,15 +15,13 @@ const signToken = (id) => {
 const sendResponse = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
-  console.log(req.secure);
-
   res.cookie('jwt', token, {
     maxAge: process.env.JWT_LOGIN_EXPIRES,
 
     //  Prevents javascript access
     httpOnly: true,
 
-    secure: process.env.NODE_ENV === 'production' ? true : false,
+    secure: true,
     sameSite: 'None',
   });
 
