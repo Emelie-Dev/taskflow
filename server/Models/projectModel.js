@@ -30,11 +30,6 @@ const projectSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      immutable: true,
-    },
     status: {
       type: String,
       enum: ['active', 'inactive'],
@@ -77,10 +72,6 @@ const projectSchema = new mongoose.Schema(
       default: false,
     },
     deadline: Date,
-    lastModified: {
-      type: Date,
-      default: Date.now,
-    },
     details: {
       type: {
         open: {
@@ -111,6 +102,7 @@ const projectSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true,
   }
 );
 

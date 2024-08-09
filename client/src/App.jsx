@@ -67,7 +67,7 @@ const App = () => {
           element={<ProtectedRoute element={Notifications} />}
         />
         <Route
-          path="/projectitem"
+          path={'/project/:projectId'}
           element={<ProtectedRoute element={ProjectItem} />}
         />
       </Routes>

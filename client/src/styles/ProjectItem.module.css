@@ -1162,6 +1162,25 @@ td {
   color: orange;
 }
 
+.loader-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.error-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  font-family: var(--general-font);
+  font-weight: 500;
+  height: 75%;
+  font-size: 1.05rem;
+  margin: 0 1rem;
+}
+
 /* Animations */
 
 @keyframes showNav {

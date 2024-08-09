@@ -265,7 +265,7 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  const excludeArray = ['lastModified', 'assigned', 'mainTask', 'assignee'];
+  const excludeArray = ['assigned', 'mainTask', 'assignee'];
 
   excludeArray.forEach((value) => delete req.body[value]);
 
@@ -282,7 +282,7 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
 
   // Update project details
   project.updateDetails(null, task.status);
-  project.lastModified = Date.now();
+
   await project.save();
 
   // Update the user current project
@@ -390,7 +390,7 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
       }
 
       // Update the last Modified property
-      task.lastModified = Date.now();
+
       await task.save();
 
       // Saves the main task and other assigned tasks
@@ -399,14 +399,13 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 
         // Updates the project details
         project.updateDetails(mainTask.status, req.body.status);
-        project.lastModified = Date.now();
+
         await project.save();
 
         // To make sure the main task is saved after the assigned task for proper data validation
         mainTask.status = req.body.status;
 
         // Update the last Modified property
-        mainTask.lastModified = Date.now();
 
         await mainTask.save();
 
@@ -414,7 +413,6 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
           { mainTask: task.mainTask },
           {
             status: req.body.status,
-            lastModified: Date.now(),
           }
         );
 
@@ -441,13 +439,7 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
         req
       );
     } else {
-      excludeArray = [
-        'lastModified',
-        'assigned',
-        'mainTask',
-        'leader',
-        'assignee',
-      ];
+      excludeArray = ['assigned', 'mainTask', 'leader', 'assignee'];
 
       excludeArray.forEach((value) => delete req.body[value]);
 
@@ -482,14 +474,11 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
       }
 
       // Adds the last Modified property to the request body
-      req.body.lastModified = Date.now();
 
       if (req.body.status) {
         // Updates the project details
         project.updateDetails(task.status, req.body.status);
       }
-
-      project.lastModified = Date.now();
 
       // updates the task
       task = await Task.findByIdAndUpdate(req.params.id, req.body, {
@@ -592,7 +581,7 @@ export const deleteTask = asyncErrorHandler(async (req, res, next) => {
 
       // Updates the project details
       project.updateDetails(task.status, null);
-      project.lastModified = Date.now();
+
       await project.save();
 
       // Update the user current project
@@ -715,7 +704,7 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
   // Update the task
   task = await Task.findByIdAndUpdate(
     task._id,
-    { assignee: [...new Set(req.body.assignee)], lastModified: Date.now() },
+    { assignee: [...new Set(req.body.assignee)] },
     { new: true, runValidators: true }
   ).populate({
     path: 'assignee',
@@ -753,7 +742,7 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Update the last modified property of the project
-  project.lastModified = Date.now();
+
   await project.save();
 
   // Update the user current project

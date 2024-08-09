@@ -58,15 +58,6 @@ const taskSchema = new mongoose.Schema(
       enum: ['high', 'medium', 'low'],
       required: [true, 'Please provide a value for the priority field.'],
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      immutable: true,
-    },
-    lastModified: {
-      type: Date,
-      default: Date.now,
-    },
     deadline: Date,
     description: {
       type: String,
@@ -77,6 +68,7 @@ const taskSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true,
   }
 );
 
@@ -98,7 +90,7 @@ taskSchema.query.filterTasks = function (type) {
     // returns tasks from the last seven days
     case 'recent':
       date.setDate(date.getDate() - 7);
-      return this.where('lastModified').gte(date);
+      return this.where('updatedAt').gte(date);
 
     // returns urgent tasks
     case 'urgent':

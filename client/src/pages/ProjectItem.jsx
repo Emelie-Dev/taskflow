@@ -29,6 +29,10 @@ import Project from '../components/Project';
 import { IoCloseSharp } from 'react-icons/io5';
 import { ToastContainer, toast } from 'react-toastify';
 import NewTask from '../components/NewTask';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { apiClient } from '../App';
+import Loader from '../components/Loader';
 
 const ProjectItem = () => {
   const [showNav, setShowNav] = useState(false);
@@ -37,14 +41,53 @@ const ProjectItem = () => {
   const [showFiles, setShowFiles] = useState(false);
   const [files, setFiles] = useState([]);
   const [addTask, setAddTask] = useState(false);
+  const [project, setProject] = useState(null);
+
   const navRef = useRef();
   const fileRef = useRef();
 
+  const { projectId } = useParams();
+
   useEffect(() => {
-    if (!showFiles) {
-      fileRef.current.files = new DataTransfer().files;
+    if (fileRef.current) {
+      if (!showFiles) {
+        fileRef.current.files = new DataTransfer().files;
+      }
     }
   }, [showFiles]);
+
+  // Fetch project data
+  useEffect(() => {
+    const getProjectData = async () => {
+      try {
+        const { data } = await apiClient(`/api/v1/projects/${projectId}`);
+
+        setProject(data.data.project);
+        console.log(data.data.project);
+      } catch (err) {
+        if (!err.response.data || err.response.status === 500) {
+          setProject({ error: true, code: 500 });
+          return toast('Unable to load project.', {
+            toastId: 'toast-id1',
+            autoClose: 2000,
+          });
+        } else {
+          if (err.response.status === 404) {
+            setProject({ error: true, code: 404 });
+          } else {
+            setProject({ error: true, code: 400 });
+          }
+
+          return toast(err.response.data.message, {
+            toastId: 'toast-id1',
+            autoClose: 2000,
+          });
+        }
+      }
+    };
+
+    getProjectData();
+  }, []);
 
   const freeSpace = 3.65 * 1024 * 1024;
   const toastId = 'toast-id';
@@ -259,7 +302,7 @@ const ProjectItem = () => {
         </ul>
       </nav>
 
-      <ToastContainer autoClose={3000} />
+      <ToastContainer autoClose={2500} />
 
       <section className={styles.section}>
         <header className={styles.header}>
@@ -395,896 +438,998 @@ const ProjectItem = () => {
         )}
 
         <section className={styles['section-content']}>
-          <h1 className={styles['project-name']}>Fitness App</h1>
-
-          <div className={styles['edit-btn-div']}>
-            <button
-              className={styles['edit-btn']}
-              onClick={() => setdisplayModal(true)}
-            >
-              Edit Project
-            </button>
-          </div>
-
-          <div className={styles['project-container']}>
-            <div className={styles['left-section']}>
-              <div className={styles['project-content']}>
-                <span className={styles['project-leader']}>
-                  <span className={styles['leader-text']}>Project Leader:</span>
-                  <span className={styles['leader']}>
-                    <img
-                      src="../../assets/images/profile1.webp"
-                      className={styles['leader-img']}
-                    />{' '}
-                    Jon Snow
-                  </span>
-                </span>
-
-                <span className={styles['project-description']}>
-                  <span className={styles['description-text']}>
-                    Project Description:
-                  </span>
-                  <div className={styles['description']}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Donec vel elit neque. Class aptent taciti sociosqu ad litora
-                    torquent per conubia nostra, per inceptos himenaeos.
-                    Vestibulum sollicitudin libero vitae est consectetur, a
-                    molestie tortor consectetur. Aenean tincidunt interdum
-                    ipsum, id pellentesque diam suscipit ut. Vivamus massa mi,
-                    fermentum eget neque eget, imperdiet tristique lectus. Proin
-                    at purus ut sem pellentesque tempor sit amet ut lectus. Sed
-                    orci augue, placerat et pretium ac, hendrerit in felis.
-                    Integer scelerisque libero non metus commodo, et hendrerit
-                    diam aliquet. Proin tincidunt porttitor ligula, a tincidunt
-                    orci pellentesque nec. Ut ultricies maximus nulla id
-                    consequat. Fusce eu consequat mi, eu euismod ligula. Aliquam
-                    porttitor neque id massa porttitor, a pretium velit
-                    vehicula. Morbi volutpat tincidunt urna, vel ullamcorper
-                    ligula fermentum at.
-                  </div>
-                </span>
-              </div>
-
-              <div className={styles['alt-project-details-container']}>
-                <span className={styles['project-details-head']}>
-                  Project Details
-                </span>
-
-                <div className={styles['table-container']}>
-                  <table className={styles.table}>
-                    <tbody>
-                      <tr>
-                        <td className={styles['table-property']}>Tasks:</td>
-                        <td>15</td>
-                      </tr>
-                      <tr>
-                        <td className={styles['table-property']}>Created:</td>
-                        <td>10th January, 2024</td>
-                      </tr>
-                      <tr>
-                        <td className={styles['table-property']}>Deadline:</td>
-                        <td>26 April, 2024</td>
-                      </tr>
-                      <tr>
-                        <td className={styles['table-property']}>Team:</td>
-                        <td>6 members</td>
-                      </tr>
-                      <tr>
-                        <td className={styles['table-property']}>Status:</td>
-                        <td>Active</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className={styles['progress-div']}>
-                  <span className={styles['progress-box']}>
-                    <span>Progress</span>
-                    <span className={styles['progress-value']}>60%</span>
-                  </span>
-
-                  <span className={styles['progress-bar']}>&nbsp;</span>
-                </div>
-              </div>
-
-              <div className={styles['alt-project-team-container']}>
-                <span className={styles['team-head']}>Team</span>
-
-                <div className={styles['team-div']}>
-                  <div className={styles['member-box']}>
-                    <img
-                      src="../../assets/images/profile2webp.webp"
-                      className={styles['member-img']}
-                    />
-                    <span className={styles['member-details']}>
-                      <span className={styles['member-name']}>Arya Stark</span>
-                      <span className={styles['member-title']}>
-                        Web Designer
-                      </span>
-                    </span>
-                  </div>
-
-                  <div className={styles['member-box']}>
-                    <img
-                      src="../../assets/images/profile3.jpeg"
-                      className={styles['member-img']}
-                    />
-                    <span className={styles['member-details']}>
-                      <span className={styles['member-name']}>
-                        Ramsay Bolton
-                      </span>
-                      <span className={styles['member-title']}>
-                        Web Developer
-                      </span>
-                    </span>
-                  </div>
-
-                  <div className={styles['member-box']}>
-                    <img
-                      src="../../assets/images/profile4.jpeg"
-                      className={styles['member-img']}
-                    />
-                    <span className={styles['member-details']}>
-                      <span className={styles['member-name']}>
-                        Cersei Lannister
-                      </span>
-                      <span className={styles['member-title']}>
-                        Human resources manager
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles['files-conatiner']}>
-                <h1 className={styles['files-text']}>
-                  Project Files
-                  <span className={styles['files-size-left']}>
-                    {' '}
-                    (3.65<span className={styles['files-size-unit']}>
-                      mb
-                    </span>{' '}
-                    free)
-                  </span>
-                </h1>
-
-                <div className={styles['add-files-box']}>
-                  <button
-                    className={styles['add-files-btn']}
-                    onClick={() => fileRef.current.click()}
-                  >
-                    Add Files
-                  </button>
-                  <input
-                    type="file"
-                    className={styles['add-file-input']}
-                    ref={fileRef}
-                    onChange={displayFiles}
-                    multiple
-                  />
-                </div>
-
-                <div className={styles['files-box']}>
-                  <article className={styles['uploaded-file']}>
-                    <BsFileEarmarkPdfFill
-                      className={`${styles['file-icon']} ${styles['file-icon1']}`}
-                    />
-                    <div className={styles['file-content']}>
-                      <span className={styles['file-name']}>
-                        AHA Selfcare Mobile Application Test-Cases.xls
-                      </span>
-                      <span className={styles['file-details']}>
-                        <span className={styles['file-property']}>Sender:</span>
-                        <span className={styles['file-sender']}>
-                          Arya Stark
-                        </span>
-                      </span>
-                      <span className={styles['file-details']}>
-                        <span className={styles['file-property']}>Size:</span>
-                        <span className={styles['file-size']}>
-                          2<span className={styles['size-unit']}>mb</span>
-                        </span>
-                      </span>
-                      <span className={styles['file-details']}>
-                        <span className={styles['file-property']}>Time:</span>
-                        <span className={styles['time-sent']}>
-                          March 31st at 6:53 PM
-                        </span>
-                      </span>
-                    </div>
-
-                    <div className={styles['menu-box']}>
-                      <BsThreeDotsVertical
-                        className={styles['menu-file-icon']}
-                      />
-                      <ul className={styles['menu-list']}>
-                        <li className={styles['menu-item']}>Download</li>
-                        <li className={styles['menu-item']}>Delete</li>
-                      </ul>
-                    </div>
-                  </article>
-
-                  <article className={styles['uploaded-file']}>
-                    <FaFileImage
-                      className={`${styles['file-icon']} ${styles['file-icon2']}`}
-                    />
-                    <div className={styles['file-content']}>
-                      <span className={styles['file-name']}>
-                        AHA Selfcare Mobile Application Test-Cases.xls
-                      </span>
-                      <span className={styles['file-details']}>
-                        <span className={styles['file-property']}>Sender:</span>
-                        <span className={styles['file-sender']}>
-                          Arya Stark
-                        </span>
-                      </span>
-                      <span className={styles['file-details']}>
-                        <span className={styles['file-property']}>Size:</span>
-                        <span className={styles['file-size']}>
-                          2<span className={styles['size-unit']}>mb</span>
-                        </span>
-                      </span>
-                      <span className={styles['file-details']}>
-                        <span className={styles['file-property']}>Time:</span>
-                        <span className={styles['time-sent']}>
-                          March 31st at 6:53 PM
-                        </span>
-                      </span>
-                    </div>
-                    <div className={styles['menu-box']}>
-                      <BsThreeDotsVertical
-                        className={styles['menu-file-icon']}
-                      />
-                      <ul className={styles['menu-list']}>
-                        <li className={styles['menu-item']}>Download</li>
-                        <li className={styles['menu-item']}>Delete</li>
-                      </ul>
-                    </div>
-                  </article>
-
-                  <article className={styles['uploaded-file']}>
-                    <FaFileLines
-                      className={`${styles['file-icon']} ${styles['file-icon3']}`}
-                    />
-                    <div className={styles['file-content']}>
-                      <span className={styles['file-name']}>
-                        AHA Selfcare Mobile Application Test-Cases.xls
-                      </span>
-                      <span className={styles['file-details']}>
-                        <span className={styles['file-property']}>Sender:</span>
-                        <span className={styles['file-sender']}>
-                          Arya Stark
-                        </span>
-                      </span>
-                      <span className={styles['file-details']}>
-                        <span className={styles['file-property']}>Size:</span>
-                        <span className={styles['file-size']}>
-                          2<span className={styles['size-unit']}>mb</span>
-                        </span>
-                      </span>
-                      <span className={styles['file-details']}>
-                        <span className={styles['file-property']}>Time:</span>
-                        <span className={styles['time-sent']}>
-                          March 31st at 6:53 PM
-                        </span>
-                      </span>
-                    </div>
-                    <div className={styles['menu-box']}>
-                      <BsThreeDotsVertical
-                        className={styles['menu-file-icon']}
-                      />
-                      <ul className={styles['menu-list']}>
-                        <li className={styles['menu-item']}>Download</li>
-                        <li className={styles['menu-item']}>Delete</li>
-                      </ul>
-                    </div>
-                  </article>
-                </div>
-              </div>
+          {project === null ? (
+            <div className={styles['loader-box']}>
+              <Loader
+                style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  marginBottom: '7rem',
+                }}
+              />
             </div>
+          ) : project.error ? (
+            project.code === 500 ? (
+              <span className={styles['error-text']}>
+                Unable to load project. Please check the URL or your network
+                connection and try reloading the page.
+              </span>
+            ) : project.code === 404 ? (
+              <span className={styles['error-text']}>
+                This project does not exist.
+              </span>
+            ) : (
+              <span className={styles['error-text']}>
+                Unable to load project.
+              </span>
+            )
+          ) : (
+            <>
+              <h1 className={styles['project-name']}>{project.name}</h1>
 
-            <div className={styles['right-section']}>
-              <div className={styles['project-details-container']}>
-                <span className={styles['project-details-head']}>
-                  Project Details
-                </span>
-
-                <div className={styles['table-container']}>
-                  <table className={styles.table}>
-                    <tbody>
-                      <tr>
-                        <td className={styles['table-property']}>Tasks:</td>
-                        <td>15</td>
-                      </tr>
-                      <tr>
-                        <td className={styles['table-property']}>Created:</td>
-                        <td>10th January, 2024</td>
-                      </tr>
-                      <tr>
-                        <td className={styles['table-property']}>Deadline:</td>
-                        <td>26 April, 2024</td>
-                      </tr>
-                      <tr>
-                        <td className={styles['table-property']}>Team:</td>
-                        <td>6 members</td>
-                      </tr>
-                      <tr>
-                        <td className={styles['table-property']}>Status:</td>
-                        <td>Active</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className={styles['progress-div']}>
-                  <span className={styles['progress-box']}>
-                    <span>Progress</span>
-                    <span className={styles['progress-value']}>60%</span>
-                  </span>
-
-                  <span className={styles['progress-bar']}>&nbsp;</span>
-                </div>
+              <div className={styles['edit-btn-div']}>
+                <button
+                  className={styles['edit-btn']}
+                  onClick={() => setdisplayModal(true)}
+                >
+                  Edit Project
+                </button>
               </div>
 
-              <div className={styles['project-team-container']}>
-                <span className={styles['team-head']}>Team</span>
-
-                <div className={styles['team-div']}>
-                  <div className={styles['member-box']}>
-                    <img
-                      src="../../assets/images/profile2webp.webp"
-                      className={styles['member-img']}
-                    />
-                    <span className={styles['member-details']}>
-                      <span className={styles['member-name']}>Arya Stark</span>
-                      <span className={styles['member-title']}>
-                        Web Designer
+              <div className={styles['project-container']}>
+                <div className={styles['left-section']}>
+                  <div className={styles['project-content']}>
+                    <span className={styles['project-leader']}>
+                      <span className={styles['leader-text']}>
+                        Project Leader:
                       </span>
-                    </span>
-                  </div>
-
-                  <div className={styles['member-box']}>
-                    <img
-                      src="../../assets/images/profile3.jpeg"
-                      className={styles['member-img']}
-                    />
-                    <span className={styles['member-details']}>
-                      <span className={styles['member-name']}>
-                        Ramsay Bolton
-                      </span>
-                      <span className={styles['member-title']}>
-                        Web Developer
-                      </span>
-                    </span>
-                  </div>
-
-                  <div className={styles['member-box']}>
-                    <img
-                      src="../../assets/images/profile4.jpeg"
-                      className={styles['member-img']}
-                    />
-                    <span className={styles['member-details']}>
-                      <span className={styles['member-name']}>
-                        Cersei Lannister
-                      </span>
-                      <span className={styles['member-title']}>
-                        Human resources manager
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles['activities-container']}>
-            <h1 className={styles['activity-head']}>Activities</h1>
-
-            <div className={styles['activity-table-container']}>
-              <table className={styles['activity-table']}>
-                <thead className={styles['table-head-row']}>
-                  <tr>
-                    <th className={styles['table-head']}>Activity</th>
-                    <th className={styles['table-head']}>Type</th>
-                    <th className={styles['table-head']}>Performed By</th>
-                    <th className={styles['table-head']}>Date</th>
-                    <th className={styles['table-head']}>Time</th>
-                    <th className={styles['table-head']}></th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <tr>
-                    <td>A task was deleted</td>
-                    <td>
-                      <span
-                        className={`${styles['activity-type']} ${styles['activity-type1']}`}
-                      >
-                        <FaTasks className={styles['activity-type-icon']} />{' '}
-                        Task
-                      </span>
-                    </td>
-                    <td className={styles.performer}>Tyrion Lannister</td>
-                    <td>June 8, 2024</td>
-                    <td>
-                      11:00 <span className={styles['activity-time']}>am</span>
-                    </td>
-                    <td>
-                      <RiDeleteBin6Line
-                        className={styles['delete-activity-icon']}
-                        title="Delete Activity"
-                      />
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>A new member joined the team</td>
-                    <td>
-                      <span
-                        className={`${styles['activity-type']} ${styles['activity-type2']}`}
-                      >
-                        <BsPeopleFill
-                          className={styles['activity-type-icon']}
+                      <span className={styles['leader']}>
+                        <img
+                          src="../../assets/images/profile1.webp"
+                          className={styles['leader-img']}
                         />{' '}
-                        Team
+                        Jon Snow
                       </span>
-                    </td>
-                    <td className={styles.performer}>Robert Baratheon</td>
-                    <td>June 5, 2024</td>
-                    <td>
-                      01:27 <span className={styles['activity-time']}>pm</span>
-                    </td>
-                    <td>
-                      <RiDeleteBin6Line
-                        className={styles['delete-activity-icon']}
-                        title="Delete Activity"
+                    </span>
+
+                    <span className={styles['project-description']}>
+                      <span className={styles['description-text']}>
+                        Project Description:
+                      </span>
+                      <div className={styles['description']}>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Donec vel elit neque. Class aptent taciti sociosqu ad
+                        litora torquent per conubia nostra, per inceptos
+                        himenaeos. Vestibulum sollicitudin libero vitae est
+                        consectetur, a molestie tortor consectetur. Aenean
+                        tincidunt interdum ipsum, id pellentesque diam suscipit
+                        ut. Vivamus massa mi, fermentum eget neque eget,
+                        imperdiet tristique lectus. Proin at purus ut sem
+                        pellentesque tempor sit amet ut lectus. Sed orci augue,
+                        placerat et pretium ac, hendrerit in felis. Integer
+                        scelerisque libero non metus commodo, et hendrerit diam
+                        aliquet. Proin tincidunt porttitor ligula, a tincidunt
+                        orci pellentesque nec. Ut ultricies maximus nulla id
+                        consequat. Fusce eu consequat mi, eu euismod ligula.
+                        Aliquam porttitor neque id massa porttitor, a pretium
+                        velit vehicula. Morbi volutpat tincidunt urna, vel
+                        ullamcorper ligula fermentum at.
+                      </div>
+                    </span>
+                  </div>
+
+                  <div className={styles['alt-project-details-container']}>
+                    <span className={styles['project-details-head']}>
+                      Project Details
+                    </span>
+
+                    <div className={styles['table-container']}>
+                      <table className={styles.table}>
+                        <tbody>
+                          <tr>
+                            <td className={styles['table-property']}>Tasks:</td>
+                            <td>15</td>
+                          </tr>
+                          <tr>
+                            <td className={styles['table-property']}>
+                              Created:
+                            </td>
+                            <td>10th January, 2024</td>
+                          </tr>
+                          <tr>
+                            <td className={styles['table-property']}>
+                              Deadline:
+                            </td>
+                            <td>26 April, 2024</td>
+                          </tr>
+                          <tr>
+                            <td className={styles['table-property']}>Team:</td>
+                            <td>6 members</td>
+                          </tr>
+                          <tr>
+                            <td className={styles['table-property']}>
+                              Status:
+                            </td>
+                            <td>Active</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className={styles['progress-div']}>
+                      <span className={styles['progress-box']}>
+                        <span>Progress</span>
+                        <span className={styles['progress-value']}>60%</span>
+                      </span>
+
+                      <span className={styles['progress-bar']}>&nbsp;</span>
+                    </div>
+                  </div>
+
+                  <div className={styles['alt-project-team-container']}>
+                    <span className={styles['team-head']}>Team</span>
+
+                    <div className={styles['team-div']}>
+                      <div className={styles['member-box']}>
+                        <img
+                          src="../../assets/images/profile2webp.webp"
+                          className={styles['member-img']}
+                        />
+                        <span className={styles['member-details']}>
+                          <span className={styles['member-name']}>
+                            Arya Stark
+                          </span>
+                          <span className={styles['member-title']}>
+                            Web Designer
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className={styles['member-box']}>
+                        <img
+                          src="../../assets/images/profile3.jpeg"
+                          className={styles['member-img']}
+                        />
+                        <span className={styles['member-details']}>
+                          <span className={styles['member-name']}>
+                            Ramsay Bolton
+                          </span>
+                          <span className={styles['member-title']}>
+                            Web Developer
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className={styles['member-box']}>
+                        <img
+                          src="../../assets/images/profile4.jpeg"
+                          className={styles['member-img']}
+                        />
+                        <span className={styles['member-details']}>
+                          <span className={styles['member-name']}>
+                            Cersei Lannister
+                          </span>
+                          <span className={styles['member-title']}>
+                            Human resources manager
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles['files-conatiner']}>
+                    <h1 className={styles['files-text']}>
+                      Project Files
+                      <span className={styles['files-size-left']}>
+                        {' '}
+                        (3.65
+                        <span className={styles['files-size-unit']}>
+                          mb
+                        </span>{' '}
+                        free)
+                      </span>
+                    </h1>
+
+                    <div className={styles['add-files-box']}>
+                      <button
+                        className={styles['add-files-btn']}
+                        onClick={() => fileRef.current.click()}
+                      >
+                        Add Files
+                      </button>
+                      <input
+                        type="file"
+                        className={styles['add-file-input']}
+                        ref={fileRef}
+                        onChange={displayFiles}
+                        multiple
                       />
-                    </td>
-                  </tr>
+                    </div>
 
-                  <tr>
-                    <td>The Project description was updated</td>
-                    <td>
-                      <span
-                        className={`${styles['activity-type']} ${styles['activity-type3']}`}
-                      >
-                        <RxUpdate className={styles['activity-type-icon']} />{' '}
-                        Update
-                      </span>
-                    </td>
-                    <td className={styles.performer}>Jon Snow</td>
-                    <td>May 27, 2024</td>
-                    <td>
-                      08:27 <span className={styles['activity-time']}>pm</span>
-                    </td>
-                    <td>
-                      <RiDeleteBin6Line
-                        className={styles['delete-activity-icon']}
-                        title="Delete Activity"
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+                    <div className={styles['files-box']}>
+                      <article className={styles['uploaded-file']}>
+                        <BsFileEarmarkPdfFill
+                          className={`${styles['file-icon']} ${styles['file-icon1']}`}
+                        />
+                        <div className={styles['file-content']}>
+                          <span className={styles['file-name']}>
+                            AHA Selfcare Mobile Application Test-Cases.xls
+                          </span>
+                          <span className={styles['file-details']}>
+                            <span className={styles['file-property']}>
+                              Sender:
+                            </span>
+                            <span className={styles['file-sender']}>
+                              Arya Stark
+                            </span>
+                          </span>
+                          <span className={styles['file-details']}>
+                            <span className={styles['file-property']}>
+                              Size:
+                            </span>
+                            <span className={styles['file-size']}>
+                              2<span className={styles['size-unit']}>mb</span>
+                            </span>
+                          </span>
+                          <span className={styles['file-details']}>
+                            <span className={styles['file-property']}>
+                              Time:
+                            </span>
+                            <span className={styles['time-sent']}>
+                              March 31st at 6:53 PM
+                            </span>
+                          </span>
+                        </div>
 
-          <div className={styles['task-container']}>
-            <div className={styles['task-head-div']}>
-              <h1 className={styles['task-head']}>Tasks</h1>
+                        <div className={styles['menu-box']}>
+                          <BsThreeDotsVertical
+                            className={styles['menu-file-icon']}
+                          />
+                          <ul className={styles['menu-list']}>
+                            <li className={styles['menu-item']}>Download</li>
+                            <li className={styles['menu-item']}>Delete</li>
+                          </ul>
+                        </div>
+                      </article>
 
-              <button
-                className={styles['add-task-btn']}
-                onClick={() => setAddTask(true)}
-              >
-                Add Task
-              </button>
-            </div>
-            <div className={styles['task-category-div']}>
-              <ul className={styles['tasks-category-list']}>
-                <li
-                  className={`${styles['taks-category']} ${
-                    taskCategory === 'all'
-                      ? styles['current-task-category']
-                      : ''
-                  }`}
-                  onClick={() => setTaskCategory('all')}
-                >
-                  All tasks
-                </li>
-                <li
-                  className={`${styles['taks-category']} ${
-                    taskCategory === 'open'
-                      ? styles['current-task-category']
-                      : ''
-                  }`}
-                  onClick={() => setTaskCategory('open')}
-                >
-                  Open
-                </li>
-                <li
-                  className={`${styles['taks-category']} ${
-                    taskCategory === 'progress'
-                      ? styles['current-task-category']
-                      : ''
-                  }`}
-                  onClick={() => setTaskCategory('progress')}
-                >
-                  In Progress
-                </li>
-                <li
-                  className={`${styles['taks-category']} ${
-                    taskCategory === 'completed'
-                      ? styles['current-task-category']
-                      : ''
-                  }`}
-                  onClick={() => setTaskCategory('completed')}
-                >
-                  Completed
-                </li>
-              </ul>
-            </div>
-            {taskCategory === 'all' && (
-              <ul className={styles['tasks-list']}>
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <GrStatusGood className={styles['status-icon']} />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
-                      </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
-                    >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <MdOpenInNew
-                      className={`${styles['status-icon']} ${styles['status-icon2']}`}
-                    />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
-                      </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
-                    >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <GrStatusGood className={styles['status-icon']} />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
-                      </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
-                    >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <RiContrastLine
-                      className={`${styles['status-icon']} ${styles['status-icon3']}`}
-                    />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
-                      </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
-                    >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <RiContrastLine
-                      className={`${styles['status-icon']} ${styles['status-icon3']}`}
-                    />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
-                      </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
-                    >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
-              </ul>
-            )}
+                      <article className={styles['uploaded-file']}>
+                        <FaFileImage
+                          className={`${styles['file-icon']} ${styles['file-icon2']}`}
+                        />
+                        <div className={styles['file-content']}>
+                          <span className={styles['file-name']}>
+                            AHA Selfcare Mobile Application Test-Cases.xls
+                          </span>
+                          <span className={styles['file-details']}>
+                            <span className={styles['file-property']}>
+                              Sender:
+                            </span>
+                            <span className={styles['file-sender']}>
+                              Arya Stark
+                            </span>
+                          </span>
+                          <span className={styles['file-details']}>
+                            <span className={styles['file-property']}>
+                              Size:
+                            </span>
+                            <span className={styles['file-size']}>
+                              2<span className={styles['size-unit']}>mb</span>
+                            </span>
+                          </span>
+                          <span className={styles['file-details']}>
+                            <span className={styles['file-property']}>
+                              Time:
+                            </span>
+                            <span className={styles['time-sent']}>
+                              March 31st at 6:53 PM
+                            </span>
+                          </span>
+                        </div>
+                        <div className={styles['menu-box']}>
+                          <BsThreeDotsVertical
+                            className={styles['menu-file-icon']}
+                          />
+                          <ul className={styles['menu-list']}>
+                            <li className={styles['menu-item']}>Download</li>
+                            <li className={styles['menu-item']}>Delete</li>
+                          </ul>
+                        </div>
+                      </article>
 
-            {taskCategory === 'open' && (
-              <ul className={styles['tasks-list']}>
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <MdOpenInNew
-                      className={`${styles['status-icon']} ${styles['status-icon2']}`}
-                    />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
-                      </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
-                    >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
-              </ul>
-            )}
+                      <article className={styles['uploaded-file']}>
+                        <FaFileLines
+                          className={`${styles['file-icon']} ${styles['file-icon3']}`}
+                        />
+                        <div className={styles['file-content']}>
+                          <span className={styles['file-name']}>
+                            AHA Selfcare Mobile Application Test-Cases.xls
+                          </span>
+                          <span className={styles['file-details']}>
+                            <span className={styles['file-property']}>
+                              Sender:
+                            </span>
+                            <span className={styles['file-sender']}>
+                              Arya Stark
+                            </span>
+                          </span>
+                          <span className={styles['file-details']}>
+                            <span className={styles['file-property']}>
+                              Size:
+                            </span>
+                            <span className={styles['file-size']}>
+                              2<span className={styles['size-unit']}>mb</span>
+                            </span>
+                          </span>
+                          <span className={styles['file-details']}>
+                            <span className={styles['file-property']}>
+                              Time:
+                            </span>
+                            <span className={styles['time-sent']}>
+                              March 31st at 6:53 PM
+                            </span>
+                          </span>
+                        </div>
+                        <div className={styles['menu-box']}>
+                          <BsThreeDotsVertical
+                            className={styles['menu-file-icon']}
+                          />
+                          <ul className={styles['menu-list']}>
+                            <li className={styles['menu-item']}>Download</li>
+                            <li className={styles['menu-item']}>Delete</li>
+                          </ul>
+                        </div>
+                      </article>
+                    </div>
+                  </div>
+                </div>
 
-            {taskCategory === 'progress' && (
-              <ul className={styles['tasks-list']}>
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <RiContrastLine
-                      className={`${styles['status-icon']} ${styles['status-icon3']}`}
-                    />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
+                <div className={styles['right-section']}>
+                  <div className={styles['project-details-container']}>
+                    <span className={styles['project-details-head']}>
+                      Project Details
                     </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
-                      </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
-                    >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <RiContrastLine
-                      className={`${styles['status-icon']} ${styles['status-icon3']}`}
-                    />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
-                      </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
-                    >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
-              </ul>
-            )}
 
-            {taskCategory === 'completed' && (
-              <ul className={styles['tasks-list']}>
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <GrStatusGood className={styles['status-icon']} />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
+                    <div className={styles['table-container']}>
+                      <table className={styles.table}>
+                        <tbody>
+                          <tr>
+                            <td className={styles['table-property']}>Tasks:</td>
+                            <td>15</td>
+                          </tr>
+                          <tr>
+                            <td className={styles['table-property']}>
+                              Created:
+                            </td>
+                            <td>10th January, 2024</td>
+                          </tr>
+                          <tr>
+                            <td className={styles['table-property']}>
+                              Deadline:
+                            </td>
+                            <td>26 April, 2024</td>
+                          </tr>
+                          <tr>
+                            <td className={styles['table-property']}>Team:</td>
+                            <td>6 members</td>
+                          </tr>
+                          <tr>
+                            <td className={styles['table-property']}>
+                              Status:
+                            </td>
+                            <td>Active</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className={styles['progress-div']}>
+                      <span className={styles['progress-box']}>
+                        <span>Progress</span>
+                        <span className={styles['progress-value']}>60%</span>
                       </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
-                    >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
 
-                <li className={styles['task-item']}>
-                  <span className={styles['task-box']}>
-                    <GrStatusGood className={styles['status-icon']} />{' '}
-                    <span className={styles['task-name']}>
-                      Make a single landing page and dashboard
-                    </span>
-                    <span className={styles['action-box']}>
-                      <span
-                        className={styles['view-icon-box']}
-                        title="View Task"
-                      >
-                        <MdRemoveRedEye className={styles['view-icon']} />
-                      </span>
-                      <span
-                        className={styles['delete-icon-box']}
-                        title="Delete Task"
-                      >
-                        <MdDelete className={styles['delete-icon']} />
-                      </span>
-                    </span>
-                  </span>
-                  <span className={styles['alt-action-box']}>
-                    <span className={styles['view-icon-box']} title="View Task">
-                      <MdRemoveRedEye className={styles['view-icon']} />
-                    </span>
-                    <span
-                      className={styles['delete-icon-box']}
-                      title="Delete Task"
+                      <span className={styles['progress-bar']}>&nbsp;</span>
+                    </div>
+                  </div>
+
+                  <div className={styles['project-team-container']}>
+                    <span className={styles['team-head']}>Team</span>
+
+                    <div className={styles['team-div']}>
+                      <div className={styles['member-box']}>
+                        <img
+                          src="../../assets/images/profile2webp.webp"
+                          className={styles['member-img']}
+                        />
+                        <span className={styles['member-details']}>
+                          <span className={styles['member-name']}>
+                            Arya Stark
+                          </span>
+                          <span className={styles['member-title']}>
+                            Web Designer
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className={styles['member-box']}>
+                        <img
+                          src="../../assets/images/profile3.jpeg"
+                          className={styles['member-img']}
+                        />
+                        <span className={styles['member-details']}>
+                          <span className={styles['member-name']}>
+                            Ramsay Bolton
+                          </span>
+                          <span className={styles['member-title']}>
+                            Web Developer
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className={styles['member-box']}>
+                        <img
+                          src="../../assets/images/profile4.jpeg"
+                          className={styles['member-img']}
+                        />
+                        <span className={styles['member-details']}>
+                          <span className={styles['member-name']}>
+                            Cersei Lannister
+                          </span>
+                          <span className={styles['member-title']}>
+                            Human resources manager
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles['activities-container']}>
+                <h1 className={styles['activity-head']}>Activities</h1>
+
+                <div className={styles['activity-table-container']}>
+                  <table className={styles['activity-table']}>
+                    <thead className={styles['table-head-row']}>
+                      <tr>
+                        <th className={styles['table-head']}>Activity</th>
+                        <th className={styles['table-head']}>Type</th>
+                        <th className={styles['table-head']}>Performed By</th>
+                        <th className={styles['table-head']}>Date</th>
+                        <th className={styles['table-head']}>Time</th>
+                        <th className={styles['table-head']}></th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr>
+                        <td>A task was deleted</td>
+                        <td>
+                          <span
+                            className={`${styles['activity-type']} ${styles['activity-type1']}`}
+                          >
+                            <FaTasks className={styles['activity-type-icon']} />{' '}
+                            Task
+                          </span>
+                        </td>
+                        <td className={styles.performer}>Tyrion Lannister</td>
+                        <td>June 8, 2024</td>
+                        <td>
+                          11:00{' '}
+                          <span className={styles['activity-time']}>am</span>
+                        </td>
+                        <td>
+                          <RiDeleteBin6Line
+                            className={styles['delete-activity-icon']}
+                            title="Delete Activity"
+                          />
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td>A new member joined the team</td>
+                        <td>
+                          <span
+                            className={`${styles['activity-type']} ${styles['activity-type2']}`}
+                          >
+                            <BsPeopleFill
+                              className={styles['activity-type-icon']}
+                            />{' '}
+                            Team
+                          </span>
+                        </td>
+                        <td className={styles.performer}>Robert Baratheon</td>
+                        <td>June 5, 2024</td>
+                        <td>
+                          01:27{' '}
+                          <span className={styles['activity-time']}>pm</span>
+                        </td>
+                        <td>
+                          <RiDeleteBin6Line
+                            className={styles['delete-activity-icon']}
+                            title="Delete Activity"
+                          />
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td>The Project description was updated</td>
+                        <td>
+                          <span
+                            className={`${styles['activity-type']} ${styles['activity-type3']}`}
+                          >
+                            <RxUpdate
+                              className={styles['activity-type-icon']}
+                            />{' '}
+                            Update
+                          </span>
+                        </td>
+                        <td className={styles.performer}>Jon Snow</td>
+                        <td>May 27, 2024</td>
+                        <td>
+                          08:27{' '}
+                          <span className={styles['activity-time']}>pm</span>
+                        </td>
+                        <td>
+                          <RiDeleteBin6Line
+                            className={styles['delete-activity-icon']}
+                            title="Delete Activity"
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className={styles['task-container']}>
+                <div className={styles['task-head-div']}>
+                  <h1 className={styles['task-head']}>Tasks</h1>
+
+                  <button
+                    className={styles['add-task-btn']}
+                    onClick={() => setAddTask(true)}
+                  >
+                    Add Task
+                  </button>
+                </div>
+                <div className={styles['task-category-div']}>
+                  <ul className={styles['tasks-category-list']}>
+                    <li
+                      className={`${styles['taks-category']} ${
+                        taskCategory === 'all'
+                          ? styles['current-task-category']
+                          : ''
+                      }`}
+                      onClick={() => setTaskCategory('all')}
                     >
-                      <MdDelete className={styles['delete-icon']} />
-                    </span>
-                  </span>
-                </li>
-              </ul>
-            )}
-          </div>
+                      All tasks
+                    </li>
+                    <li
+                      className={`${styles['taks-category']} ${
+                        taskCategory === 'open'
+                          ? styles['current-task-category']
+                          : ''
+                      }`}
+                      onClick={() => setTaskCategory('open')}
+                    >
+                      Open
+                    </li>
+                    <li
+                      className={`${styles['taks-category']} ${
+                        taskCategory === 'progress'
+                          ? styles['current-task-category']
+                          : ''
+                      }`}
+                      onClick={() => setTaskCategory('progress')}
+                    >
+                      In Progress
+                    </li>
+                    <li
+                      className={`${styles['taks-category']} ${
+                        taskCategory === 'completed'
+                          ? styles['current-task-category']
+                          : ''
+                      }`}
+                      onClick={() => setTaskCategory('completed')}
+                    >
+                      Completed
+                    </li>
+                  </ul>
+                </div>
+                {taskCategory === 'all' && (
+                  <ul className={styles['tasks-list']}>
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <GrStatusGood className={styles['status-icon']} />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <MdOpenInNew
+                          className={`${styles['status-icon']} ${styles['status-icon2']}`}
+                        />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <GrStatusGood className={styles['status-icon']} />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <RiContrastLine
+                          className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                        />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <RiContrastLine
+                          className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                        />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+                  </ul>
+                )}
+
+                {taskCategory === 'open' && (
+                  <ul className={styles['tasks-list']}>
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <MdOpenInNew
+                          className={`${styles['status-icon']} ${styles['status-icon2']}`}
+                        />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+                  </ul>
+                )}
+
+                {taskCategory === 'progress' && (
+                  <ul className={styles['tasks-list']}>
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <RiContrastLine
+                          className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                        />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <RiContrastLine
+                          className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                        />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+                  </ul>
+                )}
+
+                {taskCategory === 'completed' && (
+                  <ul className={styles['tasks-list']}>
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <GrStatusGood className={styles['status-icon']} />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+
+                    <li className={styles['task-item']}>
+                      <span className={styles['task-box']}>
+                        <GrStatusGood className={styles['status-icon']} />{' '}
+                        <span className={styles['task-name']}>
+                          Make a single landing page and dashboard
+                        </span>
+                        <span className={styles['action-box']}>
+                          <span
+                            className={styles['view-icon-box']}
+                            title="View Task"
+                          >
+                            <MdRemoveRedEye className={styles['view-icon']} />
+                          </span>
+                          <span
+                            className={styles['delete-icon-box']}
+                            title="Delete Task"
+                          >
+                            <MdDelete className={styles['delete-icon']} />
+                          </span>
+                        </span>
+                      </span>
+                      <span className={styles['alt-action-box']}>
+                        <span
+                          className={styles['view-icon-box']}
+                          title="View Task"
+                        >
+                          <MdRemoveRedEye className={styles['view-icon']} />
+                        </span>
+                        <span
+                          className={styles['delete-icon-box']}
+                          title="Delete Task"
+                        >
+                          <MdDelete className={styles['delete-icon']} />
+                        </span>
+                      </span>
+                    </li>
+                  </ul>
+                )}
+              </div>
+            </>
+          )}
         </section>
       </section>
     </main>

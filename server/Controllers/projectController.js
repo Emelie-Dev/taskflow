@@ -172,24 +172,14 @@ export const getProject = asyncErrorHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id);
 
   if (!project) {
-    const err = new CustomError('This project does not exist!', 404);
-    return next(err);
+    return next(new CustomError('This project does not exist!', 404));
   }
 
-  const { enableVisibility, team } = project;
+  const { team } = project;
 
   if (String(project.user) !== String(req.user._id)) {
     if (!team.includes(req.user._id)) {
-      const err = new CustomError('This project does not exist!', 404);
-      return next(err);
-    } else {
-      //   if (!enableVisibility) {
-      //     const err = new CustomError(
-      //       'You are not allowed to view this project!',
-      //       403
-      //     );
-      //     return next(err);
-      //   }
+      return next(new CustomError('This project does not exist!', 404));
     }
   }
 
@@ -209,7 +199,6 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
     'user',
     'team',
     'files',
-    'lastModified',
     'details',
   ];
   // name, desc, deadline,status, files, team
@@ -255,7 +244,7 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
       _id: req.params.id,
       user: req.user._id,
     },
-    { ...req.body, lastModified: Date.now() },
+    req.body,
     {
       new: true,
       runValidators: true,
@@ -428,8 +417,6 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
     // Updates the files property of the project
     project.files = files;
 
-    project.lastModified = Date.now();
-
     await project.save();
 
     // Update the user current project
@@ -574,8 +561,6 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
     } else {
       message += 'The file(s) were deleted succesfully.';
     }
-
-    project.lastModified = Date.now();
 
     await project.save();
 
@@ -729,8 +714,6 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
   // Updates team
   project.team = updatedTeam;
 
-  project.lastModified = Date.now();
-
   await project.save();
 
   // Update the user current project
@@ -771,7 +754,7 @@ export const deleteProject = asyncErrorHandler(async (req, res, next) => {
   // Check if this project is the user's current project
   if (String(req.params.id) === String(req.user.currentProject)) {
     const userProjects = await Project.find({ user: req.user._id }).sort(
-      'lastModified'
+      'updatedAt'
     );
 
     const currentProject = userProjects[0];

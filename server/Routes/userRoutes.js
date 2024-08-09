@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { getAllUsers } from '../Controllers/userController.js';
+import { getAllUsers, getUser } from '../Controllers/userController.js';
 import {
   protectRoute,
   restrictAccessTo,
@@ -9,5 +9,7 @@ import {
 const router = express.Router();
 
 router.route('/').get(protectRoute, restrictAccessTo('admin'), getAllUsers);
+
+router.get('/:id', protectRoute, getUser);
 
 export default router;

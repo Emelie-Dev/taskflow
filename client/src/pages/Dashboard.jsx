@@ -170,7 +170,7 @@ const Dashboard = () => {
     const getUserTasks = async () => {
       try {
         const { data } = await apiClient(
-          `/api/v1/tasks/my_tasks?filter=${taskCategory}&fields=name&sort=-lastModified&limit=4`
+          `/api/v1/tasks/my_tasks?filter=${taskCategory}&fields=name&sort=-updatedAt&limit=4`
         );
         setUserTasks(data.data.tasks);
       } catch {
