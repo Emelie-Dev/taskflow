@@ -711,6 +711,7 @@
 .edit-btn-div {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .edit-btn {
@@ -724,7 +725,20 @@
   cursor: pointer;
 }
 
-.edit-btn:hover {
+.delete-btn {
+  border: none;
+  outline: none;
+  background: red;
+  color: white;
+  border-radius: 5px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-left: 1rem;
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
   box-shadow: 1px 1px 8px -4px black;
 }
 

@@ -251,7 +251,13 @@ const NewTask = ({
         </span>
         <h1 className={styles['modal-head']}>Add Task</h1>
 
-        <form className={styles.form} onSubmit={createTask}>
+        <form
+          className={styles.form}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') e.preventDefault();
+          }}
+          onSubmit={createTask}
+        >
           <div className={styles['modal-list']}>
             <div className={styles.category}>
               <span className={styles['label-box']}>

@@ -169,7 +169,10 @@ export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const getProject = asyncErrorHandler(async (req, res, next) => {
-  const project = await Project.findById(req.params.id);
+  const project = await Project.findById(req.params.id).populate({
+    path: 'team',
+    select: 'firstName lastName username occupation photo',
+  });
 
   if (!project) {
     return next(new CustomError('This project does not exist!', 404));
@@ -249,7 +252,10 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
       new: true,
       runValidators: true,
     }
-  );
+  ).populate({
+    path: 'team',
+    select: 'firstName lastName username occupation photo',
+  });
 
   // Update the user current project
   await User.findByIdAndUpdate(
@@ -595,7 +601,7 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const updateTeam = asyncErrorHandler(async (req, res, next) => {
-  const project = await Project.findOne({
+  let project = await Project.findOne({
     _id: req.params.id,
     user: req.user._id,
   });
@@ -634,7 +640,7 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Filters new members and generates notifications
-  for (let member of newTeam) {
+  for (let [key, member] of newTeam.entries()) {
     if (!members.includes(member)) {
       const user = await User.findById(member).select(
         'username firstName lastName'
@@ -658,7 +664,7 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
         action: 'invitation',
         type: ['team'],
       });
-      updatedTeam.splice(0, 1);
+      updatedTeam.splice(key, 1);
     }
   }
 
@@ -712,9 +718,20 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Updates team
-  project.team = updatedTeam;
-
-  await project.save();
+  project = await Project.findOneAndUpdate(
+    {
+      _id: req.params.id,
+      user: req.user._id,
+    },
+    { team: updatedTeam },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate({
+    path: 'team',
+    select: 'firstName lastName username occupation photo',
+  });
 
   // Update the user current project
   await User.findByIdAndUpdate(
@@ -732,8 +749,11 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
 
   return res.status(200).json({
     status: 'success',
-    message:
-      'Team invitation sent successfully to new members and old members have been removed!',
+    data: {
+      project,
+      message:
+        'Team invitation sent successfully to new members and old members have been removed.',
+    },
   });
 });
 
@@ -744,7 +764,7 @@ export const deleteProject = asyncErrorHandler(async (req, res, next) => {
   });
 
   if (!project) {
-    const err = new CustomError(`Project with that ID was not found!`, 404);
+    const err = new CustomError(`This project does not exist!`, 404);
     return next(err);
   }
 

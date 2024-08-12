@@ -462,12 +462,7 @@ const Projects = () => {
           </div>
         </header>
 
-        {displayModal && (
-          <Project
-            displayModal={displayModal}
-            setdisplayModal={setdisplayModal}
-          />
-        )}
+        {displayModal && <Project setdisplayModal={setdisplayModal} />}
 
         <section className={styles['section-content']}>
           <div className={styles['section-head']}>

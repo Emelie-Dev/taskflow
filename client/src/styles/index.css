@@ -1,13 +1,20 @@
 :root {
-  --toastify-color-light: orange;
+  /* --toastify-color-light: orange;
   --toastify-color-dark: #121212;
   --toastify-font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
     'Lucida Sans', Arial, sans-serif;
   --toastify-text-color-light: white;
   --toastify-text-color-dark: orange;
-  --toastify-color-progress-light: white;
+  --toastify-color-progress-light: white; */
   --general-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --toastify-color-light: white;
+  --toastify-color-dark: #121212;
+  --toastify-font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  --toastify-text-color-light: orange;
+  --toastify-text-color-dark: white;
+  --toastify-color-progress-light: orange;
 }
 
 @font-face {

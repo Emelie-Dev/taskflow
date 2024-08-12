@@ -2,23 +2,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from '../styles/Project.module.css';
 import { IoCloseSharp } from 'react-icons/io5';
 import { apiClient } from '../App';
-import { ToastContainer, toast } from 'react-toastify';
+import { generateName } from '../pages/Dashboard';
+import { SiKashflow } from 'react-icons/si';
 
 const Project = ({
-  displayModal,
-  setdisplayModal,
+  toast,
+  setDisplayModal,
   editProject,
   projectData,
+  projectTeam,
+  setProject: setNewProject,
 }) => {
   const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1;
-  const currentDate = new Date().getDate();
+  const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+  const currentDate = String(new Date().getDate()).padStart(2, '0');
 
   const [project, setProject] = useState(
     projectData || {
       name: '',
       status: 'active',
-      deadline: `${currentYear}-0${currentMonth}-0${currentDate}`,
+      deadline: `${currentYear}-${currentMonth}-${currentDate}`,
       team: new Set(),
       description: '',
       addFiles: false,
@@ -26,18 +29,21 @@ const Project = ({
   );
   const [isChanged, setIsChanged] = useState(false);
   const [searching, setSearching] = useState(false);
-
-  const memberRef = useRef();
+  const [isNameValid, setIsNameValid] = useState(false);
+  const [memberName, setMemberName] = useState('');
+  const [team, setTeam] = useState(projectTeam || []);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const initialData = projectData || {
     name: '',
     status: 'active',
-    deadline: `${currentYear}-0${currentMonth}-0${currentDate}`,
+    deadline: `${currentYear}-${currentMonth}-${currentDate}`,
     team: new Set(),
     description: '',
     addFiles: false,
   };
 
+  // Checks if project data has changed
   useEffect(() => {
     let num = 0;
     let limit = Object.keys(project).length;
@@ -65,13 +71,32 @@ const Project = ({
     }
   }, [project]);
 
+  // Checks if new member name is valid or it exists already
+  useEffect(() => {
+    let username = memberName.trim();
+
+    if (username.startsWith('@')) username = username.slice(1);
+
+    const user = team.find((member) => member.username === username);
+
+    if (username === '') {
+      setIsNameValid(false);
+    } else if (username.match(/\W/)) {
+      setIsNameValid(false);
+    } else if (user) {
+      setIsNameValid(false);
+    } else {
+      setIsNameValid(true);
+    }
+  }, [memberName]);
+
   const hideDisplayModal = (e) => {
-    e.target === e.currentTarget && setdisplayModal(false);
+    e.target === e.currentTarget && setDisplayModal(false);
   };
 
   const addMember = async () => {
     let user;
-    let username = String(memberRef.current.value).trim();
+    let username = memberName.trim();
 
     if (username === '') return;
 
@@ -80,11 +105,12 @@ const Project = ({
     setSearching(true);
 
     try {
-      const { data } = await apiClient(`/api/v1/users/${username}`);
+      const { data } = await apiClient(`/api/v1/users/${username}?team=true`);
 
       user = data.data.user;
 
       setSearching(false);
+      setIsNameValid(false);
     } catch (err) {
       setSearching(false);
 
@@ -99,17 +125,102 @@ const Project = ({
       }
     }
 
-    console.log(user);
+    if (!project.team.has(user._id)) {
+      const members = new Set([...project.team]);
+      members.add(user._id);
+
+      setTeam([...team, user]);
+      setProject({ ...project, team: members });
+    }
+  };
+
+  const removeMember = (id) => () => {
+    let username = memberName.trim();
+    if (username.startsWith('@')) username = username.slice(1);
+
+    const newTeam = [...team];
+    const teamSet = new Set([...project.team]);
+
+    const index = newTeam.findIndex((member) => member._id === id);
+
+    if (index !== -1) {
+      if (username === newTeam[index].username) setIsNameValid(true);
+
+      newTeam.splice(index, 1);
+      teamSet.delete(id);
+
+      setTeam(newTeam);
+      setProject({ ...project, team: teamSet });
+    }
+  };
+
+  const submitForm = async (e) => {
+    e.preventDefault();
+
+    let body = { ...project };
+    delete body.team;
+
+    let request = editProject
+      ? apiClient.patch(`/api/v1/projects/${project.id}`, body)
+      : '';
+
+    setIsProcessing(true);
+
+    try {
+      let response = await request;
+
+      // If team members were updated
+      if (String([...project.team]) !== String([...initialData.team])) {
+        const newTeam = [...project.team];
+
+        try {
+          response = await apiClient.patch(
+            `/api/v1/projects/${project.id}/team`,
+            { team: newTeam }
+          );
+
+          toast(response.data.data.message, {
+            toastId: 'toast-id3',
+          });
+        } catch {
+          toast('An error occured while updating the team members.', {
+            toastId: 'toast-id3',
+          });
+        }
+      }
+
+      setIsProcessing(false);
+      setDisplayModal(false);
+
+      if (editProject) {
+        setNewProject(response.data.data.project);
+      } else {
+      }
+    } catch (err) {
+      const message = editProject
+        ? 'An error occured while saving project.'
+        : 'An error occured while creating project.';
+
+      setIsProcessing(false);
+
+      if (!err.response.data || err.response.status === 500) {
+        return toast(message, {
+          toastId: 'toast-id2',
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id2',
+        });
+      }
+    }
   };
 
   return (
     <section className={styles.section} onClick={hideDisplayModal}>
-      <ToastContainer autoClose={2000} />
-
       <div className={styles['modal-container']}>
         <span
           className={styles['close-modal']}
-          onClick={() => setdisplayModal(false)}
+          onClick={() => setDisplayModal(false)}
         >
           <IoCloseSharp className={styles['close-modal-icon']} />
         </span>
@@ -117,7 +228,14 @@ const Project = ({
           {editProject ? 'Edit Project' : 'Create Project'}
         </h1>
 
-        <form className={styles.form}>
+        <form
+          className={styles.form}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') e.preventDefault();
+          }}
+          onSubmit={submitForm}
+          noValidate
+        >
           <div className={styles['modal-list']}>
             <div className={styles.category}>
               <span className={styles['label-box']}>
@@ -167,7 +285,7 @@ const Project = ({
                 className={styles['form-input']}
                 type="date"
                 id="deadline"
-                min={initialData.deadline}
+                min={`${currentYear}-${currentMonth}-${currentDate}`}
                 value={project.deadline}
                 onChange={(e) =>
                   setProject({ ...project, deadline: e.target.value })
@@ -188,16 +306,22 @@ const Project = ({
                   type="text"
                   id="team"
                   placeholder={'Provide username e.g @user1'}
-                  ref={memberRef}
+                  value={memberName}
+                  onChange={(e) => setMemberName(e.target.value)}
                 />
 
                 <button
-                  className={styles['add-member-btn']}
+                  className={`${styles['add-member-btn']} ${
+                    !isNameValid ? styles['disable-btn'] : ''
+                  }`}
                   type="button"
                   onClick={addMember}
                 >
-                  Add
-                  <div className="searching-loader"></div>
+                  {searching ? (
+                    <div className={styles['searching-loader']}></div>
+                  ) : (
+                    'Add'
+                  )}
                 </button>
               </span>
             </div>
@@ -212,45 +336,32 @@ const Project = ({
               </span>
 
               <div className={styles['assignees']}>
-                <span className={styles['assignee-box']}>
-                  <IoCloseSharp className={styles['remove-assignee']} />
-                  <span className={styles['image-box']}>
-                    <span className={styles['assignee-name']}>
-                      Curtis Jones
+                {team.length === 0 ? (
+                  <i className={styles['no-team-text']}>No team member</i>
+                ) : (
+                  team.map((member) => (
+                    <span key={member._id} className={styles['assignee-box']}>
+                      <IoCloseSharp
+                        className={styles['remove-assignee']}
+                        onClick={removeMember(member._id)}
+                      />
+                      <span className={styles['image-box']}>
+                        <span className={styles['assignee-name']}>
+                          {generateName(
+                            member.firstName,
+                            member.lastName,
+                            member.username
+                          )}
+                        </span>
+
+                        <img
+                          className={styles['assignee-img']}
+                          src={`../../assets/images/users/${member.photo}`}
+                        />
+                      </span>
                     </span>
-
-                    <img
-                      className={styles['assignee-img']}
-                      src="../../public/assets/images/profile1.webp"
-                    />
-                  </span>
-                </span>
-
-                <span className={styles['assignee-box']}>
-                  <IoCloseSharp className={styles['remove-assignee']} />
-                  <span className={styles['image-box']}>
-                    <span className={styles['assignee-name']}>John Snow</span>
-
-                    <img
-                      className={styles['assignee-img']}
-                      src="../../public/assets/images/profile3.jpeg"
-                    />
-                  </span>
-                </span>
-
-                <span className={styles['assignee-box']}>
-                  <IoCloseSharp className={styles['remove-assignee']} />
-                  <span className={styles['image-box']}>
-                    <span className={styles['assignee-name']}>
-                      Tyrion Lannister
-                    </span>
-
-                    <img
-                      className={styles['assignee-img']}
-                      src="../../public/assets/images/pics1.jpg"
-                    />
-                  </span>
-                </span>
+                  ))
+                )}
               </div>
             </div>
 
@@ -289,12 +400,29 @@ const Project = ({
           </div>
 
           <div className={styles['btn-box']}>
-            <input
+            <button
               className={`${styles['project-btn']} ${
-                !isChanged ? styles['disable-submit'] : ''
-              }`}
+                !isChanged ? styles['disable-btn'] : ''
+              } ${isProcessing ? styles['processing-button'] : ''}`}
               type="submit"
-            />
+            >
+              {!isProcessing ? (editProject ? 'Save' : 'Submit') : ''}
+              {isProcessing ? (
+                editProject ? (
+                  <>
+                    <SiKashflow className={styles['creating-icon']} />{' '}
+                    Saving....
+                  </>
+                ) : (
+                  <>
+                    <SiKashflow className={styles['creating-icon']} />{' '}
+                    Processing....
+                  </>
+                )
+              ) : (
+                ''
+              )}
+            </button>
           </div>
         </form>
       </div>

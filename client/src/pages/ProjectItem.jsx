@@ -30,18 +30,21 @@ import { IoCloseSharp } from 'react-icons/io5';
 import { ToastContainer, toast } from 'react-toastify';
 import NewTask from '../components/NewTask';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { apiClient } from '../App';
 import Loader from '../components/Loader';
+import DeleteComponent from '../components/DeleteComponent';
 
 const ProjectItem = () => {
   const [showNav, setShowNav] = useState(false);
   const [taskCategory, setTaskCategory] = useState('all');
-  const [displayModal, setdisplayModal] = useState(false);
+  const [displayModal, setDisplayModal] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
   const [files, setFiles] = useState([]);
   const [addTask, setAddTask] = useState(false);
   const [project, setProject] = useState(null);
+  const [projectData, setProjectData] = useState(null);
+  const [projectTeam, setProjectTeam] = useState([]);
+  const [deleteModal, setDeleteModal] = useState(false);
 
   const navRef = useRef();
   const fileRef = useRef();
@@ -63,6 +66,7 @@ const ProjectItem = () => {
         const { data } = await apiClient(`/api/v1/projects/${projectId}`);
 
         setProject(data.data.project);
+
         console.log(data.data.project);
       } catch (err) {
         if (!err.response.data || err.response.status === 500) {
@@ -88,6 +92,30 @@ const ProjectItem = () => {
 
     getProjectData();
   }, []);
+
+  useEffect(() => {
+    if (project) {
+      if (!project.error) {
+        setProjectData({
+          id: project._id,
+          name: project.name,
+          status: project.status,
+          get deadline() {
+            const date = new Date(project.deadline);
+
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            return `${date.getFullYear()}-${month}-${day}`;
+          },
+          team: new Set(project.team.map((member) => member._id)),
+          description: project.description,
+          addFiles: project.addFiles,
+        });
+        setProjectTeam(project.team);
+      }
+    }
+  }, [project]);
 
   const freeSpace = 3.65 * 1024 * 1024;
   const toastId = 'toast-id';
@@ -345,9 +373,20 @@ const ProjectItem = () => {
 
         {displayModal && (
           <Project
-            displayModal={displayModal}
-            setdisplayModal={setdisplayModal}
+            toast={toast}
+            setDisplayModal={setDisplayModal}
             editProject={true}
+            projectData={projectData}
+            projectTeam={projectTeam}
+            setProject={setProject}
+          />
+        )}
+
+        {deleteModal && (
+          <DeleteComponent
+            projectId={project._id}
+            projectName={project.name}
+            setDeleteModal={setDeleteModal}
           />
         )}
 
@@ -470,9 +509,16 @@ const ProjectItem = () => {
               <div className={styles['edit-btn-div']}>
                 <button
                   className={styles['edit-btn']}
-                  onClick={() => setdisplayModal(true)}
+                  onClick={() => setDisplayModal(true)}
                 >
                   Edit Project
+                </button>
+
+                <button
+                  className={styles['delete-btn']}
+                  onClick={() => setDeleteModal(true)}
+                >
+                  Delete Project
                 </button>
               </div>
 
