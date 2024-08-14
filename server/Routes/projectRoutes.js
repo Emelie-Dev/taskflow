@@ -31,7 +31,7 @@ router.get('/my_projects', getMyProjects);
 
 router.route('/:id').get(getProject).patch(updateProject).delete(deleteProject);
 
-router.route('/:id/files').patch(uploadProjectFiles).delete(deleteProjectFiles);
+router.route('/:id/files').post(uploadProjectFiles).delete(deleteProjectFiles);
 
 router.patch('/:id/team', updateTeam);
 

@@ -33,6 +33,8 @@ import { useParams } from 'react-router-dom';
 import { apiClient } from '../App';
 import Loader from '../components/Loader';
 import DeleteComponent from '../components/DeleteComponent';
+import { generateName } from './Dashboard';
+import { months } from './Dashboard';
 
 const ProjectItem = () => {
   const [showNav, setShowNav] = useState(false);
@@ -45,9 +47,15 @@ const ProjectItem = () => {
   const [projectData, setProjectData] = useState(null);
   const [projectTeam, setProjectTeam] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [freeSpace, setFreeSpace] = useState(0);
+  const [fileUploading, setFileUploading] = useState(false);
+  const [selectMode, setSelectMode] = useState({ value: false, index: null });
+  const [disposableFiles, setDisposableFiles] = useState([]);
 
   const navRef = useRef();
   const fileRef = useRef();
+  const namesRef = useRef([]);
+  const checkBoxRef = useRef([]);
 
   const { projectId } = useParams();
 
@@ -69,7 +77,11 @@ const ProjectItem = () => {
 
         console.log(data.data.project);
       } catch (err) {
-        if (!err.response.data || err.response.status === 500) {
+        if (
+          !err.response ||
+          !err.response.data ||
+          err.response.status === 500
+        ) {
           setProject({ error: true, code: 500 });
           return toast('Unable to load project.', {
             toastId: 'toast-id1',
@@ -96,6 +108,12 @@ const ProjectItem = () => {
   useEffect(() => {
     if (project) {
       if (!project.error) {
+        const filesSize = project.files.reduce(
+          (total, file) => total + file.size,
+          0
+        );
+
+        setFreeSpace(5 * 1024 * 1024 - filesSize);
         setProjectData({
           id: project._id,
           name: project.name,
@@ -117,9 +135,6 @@ const ProjectItem = () => {
     }
   }, [project]);
 
-  const freeSpace = 3.65 * 1024 * 1024;
-  const toastId = 'toast-id';
-
   const hideNav = (e) => {
     if (e.target === navRef.current) {
       setShowNav(false);
@@ -138,9 +153,14 @@ const ProjectItem = () => {
     if (totalSize > freeSpace) {
       e.target.files = new DataTransfer().files;
 
-      return toast(`The total file size for uploads must be under 3.65mb`, {
-        toastId,
-      });
+      return toast(
+        `The total file size for upload must be under ${
+          calculateSize(freeSpace).value
+        }${calculateSize(freeSpace).unit}.`,
+        {
+          toastId: 'toast-id2',
+        }
+      );
     }
 
     setShowFiles(true);
@@ -184,6 +204,285 @@ const ProjectItem = () => {
     setFiles(newFiles);
 
     newFiles.length === 0 && setShowFiles(false);
+  };
+
+  const addToNamesRef = (el) => {
+    if (el && !namesRef.current.includes(el)) {
+      namesRef.current.push(el);
+    }
+  };
+
+  const addToCheckBoxRef = (el) => {
+    if (el && !checkBoxRef.current.includes(el)) {
+      checkBoxRef.current.push(el);
+    }
+  };
+
+  const uploadFiles = async () => {
+    const formData = new FormData();
+
+    files.forEach((file) => formData.append('files', file));
+
+    const fileNames = namesRef.current.map((file, index) => {
+      let name = String(file.value).trim();
+
+      if (name === '') {
+        name = files[index].name;
+      }
+
+      return name;
+    });
+
+    setFileUploading(true);
+
+    try {
+      const { data } = await apiClient.post(
+        `/api/v1/projects/${projectId}/files`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'x-file-names': fileNames,
+          },
+        }
+      );
+
+      setFileUploading(false);
+      setShowFiles(false);
+      setProject(data.data.project);
+    } catch (err) {
+      setFileUploading(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast(`Unable to upload file${files.length === 1 ? '' : 's'}.`, {
+          toastId: 'toast-id3',
+          autoClose: 2000,
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id3',
+          autoClose: 2000,
+        });
+      }
+    }
+  };
+
+  const deleteFiles = async () => {};
+
+  const getFileName = (name, path) => {
+    name = String(name).trim();
+    path = String(path).trim();
+
+    const fileName =
+      name.lastIndexOf('.') !== -1
+        ? name.slice(0, name.lastIndexOf('.'))
+        : name;
+
+    const ext =
+      path.lastIndexOf('.') !== -1 ? path.slice(path.lastIndexOf('.')) : '';
+
+    const newName = `${fileName}${ext}`;
+
+    return { name: newName, ext };
+  };
+
+  const fileDate = (date) => {
+    date = new Date(date);
+
+    const time =
+      date.getHours() === 0
+        ? `12:${String(date.getMinutes()).padStart(2, '0')} AM`
+        : date.getHours() === 12
+        ? `12:${String(date.getMinutes()).padStart(2, '0')} PM`
+        : date.getHours() > 12
+        ? `${date.getHours() - 12}:${String(date.getMinutes()).padStart(
+            2,
+            '0'
+          )}PM`
+        : `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}AM`;
+
+    return `${
+      months[date.getMonth()]
+    } ${date.getDate()}, ${date.getFullYear()} at ${time}`;
+  };
+
+  const fileICon = (ext) => {
+    let icon;
+
+    switch (ext) {
+      case '.html':
+      case '.htm':
+        icon = 'html.png';
+        break;
+
+      case '.css':
+        icon = 'css.png';
+        break;
+
+      case '.js':
+        icon = 'js.png';
+        break;
+
+      case '.py':
+        icon = 'py.webp';
+        break;
+
+      case '.java':
+        icon = 'java.webp';
+        break;
+
+      case '.jsx':
+        icon = 'jsx.png';
+        break;
+
+      case '.pdf':
+        icon = 'pdf.png';
+        break;
+
+      case '.json':
+        icon = 'json.png';
+        break;
+
+      case '.php':
+        icon = 'php-128.png';
+        break;
+
+      case '.ts':
+        icon = 'ts.png';
+        break;
+
+      case '.txt':
+        icon = 'txt.png';
+        break;
+
+      case '.doc':
+      case '.docx':
+        icon = 'doc.png';
+        break;
+
+      case '.cpp':
+        icon = 'c++.png';
+        break;
+
+      case '.swift':
+        icon = 'swift.png';
+        break;
+
+      case '.env':
+        icon = 'env.png;';
+        break;
+
+      case '.tif':
+      case '.tiff':
+      case '.jpg':
+      case '.jpeg':
+      case '.wpeg':
+      case '.webp':
+      case '.gif':
+      case '.png':
+      case '.eps':
+      case '.ai':
+      case '.bmp':
+      case '.ico':
+      case '.svg':
+      case '.ps':
+      case '.psd':
+        icon = 'img.png';
+        break;
+
+      case '.mkv':
+      case '.mp4':
+      case '.3g2':
+      case '.3gp':
+      case '.avi':
+      case '.flv':
+      case '.h264':
+      case '.m4v':
+      case '.mov':
+      case '.mpg':
+      case '.mpeg':
+      case '.rm':
+      case '.swf':
+      case '.vob':
+      case '.webm':
+      case '.wmv':
+        icon = 'video.png';
+        break;
+
+      case '.mp3':
+      case '.ogg':
+      case '.aif':
+      case '.cda':
+      case '.mid':
+      case '.midi':
+      case '.mpa':
+      case '.wav':
+      case '.wma':
+      case '.wpl':
+      case '.aac':
+        icon = 'audio.png';
+        break;
+
+      case '.7z':
+      case '.arj':
+      case '.deb':
+      case '.pkg':
+      case '.rar':
+      case '.rpm':
+      case '.gz':
+      case '.tar.gz':
+      case '.tar':
+      case '.tgz':
+      case '.tar.bz2':
+      case '.tbz2':
+      case '.tar.xz':
+      case '.txz':
+      case '.z':
+      case '.zip':
+      case '.bz2':
+      case '.xz':
+      case '.lzma':
+      case '.Z':
+      case '.cab':
+      case '.sit':
+      case '.lzh':
+      case '.lha':
+      case '.gzipped':
+      case '.zipped':
+        icon = 'zip.png';
+        break;
+
+      case '.csv':
+      case '.dat':
+      case '.db':
+      case '.dbf':
+      case '.log':
+      case '.mdb':
+      case '.sav':
+      case '.sql':
+      case '.tar':
+      case '.xml':
+      case '.accdb':
+        icon = 'db.png';
+        break;
+
+      case '.srt':
+      case '.sub':
+      case '.ssa':
+      case '.smi':
+      case '.vtt':
+        icon = 'sub.png';
+        break;
+
+      default:
+        icon = 'others.png';
+        break;
+    }
+
+    return icon;
+  };
+
+  const handleCheckBox = (id) => (e) => {
+    const value = e.target.checked;
   };
 
   return (
@@ -434,6 +733,7 @@ const ProjectItem = () => {
                           className={styles['file-new-name']}
                           type="text"
                           placeholder="Leave blank to use the original name"
+                          ref={addToNamesRef}
                         />
                       </div>
 
@@ -458,11 +758,21 @@ const ProjectItem = () => {
               </ul>
 
               <div className={styles['btn-box']}>
-                <input
-                  className={styles['upload-btn']}
-                  type="submit"
-                  value={'Upload'}
-                />
+                <button
+                  className={`${styles['upload-btn']} ${
+                    fileUploading ? styles['uploading-button'] : ''
+                  }`}
+                  onClick={uploadFiles}
+                >
+                  {fileUploading ? (
+                    <>
+                      <SiKashflow className={styles['creating-icon']} />{' '}
+                      Uploading....
+                    </>
+                  ) : (
+                    'Upload'
+                  )}
+                </button>
               </div>
             </div>
           </section>
@@ -531,10 +841,14 @@ const ProjectItem = () => {
                       </span>
                       <span className={styles['leader']}>
                         <img
-                          src="../../assets/images/profile1.webp"
+                          src={`../../assets/images/users/${project.user.photo}`}
                           className={styles['leader-img']}
                         />{' '}
-                        Jon Snow
+                        {generateName(
+                          project.user.firstName,
+                          project.user.lastName,
+                          project.user.username
+                        )}
                       </span>
                     </span>
 
@@ -543,23 +857,7 @@ const ProjectItem = () => {
                         Project Description:
                       </span>
                       <div className={styles['description']}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Donec vel elit neque. Class aptent taciti sociosqu ad
-                        litora torquent per conubia nostra, per inceptos
-                        himenaeos. Vestibulum sollicitudin libero vitae est
-                        consectetur, a molestie tortor consectetur. Aenean
-                        tincidunt interdum ipsum, id pellentesque diam suscipit
-                        ut. Vivamus massa mi, fermentum eget neque eget,
-                        imperdiet tristique lectus. Proin at purus ut sem
-                        pellentesque tempor sit amet ut lectus. Sed orci augue,
-                        placerat et pretium ac, hendrerit in felis. Integer
-                        scelerisque libero non metus commodo, et hendrerit diam
-                        aliquet. Proin tincidunt porttitor ligula, a tincidunt
-                        orci pellentesque nec. Ut ultricies maximus nulla id
-                        consequat. Fusce eu consequat mi, eu euismod ligula.
-                        Aliquam porttitor neque id massa porttitor, a pretium
-                        velit vehicula. Morbi volutpat tincidunt urna, vel
-                        ullamcorper ligula fermentum at.
+                        {project.description}
                       </div>
                     </span>
                   </div>
@@ -574,29 +872,56 @@ const ProjectItem = () => {
                         <tbody>
                           <tr>
                             <td className={styles['table-property']}>Tasks:</td>
-                            <td>15</td>
+                            <td>
+                              {project.details.complete +
+                                project.details.open +
+                                project.details.progress}
+                            </td>
                           </tr>
                           <tr>
                             <td className={styles['table-property']}>
                               Created:
                             </td>
-                            <td>10th January, 2024</td>
+                            <td>{`${
+                              months[new Date(project.createdAt).getMonth()]
+                            } ${new Date(
+                              project.createdAt
+                            ).getDate()}, ${new Date(
+                              project.createdAt
+                            ).getFullYear()}`}</td>
                           </tr>
                           <tr>
                             <td className={styles['table-property']}>
                               Deadline:
                             </td>
-                            <td>26 April, 2024</td>
+                            <td>
+                              {project.deadline ? (
+                                `${
+                                  months[new Date(project.deadline).getMonth()]
+                                } ${new Date(
+                                  project.deadline
+                                ).getDate()}, ${new Date(
+                                  project.deadline
+                                ).getFullYear()}`
+                              ) : (
+                                <i>No deadline</i>
+                              )}
+                            </td>
                           </tr>
                           <tr>
                             <td className={styles['table-property']}>Team:</td>
-                            <td>6 members</td>
+                            <td>
+                              {project.team.length}{' '}
+                              {project.team.length === 1 ? 'member' : 'members'}
+                            </td>
                           </tr>
                           <tr>
                             <td className={styles['table-property']}>
                               Status:
                             </td>
-                            <td>Active</td>
+                            <td className={styles['project-status']}>
+                              {project.status}
+                            </td>
                           </tr>
                         </tbody>
                       </table>
@@ -604,10 +929,21 @@ const ProjectItem = () => {
                     <div className={styles['progress-div']}>
                       <span className={styles['progress-box']}>
                         <span>Progress</span>
-                        <span className={styles['progress-value']}>60%</span>
+                        <span className={styles['progress-value']}>
+                          {project.details.projectProgress}%
+                        </span>
                       </span>
 
-                      <span className={styles['progress-bar']}>&nbsp;</span>
+                      <span className={styles['progress-bar-box']}>
+                        <span
+                          className={styles['progress-bar']}
+                          style={{
+                            width: `${project.details.projectProgress}%`,
+                          }}
+                        >
+                          &nbsp;
+                        </span>
+                      </span>
                     </div>
                   </div>
 
@@ -615,50 +951,33 @@ const ProjectItem = () => {
                     <span className={styles['team-head']}>Team</span>
 
                     <div className={styles['team-div']}>
-                      <div className={styles['member-box']}>
-                        <img
-                          src="../../assets/images/profile2webp.webp"
-                          className={styles['member-img']}
-                        />
-                        <span className={styles['member-details']}>
-                          <span className={styles['member-name']}>
-                            Arya Stark
-                          </span>
-                          <span className={styles['member-title']}>
-                            Web Designer
-                          </span>
-                        </span>
-                      </div>
-
-                      <div className={styles['member-box']}>
-                        <img
-                          src="../../assets/images/profile3.jpeg"
-                          className={styles['member-img']}
-                        />
-                        <span className={styles['member-details']}>
-                          <span className={styles['member-name']}>
-                            Ramsay Bolton
-                          </span>
-                          <span className={styles['member-title']}>
-                            Web Developer
-                          </span>
-                        </span>
-                      </div>
-
-                      <div className={styles['member-box']}>
-                        <img
-                          src="../../assets/images/profile4.jpeg"
-                          className={styles['member-img']}
-                        />
-                        <span className={styles['member-details']}>
-                          <span className={styles['member-name']}>
-                            Cersei Lannister
-                          </span>
-                          <span className={styles['member-title']}>
-                            Human resources manager
-                          </span>
-                        </span>
-                      </div>
+                      {project.team.length === 0 ? (
+                        <i className={styles['italic-text']}>No member</i>
+                      ) : (
+                        project.team.map((member) => (
+                          <div
+                            key={member._id}
+                            className={styles['member-box']}
+                          >
+                            <img
+                              src={`../../assets/images/users/${member.photo}`}
+                              className={styles['member-img']}
+                            />
+                            <span className={styles['member-details']}>
+                              <span className={styles['member-name']}>
+                                {generateName(
+                                  member.firstName,
+                                  member.lastName,
+                                  member.username
+                                )}
+                              </span>
+                              <span className={styles['member-title']}>
+                                {member.occupation}
+                              </span>
+                            </span>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
 
@@ -667,9 +986,9 @@ const ProjectItem = () => {
                       Project Files
                       <span className={styles['files-size-left']}>
                         {' '}
-                        (3.65
+                        ({calculateSize(freeSpace).value}
                         <span className={styles['files-size-unit']}>
-                          mb
+                          {calculateSize(freeSpace).unit}
                         </span>{' '}
                         free)
                       </span>
@@ -692,138 +1011,88 @@ const ProjectItem = () => {
                     </div>
 
                     <div className={styles['files-box']}>
-                      <article className={styles['uploaded-file']}>
-                        <BsFileEarmarkPdfFill
-                          className={`${styles['file-icon']} ${styles['file-icon1']}`}
-                        />
-                        <div className={styles['file-content']}>
-                          <span className={styles['file-name']}>
-                            AHA Selfcare Mobile Application Test-Cases.xls
-                          </span>
-                          <span className={styles['file-details']}>
-                            <span className={styles['file-property']}>
-                              Sender:
-                            </span>
-                            <span className={styles['file-sender']}>
-                              Arya Stark
-                            </span>
-                          </span>
-                          <span className={styles['file-details']}>
-                            <span className={styles['file-property']}>
-                              Size:
-                            </span>
-                            <span className={styles['file-size']}>
-                              2<span className={styles['size-unit']}>mb</span>
-                            </span>
-                          </span>
-                          <span className={styles['file-details']}>
-                            <span className={styles['file-property']}>
-                              Time:
-                            </span>
-                            <span className={styles['time-sent']}>
-                              March 31st at 6:53 PM
-                            </span>
-                          </span>
-                        </div>
+                      {project.files.length === 0 ? (
+                        <i className={styles['italic-text']}>No file</i>
+                      ) : (
+                        project.files.map((file, index) => (
+                          <article
+                            key={file._id}
+                            className={styles['uploaded-file']}
+                          >
+                            <img
+                              className={styles['file-icon']}
+                              src={`../../public/assets/file-icons/${fileICon(
+                                getFileName(file.name, file.path).ext
+                              )}`}
+                            />
+                            <div className={styles['file-content']}>
+                              <span className={styles['file-name']}>
+                                {getFileName(file.name, file.path).name}
+                              </span>
+                              <span className={styles['file-details']}>
+                                <span className={styles['file-property']}>
+                                  Sender:
+                                </span>
+                                <span className={styles['file-sender']}>
+                                  {generateName(
+                                    file.sender.firstName,
+                                    file.sender.lastName,
+                                    file.sender.username
+                                  )}
+                                </span>
+                              </span>
+                              <span className={styles['file-details']}>
+                                <span className={styles['file-property']}>
+                                  Size:
+                                </span>
+                                <span className={styles['file-size']}>
+                                  {calculateSize(file.size).value}
+                                  <span className={styles['size-unit']}>
+                                    {calculateSize(file.size).unit}
+                                  </span>
+                                </span>
+                              </span>
+                              <span className={styles['file-details']}>
+                                <span className={styles['file-property']}>
+                                  Time:
+                                </span>
+                                <span className={styles['time-sent']}>
+                                  {fileDate(file.time)}
+                                </span>
+                              </span>
+                            </div>
 
-                        <div className={styles['menu-box']}>
-                          <BsThreeDotsVertical
-                            className={styles['menu-file-icon']}
-                          />
-                          <ul className={styles['menu-list']}>
-                            <li className={styles['menu-item']}>Download</li>
-                            <li className={styles['menu-item']}>Delete</li>
-                          </ul>
-                        </div>
-                      </article>
-
-                      <article className={styles['uploaded-file']}>
-                        <FaFileImage
-                          className={`${styles['file-icon']} ${styles['file-icon2']}`}
-                        />
-                        <div className={styles['file-content']}>
-                          <span className={styles['file-name']}>
-                            AHA Selfcare Mobile Application Test-Cases.xls
-                          </span>
-                          <span className={styles['file-details']}>
-                            <span className={styles['file-property']}>
-                              Sender:
-                            </span>
-                            <span className={styles['file-sender']}>
-                              Arya Stark
-                            </span>
-                          </span>
-                          <span className={styles['file-details']}>
-                            <span className={styles['file-property']}>
-                              Size:
-                            </span>
-                            <span className={styles['file-size']}>
-                              2<span className={styles['size-unit']}>mb</span>
-                            </span>
-                          </span>
-                          <span className={styles['file-details']}>
-                            <span className={styles['file-property']}>
-                              Time:
-                            </span>
-                            <span className={styles['time-sent']}>
-                              March 31st at 6:53 PM
-                            </span>
-                          </span>
-                        </div>
-                        <div className={styles['menu-box']}>
-                          <BsThreeDotsVertical
-                            className={styles['menu-file-icon']}
-                          />
-                          <ul className={styles['menu-list']}>
-                            <li className={styles['menu-item']}>Download</li>
-                            <li className={styles['menu-item']}>Delete</li>
-                          </ul>
-                        </div>
-                      </article>
-
-                      <article className={styles['uploaded-file']}>
-                        <FaFileLines
-                          className={`${styles['file-icon']} ${styles['file-icon3']}`}
-                        />
-                        <div className={styles['file-content']}>
-                          <span className={styles['file-name']}>
-                            AHA Selfcare Mobile Application Test-Cases.xls
-                          </span>
-                          <span className={styles['file-details']}>
-                            <span className={styles['file-property']}>
-                              Sender:
-                            </span>
-                            <span className={styles['file-sender']}>
-                              Arya Stark
-                            </span>
-                          </span>
-                          <span className={styles['file-details']}>
-                            <span className={styles['file-property']}>
-                              Size:
-                            </span>
-                            <span className={styles['file-size']}>
-                              2<span className={styles['size-unit']}>mb</span>
-                            </span>
-                          </span>
-                          <span className={styles['file-details']}>
-                            <span className={styles['file-property']}>
-                              Time:
-                            </span>
-                            <span className={styles['time-sent']}>
-                              March 31st at 6:53 PM
-                            </span>
-                          </span>
-                        </div>
-                        <div className={styles['menu-box']}>
-                          <BsThreeDotsVertical
-                            className={styles['menu-file-icon']}
-                          />
-                          <ul className={styles['menu-list']}>
-                            <li className={styles['menu-item']}>Download</li>
-                            <li className={styles['menu-item']}>Delete</li>
-                          </ul>
-                        </div>
-                      </article>
+                            {selectMode.value ? (
+                              <input
+                                className={styles['file-checkbox']}
+                                type="checkbox"
+                                ref={addToCheckBoxRef}
+                                defaultChecked={selectMode.index === index}
+                                onChange={handleCheckBox(file._id)}
+                              />
+                            ) : (
+                              <div className={styles['menu-box']}>
+                                <BsThreeDotsVertical
+                                  className={styles['menu-file-icon']}
+                                />
+                                <ul className={styles['menu-list']}>
+                                  <li
+                                    className={styles['menu-item']}
+                                    onClick={() =>
+                                      setSelectMode({ value: true, index })
+                                    }
+                                  >
+                                    Select
+                                  </li>
+                                  <li className={styles['menu-item']}>
+                                    Download
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </article>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -839,29 +1108,59 @@ const ProjectItem = () => {
                         <tbody>
                           <tr>
                             <td className={styles['table-property']}>Tasks:</td>
-                            <td>15</td>
+                            <td>
+                              {' '}
+                              {project.details.complete +
+                                project.details.open +
+                                project.details.progress}
+                            </td>
                           </tr>
                           <tr>
                             <td className={styles['table-property']}>
                               Created:
                             </td>
-                            <td>10th January, 2024</td>
+                            <td>{`${
+                              months[new Date(project.createdAt).getMonth()]
+                            } ${new Date(
+                              project.createdAt
+                            ).getDate()}, ${new Date(
+                              project.createdAt
+                            ).getFullYear()}`}</td>
                           </tr>
                           <tr>
                             <td className={styles['table-property']}>
                               Deadline:
                             </td>
-                            <td>26 April, 2024</td>
+                            <td>
+                              {project.deadline ? (
+                                `${
+                                  months[new Date(project.deadline).getMonth()]
+                                } ${new Date(
+                                  project.deadline
+                                ).getDate()}, ${new Date(
+                                  project.deadline
+                                ).getFullYear()}`
+                              ) : (
+                                <i>No deadline</i>
+                              )}
+                            </td>
                           </tr>
                           <tr>
                             <td className={styles['table-property']}>Team:</td>
-                            <td>6 members</td>
+                            <td>
+                              {' '}
+                              {project.team.length}{' '}
+                              {project.team.length === 1 ? 'member' : 'members'}
+                            </td>
                           </tr>
                           <tr>
                             <td className={styles['table-property']}>
                               Status:
                             </td>
-                            <td>Active</td>
+                            <td className={styles['project-status']}>
+                              {' '}
+                              {project.status}
+                            </td>
                           </tr>
                         </tbody>
                       </table>
@@ -869,10 +1168,22 @@ const ProjectItem = () => {
                     <div className={styles['progress-div']}>
                       <span className={styles['progress-box']}>
                         <span>Progress</span>
-                        <span className={styles['progress-value']}>60%</span>
+                        <span className={styles['progress-value']}>
+                          {' '}
+                          {project.details.projectProgress}%
+                        </span>
                       </span>
 
-                      <span className={styles['progress-bar']}>&nbsp;</span>
+                      <span className={styles['progress-bar-box']}>
+                        <span
+                          className={styles['progress-bar']}
+                          style={{
+                            width: `${project.details.projectProgress}%`,
+                          }}
+                        >
+                          &nbsp;
+                        </span>
+                      </span>
                     </div>
                   </div>
 
@@ -880,50 +1191,33 @@ const ProjectItem = () => {
                     <span className={styles['team-head']}>Team</span>
 
                     <div className={styles['team-div']}>
-                      <div className={styles['member-box']}>
-                        <img
-                          src="../../assets/images/profile2webp.webp"
-                          className={styles['member-img']}
-                        />
-                        <span className={styles['member-details']}>
-                          <span className={styles['member-name']}>
-                            Arya Stark
-                          </span>
-                          <span className={styles['member-title']}>
-                            Web Designer
-                          </span>
-                        </span>
-                      </div>
-
-                      <div className={styles['member-box']}>
-                        <img
-                          src="../../assets/images/profile3.jpeg"
-                          className={styles['member-img']}
-                        />
-                        <span className={styles['member-details']}>
-                          <span className={styles['member-name']}>
-                            Ramsay Bolton
-                          </span>
-                          <span className={styles['member-title']}>
-                            Web Developer
-                          </span>
-                        </span>
-                      </div>
-
-                      <div className={styles['member-box']}>
-                        <img
-                          src="../../assets/images/profile4.jpeg"
-                          className={styles['member-img']}
-                        />
-                        <span className={styles['member-details']}>
-                          <span className={styles['member-name']}>
-                            Cersei Lannister
-                          </span>
-                          <span className={styles['member-title']}>
-                            Human resources manager
-                          </span>
-                        </span>
-                      </div>
+                      {project.team.length === 0 ? (
+                        <i className={styles['italic-text']}>No member</i>
+                      ) : (
+                        project.team.map((member) => (
+                          <div
+                            key={member._id}
+                            className={styles['member-box']}
+                          >
+                            <img
+                              src={`../../assets/images/users/${member.photo}`}
+                              className={styles['member-img']}
+                            />
+                            <span className={styles['member-details']}>
+                              <span className={styles['member-name']}>
+                                {generateName(
+                                  member.firstName,
+                                  member.lastName,
+                                  member.username
+                                )}
+                              </span>
+                              <span className={styles['member-title']}>
+                                {member.occupation}
+                              </span>
+                            </span>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>

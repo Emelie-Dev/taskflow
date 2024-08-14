@@ -321,6 +321,9 @@
   border: 1px solid rgba(128, 128, 128, 0.404);
   border-radius: 5px;
   padding: 1rem;
+  /* height: fit-content; */
+  max-height: 50%;
+  overflow: auto;
 }
 
 .project-leader {
@@ -447,18 +450,6 @@
   flex-shrink: 0;
 }
 
-.file-icon1 {
-  color: red;
-}
-
-.file-icon2 {
-  color: green;
-}
-
-.file-icon3 {
-  color: blue;
-}
-
 .file-content {
   display: flex;
   flex-direction: column;
@@ -494,6 +485,7 @@
   overflow: hidden;
   color: orange;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .file-sender:hover {
@@ -503,6 +495,7 @@
 .file-size,
 .time-sent {
   font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .size-unit {
@@ -575,17 +568,6 @@
   color: orange;
 }
 
-.progress-bar {
-  height: 0.25rem;
-  border-radius: 20px;
-  margin: 1rem 0;
-  background: linear-gradient(
-    to right,
-    orange 60%,
-    rgba(128, 128, 128, 0.5) 40%
-  );
-}
-
 .project-team-container,
 .alt-project-team-container {
   box-shadow: 1px 1px 10px -7px black;
@@ -617,7 +599,7 @@
 .member-box {
   display: flex;
   margin-bottom: 1.5rem;
-  width: 100%;
+  width: fit-content;
   cursor: pointer;
   transition: opacity 0.2s;
 }
@@ -673,7 +655,7 @@
   list-style-type: none;
   position: absolute;
   left: -400%;
-  top: 110%;
+  top: 100%;
   box-shadow: 1px 1px 8px -3px black;
   border-radius: 5px;
   display: none;
@@ -923,6 +905,10 @@ td {
   text-align: left;
   font-size: 1.02rem;
   cursor: auto;
+}
+
+.project-status {
+  text-transform: capitalize;
 }
 
 .performer {
@@ -1193,6 +1179,47 @@ td {
   height: 75%;
   font-size: 1.05rem;
   margin: 0 1rem;
+}
+
+.progress-bar-box {
+  height: 0.25rem;
+  border-radius: 20px;
+  margin: 1rem 0;
+  background: rgba(128, 128, 128, 0.5);
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.progress-bar {
+  background: orange;
+  height: inherit;
+}
+
+.italic-text {
+  color: gray;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.creating-icon {
+  margin-right: 0.5rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  animation: rotate 1s linear 0s infinite normal both;
+}
+
+.uploading-button {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.file-checkbox {
+  accent-color: orange;
+  cursor: pointer;
+  width: 1rem;
+  height: 1rem;
+  margin-left: auto;
 }
 
 /* Animations */

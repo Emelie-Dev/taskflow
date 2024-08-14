@@ -9,7 +9,6 @@ import { filterValues } from './taskController.js';
 import User from '../Models/userModel.js';
 import multer from 'multer';
 import fs from 'fs';
-import { group } from 'console';
 
 // Update current Project
 
@@ -101,9 +100,9 @@ const multerStorage = multer.diskStorage({
   filename: function (req, file, cb) {
     const ext = file.originalname.slice(file.originalname.lastIndexOf('.'));
 
-    const fileName = `user-${Math.round(
-      Math.random() * 1e14
-    )}-${Date.now()}${ext}`;
+    const fileName = `user-${req.user._id}-${
+      Math.round(Math.random() * 1e14) + Date.now()
+    }${ext}`;
 
     cb(null, fileName);
   },
@@ -169,10 +168,15 @@ export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const getProject = asyncErrorHandler(async (req, res, next) => {
-  const project = await Project.findById(req.params.id).populate({
-    path: 'team',
-    select: 'firstName lastName username occupation photo',
-  });
+  const project = await Project.findById(req.params.id)
+    .populate({
+      path: 'user',
+      select: 'firstName lastName username photo',
+    })
+    .populate({
+      path: 'team',
+      select: 'firstName lastName username occupation photo',
+    });
 
   if (!project) {
     return next(new CustomError('This project does not exist!', 404));
@@ -180,7 +184,7 @@ export const getProject = asyncErrorHandler(async (req, res, next) => {
 
   const { team } = project;
 
-  if (String(project.user) !== String(req.user._id)) {
+  if (String(project.user._id) !== String(req.user._id)) {
     if (!team.includes(req.user._id)) {
       return next(new CustomError('This project does not exist!', 404));
     }
@@ -280,7 +284,7 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
-  const project = await Project.findById(req.params.id);
+  let project = await Project.findById(req.params.id);
 
   // Check if project exist
   if (!project) {
@@ -289,19 +293,13 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Validate request header
-  if (!req.headers['x-files-names']) {
+  if (!req.headers['x-file-names']) {
     return next(new CustomError('Invalid request!', 400));
   }
 
-  let newFilesNames;
+  const newFilesNames = req.headers['x-file-names'].split(',');
 
-  try {
-    newFilesNames = JSON.parse(req.headers['x-files-names']);
-  } catch {
-    return next(new CustomError('Invalid request!', 400));
-  }
-
-  if (!Array.isArray(newFilesNames) || newFilesNames.length === 0) {
+  if (newFilesNames.length === 0) {
     return next(new CustomError('Invalid request!', 400));
   }
 
@@ -402,28 +400,40 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
       return next(err);
     }
 
-    const filesData = req.files.map((file, index) => {
-      const data = {
-        path: file.path,
-        name: newFilesNames[index],
-        size: file.size,
-        sender: {
-          userId: req.user._id,
-          name: req.user.username,
-          firstName: req.user.firstName,
-          lastName: req.user.lastName,
-        },
-      };
+    const filesData = req.files.map((file, index) => ({
+      path: file.path,
+      name: newFilesNames[index],
+      size: file.size,
+      sender: {
+        userId: req.user._id,
+        name: req.user.username,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+      },
+    }));
 
-      return data;
-    });
-
-    const files = project.files.concat(filesData);
+    const files = [...filesData, ...project.files];
 
     // Updates the files property of the project
-    project.files = files;
-
-    await project.save();
+    project = await Project.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        user: req.user._id,
+      },
+      { files },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .populate({
+        path: 'user',
+        select: 'firstName lastName username photo',
+      })
+      .populate({
+        path: 'team',
+        select: 'firstName lastName username occupation photo',
+      });
 
     // Update the user current project
     await User.findByIdAndUpdate(
@@ -450,7 +460,10 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
 
     return res.status(200).json({
       status: 'success',
-      message: 'The file(s) were uploaded successfully.',
+      data: {
+        project,
+        message: 'The file(s) were uploaded successfully.',
+      },
     });
   });
 });
@@ -652,18 +665,27 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
         );
       }
 
-      notifications.push({
+      const oldNotification = await Notification.findOne({
         user: member,
-        performer: {
-          name: req.user.username,
-          owner: req.user._id,
-          firstName: req.user.firstName,
-          lastName: req.user.lastName,
-          project: project._id,
-        },
         action: 'invitation',
-        type: ['team'],
+        'performer.project': project._id,
       });
+
+      if (!oldNotification) {
+        notifications.push({
+          user: member,
+          performer: {
+            name: req.user.username,
+            owner: req.user._id,
+            firstName: req.user.firstName,
+            lastName: req.user.lastName,
+            project: project._id,
+          },
+          action: 'invitation',
+          type: ['team'],
+        });
+      }
+
       updatedTeam.splice(key, 1);
     }
   }
@@ -728,10 +750,15 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
       new: true,
       runValidators: true,
     }
-  ).populate({
-    path: 'team',
-    select: 'firstName lastName username occupation photo',
-  });
+  )
+    .populate({
+      path: 'user',
+      select: 'firstName lastName username photo',
+    })
+    .populate({
+      path: 'team',
+      select: 'firstName lastName username occupation photo',
+    });
 
   // Update the user current project
   await User.findByIdAndUpdate(

@@ -36,7 +36,8 @@
     - Check project and task model for timestamp (schema option)
     - Create page for wrong routes in the frontend
     - Enable detecting of active and inactive projects
-    - Test duplicating usernames
+    - Test duplicating username when creating account
+    - Add !err.response for catch block
 
 
  -- Data Design
