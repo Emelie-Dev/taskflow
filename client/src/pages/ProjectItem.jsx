@@ -459,7 +459,6 @@ const ProjectItem = () => {
       case '.mdb':
       case '.sav':
       case '.sql':
-      case '.tar':
       case '.xml':
       case '.accdb':
         icon = 'db.png';
