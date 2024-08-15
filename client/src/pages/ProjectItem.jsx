@@ -16,7 +16,6 @@ import {
 import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { FaRegCircleUser, FaFileImage } from 'react-icons/fa6';
-import { FaFileLines } from 'react-icons/fa6';
 import {
   BsFileEarmarkPdfFill,
   BsThreeDotsVertical,

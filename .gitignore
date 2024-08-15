@@ -13,6 +13,8 @@ dist
 dist-ssr
 *.local
 
+project-files/
+
 *.env
 *.vscode/
 
