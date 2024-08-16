@@ -8,6 +8,8 @@ import Notification from '../Models/notificationModel.js';
 import { filterValues } from './taskController.js';
 import User from '../Models/userModel.js';
 import multer from 'multer';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import fs from 'fs';
 
 // Update current Project
@@ -184,8 +186,12 @@ export const getProject = asyncErrorHandler(async (req, res, next) => {
 
   const { team } = project;
 
+  const isMember = team.find(
+    (member) => String(member._id) === String(req.user._id)
+  );
+
   if (String(project.user._id) !== String(req.user._id)) {
-    if (!team.includes(req.user._id)) {
+    if (!isMember) {
       return next(new CustomError('This project does not exist!', 404));
     }
   }
@@ -256,10 +262,15 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
       new: true,
       runValidators: true,
     }
-  ).populate({
-    path: 'team',
-    select: 'firstName lastName username occupation photo',
-  });
+  )
+    .populate({
+      path: 'user',
+      select: 'firstName lastName username photo',
+    })
+    .populate({
+      path: 'team',
+      select: 'firstName lastName username occupation photo',
+    });
 
   // Update the user current project
   await User.findByIdAndUpdate(
@@ -406,7 +417,7 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
       size: file.size,
       sender: {
         userId: req.user._id,
-        name: req.user.username,
+        username: req.user.username,
         firstName: req.user.firstName,
         lastName: req.user.lastName,
       },
@@ -418,7 +429,7 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
     project = await Project.findOneAndUpdate(
       {
         _id: req.params.id,
-        user: req.user._id,
+        user: project.user,
       },
       { files },
       {
@@ -436,15 +447,17 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
       });
 
     // Update the user current project
-    await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        currentProject: project._id,
-      },
-      {
-        runValidators: true,
-      }
-    );
+    if (String(project.user) === String(req.user._id)) {
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          currentProject: project._id,
+        },
+        {
+          runValidators: true,
+        }
+      );
+    }
 
     await Notification.create({
       user: project.user,
@@ -469,7 +482,7 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
-  const project = await Project.findById(req.params.id);
+  let project = await Project.findById(req.params.id);
 
   // Check if project exist
   if (!project) {
@@ -479,7 +492,7 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
 
   // Check is the files from the request body is an array
   if (!Array.isArray(req.body.files)) {
-    return next(new CustomError('Invalid request format', 400));
+    return next(new CustomError('Invalid request format.', 400));
   }
 
   // Check if the length of the files is 0
@@ -489,6 +502,7 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
 
   // Convert the member ids to string
   const team = project.team.map((value) => String(value));
+  const projectFiles = [...project.files];
 
   // Check if the project does not belong to the user
   if (String(project.user) !== String(req.user._id)) {
@@ -498,22 +512,21 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Check if the project has files
-  if (project.files.length === 0) {
+  if (projectFiles.length === 0) {
     return next(new CustomError('This project has no file.', 400));
   }
 
   const fileNames = [];
+  const errorFiles = [];
+  const restrictedFiles = [];
 
-  const files = project.files.filter((file) => {
+  const files = projectFiles.filter((file) => {
     const condition = req.body.files.includes(file.name);
 
     if (condition) fileNames.push(file.name);
 
     return condition;
   });
-
-  const errorFiles = [];
-  const restrictedFiles = [];
 
   if (files.length === 0) {
     return next(new CustomError('None of the provided files exist!', 404));
@@ -531,25 +544,32 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
 
   const deleteFiles = files.map((file) => {
     return new Promise((resolve, reject) => {
+      const fileName =
+        file.name.lastIndexOf('.') !== -1
+          ? file.name.slice(0, file.name.lastIndexOf('.'))
+          : file.name;
+
+      const ext =
+        file.path.lastIndexOf('.') !== -1
+          ? file.path.slice(file.path.lastIndexOf('.'))
+          : '';
+
       if (
         String(file.sender.userId) === String(req.user._id) ||
         String(req.user._id) === String(project.user)
       ) {
         fs.unlink(file.path, (err) => {
           if (err) {
-            errorFiles.push(file.name);
+            errorFiles.push(`${fileName}${ext}`);
             reject();
           }
 
-          const index = project.files.findIndex(
-            (doc) => doc.name === file.name
-          );
-
-          project.files.splice(index, 1);
+          const index = projectFiles.findIndex((doc) => doc.name === file.name);
+          projectFiles.splice(index, 1);
           resolve();
         });
       } else {
-        restrictedFiles.push(file.name);
+        restrictedFiles.push(`${fileName}${ext}`);
         reject();
       }
     });
@@ -575,24 +595,38 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
     files.length - (errorFiles.length + restrictedFiles.length);
 
   if (otherFiles !== 0) {
-    if (errorFiles.length !== 0 || restrictedFiles.length !== 0) {
-      message += 'The remaining file(s) were deleted succesfully.';
-    } else {
-      message += 'The file(s) were deleted succesfully.';
-    }
-
-    await project.save();
-
-    // Update the user current project
-    await User.findByIdAndUpdate(
-      req.user._id,
+    project = await Project.findOneAndUpdate(
       {
-        currentProject: project._id,
+        _id: req.params.id,
+        user: project.user,
       },
+      { files: projectFiles },
       {
+        new: true,
         runValidators: true,
       }
-    );
+    )
+      .populate({
+        path: 'user',
+        select: 'firstName lastName username photo',
+      })
+      .populate({
+        path: 'team',
+        select: 'firstName lastName username occupation photo',
+      });
+
+    // Update the user current project
+    if (String(project.user) === String(req.user._id)) {
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          currentProject: project._id,
+        },
+        {
+          runValidators: true,
+        }
+      );
+    }
 
     await Notification.create({
       user: project.user,
@@ -605,11 +639,24 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
       action: 'deletion',
       type: ['files'],
     });
+  } else {
+    project = await Project.findById(req.params.id)
+      .populate({
+        path: 'user',
+        select: 'firstName lastName username photo',
+      })
+      .populate({
+        path: 'team',
+        select: 'firstName lastName username occupation photo',
+      });
   }
 
   return res.status(200).json({
     status: 'success',
-    message,
+    data: {
+      project,
+      message,
+    },
   });
 });
 
@@ -643,17 +690,17 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
 
   const newTeam = [...new Set(req.body.team)];
 
-  const updatedTeam = [...newTeam];
+  const updatedTeam = new Set(newTeam);
 
   const leaderIndex = newTeam.indexOf(String(req.user._id));
 
   if (leaderIndex !== -1) {
     newTeam.splice(leaderIndex, 1);
-    updatedTeam.splice(leaderIndex, 1);
+    updatedTeam.delete(String(req.user._id));
   }
 
   // Filters new members and generates notifications
-  for (let [key, member] of newTeam.entries()) {
+  for (let member of newTeam) {
     if (!members.includes(member)) {
       const user = await User.findById(member).select(
         'username firstName lastName'
@@ -686,7 +733,7 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
         });
       }
 
-      updatedTeam.splice(key, 1);
+      updatedTeam.delete(member);
     }
   }
 
@@ -745,7 +792,7 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
       _id: req.params.id,
       user: req.user._id,
     },
-    { team: updatedTeam },
+    { team: [...updatedTeam] },
     {
       new: true,
       runValidators: true,
@@ -922,6 +969,53 @@ export const respondToInvitation = asyncErrorHandler(async (req, res, next) => {
     message,
   });
 });
+
+export const getProjectFile = async (req, res) => {
+  const { projectId, file: filePath } = req.params;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    return res.status(404).send('This file does not exist!');
+  }
+
+  const { team } = project;
+
+  if (String(project.user._id) !== String(req.user._id)) {
+    if (!team.includes(String(req.user._id))) {
+      return res.status(404).send('This file does not exist!');
+    }
+  }
+
+  const projectFile = project.files.find(
+    (file) => String(file.path).slice(21) === filePath
+  );
+
+  if (!projectFile) {
+    return res.status(404).send('This file does not exist!');
+  }
+
+  const path = join(
+    dirname(fileURLToPath(import.meta.url)),
+    `../Public/project-files/${filePath}`
+  );
+
+  const fileName =
+    projectFile.name.lastIndexOf('.') !== -1
+      ? projectFile.name.slice(0, projectFile.name.lastIndexOf('.'))
+      : projectFile.name;
+
+  const ext =
+    projectFile.path.lastIndexOf('.') !== -1
+      ? projectFile.path.slice(projectFile.path.lastIndexOf('.'))
+      : '';
+
+  return res.download(path, `${fileName}${ext}`, (err) => {
+    if (err) {
+      res.status(500).send('Error occured while downloading file.');
+    }
+  });
+};
 
 export const createNewProject = factory.createOne(Project, 'project');
 

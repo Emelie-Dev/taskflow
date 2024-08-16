@@ -34,6 +34,7 @@ import Loader from '../components/Loader';
 import DeleteComponent from '../components/DeleteComponent';
 import { generateName } from './Dashboard';
 import { months } from './Dashboard';
+import { BiSolidSelectMultiple } from 'react-icons/bi';
 
 const ProjectItem = () => {
   const [showNav, setShowNav] = useState(false);
@@ -45,11 +46,12 @@ const ProjectItem = () => {
   const [project, setProject] = useState(null);
   const [projectData, setProjectData] = useState(null);
   const [projectTeam, setProjectTeam] = useState([]);
-  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({ value: false, type: null });
   const [freeSpace, setFreeSpace] = useState(0);
   const [fileUploading, setFileUploading] = useState(false);
   const [selectMode, setSelectMode] = useState({ value: false, index: null });
   const [disposableFiles, setDisposableFiles] = useState([]);
+  const [deleteData, setDeleteData] = useState({});
 
   const navRef = useRef();
   const fileRef = useRef();
@@ -265,8 +267,6 @@ const ProjectItem = () => {
     }
   };
 
-  const deleteFiles = async () => {};
-
   const getFileName = (name, path) => {
     name = String(name).trim();
     path = String(path).trim();
@@ -281,7 +281,7 @@ const ProjectItem = () => {
 
     const newName = `${fileName}${ext}`;
 
-    return { name: newName, ext };
+    return { name: newName, ext, serverName: path.slice(21) };
   };
 
   const fileDate = (date) => {
@@ -479,9 +479,31 @@ const ProjectItem = () => {
     return icon;
   };
 
-  const handleCheckBox = (id) => (e) => {
+  const handleCheckBox = (name) => (e) => {
     const value = e.target.checked;
+
+    const files = new Set([...disposableFiles]);
+
+    if (value) {
+      files.add(name);
+    } else {
+      files.delete(name);
+    }
+
+    setDisposableFiles([...files]);
   };
+
+  const selectAllFiles = () => {
+    if (disposableFiles.length === project.files.length) {
+      setDisposableFiles([]);
+      checkBoxRef.current.forEach((el) => (el.checked = false));
+    } else {
+      setDisposableFiles(project.files.map((file) => file.name));
+      checkBoxRef.current.forEach((el) => (el.checked = true));
+    }
+  };
+
+  // do responsive for delete file box
 
   return (
     <main className={styles.div}>
@@ -679,11 +701,14 @@ const ProjectItem = () => {
           />
         )}
 
-        {deleteModal && (
+        {deleteModal.value && (
           <DeleteComponent
-            projectId={project._id}
-            projectName={project.name}
+            toast={toast}
+            type={deleteModal.type}
+            typeData={deleteData}
             setDeleteModal={setDeleteModal}
+            setProject={setProject}
+            setSelectMode={setSelectMode}
           />
         )}
 
@@ -824,7 +849,10 @@ const ProjectItem = () => {
 
                 <button
                   className={styles['delete-btn']}
-                  onClick={() => setDeleteModal(true)}
+                  onClick={() => {
+                    setDeleteModal({ value: true, type: 'Project' });
+                    setDeleteData({ id: project._id, name: project.name });
+                  }}
                 >
                   Delete Project
                 </button>
@@ -968,6 +996,7 @@ const ProjectItem = () => {
                                   member.lastName,
                                   member.username
                                 )}
+                                mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
                               </span>
                               <span className={styles['member-title']}>
                                 {member.occupation}
@@ -979,34 +1008,92 @@ const ProjectItem = () => {
                     </div>
                   </div>
 
-                  <div className={styles['files-conatiner']}>
-                    <h1 className={styles['files-text']}>
-                      Project Files
-                      <span className={styles['files-size-left']}>
-                        {' '}
-                        ({calculateSize(freeSpace).value}
-                        <span className={styles['files-size-unit']}>
-                          {calculateSize(freeSpace).unit}
-                        </span>{' '}
-                        free)
-                      </span>
-                    </h1>
+                  <div
+                    className={`${styles['files-conatiner']} ${
+                      selectMode.value ? styles['remove-padding'] : ''
+                    }`}
+                  >
+                    {selectMode.value ? (
+                      <div className={styles['delete-files-box']}>
+                        <span className={styles['delete-files-text']}>
+                          Selected {disposableFiles.length}{' '}
+                          {disposableFiles.length === 1 ? 'file' : 'files'}
+                        </span>
 
-                    <div className={styles['add-files-box']}>
-                      <button
-                        className={styles['add-files-btn']}
-                        onClick={() => fileRef.current.click()}
-                      >
-                        Add Files
-                      </button>
-                      <input
-                        type="file"
-                        className={styles['add-file-input']}
-                        ref={fileRef}
-                        onChange={displayFiles}
-                        multiple
-                      />
-                    </div>
+                        <div className={styles['delete-btn-div']}>
+                          <button
+                            className={styles['cancel-file-btn']}
+                            onClick={() => {
+                              setSelectMode({ value: false, index: null });
+                              setDisposableFiles([]);
+                            }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className={`${styles['delete-file-btn']} ${
+                              disposableFiles.length === 0
+                                ? styles['disable-btn']
+                                : ''
+                            }`}
+                            onClick={() => {
+                              setDeleteModal({
+                                value: true,
+                                type: `${
+                                  disposableFiles.length === 1
+                                    ? 'File'
+                                    : 'Files'
+                                }`,
+                              });
+                              setDeleteData({
+                                id: project._id,
+                                files: disposableFiles,
+                              });
+                            }}
+                          >
+                            Delete
+                          </button>
+                          <BiSolidSelectMultiple
+                            className={`${styles['select-all-icon']} ${
+                              disposableFiles.length === project.files.length
+                                ? styles['select-all-icon2']
+                                : ''
+                            }`}
+                            onClick={selectAllFiles}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {' '}
+                        <h1 className={styles['files-text']}>
+                          Project Files
+                          <span className={styles['files-size-left']}>
+                            {' '}
+                            ({calculateSize(freeSpace).value}
+                            <span className={styles['files-size-unit']}>
+                              {calculateSize(freeSpace).unit}
+                            </span>{' '}
+                            free)
+                          </span>
+                        </h1>
+                        <div className={styles['add-files-box']}>
+                          <button
+                            className={styles['add-files-btn']}
+                            onClick={() => fileRef.current.click()}
+                          >
+                            Add Files
+                          </button>
+                          <input
+                            type="file"
+                            className={styles['add-file-input']}
+                            ref={fileRef}
+                            onChange={displayFiles}
+                            multiple
+                          />
+                        </div>
+                      </>
+                    )}
 
                     <div className={styles['files-box']}>
                       {project.files.length === 0 ? (
@@ -1066,7 +1153,7 @@ const ProjectItem = () => {
                                 type="checkbox"
                                 ref={addToCheckBoxRef}
                                 defaultChecked={selectMode.index === index}
-                                onChange={handleCheckBox(file._id)}
+                                onChange={handleCheckBox(file.name)}
                               />
                             ) : (
                               <div className={styles['menu-box']}>
@@ -1076,14 +1163,36 @@ const ProjectItem = () => {
                                 <ul className={styles['menu-list']}>
                                   <li
                                     className={styles['menu-item']}
-                                    onClick={() =>
-                                      setSelectMode({ value: true, index })
-                                    }
+                                    onClick={() => {
+                                      setSelectMode({ value: true, index });
+                                      setDisposableFiles([file.name]);
+                                    }}
                                   >
                                     Select
                                   </li>
                                   <li className={styles['menu-item']}>
-                                    Download
+                                    <a
+                                      href={
+                                        import.meta.env.MODE === 'production'
+                                          ? `${
+                                              import.meta.env.VITE_BACKEND_URL
+                                            }/project-files/${project._id}/${
+                                              getFileName(file.name, file.path)
+                                                .serverName
+                                            }`
+                                          : `${
+                                              import.meta.env
+                                                .VITE_LOCAL_BACKEND_URL
+                                            }/project-files/${project._id}/${
+                                              getFileName(file.name, file.path)
+                                                .serverName
+                                            }`
+                                      }
+                                      className={styles['download-link']}
+                                      download={true}
+                                    >
+                                      Download
+                                    </a>
                                   </li>
                                 </ul>
                               </div>

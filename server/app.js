@@ -47,6 +47,9 @@ import notificationRouter from './Routes/notificationRoutes.js';
 import analyticsRouter from './Routes/analyticsRoutes.js';
 
 import dashboardRouter from './Routes/dashboardRoutes.js';
+import User from './Models/userModel.js';
+import { getProjectFile } from './Controllers/projectController.js';
+import { protectRoute } from './Controllers/authController.js';
 
 const app = express();
 
@@ -78,9 +81,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Render static files
-app.use(
-  express.static(join(dirname(fileURLToPath(import.meta.url)), 'Public'))
-);
+// app.use(
+//   express.static(join(dirname(fileURLToPath(import.meta.url)), 'Public'))
+// );
 
 // Adds security headers
 app.use(helmet());
@@ -128,6 +131,7 @@ app.use('/api/v1/tasks', taskRouter);
 app.use('/api/v1/notifications', notificationRouter);
 app.use('/api/v1/analytics', analyticsRouter);
 app.use('/api/v1/dashboard', dashboardRouter);
+app.use('/project-files/:projectId/:file', protectRoute, getProjectFile);
 
 // For wrong endpoints
 app.all('*', (req, res, next) => {

@@ -21,8 +21,8 @@ export const AuthContext = createContext();
 export const apiClient = axios.create({
   baseURL:
     import.meta.env.MODE === 'production'
-      ? 'https://taskflow-vuni.onrender.com'
-      : 'http://localhost:2005',
+      ? import.meta.env.VITE_BACKEND_URL
+      : import.meta.env.VITE_LOCAL_BACKEND_URL,
   withCredentials: true,
 });
 

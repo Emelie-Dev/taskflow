@@ -60,7 +60,7 @@ const projectSchema = new mongoose.Schema(
               type: mongoose.Schema.ObjectId,
               ref: 'User',
             },
-            name: String,
+            username: String,
             lastName: String,
             firstName: String,
           },
