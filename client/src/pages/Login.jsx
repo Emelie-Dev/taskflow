@@ -76,6 +76,7 @@ const Login = () => {
           navigate('/dashboard');
         }
       }
+      console.log(data);
 
       return setIsProcessing(false);
     } catch (err) {
