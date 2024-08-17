@@ -391,7 +391,8 @@
   position: sticky;
   top: 0;
   z-index: 3;
-  padding-top: 1rem;
+  padding: 1rem 0;
+  /* border-bottom: 1px solid rgba(128, 128, 128, 0.3); */
 }
 
 .files-text {
@@ -1600,7 +1601,7 @@ td {
   }
 
   .files-conatiner {
-    padding: 1rem 0.5rem 2rem;
+    padding: 0 0.5rem 2rem;
   }
 
   .files-box {
