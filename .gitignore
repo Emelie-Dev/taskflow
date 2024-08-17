@@ -13,7 +13,11 @@ dist
 dist-ssr
 *.local
 
-project-files/
+# Ignore all files in a specific directory
+server/Public/project-files/*
+
+# Do not ignore the directory itself
+!server/Public/project-files/
 
 *.env
 *.vscode/
