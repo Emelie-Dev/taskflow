@@ -629,15 +629,12 @@
   display: flex;
   flex-direction: column;
   margin-left: 1rem;
-  /* width: 100% - 2rem; */
-  /* Fix width issue */
-  background: red;
+  /* width: 100%; */
 }
 
 .member-name {
   font-weight: 600;
   font-size: 1.05rem;
-  word-wrap: break-word;
 }
 
 .member-title {
@@ -645,7 +642,6 @@
   font-weight: 600;
   font-size: 0.95rem;
   margin-top: 0.2rem;
-  word-wrap: break-word;
 }
 
 .menu-box {

@@ -996,7 +996,6 @@ const ProjectItem = () => {
                                   member.lastName,
                                   member.username
                                 )}
-                                mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
                               </span>
                               <span className={styles['member-title']}>
                                 {member.occupation}
