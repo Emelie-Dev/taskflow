@@ -47,6 +47,7 @@ const devErrorHandler = (error, req, res) => {
 };
 
 const prodErrorHandler = (error, req, res) => {
+  console.log(error);
   if (error.isOperational) {
     return res.status(error.statusCode).json({
       status: error.status,
