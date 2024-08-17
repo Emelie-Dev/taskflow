@@ -368,6 +368,7 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
   upload.array('files')(req, res, async (error) => {
     if (error) {
       console.log(error);
+
       const err = new CustomError('An error occurred during file upload!', 500);
       return next(err);
     }
