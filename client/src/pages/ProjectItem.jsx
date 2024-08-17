@@ -1102,7 +1102,7 @@ const ProjectItem = () => {
                           >
                             <img
                               className={styles['file-icon']}
-                              src={`../../public/assets/file-icons/${fileICon(
+                              src={`../../assets/file-icons/${fileICon(
                                 getFileName(file.name, file.path).ext
                               )}`}
                             />
