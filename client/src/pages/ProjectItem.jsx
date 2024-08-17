@@ -1008,11 +1008,7 @@ const ProjectItem = () => {
                     </div>
                   </div>
 
-                  <div
-                    className={`${styles['files-conatiner']} ${
-                      selectMode.value ? styles['remove-padding'] : ''
-                    }`}
-                  >
+                  <div className={styles['files-conatiner']}>
                     {selectMode.value ? (
                       <div className={styles['delete-files-box']}>
                         <span className={styles['delete-files-text']}>
@@ -1064,7 +1060,7 @@ const ProjectItem = () => {
                         </div>
                       </div>
                     ) : (
-                      <>
+                      <div className={styles['file-container-head']}>
                         {' '}
                         <h1 className={styles['files-text']}>
                           Project Files
@@ -1092,7 +1088,7 @@ const ProjectItem = () => {
                             multiple
                           />
                         </div>
-                      </>
+                      </div>
                     )}
 
                     <div className={styles['files-box']}>

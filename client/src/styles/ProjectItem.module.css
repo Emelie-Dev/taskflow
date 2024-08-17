@@ -378,7 +378,7 @@
 .files-conatiner {
   font-family: var(--general-font);
   margin-top: 2rem;
-  padding: 1rem 1rem 2rem;
+  padding: 0 1rem 2rem;
   box-shadow: 1px 1px 10px -7px black;
   border-radius: 5px;
   width: 100%;
@@ -386,8 +386,12 @@
   overflow: auto;
 }
 
-.remove-padding {
-  padding-top: 0;
+.file-container-head {
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  padding-top: 1rem;
 }
 
 .files-text {
@@ -1236,6 +1240,7 @@ td {
   justify-content: space-between;
   position: sticky;
   top: 0;
+  z-index: 3;
 }
 
 .delete-files-text {
