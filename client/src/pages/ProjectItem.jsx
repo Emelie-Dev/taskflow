@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/ProjectItem.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -12,8 +12,9 @@ import {
   MdDelete,
   MdRemoveRedEye,
   MdOpenInNew,
+  MdAttachFile,
 } from 'react-icons/md';
-import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
+import { FaTasks, FaCalendarAlt, FaSearch, FaFileAlt } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import { FaRegCircleUser, FaFileImage } from 'react-icons/fa6';
 import {
@@ -35,8 +36,10 @@ import DeleteComponent from '../components/DeleteComponent';
 import { generateName } from './Dashboard';
 import { months } from './Dashboard';
 import { BiSolidSelectMultiple } from 'react-icons/bi';
+import { AuthContext } from '../App';
 
 const ProjectItem = () => {
+  const { userData } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [taskCategory, setTaskCategory] = useState('all');
   const [displayModal, setDisplayModal] = useState(false);
@@ -503,7 +506,142 @@ const ProjectItem = () => {
     }
   };
 
-  // do responsive for delete file box
+  const getActivityMessage = (activity) => {
+    if (activity.action === 'update') {
+      return `The project ${activity.type.includes('name') ? 'name' : ''} ${
+        activity.type.length > 1 ? 'and' : ''
+      } ${activity.type.includes('description') ? 'description' : ''} ${
+        activity.type.length > 1 ? 'were' : 'was'
+      } updated`;
+    } else if (
+      activity.action === 'reduction' ||
+      activity.action === 'extension'
+    ) {
+      let dateDifference;
+
+      const timeDifference = Math.abs(
+        Date.parse(activity.state.deadline.to) -
+          Date.parse(activity.state.deadline.from)
+      );
+
+      dateDifference = `${
+        Math.floor(timeDifference / 86400000) === 1
+          ? 'a day'
+          : `${Math.floor(timeDifference / 86400000)} days`
+      }`;
+
+      return (
+        <>
+          The project deadline was
+          {activity.action === 'reduction' ? ' shortened' : ' extended'}
+          {dateDifference ? ' by ' : ''}
+          <span className={styles['activity-text']}>
+            {dateDifference ? `${dateDifference}` : ''}
+          </span>
+        </>
+      );
+    } else if (activity.action === 'transition') {
+      if (activity.type.includes('status')) {
+        return (
+          <>
+            The project status was changed to{' '}
+            <span className={styles['activity-text']}>
+              {activity.state.status.to}
+            </span>
+          </>
+        );
+      }
+    } else if (activity.action === 'filePermission') {
+      return `Team members were ${
+        activity.state.addFiles.to
+          ? 'given permission to add files'
+          : 'disabled from adding files'
+      }`;
+    } else if (activity.action === 'addition') {
+      if (activity.type.includes('files')) {
+        return (
+          <>
+            {userData._id === activity.performer.id ? (
+              'You '
+            ) : (
+              <a href="#" className={styles['activity-names']}>
+                {generateName(
+                  activity.performer.firstName,
+                  activity.performer.lastName,
+                  activity.performer.username
+                )}{' '}
+              </a>
+            )}
+            added{' '}
+            {activity.performer.filesLength === 1
+              ? 'a'
+              : activity.performer.filesLength}{' '}
+            {activity.performer.filesLength === 1 ? 'file' : 'files'}
+          </>
+        );
+      } else if (activity.type.includes('team')) {
+        return (
+          <>
+            <a href="#" className={styles['activity-names']}>
+              {generateName(
+                activity.state.firstName,
+                activity.state.lastName,
+                activity.state.username
+              )}{' '}
+            </a>
+            was added to the team
+          </>
+        );
+      }
+    } else if (activity.action === 'deletion') {
+      if (activity.type.includes('files')) {
+        return (
+          <>
+            {userData._id === activity.performer.id ? (
+              'You '
+            ) : (
+              <a href="#" className={styles['activity-names']}>
+                {generateName(
+                  activity.performer.firstName,
+                  activity.performer.lastName,
+                  activity.performer.username
+                )}{' '}
+              </a>
+            )}
+            deleted{' '}
+            {activity.performer.filesLength === 1
+              ? 'a'
+              : activity.performer.filesLength}{' '}
+            {activity.performer.filesLength === 1 ? 'file' : 'files'}
+          </>
+        );
+      } else if (activity.type.includes('task')) {
+        return 'A task was deleted';
+      }
+    } else if (activity.action === 'removal') {
+      if (activity.type.includes('team')) {
+        return (
+          <>
+            {activity.state.oldMembers.map((member, index, array) => (
+              <a key={member._id} href="#" className={styles['activity-names']}>
+                {index !== 0 ? ' ' : ''}
+                {generateName(
+                  member.firstName,
+                  member.lastName,
+                  member.username
+                )}
+                {index !== array.length - 1 ? ',' : ''}
+              </a>
+            ))}{' '}
+            {activity.state.oldMembers.length === 1 ? 'was' : 'were'} removed
+            from the team
+          </>
+        );
+      }
+    } else if (activity.action === 'creation') {
+      return 'A task was created';
+    }
+  };
 
   return (
     <main className={styles.div}>
@@ -978,7 +1116,10 @@ const ProjectItem = () => {
 
                     <div className={styles['team-div']}>
                       {project.team.length === 0 ? (
-                        <i className={styles['italic-text']}>No member</i>
+                        <div className={styles['no-content-box']}>
+                          {' '}
+                          <i className={styles['italic-text']}>No member</i>
+                        </div>
                       ) : (
                         project.team.map((member) => (
                           <div
@@ -1092,7 +1233,10 @@ const ProjectItem = () => {
 
                     <div className={styles['files-box']}>
                       {project.files.length === 0 ? (
-                        <i className={styles['italic-text']}>No file</i>
+                        <div className={styles['no-content-box']}>
+                          {' '}
+                          <i className={styles['italic-text']}>No file</i>{' '}
+                        </div>
                       ) : (
                         project.files.map((file, index) => (
                           <article
@@ -1294,7 +1438,10 @@ const ProjectItem = () => {
 
                     <div className={styles['team-div']}>
                       {project.team.length === 0 ? (
-                        <i className={styles['italic-text']}>No member</i>
+                        <div className={styles['no-content-box']}>
+                          {' '}
+                          <i className={styles['italic-text']}>No member</i>
+                        </div>
                       ) : (
                         project.team.map((member) => (
                           <div
@@ -1325,101 +1472,143 @@ const ProjectItem = () => {
                 </div>
               </div>
 
+              {/* 
+              // name and description update
+              // deadline update
+              // status change
+              // files permission
+              // Add project files
+              // delete project file
+              // join team or remove from project team 
+              // A task was added
+              // A task was deleted
+              */}
+
               <div className={styles['activities-container']}>
                 <h1 className={styles['activity-head']}>Activities</h1>
 
-                <div className={styles['activity-table-container']}>
-                  <table className={styles['activity-table']}>
-                    <thead className={styles['table-head-row']}>
-                      <tr>
-                        <th className={styles['table-head']}>Activity</th>
-                        <th className={styles['table-head']}>Type</th>
-                        <th className={styles['table-head']}>Performed By</th>
-                        <th className={styles['table-head']}>Date</th>
-                        <th className={styles['table-head']}>Time</th>
-                        <th className={styles['table-head']}></th>
-                      </tr>
-                    </thead>
+                {project.activities.length === 0 ? (
+                  <div className={styles['no-project-activity-box']}>
+                    {' '}
+                    <i className={styles['no-project-activity-txt']}>
+                      No activities
+                    </i>{' '}
+                  </div>
+                ) : (
+                  <div className={styles['activity-table-container']}>
+                    <table className={styles['activity-table']}>
+                      <thead className={styles['table-head-row']}>
+                        <tr>
+                          <th className={styles['table-head']}>Activity</th>
+                          <th className={styles['table-head']}>Type</th>
+                          <th className={styles['table-head']}>Date</th>
+                          <th className={styles['table-head']}>Time</th>
+                          <th className={styles['table-head']}></th>
+                        </tr>
+                      </thead>
 
-                    <tbody>
-                      <tr>
-                        <td>A task was deleted</td>
-                        <td>
-                          <span
-                            className={`${styles['activity-type']} ${styles['activity-type1']}`}
-                          >
-                            <FaTasks className={styles['activity-type-icon']} />{' '}
-                            Task
-                          </span>
-                        </td>
-                        <td className={styles.performer}>Tyrion Lannister</td>
-                        <td>June 8, 2024</td>
-                        <td>
-                          11:00{' '}
-                          <span className={styles['activity-time']}>am</span>
-                        </td>
-                        <td>
-                          <RiDeleteBin6Line
-                            className={styles['delete-activity-icon']}
-                            title="Delete Activity"
-                          />
-                        </td>
-                      </tr>
+                      <tbody>
+                        {project.activities.map((activity) => (
+                          <tr key={activity._id}>
+                            <td className={styles['activity-table-data']}>
+                              {getActivityMessage(activity)}
+                            </td>
+                            <td className={styles['activity-table-data']}>
+                              {(activity.action === 'creation' ||
+                                (activity.action === 'deletion' &&
+                                  activity.type.includes('task'))) && (
+                                <span
+                                  className={`${styles['activity-type']} ${styles['activity-type1']}`}
+                                >
+                                  <FaTasks
+                                    className={styles['activity-type-icon']}
+                                  />{' '}
+                                  Task
+                                </span>
+                              )}
 
-                      <tr>
-                        <td>A new member joined the team</td>
-                        <td>
-                          <span
-                            className={`${styles['activity-type']} ${styles['activity-type2']}`}
-                          >
-                            <BsPeopleFill
-                              className={styles['activity-type-icon']}
-                            />{' '}
-                            Team
-                          </span>
-                        </td>
-                        <td className={styles.performer}>Robert Baratheon</td>
-                        <td>June 5, 2024</td>
-                        <td>
-                          01:27{' '}
-                          <span className={styles['activity-time']}>pm</span>
-                        </td>
-                        <td>
-                          <RiDeleteBin6Line
-                            className={styles['delete-activity-icon']}
-                            title="Delete Activity"
-                          />
-                        </td>
-                      </tr>
+                              {(activity.action === 'update' ||
+                                activity.action === 'reduction' ||
+                                activity.action === 'extension' ||
+                                activity.action === 'transition') && (
+                                <span
+                                  className={`${styles['activity-type']} ${styles['activity-type3']}`}
+                                >
+                                  <RxUpdate
+                                    className={styles['activity-type-icon']}
+                                  />{' '}
+                                  Update
+                                </span>
+                              )}
 
-                      <tr>
-                        <td>The Project description was updated</td>
-                        <td>
-                          <span
-                            className={`${styles['activity-type']} ${styles['activity-type3']}`}
-                          >
-                            <RxUpdate
-                              className={styles['activity-type-icon']}
-                            />{' '}
-                            Update
-                          </span>
-                        </td>
-                        <td className={styles.performer}>Jon Snow</td>
-                        <td>May 27, 2024</td>
-                        <td>
-                          08:27{' '}
-                          <span className={styles['activity-time']}>pm</span>
-                        </td>
-                        <td>
-                          <RiDeleteBin6Line
-                            className={styles['delete-activity-icon']}
-                            title="Delete Activity"
-                          />
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                              {((activity.action === 'addition' &&
+                                activity.type.includes('team')) ||
+                                (activity.action === 'removal' &&
+                                  activity.type.includes('team'))) && (
+                                <span
+                                  className={`${styles['activity-type']} ${styles['activity-type2']}`}
+                                >
+                                  <BsPeopleFill
+                                    className={styles['activity-type-icon']}
+                                  />{' '}
+                                  Team
+                                </span>
+                              )}
+
+                              {((activity.action === 'addition' &&
+                                activity.type.includes('files')) ||
+                                (activity.action === 'deletion' &&
+                                  activity.type.includes('files')) ||
+                                activity.action === 'filePermission') && (
+                                <span
+                                  className={`${styles['activity-type']} ${styles['activity-type4']}`}
+                                >
+                                  <FaFileAlt
+                                    className={styles['activity-type-icon2']}
+                                  />{' '}
+                                  File
+                                </span>
+                              )}
+                            </td>
+
+                            <td className={styles['activity-table-data']}>
+                              {months[new Date(activity.time).getMonth()]}{' '}
+                              {new Date(activity.time).getDate()},{' '}
+                              {new Date(activity.time).getFullYear()}
+                            </td>
+                            <td className={styles['activity-table-data']}>
+                              {new Date(activity.time).getHours() === 0 ||
+                              new Date(activity.time).getHours() === 12
+                                ? 12
+                                : new Date(activity.time).getHours() > 12
+                                ? String(
+                                    new Date(activity.time).getHours() - 12
+                                  ).padStart(2, '0')
+                                : String(
+                                    new Date(activity.time).getHours()
+                                  ).padStart(2, '0')}
+                              :
+                              {String(
+                                new Date(activity.time).getMinutes()
+                              ).padStart(2, '0')}{' '}
+                              <span className={styles['activity-time']}>
+                                {new Date(activity.time).getHours() >= 12
+                                  ? 'pm'
+                                  : 'am'}
+                              </span>
+                            </td>
+                            <td className={styles['activity-table-data']}>
+                              <RiDeleteBin6Line
+                                className={styles['delete-activity-icon']}
+                                title="Delete Activity"
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
 
               <div className={styles['task-container']}>

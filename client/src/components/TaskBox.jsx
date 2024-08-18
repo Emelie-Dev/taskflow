@@ -470,7 +470,7 @@ const TaskBox = ({
       activity.action === 'reduction' ||
       activity.action === 'extension'
     ) {
-      let dateDfifference;
+      let dateDifference;
 
       const timeDifference = Math.abs(
         Date.parse(activity.state.deadline.to) -
@@ -478,13 +478,13 @@ const TaskBox = ({
       );
 
       if (timeDifference >= 86400000) {
-        dateDfifference = `${
+        dateDifference = `${
           Math.floor(timeDifference / 86400000) === 1
             ? 'a day'
             : `${Math.floor(timeDifference / 86400000)} days`
         }`;
       } else if (timeDifference >= 3600000) {
-        dateDfifference = `${
+        dateDifference = `${
           Math.floor(timeDifference / 3600000) === 1
             ? 'an hour'
             : `${Math.floor(timeDifference / 3600000)} hours`
@@ -502,9 +502,9 @@ const TaskBox = ({
               )}
           {activity.action === 'reduction' ? ' shortened' : ' extended'} the
           deadline
-          {dateDfifference ? ' by ' : ''}
+          {dateDifference ? ' by ' : ''}
           <span className={styles['activity-text']}>
-            {dateDfifference ? `${dateDfifference}` : ''}
+            {dateDifference ? `${dateDifference}` : ''}
           </span>
           .
         </>

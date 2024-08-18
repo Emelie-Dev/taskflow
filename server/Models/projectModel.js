@@ -113,6 +113,11 @@ projectSchema.index({ name: 1, user: 1 }, { unique: true });
 projectSchema.index({ 'details.projectProgress': 1 });
 
 // Virtual populate activities
+projectSchema.virtual('activities', {
+  ref: 'Notification',
+  foreignField: 'project',
+  localField: '_id',
+});
 
 // virtual populate Tasks
 projectSchema.virtual('tasks', {

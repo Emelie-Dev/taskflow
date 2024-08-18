@@ -12,8 +12,6 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
 
-// Update current Project
-
 const generateNotifications = async (fields, values, project, req) => {
   let notifications = [];
 
@@ -83,6 +81,25 @@ const generateNotifications = async (fields, values, project, req) => {
       user,
       project: project._id,
       action: 'transition',
+      state: notificationValues,
+    };
+
+    notification.type = Object.keys(notification.state);
+
+    if (notification.type.length !== 0) notifications.push(notification);
+  }
+
+  if (fields.includes('addFiles')) {
+    const notificationValues = await filterValues(
+      { ...values },
+      false,
+      'addFiles'
+    );
+
+    const notification = {
+      user,
+      project: project._id,
+      action: 'filePermission',
       state: notificationValues,
     };
 
@@ -170,15 +187,24 @@ export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const getProject = asyncErrorHandler(async (req, res, next) => {
-  const project = await Project.findById(req.params.id)
-    .populate({
+  const project = await Project.findById(req.params.id).populate([
+    {
       path: 'user',
       select: 'firstName lastName username photo',
-    })
-    .populate({
+    },
+    {
       path: 'team',
       select: 'firstName lastName username occupation photo',
-    });
+    },
+    {
+      path: 'activities',
+      options: { sort: { time: -1 }, perDocumentLimit: 50 },
+      populate: {
+        path: 'user',
+        select: 'username firstName lastName',
+      },
+    },
+  ]);
 
   if (!project) {
     return next(new CustomError('This project does not exist!', 404));
@@ -462,9 +488,11 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
     await Notification.create({
       user: project.user,
       performer: {
-        name: req.user.username,
+        id: req.user._id,
+        username: req.user.username,
         firstName: req.user.firstName,
         lastName: req.user.lastName,
+        filesLength: req.files.length,
       },
       project: project._id,
       action: 'addition',
@@ -631,9 +659,11 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
     await Notification.create({
       user: project.user,
       performer: {
-        name: req.user.username,
+        id: req.user._id,
+        username: req.user.username,
         firstName: req.user.firstName,
         lastName: req.user.lastName,
+        filesLength: otherFiles,
       },
       project: project._id,
       action: 'deletion',
@@ -780,7 +810,7 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
     notifications.push({
       user: req.user._id,
       project: project._id,
-      action: 'assignment',
+      action: 'removal',
       state: { oldMembers },
       type: ['team'],
     });
@@ -940,8 +970,9 @@ export const respondToInvitation = asyncErrorHandler(async (req, res, next) => {
         user: notification.performer.id,
         project: project._id,
         action: 'addition',
+        type: ['team'],
         state: {
-          name: req.user.username,
+          username: req.user.username,
           firstName: req.user.firstName,
           lastName: req.user.lastName,
         },

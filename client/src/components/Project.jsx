@@ -344,6 +344,7 @@ const Project = ({
                       <IoCloseSharp
                         className={styles['remove-assignee']}
                         onClick={removeMember(member._id)}
+                        title="Remove"
                       />
                       <span className={styles['image-box']}>
                         <span className={styles['assignee-name']}>

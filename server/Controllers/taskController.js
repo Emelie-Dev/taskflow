@@ -247,17 +247,12 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
 
   if (!req.body.project) req.body.project = req.params.projectId;
 
-  const project = await Project.findById(req.body.project);
+  const project = await Project.findOne({
+    _id: req.body.project,
+    user: req.user._id,
+  });
 
-  if (project) {
-    if (String(project.user) !== String(req.body.user)) {
-      const err = new CustomError(
-        'You are not the owner of this project, so you cannot create this task!',
-        403
-      );
-      return next(err);
-    }
-  } else {
+  if (!project) {
     const err = new CustomError(
       'The project you provided does not exist!',
       404

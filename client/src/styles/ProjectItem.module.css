@@ -873,19 +873,30 @@
   max-height: 100vh;
   overflow: auto;
   white-space: nowrap;
+  margin-bottom: 4rem;
 }
 
 .activity-head {
   font-weight: 700;
   font-size: 1.2rem;
   font-family: var(--general-font);
+  margin-bottom: 2rem;
 }
 
 .activity-table {
-  margin-top: 2rem;
   border-collapse: collapse;
   width: 100%;
-  margin-bottom: 2rem;
+}
+
+.activity-text {
+  font-weight: 500;
+}
+
+.activity-names {
+  cursor: pointer;
+  font-weight: 500;
+  color: black;
+  text-decoration: none;
 }
 
 .table-head-row {
@@ -907,7 +918,7 @@
   cursor: auto;
 }
 
-td {
+.activity-table-data {
   padding: 1rem;
   text-align: left;
   font-size: 1.02rem;
@@ -916,11 +927,6 @@ td {
 
 .project-status {
   text-transform: capitalize;
-}
-
-.performer {
-  font-weight: 500;
-  cursor: pointer;
 }
 
 .activity-time {
@@ -952,6 +958,13 @@ td {
   transform: translateY(1px);
 }
 
+.activity-type-icon2 {
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-right: 0.5rem;
+  transform: translateY(1px);
+}
+
 .activity-type1 {
   color: rgb(0, 158, 251);
   background: rgba(0, 158, 251, 0.15);
@@ -965,6 +978,11 @@ td {
 .activity-type3 {
   color: rgb(220, 20, 60);
   background: rgba(220, 20, 60, 0.15);
+}
+
+.activity-type4 {
+  color: rgb(46, 139, 87);
+  background: rgba(46, 139, 87, 0.15);
 }
 
 .task-head-div {
@@ -1207,6 +1225,7 @@ td {
   color: gray;
   margin-bottom: 1rem;
   font-weight: 500;
+  font-size: 1.1rem;
 }
 
 .creating-icon {
@@ -1307,6 +1326,26 @@ td {
 .download-link {
   text-decoration: none;
   color: black;
+}
+
+.no-content-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-project-activity-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 3rem 0;
+}
+
+.no-project-activity-txt {
+  color: gray;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  font-size: 1.1rem;
 }
 
 /* Animations */

@@ -24,6 +24,7 @@ const notificationSchema = new mongoose.Schema({
       'removal', // When members are removed
       'response',
       'task', // For private notification on task assignment
+      'filePermission',
     ],
     // required: [true, 'Please provide a value for the action field.'],
   },
@@ -45,6 +46,7 @@ const notificationSchema = new mongoose.Schema({
         'assignedTask',
         'project',
         'files',
+        'addFiles',
       ],
       // required: [true, 'Please provide a value for the type field.'],
     },

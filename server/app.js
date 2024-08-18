@@ -131,7 +131,7 @@ app.use('/api/v1/tasks', taskRouter);
 app.use('/api/v1/notifications', notificationRouter);
 app.use('/api/v1/analytics', analyticsRouter);
 app.use('/api/v1/dashboard', dashboardRouter);
-app.use('/project-files/:projectId/:file', protectRoute, getProjectFile);
+app.get('/project-files/:projectId/:file', protectRoute, getProjectFile);
 
 // For wrong endpoints
 app.all('*', (req, res, next) => {
