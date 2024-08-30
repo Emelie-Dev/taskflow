@@ -11,6 +11,8 @@ import {
   respondToInvitation,
   uploadProjectFiles,
   deleteProjectFiles,
+  getProjectActivities,
+  deleteProjectActivities,
 } from '../Controllers/projectController.js';
 import { protectRoute } from '../Controllers/authController.js';
 import taskRouter from './taskRoutes.js';
@@ -36,5 +38,10 @@ router.route('/:id/files').post(uploadProjectFiles).patch(deleteProjectFiles);
 router.patch('/:id/team', updateTeam);
 
 router.patch('/:invitationId/reply-invitation', respondToInvitation);
+
+router
+  .route('/:id/activities')
+  .get(getProjectActivities)
+  .patch(deleteProjectActivities);
 
 export default router;

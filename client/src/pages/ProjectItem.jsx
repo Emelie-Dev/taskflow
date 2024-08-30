@@ -12,7 +12,9 @@ import {
   MdDelete,
   MdRemoveRedEye,
   MdOpenInNew,
-  MdAttachFile,
+  MdKeyboardDoubleArrowLeft,
+  MdKeyboardDoubleArrowRight,
+  MdOutlineSignalWifiOff,
 } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt, FaSearch, FaFileAlt } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
@@ -37,11 +39,12 @@ import { generateName } from './Dashboard';
 import { months } from './Dashboard';
 import { BiSolidSelectMultiple } from 'react-icons/bi';
 import { AuthContext } from '../App';
+import { VscIssueReopened } from 'react-icons/vsc';
+import DeleteModal from '../components/DeleteModal';
 
 const ProjectItem = () => {
   const { userData } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
-  const [taskCategory, setTaskCategory] = useState('all');
   const [displayModal, setDisplayModal] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
   const [files, setFiles] = useState([]);
@@ -53,13 +56,43 @@ const ProjectItem = () => {
   const [freeSpace, setFreeSpace] = useState(0);
   const [fileUploading, setFileUploading] = useState(false);
   const [selectMode, setSelectMode] = useState({ value: false, index: null });
+  const [activitySelectMode, setActivitySelectMode] = useState({
+    value: false,
+    index: null,
+  });
   const [disposableFiles, setDisposableFiles] = useState([]);
   const [deleteData, setDeleteData] = useState({});
+  const [projectActivities, setProjectActivities] = useState([[]]);
+  const [activitiesData, setActivitiesData] = useState({
+    loading: true,
+    lastPage: true,
+    error: false,
+  });
+  const [tablePage, setTablePage] = useState(1);
+  const [disposableActivities, setDisposableActivities] = useState([]);
+  const [deletingActivity, setDeletingActivity] = useState({
+    value: false,
+    id: null,
+  });
+  const [createCount, setCreateCount] = useState(0);
+  const [deleteCount, setDeleteCount] = useState(0);
+  const [tasks, setTasks] = useState([]);
+  const [tasksDetails, setTasksDetails] = useState({
+    category: 'all',
+    page: 1,
+  });
+  const [tasksData, setTasksData] = useState({
+    loading: true,
+    lastPage: true,
+    error: false,
+    pageError: false,
+  });
 
   const navRef = useRef();
   const fileRef = useRef();
   const namesRef = useRef([]);
   const checkBoxRef = useRef([]);
+  const activitiesRef = useRef([]);
 
   const { projectId } = useParams();
 
@@ -67,6 +100,7 @@ const ProjectItem = () => {
     if (fileRef.current) {
       if (!showFiles) {
         fileRef.current.files = new DataTransfer().files;
+        namesRef.current = [];
       }
     }
   }, [showFiles]);
@@ -135,9 +169,86 @@ const ProjectItem = () => {
           addFiles: project.addFiles,
         });
         setProjectTeam(project.team);
+        setActivitiesData({
+          loading: false,
+          lastPage: project.activities.length < 50,
+          error: false,
+        });
+        setTablePage(1);
+        setProjectActivities(
+          project.activities.length !== 0 ? [project.activities] : []
+        );
       }
     }
   }, [project]);
+
+  // Fetch tasks
+  useEffect(() => {
+    const getTasks = async () => {
+      const { category, page } = tasksDetails;
+
+      try {
+        const { data } = await apiClient(
+          `/api/v1/projects/${projectId}/tasks?${
+            category === 'open'
+              ? 'status=open&'
+              : category === 'progress'
+              ? 'status=progress&'
+              : category === 'complete'
+              ? 'status=complete&'
+              : ''
+          }page=${page}&deleteCount=${deleteCount}&createCount=${createCount}`
+        );
+
+        setTasksData({
+          loading: false,
+          lastPage: data.data.tasks.length < 30,
+          error: false,
+          pageError: false,
+        });
+
+        if (page === 1) {
+          setTasks(data.data.tasks);
+        } else {
+          setTasks([...tasks, ...data.data.tasks]);
+        }
+      } catch (err) {
+        if (page === 1) {
+          setTasksData({
+            loading: false,
+            lastPage: true,
+            error: true,
+            pageError: false,
+          });
+        } else {
+          setTasksData({
+            loading: false,
+            lastPage: false,
+            error: false,
+            pageError: true,
+          });
+        }
+
+        if (
+          !err.response ||
+          !err.response.data ||
+          err.response.status === 500
+        ) {
+          return toast('An error occured while fetching tasks.', {
+            toastId: 'toast-id7',
+            autoClose: 2000,
+          });
+        } else {
+          return toast(err.response.data.message, {
+            toastId: 'toast-id7',
+            autoClose: 2000,
+          });
+        }
+      }
+    };
+
+    getTasks();
+  }, [tasksDetails]);
 
   const hideNav = (e) => {
     if (e.target === navRef.current) {
@@ -210,15 +321,9 @@ const ProjectItem = () => {
     newFiles.length === 0 && setShowFiles(false);
   };
 
-  const addToNamesRef = (el) => {
-    if (el && !namesRef.current.includes(el)) {
-      namesRef.current.push(el);
-    }
-  };
-
-  const addToCheckBoxRef = (el) => {
-    if (el && !checkBoxRef.current.includes(el)) {
-      checkBoxRef.current.push(el);
+  const addToRef = (ref) => (el) => {
+    if (el && !ref.current.includes(el)) {
+      ref.current.push(el);
     }
   };
 
@@ -482,27 +587,65 @@ const ProjectItem = () => {
     return icon;
   };
 
-  const handleCheckBox = (name) => (e) => {
+  const handleCheckBox = (type, data) => (e) => {
     const value = e.target.checked;
 
-    const files = new Set([...disposableFiles]);
+    const dataList =
+      type === 'files'
+        ? new Set(disposableFiles)
+        : type === 'activities'
+        ? new Set(disposableActivities)
+        : '';
+
+    const setDataList =
+      type === 'files'
+        ? setDisposableFiles
+        : type === 'activities'
+        ? setDisposableActivities
+        : '';
 
     if (value) {
-      files.add(name);
+      dataList.add(data);
     } else {
-      files.delete(name);
+      dataList.delete(data);
     }
 
-    setDisposableFiles([...files]);
+    setDataList([...dataList]);
   };
 
-  const selectAllFiles = () => {
-    if (disposableFiles.length === project.files.length) {
-      setDisposableFiles([]);
-      checkBoxRef.current.forEach((el) => (el.checked = false));
+  const selectAllData = (type, ref) => () => {
+    const selectLength =
+      type === 'files'
+        ? disposableFiles.length
+        : type === 'activities'
+        ? disposableActivities.length
+        : 0;
+
+    const setDataList =
+      type === 'files'
+        ? setDisposableFiles
+        : type === 'activities'
+        ? setDisposableActivities
+        : '';
+
+    const data =
+      type === 'files'
+        ? project.files
+        : type === 'activities'
+        ? projectActivities[tablePage - 1]
+        : 0;
+
+    if (selectLength === data.length) {
+      setDataList([]);
+      ref.current.forEach((el) => (el.checked = false));
     } else {
-      setDisposableFiles(project.files.map((file) => file.name));
-      checkBoxRef.current.forEach((el) => (el.checked = true));
+      if (type === 'files') {
+        setDataList(data.map((file) => file.name));
+      } else if (type === 'activities') {
+        setDataList(data.map((activity) => activity._id));
+      }
+
+      ref.current.forEach((el) => (el.checked = true));
     }
   };
 
@@ -641,6 +784,125 @@ const ProjectItem = () => {
     } else if (activity.action === 'creation') {
       return 'A task was created';
     }
+  };
+
+  const goToPage = async (nextPage) => {
+    if (nextPage === tablePage) return;
+    else if (projectActivities[nextPage - 1]) setTablePage(nextPage);
+    else {
+      setActivitiesData({
+        loading: true,
+        lastPage: false,
+        error: false,
+      });
+
+      try {
+        const { data } = await apiClient(
+          `/api/v1/projects/${projectId}/activities?page=${nextPage}`
+        );
+
+        setActivitiesData({
+          loading: false,
+          lastPage: data.data.activities.length < 50,
+          error: false,
+        });
+
+        if (data.data.activities.length === 0) return;
+
+        setProjectActivities([...projectActivities, data.data.activities]);
+        setTablePage(nextPage);
+      } catch (err) {
+        setActivitiesData({
+          loading: false,
+          lastPage: false,
+          error: true,
+        });
+
+        if (
+          !err.response ||
+          !err.response.data ||
+          err.response.status === 500
+        ) {
+          return toast('An error occured while fetching activities.', {
+            toastId: 'toast-id5',
+            autoClose: 2000,
+          });
+        } else {
+          return toast(err.response.data.message, {
+            toastId: 'toast-id5',
+            autoClose: 2000,
+          });
+        }
+      }
+    }
+  };
+
+  const isLastPage = () => {
+    if (activitiesData.lastPage) {
+      return projectActivities.length === tablePage;
+    } else {
+      return projectActivities.length + 1 === tablePage;
+    }
+  };
+
+  const deleteActivity = (id) => async () => {
+    setDeletingActivity({ id, value: true });
+
+    try {
+      const { data } = await apiClient.patch(
+        `/api/v1/projects/${projectId}/activities`,
+        {
+          activities: [id],
+        }
+      );
+      setDeletingActivity({ value: false, id: null });
+      setProject(data.data.project);
+    } catch (err) {
+      setDeletingActivity({ value: false, id: null });
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occured while deleting activity.', {
+          toastId: 'toast-id6',
+          autoClose: 2000,
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id6',
+          autoClose: 2000,
+        });
+      }
+    }
+  };
+
+  const changeTaskCategory = (category) => () => {
+    if (category === tasksDetails.category) return;
+
+    setDeleteCount(0);
+    setCreateCount(0);
+    setTasks([]);
+    setTasksData({
+      loading: true,
+      lastPage: true,
+      error: false,
+      pageError: false,
+    });
+    setTasksDetails({ category, page: 1 });
+  };
+
+  const nextTaskPage = () => {
+    const { page, category } = tasksDetails;
+
+    if (tasksData.pageError) {
+      setTasksDetails({ page, category });
+    } else {
+      setTasksDetails({ page: page + 1, category });
+    }
+
+    setTasksData({
+      loading: true,
+      lastPage: true,
+      error: false,
+      pageError: false,
+    });
   };
 
   return (
@@ -846,7 +1108,13 @@ const ProjectItem = () => {
             typeData={deleteData}
             setDeleteModal={setDeleteModal}
             setProject={setProject}
-            setSelectMode={setSelectMode}
+            setSelectMode={
+              deleteModal.type.startsWith('File')
+                ? setSelectMode
+                : deleteModal.type.startsWith('Activit')
+                ? setActivitySelectMode
+                : null
+            }
           />
         )}
 
@@ -894,7 +1162,7 @@ const ProjectItem = () => {
                           className={styles['file-new-name']}
                           type="text"
                           placeholder="Leave blank to use the original name"
-                          ref={addToNamesRef}
+                          ref={addToRef(namesRef)}
                         />
                       </div>
 
@@ -941,9 +1209,15 @@ const ProjectItem = () => {
 
         {addTask && (
           <NewTask
-            addTask={addTask}
             setAddTask={setAddTask}
             fixedProject={true}
+            projectPage={true}
+            projects={[project]}
+            currentProjectIndex={0}
+            setCreateCount={setCreateCount}
+            setProject={setProject}
+            setTasks={setTasks}
+            category={tasksDetails.category}
           />
         )}
 
@@ -1195,7 +1469,7 @@ const ProjectItem = () => {
                                 ? styles['select-all-icon2']
                                 : ''
                             }`}
-                            onClick={selectAllFiles}
+                            onClick={selectAllData('files', checkBoxRef)}
                           />
                         </div>
                       </div>
@@ -1290,9 +1564,9 @@ const ProjectItem = () => {
                               <input
                                 className={styles['file-checkbox']}
                                 type="checkbox"
-                                ref={addToCheckBoxRef}
+                                ref={addToRef(checkBoxRef)}
                                 defaultChecked={selectMode.index === index}
-                                onChange={handleCheckBox(file.name)}
+                                onChange={handleCheckBox('files', file.name)}
                               />
                             ) : (
                               <div className={styles['menu-box']}>
@@ -1472,142 +1746,336 @@ const ProjectItem = () => {
                 </div>
               </div>
 
-              {/* 
-              // name and description update
-              // deadline update
-              // status change
-              // files permission
-              // Add project files
-              // delete project file
-              // join team or remove from project team 
-              // A task was added
-              // A task was deleted
-              */}
-
               <div className={styles['activities-container']}>
                 <h1 className={styles['activity-head']}>Activities</h1>
 
-                {project.activities.length === 0 ? (
+                {projectActivities.length === 0 ? (
                   <div className={styles['no-project-activity-box']}>
                     {' '}
                     <i className={styles['no-project-activity-txt']}>
-                      No activities
+                      No activity
                     </i>{' '}
                   </div>
                 ) : (
-                  <div className={styles['activity-table-container']}>
-                    <table className={styles['activity-table']}>
-                      <thead className={styles['table-head-row']}>
-                        <tr>
-                          <th className={styles['table-head']}>Activity</th>
-                          <th className={styles['table-head']}>Type</th>
-                          <th className={styles['table-head']}>Date</th>
-                          <th className={styles['table-head']}>Time</th>
-                          <th className={styles['table-head']}></th>
-                        </tr>
-                      </thead>
+                  <>
+                    <div className={styles['activity-header']}>
+                      <div className={styles['activity-header-text']}>
+                        {activitySelectMode.value ? (
+                          <span className={styles['delete-activity-text']}>
+                            {disposableActivities.length} selected{' '}
+                          </span>
+                        ) : (
+                          <>
+                            Showing
+                            <span className={styles['activity-entry-text']}>
+                              {' '}
+                              {(tablePage - 1) * 50 + 1}
+                            </span>{' '}
+                            to
+                            <span className={styles['activity-entry-text']}>
+                              {' '}
+                              {(tablePage - 1) * 50 +
+                                projectActivities[tablePage - 1].length}
+                            </span>{' '}
+                            of
+                            <span className={styles['activity-entry-text']}>
+                              {' '}
+                              {projectActivities.flat().length}
+                            </span>
+                          </>
+                        )}
+                      </div>
 
-                      <tbody>
-                        {project.activities.map((activity) => (
-                          <tr key={activity._id}>
-                            <td className={styles['activity-table-data']}>
-                              {getActivityMessage(activity)}
-                            </td>
-                            <td className={styles['activity-table-data']}>
-                              {(activity.action === 'creation' ||
-                                (activity.action === 'deletion' &&
-                                  activity.type.includes('task'))) && (
+                      {activitySelectMode.value ? (
+                        <div>
+                          <button
+                            className={styles['cancel-activity-btn']}
+                            onClick={() => {
+                              setActivitySelectMode({
+                                value: false,
+                                index: null,
+                              });
+                              setDisposableActivities([]);
+                            }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className={`${styles['delete-activity-btn']}  ${
+                              disposableActivities.length === 0
+                                ? styles['disable-btn']
+                                : ''
+                            }`}
+                            onClick={() => {
+                              setDeleteModal({
+                                value: true,
+                                type:
+                                  disposableActivities.length !== 1
+                                    ? 'Activities'
+                                    : 'Activity',
+                              });
+                              setDeleteData({
+                                id: project._id,
+                                activities: disposableActivities,
+                              });
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ) : (
+                        <div className={styles['entry-navigation-box']}>
+                          <span
+                            className={`${styles['activity-content-box']} ${
+                              styles['activity-arrow-box']
+                            } ${tablePage === 1 ? styles['disable-box'] : ''}`}
+                            onClick={() => goToPage(tablePage - 1)}
+                          >
+                            <MdKeyboardDoubleArrowLeft
+                              className={styles['activity-icon']}
+                            />
+                          </span>
+
+                          <div className={styles['pagination-box']}>
+                            <>
+                              {projectActivities.map((page, index) => (
                                 <span
-                                  className={`${styles['activity-type']} ${styles['activity-type1']}`}
+                                  key={index}
+                                  className={`${
+                                    styles['activity-content-box']
+                                  } ${
+                                    tablePage === index + 1
+                                      ? styles['current-page']
+                                      : ''
+                                  }`}
+                                  onClick={() => goToPage(index + 1)}
                                 >
-                                  <FaTasks
-                                    className={styles['activity-type-icon']}
-                                  />{' '}
-                                  Task
+                                  {index + 1}
+                                </span>
+                              ))}
+
+                              {!activitiesData.lastPage && (
+                                <span
+                                  className={styles['activity-content-box']}
+                                  onClick={() =>
+                                    goToPage(projectActivities.length + 1)
+                                  }
+                                >
+                                  {activitiesData.loading ? (
+                                    <div
+                                      className={styles['searching-loader']}
+                                    ></div>
+                                  ) : (
+                                    projectActivities.length + 1
+                                  )}
                                 </span>
                               )}
+                            </>
+                          </div>
 
-                              {(activity.action === 'update' ||
-                                activity.action === 'reduction' ||
-                                activity.action === 'extension' ||
-                                activity.action === 'transition') && (
-                                <span
-                                  className={`${styles['activity-type']} ${styles['activity-type3']}`}
-                                >
-                                  <RxUpdate
-                                    className={styles['activity-type-icon']}
-                                  />{' '}
-                                  Update
-                                </span>
+                          <span
+                            className={`${styles['activity-content-box']} ${
+                              styles['activity-arrow-box']
+                            } ${isLastPage() ? styles['disable-box'] : ''}`}
+                            onClick={() => goToPage(tablePage + 1)}
+                          >
+                            <MdKeyboardDoubleArrowRight
+                              className={styles['activity-icon']}
+                            />
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className={styles['activity-table-container']}>
+                      <table className={styles['activity-table']}>
+                        <thead className={styles['table-head-row']}>
+                          <tr>
+                            <th className={styles['table-head']}>Activity</th>
+                            <th className={styles['table-head']}>Type</th>
+                            <th className={styles['table-head']}>Date</th>
+                            <th className={styles['table-head']}>Time</th>
+                            <th className={styles['table-head']}>
+                              {activitySelectMode.value ? (
+                                <BiSolidSelectMultiple
+                                  className={`${
+                                    styles['select-all-activity']
+                                  } ${
+                                    disposableActivities.length ===
+                                    projectActivities[tablePage - 1].length
+                                      ? styles['select-all-activity2']
+                                      : ''
+                                  }`}
+                                  onClick={selectAllData(
+                                    'activities',
+                                    activitiesRef
+                                  )}
+                                />
+                              ) : (
+                                ''
                               )}
-
-                              {((activity.action === 'addition' &&
-                                activity.type.includes('team')) ||
-                                (activity.action === 'removal' &&
-                                  activity.type.includes('team'))) && (
-                                <span
-                                  className={`${styles['activity-type']} ${styles['activity-type2']}`}
-                                >
-                                  <BsPeopleFill
-                                    className={styles['activity-type-icon']}
-                                  />{' '}
-                                  Team
-                                </span>
-                              )}
-
-                              {((activity.action === 'addition' &&
-                                activity.type.includes('files')) ||
-                                (activity.action === 'deletion' &&
-                                  activity.type.includes('files')) ||
-                                activity.action === 'filePermission') && (
-                                <span
-                                  className={`${styles['activity-type']} ${styles['activity-type4']}`}
-                                >
-                                  <FaFileAlt
-                                    className={styles['activity-type-icon2']}
-                                  />{' '}
-                                  File
-                                </span>
-                              )}
-                            </td>
-
-                            <td className={styles['activity-table-data']}>
-                              {months[new Date(activity.time).getMonth()]}{' '}
-                              {new Date(activity.time).getDate()},{' '}
-                              {new Date(activity.time).getFullYear()}
-                            </td>
-                            <td className={styles['activity-table-data']}>
-                              {new Date(activity.time).getHours() === 0 ||
-                              new Date(activity.time).getHours() === 12
-                                ? 12
-                                : new Date(activity.time).getHours() > 12
-                                ? String(
-                                    new Date(activity.time).getHours() - 12
-                                  ).padStart(2, '0')
-                                : String(
-                                    new Date(activity.time).getHours()
-                                  ).padStart(2, '0')}
-                              :
-                              {String(
-                                new Date(activity.time).getMinutes()
-                              ).padStart(2, '0')}{' '}
-                              <span className={styles['activity-time']}>
-                                {new Date(activity.time).getHours() >= 12
-                                  ? 'pm'
-                                  : 'am'}
-                              </span>
-                            </td>
-                            <td className={styles['activity-table-data']}>
-                              <RiDeleteBin6Line
-                                className={styles['delete-activity-icon']}
-                                title="Delete Activity"
-                              />
-                            </td>
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+
+                        <tbody>
+                          {projectActivities[tablePage - 1].map(
+                            (activity, index) => (
+                              <tr key={activity._id}>
+                                <td className={styles['activity-table-data']}>
+                                  {getActivityMessage(activity)}
+                                </td>
+                                <td className={styles['activity-table-data']}>
+                                  {(activity.action === 'creation' ||
+                                    (activity.action === 'deletion' &&
+                                      activity.type.includes('task'))) && (
+                                    <span
+                                      className={`${styles['activity-type']} ${styles['activity-type1']}`}
+                                    >
+                                      <FaTasks
+                                        className={styles['activity-type-icon']}
+                                      />{' '}
+                                      Task
+                                    </span>
+                                  )}
+
+                                  {(activity.action === 'update' ||
+                                    activity.action === 'reduction' ||
+                                    activity.action === 'extension' ||
+                                    activity.action === 'transition') && (
+                                    <span
+                                      className={`${styles['activity-type']} ${styles['activity-type3']}`}
+                                    >
+                                      <RxUpdate
+                                        className={styles['activity-type-icon']}
+                                      />{' '}
+                                      Update
+                                    </span>
+                                  )}
+
+                                  {((activity.action === 'addition' &&
+                                    activity.type.includes('team')) ||
+                                    (activity.action === 'removal' &&
+                                      activity.type.includes('team'))) && (
+                                    <span
+                                      className={`${styles['activity-type']} ${styles['activity-type2']}`}
+                                    >
+                                      <BsPeopleFill
+                                        className={styles['activity-type-icon']}
+                                      />{' '}
+                                      Team
+                                    </span>
+                                  )}
+
+                                  {((activity.action === 'addition' &&
+                                    activity.type.includes('files')) ||
+                                    (activity.action === 'deletion' &&
+                                      activity.type.includes('files')) ||
+                                    activity.action === 'filePermission') && (
+                                    <span
+                                      className={`${styles['activity-type']} ${styles['activity-type4']}`}
+                                    >
+                                      <FaFileAlt
+                                        className={
+                                          styles['activity-type-icon2']
+                                        }
+                                      />{' '}
+                                      File
+                                    </span>
+                                  )}
+                                </td>
+
+                                <td className={styles['activity-table-data']}>
+                                  {months[new Date(activity.time).getMonth()]}{' '}
+                                  {new Date(activity.time).getDate()},{' '}
+                                  {new Date(activity.time).getFullYear()}
+                                </td>
+                                <td className={styles['activity-table-data']}>
+                                  {new Date(activity.time).getHours() === 0 ||
+                                  new Date(activity.time).getHours() === 12
+                                    ? 12
+                                    : new Date(activity.time).getHours() > 12
+                                    ? String(
+                                        new Date(activity.time).getHours() - 12
+                                      ).padStart(2, '0')
+                                    : String(
+                                        new Date(activity.time).getHours()
+                                      ).padStart(2, '0')}
+                                  :
+                                  {String(
+                                    new Date(activity.time).getMinutes()
+                                  ).padStart(2, '0')}{' '}
+                                  <span className={styles['activity-time']}>
+                                    {new Date(activity.time).getHours() >= 12
+                                      ? 'pm'
+                                      : 'am'}
+                                  </span>
+                                </td>
+                                <td className={styles['activity-table-data']}>
+                                  {deletingActivity.id === activity._id ? (
+                                    <div
+                                      className={styles['searching-loader2']}
+                                    ></div>
+                                  ) : activitySelectMode.value ? (
+                                    <input
+                                      type="checkbox"
+                                      className={styles['activity-checkbox']}
+                                      ref={addToRef(activitiesRef)}
+                                      defaultChecked={
+                                        activitySelectMode.index === index
+                                      }
+                                      onChange={handleCheckBox(
+                                        'activities',
+                                        activity._id
+                                      )}
+                                    />
+                                  ) : (
+                                    <span
+                                      className={
+                                        styles['activity-action-container']
+                                      }
+                                    >
+                                      <BsThreeDotsVertical
+                                        className={styles['activity-menu']}
+                                      />
+
+                                      <ul
+                                        className={
+                                          styles['activity-action-box']
+                                        }
+                                      >
+                                        <li
+                                          className={styles['action-option']}
+                                          onClick={() => {
+                                            setActivitySelectMode({
+                                              value: true,
+                                              index,
+                                            });
+                                            setDisposableActivities([
+                                              activity._id,
+                                            ]);
+                                          }}
+                                        >
+                                          Select
+                                        </li>
+
+                                        <li
+                                          className={styles['action-option']}
+                                          onClick={deleteActivity(activity._id)}
+                                        >
+                                          Delete
+                                        </li>
+                                      </ul>
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </div>
 
@@ -1626,99 +2094,100 @@ const ProjectItem = () => {
                   <ul className={styles['tasks-category-list']}>
                     <li
                       className={`${styles['taks-category']} ${
-                        taskCategory === 'all'
+                        tasksDetails.category === 'all'
                           ? styles['current-task-category']
                           : ''
                       }`}
-                      onClick={() => setTaskCategory('all')}
+                      onClick={changeTaskCategory('all')}
                     >
                       All tasks
                     </li>
                     <li
                       className={`${styles['taks-category']} ${
-                        taskCategory === 'open'
+                        tasksDetails.category === 'open'
                           ? styles['current-task-category']
                           : ''
                       }`}
-                      onClick={() => setTaskCategory('open')}
+                      onClick={changeTaskCategory('open')}
                     >
                       Open
                     </li>
                     <li
                       className={`${styles['taks-category']} ${
-                        taskCategory === 'progress'
+                        tasksDetails.category === 'progress'
                           ? styles['current-task-category']
                           : ''
                       }`}
-                      onClick={() => setTaskCategory('progress')}
+                      onClick={changeTaskCategory('progress')}
                     >
                       In Progress
                     </li>
                     <li
                       className={`${styles['taks-category']} ${
-                        taskCategory === 'completed'
+                        tasksDetails.category === 'complete'
                           ? styles['current-task-category']
                           : ''
                       }`}
-                      onClick={() => setTaskCategory('completed')}
+                      onClick={changeTaskCategory('complete')}
                     >
                       Completed
                     </li>
                   </ul>
                 </div>
-                {taskCategory === 'all' && (
+
+                {tasksData.loading ? (
+                  <div className={styles['tasks-loader-box']}>
+                    <Loader
+                      style={{
+                        width: '2.5rem',
+                        height: '2.5rem',
+                      }}
+                    />
+                  </div>
+                ) : tasksData.error ? (
+                  <div className={styles['no-tasks-text']}>
+                    <MdOutlineSignalWifiOff
+                      className={styles['network-icon']}
+                    />{' '}
+                    Unable to retrieve data
+                  </div>
+                ) : (
                   <ul className={styles['tasks-list']}>
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <GrStatusGood className={styles['status-icon']} />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
+                    {tasks.map((task) => (
+                      <li key={task._id} className={styles['task-item']}>
+                        <span className={styles['task-box']}>
+                          {task.status === 'complete' ? (
+                            <GrStatusGood className={styles['status-icon']} />
+                          ) : task.status === 'progress' ? (
+                            <svg
+                              className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                              stroke="currentColor"
+                              strokeWidth="0"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM18 12C18 15.3137 15.3137 18 12 18V6C15.3137 6 18 8.68629 18 12Z"></path>
+                            </svg>
+                          ) : (
+                            <VscIssueReopened
+                              className={`${styles['status-icon']}  ${styles['status-icon2']}`}
+                            />
+                          )}
+
+                          <span className={styles['task-name']}>
+                            {task.name}
                           </span>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
+
+                          <span className={styles['action-box']}>
+                            <span
+                              className={styles['delete-icon-box']}
+                              title="Delete Task"
+                            >
+                              <MdDelete className={styles['delete-icon']} />
+                            </span>
                           </span>
                         </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <MdOpenInNew
-                          className={`${styles['status-icon']} ${styles['status-icon2']}`}
-                        />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
-                          </span>
+
+                        <span className={styles['alt-action-box']}>
                           <span
                             className={styles['delete-icon-box']}
                             title="Delete Task"
@@ -1726,337 +2195,20 @@ const ProjectItem = () => {
                             <MdDelete className={styles['delete-icon']} />
                           </span>
                         </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <GrStatusGood className={styles['status-icon']} />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
-                          </span>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
-                          </span>
-                        </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <RiContrastLine
-                          className={`${styles['status-icon']} ${styles['status-icon3']}`}
-                        />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
-                          </span>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
-                          </span>
-                        </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <RiContrastLine
-                          className={`${styles['status-icon']} ${styles['status-icon3']}`}
-                        />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
-                          </span>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
-                          </span>
-                        </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
+                      </li>
+                    ))}
                   </ul>
                 )}
 
-                {taskCategory === 'open' && (
-                  <ul className={styles['tasks-list']}>
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <MdOpenInNew
-                          className={`${styles['status-icon']} ${styles['status-icon2']}`}
-                        />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
-                          </span>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
-                          </span>
-                        </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
-                  </ul>
-                )}
-
-                {taskCategory === 'progress' && (
-                  <ul className={styles['tasks-list']}>
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <RiContrastLine
-                          className={`${styles['status-icon']} ${styles['status-icon3']}`}
-                        />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
-                          </span>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
-                          </span>
-                        </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <RiContrastLine
-                          className={`${styles['status-icon']} ${styles['status-icon3']}`}
-                        />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
-                          </span>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
-                          </span>
-                        </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
-                  </ul>
-                )}
-
-                {taskCategory === 'completed' && (
-                  <ul className={styles['tasks-list']}>
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <GrStatusGood className={styles['status-icon']} />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
-                          </span>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
-                          </span>
-                        </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
-
-                    <li className={styles['task-item']}>
-                      <span className={styles['task-box']}>
-                        <GrStatusGood className={styles['status-icon']} />{' '}
-                        <span className={styles['task-name']}>
-                          Make a single landing page and dashboard
-                        </span>
-                        <span className={styles['action-box']}>
-                          <span
-                            className={styles['view-icon-box']}
-                            title="View Task"
-                          >
-                            <MdRemoveRedEye className={styles['view-icon']} />
-                          </span>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
-                          </span>
-                        </span>
-                      </span>
-                      <span className={styles['alt-action-box']}>
-                        <span
-                          className={styles['view-icon-box']}
-                          title="View Task"
-                        >
-                          <MdRemoveRedEye className={styles['view-icon']} />
-                        </span>
-                        <span
-                          className={styles['delete-icon-box']}
-                          title="Delete Task"
-                        >
-                          <MdDelete className={styles['delete-icon']} />
-                        </span>
-                      </span>
-                    </li>
-                  </ul>
+                {!tasksData.lastPage && (
+                  <div className={styles['show-more-box']}>
+                    <button
+                      className={styles['show-more-btn']}
+                      onClick={nextTaskPage}
+                    >
+                      Show More
+                    </button>
+                  </div>
                 )}
               </div>
             </>

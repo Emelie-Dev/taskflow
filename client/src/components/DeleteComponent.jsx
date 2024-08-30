@@ -99,6 +99,44 @@ const DeleteComponent = ({
     }
   };
 
+  const deleteActivities = async () => {
+    setIsProcessing(true);
+
+    try {
+      const { data } = await apiClient.patch(
+        `/api/v1/projects/${typeData.id}/activities`,
+        {
+          activities: typeData.activities,
+        }
+      );
+
+      setIsProcessing(false);
+      setProject(data.data.project);
+      setDeleteModal({ value: false, type: null });
+      setSelectMode({ value: false, index: null });
+    } catch (err) {
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast(
+          `An error occured while deleting ${
+            typeData.activities.length !== 1 ? 'activities' : 'activity'
+          }.`,
+          {
+            toastId: 'toast-id3',
+            autoClose: 2000,
+          }
+        );
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id3',
+          autoClose: 2000,
+        });
+      }
+    }
+  };
+
+  const deleteTask = async () => {};
+
   return (
     <section className={styles.section} onClick={hideDisplayModal}>
       <div className={styles['modal-container']}>
@@ -133,6 +171,14 @@ const DeleteComponent = ({
               {typeData.files.length !== 1 ? 's' : ''} is permanent and cannot
               be undone.
             </span>
+          ) : type.startsWith('Activit') ? (
+            <span className={styles['delete-text']}>
+              Are you sure you want to delete{' '}
+              {typeData.activities.length !== 1
+                ? 'these activities'
+                : 'this activity'}
+              .
+            </span>
           ) : (
             ''
           )}
@@ -152,6 +198,8 @@ const DeleteComponent = ({
                 ? deleteProject
                 : type.startsWith('File')
                 ? deleteFiles
+                : type.startsWith('Activit')
+                ? deleteActivities
                 : null
             }
           >

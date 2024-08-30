@@ -262,6 +262,8 @@ export class ApiFeatures {
             path: 'project',
             select: 'name',
           });
+      } else {
+        this.query.find(queryOptions);
       }
     } else if (this.collection === 'projects') {
       this.query.find(queryOptions).populate({

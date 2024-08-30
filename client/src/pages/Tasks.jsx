@@ -371,7 +371,6 @@ const Tasks = () => {
   return (
     <main className={styles.div}>
       <ToastContainer autoClose={2000} />
-
       <nav
         ref={navRef}
         className={`${styles['responsive-nav']} ${
@@ -451,7 +450,6 @@ const Tasks = () => {
           </ul>
         </section>
       </nav>
-
       <nav className={styles.nav}>
         {' '}
         <div className={styles.head}>
@@ -514,7 +512,6 @@ const Tasks = () => {
           </li>
         </ul>
       </nav>
-
       {addTask && (
         <NewTask
           setAddTask={setAddTask}

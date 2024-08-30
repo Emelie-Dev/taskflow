@@ -22,6 +22,10 @@ const NewTask = ({
   setScheduleData,
   projectsDetails,
   setReloadProject,
+  projectPage,
+  setProject,
+  setTasks,
+  category,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [taskData, setTaskData] = useState({
@@ -177,7 +181,7 @@ const NewTask = ({
             }
           );
 
-          if (fixedProject) {
+          if (fixedProject && !projectPage) {
             const { data } = await apiClient.get(
               `/api/v1/tasks/${task._id}/activities?page=1`
             );
@@ -186,7 +190,11 @@ const NewTask = ({
             task.activities = data.data.activities;
           }
         } catch (err) {
-          if (!err.response.data || err.response.status === 500) {
+          if (
+            !err.response ||
+            !err.response.data ||
+            err.response.status === 500
+          ) {
             toast('An error occured while assigning the task.', {
               toastId: 'toast-id2',
             });
@@ -198,15 +206,18 @@ const NewTask = ({
         }
       }
 
-      setAddTask(false);
-
-      if (fixedProject) {
+      if (fixedProject && !projectPage) {
         setCurrentProject({
           tasks: [task, ...currentProject.tasks],
         });
         projects[currentProjectIndex].details[task.status]++;
         setCreateCount((prevCount) => prevCount + 1);
-      } else {
+      } else if (projectPage) {
+        if (category === 'all' || category === task.status) {
+          setTasks((tasks) => [task, ...tasks]);
+          setCreateCount((prevCount) => prevCount + 1);
+        }
+      } else if (!fixedProject) {
         if (new Date(task.deadline).getDate() === new Date().getDate()) {
           setScheduleDetails({
             year: new Date().getFullYear(),
@@ -223,8 +234,10 @@ const NewTask = ({
           });
         }
       }
+
+      setAddTask(false);
     } catch (err) {
-      if (!err.response.data) {
+      if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occured while creating task.', {
           toastId: 'toast-id2',
         });

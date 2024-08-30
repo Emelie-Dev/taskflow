@@ -38,6 +38,7 @@
     - Enable detecting of active and inactive projects
     - Test duplicating username when creating account
     - Add !err.response for catch block
+    - Enable data update after saving activity
 
 
  -- Data Design

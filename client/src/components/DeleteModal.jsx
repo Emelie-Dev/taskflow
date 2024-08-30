@@ -17,7 +17,7 @@ const DeleteModal = ({ setShowDeleteBox, deleteTask, deleting }) => {
           Cancel
         </button>
         <button
-          className={`${styles.button}  ${deleting ? styles.deleting : ''}`}
+          className={`${styles.button}   ${deleting ? styles.deleting : ''}`}
           onClick={deleteTask}
         >
           {deleting ? (

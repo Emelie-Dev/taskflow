@@ -9,7 +9,7 @@ import { filterValues } from './taskController.js';
 import User from '../Models/userModel.js';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 import fs from 'fs';
 
 const generateNotifications = async (fields, values, project, req) => {
@@ -288,15 +288,24 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
       new: true,
       runValidators: true,
     }
-  )
-    .populate({
+  ).populate([
+    {
       path: 'user',
       select: 'firstName lastName username photo',
-    })
-    .populate({
+    },
+    {
       path: 'team',
       select: 'firstName lastName username occupation photo',
-    });
+    },
+    {
+      path: 'activities',
+      options: { sort: { time: -1 }, perDocumentLimit: 50 },
+      populate: {
+        path: 'user',
+        select: 'username firstName lastName',
+      },
+    },
+  ]);
 
   // Update the user current project
   await User.findByIdAndUpdate(
@@ -462,15 +471,24 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
         new: true,
         runValidators: true,
       }
-    )
-      .populate({
+    ).populate([
+      {
         path: 'user',
         select: 'firstName lastName username photo',
-      })
-      .populate({
+      },
+      {
         path: 'team',
         select: 'firstName lastName username occupation photo',
-      });
+      },
+      {
+        path: 'activities',
+        options: { sort: { time: -1 }, perDocumentLimit: 50 },
+        populate: {
+          path: 'user',
+          select: 'username firstName lastName',
+        },
+      },
+    ]);
 
     // Update the user current project
     if (String(project.user) === String(req.user._id)) {
@@ -633,16 +651,24 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
         new: true,
         runValidators: true,
       }
-    )
-      .populate({
+    ).populate([
+      {
         path: 'user',
         select: 'firstName lastName username photo',
-      })
-      .populate({
+      },
+      {
         path: 'team',
         select: 'firstName lastName username occupation photo',
-      });
-
+      },
+      {
+        path: 'activities',
+        options: { sort: { time: -1 }, perDocumentLimit: 50 },
+        populate: {
+          path: 'user',
+          select: 'username firstName lastName',
+        },
+      },
+    ]);
     // Update the user current project
     if (String(project.user) === String(req.user._id)) {
       await User.findByIdAndUpdate(
@@ -827,15 +853,24 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
       new: true,
       runValidators: true,
     }
-  )
-    .populate({
+  ).populate([
+    {
       path: 'user',
       select: 'firstName lastName username photo',
-    })
-    .populate({
+    },
+    {
       path: 'team',
       select: 'firstName lastName username occupation photo',
-    });
+    },
+    {
+      path: 'activities',
+      options: { sort: { time: -1 }, perDocumentLimit: 50 },
+      populate: {
+        path: 'user',
+        select: 'username firstName lastName',
+      },
+    },
+  ]);
 
   // Update the user current project
   await User.findByIdAndUpdate(
@@ -961,13 +996,13 @@ export const respondToInvitation = asyncErrorHandler(async (req, res, next) => {
     // Creates notifications for the project owner and the project
     await Notification.insertMany([
       {
-        user: notification.performer.id,
+        user: notification.performer.owner,
         action: 'response',
         type: ['team'],
         state: { response },
       },
       {
-        user: notification.performer.id,
+        user: notification.performer.owner,
         project: project._id,
         action: 'addition',
         type: ['team'],
@@ -1047,6 +1082,89 @@ export const getProjectFile = async (req, res) => {
     }
   });
 };
+
+export const getProjectActivities = asyncErrorHandler(
+  async (req, res, next) => {
+    const project = await Project.findOne({
+      _id: req.params.id,
+      user: req.user._id,
+    });
+
+    // Checks if the project exists
+    if (!project) {
+      return next(new CustomError('This project does not exist!', 404));
+    }
+
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 50;
+    const skip = (page - 1) * limit;
+
+    const activities = await Notification.find({ project: req.params.id })
+      .populate({
+        path: 'user',
+        select: 'username firstName lastName',
+      })
+      .sort('-time')
+      .skip(skip)
+      .limit(limit);
+
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        activities,
+      },
+    });
+  }
+);
+
+export const deleteProjectActivities = asyncErrorHandler(
+  async (req, res, next) => {
+    const project = await Project.findOne({
+      _id: req.params.id,
+      user: req.user._id,
+    }).populate([
+      {
+        path: 'user',
+        select: 'firstName lastName username photo',
+      },
+      {
+        path: 'team',
+        select: 'firstName lastName username occupation photo',
+      },
+      {
+        path: 'activities',
+        options: { sort: { time: -1 }, perDocumentLimit: 50 },
+        populate: {
+          path: 'user',
+          select: 'username firstName lastName',
+        },
+      },
+    ]);
+
+    // Checks if the project exists
+    if (!project) {
+      return next(new CustomError('This project does not exist!', 404));
+    }
+
+    await Promise.allSettled(
+      req.body.activities.map(
+        (activity) =>
+          new Promise(async (resolve, reject) => {
+            try {
+              resolve(await Notification.deleteOne({ _id: activity }));
+            } catch {
+              reject();
+            }
+          })
+      )
+    );
+
+    return res.status(200).json({
+      status: 'success',
+      data: { project },
+    });
+  }
+);
 
 export const createNewProject = factory.createOne(Project, 'project');
 

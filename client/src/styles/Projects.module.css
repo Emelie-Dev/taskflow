@@ -1016,9 +1016,14 @@ td {
 }
 
 .table-project-action {
-  position: relative;
+  /* position: relative; */
   text-align: right;
   padding-right: 1.5rem;
+}
+
+.table-project-action-box {
+  display: inline-flex;
+  position: relative;
 }
 
 .action-box {
@@ -1028,15 +1033,10 @@ td {
   box-shadow: 1px 1px 6px -3px black;
   border-radius: 5px;
   list-style-type: none;
-  left: -10%;
-  top: -95%;
+  right: 0;
+  bottom: 70%;
   display: none;
   z-index: 2;
-}
-
-.table-project-action-box {
-  /* background: red; */
-  display: inline-flex;
 }
 
 .table-project-action-box:hover .action-box {
