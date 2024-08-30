@@ -669,6 +669,7 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
         },
       },
     ]);
+
     // Update the user current project
     if (String(project.user) === String(req.user._id)) {
       await User.findByIdAndUpdate(
@@ -696,15 +697,24 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
       type: ['files'],
     });
   } else {
-    project = await Project.findById(req.params.id)
-      .populate({
+    project = await Project.findById(req.params.id).populate([
+      {
         path: 'user',
         select: 'firstName lastName username photo',
-      })
-      .populate({
+      },
+      {
         path: 'team',
         select: 'firstName lastName username occupation photo',
-      });
+      },
+      {
+        path: 'activities',
+        options: { sort: { time: -1 }, perDocumentLimit: 50 },
+        populate: {
+          path: 'user',
+          select: 'username firstName lastName',
+        },
+      },
+    ]);
   }
 
   return res.status(200).json({
