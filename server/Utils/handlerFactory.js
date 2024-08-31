@@ -2,18 +2,44 @@ import User from '../Models/userModel.js';
 import { ApiFeatures, QueryFeatures } from './ApiFeatures.js';
 import CustomError from './CustomError.js';
 import asyncErrorHandler from './asyncErrorHandler.js';
+import Project from '../Models/projectModel.js';
 
 const getAll = (Model, collection) =>
   asyncErrorHandler(async (req, res, next) => {
     let filter = {};
 
     if (collection === 'tasks') {
-      if (req.params.projectId)
+      if (req.params.projectId && !req.query.projectPage) {
         filter = {
           user: req.user._id,
           project: req.params.projectId,
           assigned: { $ne: true },
         };
+      } else if (req.query.projectPage) {
+        const project = await Project.findById(req.params.projectId);
+
+        // Checks if the project exists
+        if (!project) {
+          return next(new CustomError('This project does not exist!', 404));
+        }
+
+        const { team } = project;
+
+        const isMember = team.find(
+          (member) => String(member) === String(req.user._id)
+        );
+
+        if (String(project.user._id) !== String(req.user._id)) {
+          if (!isMember) {
+            return next(new CustomError('This project does not exist!', 404));
+          }
+        }
+
+        filter = {
+          project: req.params.projectId,
+          assigned: { $ne: true },
+        };
+      }
     }
 
     const result = new ApiFeatures(collection, Model.find(filter), req.query)
@@ -22,7 +48,7 @@ const getAll = (Model, collection) =>
       .limitFields()
       .paginate();
 
-    if (req.params.projectId) {
+    if (req.params.projectId && !req.query.projectPage) {
       result.query
         .populate({
           path: 'assignee',

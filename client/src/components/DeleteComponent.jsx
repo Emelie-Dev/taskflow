@@ -12,6 +12,8 @@ const DeleteComponent = ({
   setDeleteModal,
   setProject,
   setSelectMode,
+  setDeleteCount,
+  setTasks,
 }) => {
   const [isNameValid, setIsNameValid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -135,7 +137,39 @@ const DeleteComponent = ({
     }
   };
 
-  const deleteTask = async () => {};
+  const deleteTask = async () => {
+    setIsProcessing(true);
+
+    try {
+      let data;
+      await apiClient.delete(`/api/v1/tasks/${typeData.task}`);
+
+      try {
+        data = await apiClient(`/api/v1/projects/${typeData.id}`);
+      } catch (err) {
+        throw new Error();
+      }
+
+      setIsProcessing(false);
+      setProject(data.data.data.project);
+      setTasks((tasks) => tasks.filter((task) => task._id !== typeData.task));
+      setDeleteCount((prevCount) => prevCount + 1);
+      setDeleteModal({ value: false, type: null });
+    } catch (err) {
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occured while deleting task.', {
+          toastId: 'toast-id4',
+          autoClose: 2000,
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id4',
+          autoClose: 2000,
+        });
+      }
+    }
+  };
 
   return (
     <section className={styles.section} onClick={hideDisplayModal}>
@@ -177,8 +211,10 @@ const DeleteComponent = ({
               {typeData.activities.length !== 1
                 ? 'these activities'
                 : 'this activity'}
-              .
+              ?
             </span>
+          ) : type === 'Task' ? (
+            'Are you sure you want to delete this task?'
           ) : (
             ''
           )}
@@ -200,6 +236,8 @@ const DeleteComponent = ({
                 ? deleteFiles
                 : type.startsWith('Activit')
                 ? deleteActivities
+                : type === 'Task'
+                ? deleteTask
                 : null
             }
           >

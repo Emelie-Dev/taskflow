@@ -214,6 +214,7 @@ export class ApiFeatures {
       'category',
       'deleteCount',
       'createCount',
+      'projectPage',
     ];
   }
 

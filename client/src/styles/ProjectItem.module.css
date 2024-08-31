@@ -1599,7 +1599,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 5rem 0 2rem;
+  margin: 5rem 0 3rem;
 }
 
 .no-tasks-text {
@@ -1609,7 +1609,7 @@
   font-family: var(--general-font);
   color: gray;
   font-size: 1.15rem;
-  margin: 5rem 0 2rem;
+  margin: 5rem 0 3rem;
 }
 
 .show-more-box {
@@ -1638,6 +1638,18 @@
 
 .show-more-btn:hover {
   opacity: 0.8;
+}
+
+.download-icon {
+  margin-left: auto;
+  width: 1.3rem;
+  height: 1.3rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.download-icon:hover {
+  color: orange;
 }
 
 /* Animations */
@@ -1940,7 +1952,7 @@
   .task-item:hover .alt-action-box {
     display: flex;
     align-items: center;
-    margin-left: 2.3rem;
+    margin-left: 1.7rem;
     margin-top: 0.5rem;
   }
 

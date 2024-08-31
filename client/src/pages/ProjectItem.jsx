@@ -40,7 +40,7 @@ import { months } from './Dashboard';
 import { BiSolidSelectMultiple } from 'react-icons/bi';
 import { AuthContext } from '../App';
 import { VscIssueReopened } from 'react-icons/vsc';
-import DeleteModal from '../components/DeleteModal';
+import { FiDownload } from 'react-icons/fi';
 
 const ProjectItem = () => {
   const { userData } = useContext(AuthContext);
@@ -112,8 +112,6 @@ const ProjectItem = () => {
         const { data } = await apiClient(`/api/v1/projects/${projectId}`);
 
         setProject(data.data.project);
-
-        console.log(data.data.project);
       } catch (err) {
         if (
           !err.response ||
@@ -197,7 +195,7 @@ const ProjectItem = () => {
               : category === 'complete'
               ? 'status=complete&'
               : ''
-          }page=${page}&deleteCount=${deleteCount}&createCount=${createCount}`
+          }page=${page}&projectPage=true&deleteCount=${deleteCount}&createCount=${createCount}`
         );
 
         setTasksData({
@@ -630,7 +628,9 @@ const ProjectItem = () => {
 
     const data =
       type === 'files'
-        ? project.files
+        ? project.files.filter(
+            (file) => isOwner() || file.sender.userId === userData._id
+          )
         : type === 'activities'
         ? projectActivities[tablePage - 1]
         : 0;
@@ -905,6 +905,10 @@ const ProjectItem = () => {
     });
   };
 
+  const isOwner = () => {
+    return userData._id === project.user._id;
+  };
+
   return (
     <main className={styles.div}>
       <nav
@@ -1115,6 +1119,8 @@ const ProjectItem = () => {
                 ? setActivitySelectMode
                 : null
             }
+            setDeleteCount={setDeleteCount}
+            setTasks={setTasks}
           />
         )}
 
@@ -1251,24 +1257,28 @@ const ProjectItem = () => {
             <>
               <h1 className={styles['project-name']}>{project.name}</h1>
 
-              <div className={styles['edit-btn-div']}>
-                <button
-                  className={styles['edit-btn']}
-                  onClick={() => setDisplayModal(true)}
-                >
-                  Edit Project
-                </button>
+              {isOwner() && (
+                <div className={styles['edit-btn-div']}>
+                  <button
+                    className={styles['edit-btn']}
+                    onClick={() => setDisplayModal(true)}
+                  >
+                    Edit Project
+                  </button>
 
-                <button
-                  className={styles['delete-btn']}
-                  onClick={() => {
-                    setDeleteModal({ value: true, type: 'Project' });
-                    setDeleteData({ id: project._id, name: project.name });
-                  }}
-                >
-                  Delete Project
-                </button>
-              </div>
+                  <button
+                    className={styles['delete-btn']}
+                    onClick={() => {
+                      setDeleteModal({ value: true, type: 'Project' });
+                      setDeleteData({ id: project._id, name: project.name });
+                    }}
+                  >
+                    Delete Project
+                  </button>
+                </div>
+              )}
+
+              {!isOwner() && <div> &nbsp;</div>}
 
               <div className={styles['project-container']}>
                 <div className={styles['left-section']}>
@@ -1465,7 +1475,12 @@ const ProjectItem = () => {
                           </button>
                           <BiSolidSelectMultiple
                             className={`${styles['select-all-icon']} ${
-                              disposableFiles.length === project.files.length
+                              disposableFiles.length ===
+                              project.files.filter(
+                                (file) =>
+                                  isOwner() ||
+                                  file.sender.userId === userData._id
+                              ).length
                                 ? styles['select-all-icon2']
                                 : ''
                             }`}
@@ -1478,30 +1493,38 @@ const ProjectItem = () => {
                         {' '}
                         <h1 className={styles['files-text']}>
                           Project Files
-                          <span className={styles['files-size-left']}>
-                            {' '}
-                            ({calculateSize(freeSpace).value}
-                            <span className={styles['files-size-unit']}>
-                              {calculateSize(freeSpace).unit}
-                            </span>{' '}
-                            free)
-                          </span>
+                          {!isOwner() && !project.addFiles ? (
+                            ''
+                          ) : (
+                            <span className={styles['files-size-left']}>
+                              {' '}
+                              ({calculateSize(freeSpace).value}
+                              <span className={styles['files-size-unit']}>
+                                {calculateSize(freeSpace).unit}
+                              </span>{' '}
+                              free)
+                            </span>
+                          )}
                         </h1>
-                        <div className={styles['add-files-box']}>
-                          <button
-                            className={styles['add-files-btn']}
-                            onClick={() => fileRef.current.click()}
-                          >
-                            Add Files
-                          </button>
-                          <input
-                            type="file"
-                            className={styles['add-file-input']}
-                            ref={fileRef}
-                            onChange={displayFiles}
-                            multiple
-                          />
-                        </div>
+                        {!isOwner() && !project.addFiles ? (
+                          ''
+                        ) : (
+                          <div className={styles['add-files-box']}>
+                            <button
+                              className={styles['add-files-btn']}
+                              onClick={() => fileRef.current.click()}
+                            >
+                              Add Files
+                            </button>
+                            <input
+                              type="file"
+                              className={styles['add-file-input']}
+                              ref={fileRef}
+                              onChange={displayFiles}
+                              multiple
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -1559,8 +1582,32 @@ const ProjectItem = () => {
                                 </span>
                               </span>
                             </div>
-
-                            {selectMode.value ? (
+                            {!isOwner() &&
+                            file.sender.userId !== userData._id ? (
+                              <a
+                                href={
+                                  import.meta.env.MODE === 'production'
+                                    ? `${
+                                        import.meta.env.VITE_BACKEND_URL
+                                      }/project-files/${project._id}/${
+                                        getFileName(file.name, file.path)
+                                          .serverName
+                                      }`
+                                    : `${
+                                        import.meta.env.VITE_LOCAL_BACKEND_URL
+                                      }/project-files/${project._id}/${
+                                        getFileName(file.name, file.path)
+                                          .serverName
+                                      }`
+                                }
+                                className={styles['download-link']}
+                                download={true}
+                              >
+                                <FiDownload
+                                  className={styles['download-icon']}
+                                />
+                              </a>
+                            ) : selectMode.value ? (
                               <input
                                 className={styles['file-checkbox']}
                                 type="checkbox"
@@ -1573,6 +1620,7 @@ const ProjectItem = () => {
                                 <BsThreeDotsVertical
                                   className={styles['menu-file-icon']}
                                 />
+
                                 <ul className={styles['menu-list']}>
                                   <li
                                     className={styles['menu-item']}
@@ -1583,6 +1631,7 @@ const ProjectItem = () => {
                                   >
                                     Select
                                   </li>
+
                                   <li className={styles['menu-item']}>
                                     <a
                                       href={
@@ -1895,26 +1944,28 @@ const ProjectItem = () => {
                             <th className={styles['table-head']}>Type</th>
                             <th className={styles['table-head']}>Date</th>
                             <th className={styles['table-head']}>Time</th>
-                            <th className={styles['table-head']}>
-                              {activitySelectMode.value ? (
-                                <BiSolidSelectMultiple
-                                  className={`${
-                                    styles['select-all-activity']
-                                  } ${
-                                    disposableActivities.length ===
-                                    projectActivities[tablePage - 1].length
-                                      ? styles['select-all-activity2']
-                                      : ''
-                                  }`}
-                                  onClick={selectAllData(
-                                    'activities',
-                                    activitiesRef
-                                  )}
-                                />
-                              ) : (
-                                ''
-                              )}
-                            </th>
+                            {isOwner() && (
+                              <th className={styles['table-head']}>
+                                {activitySelectMode.value ? (
+                                  <BiSolidSelectMultiple
+                                    className={`${
+                                      styles['select-all-activity']
+                                    } ${
+                                      disposableActivities.length ===
+                                      projectActivities[tablePage - 1].length
+                                        ? styles['select-all-activity2']
+                                        : ''
+                                    }`}
+                                    onClick={selectAllData(
+                                      'activities',
+                                      activitiesRef
+                                    )}
+                                  />
+                                ) : (
+                                  ''
+                                )}
+                              </th>
+                            )}
                           </tr>
                         </thead>
 
@@ -2011,64 +2062,68 @@ const ProjectItem = () => {
                                       : 'am'}
                                   </span>
                                 </td>
-                                <td className={styles['activity-table-data']}>
-                                  {deletingActivity.id === activity._id ? (
-                                    <div
-                                      className={styles['searching-loader2']}
-                                    ></div>
-                                  ) : activitySelectMode.value ? (
-                                    <input
-                                      type="checkbox"
-                                      className={styles['activity-checkbox']}
-                                      ref={addToRef(activitiesRef)}
-                                      defaultChecked={
-                                        activitySelectMode.index === index
-                                      }
-                                      onChange={handleCheckBox(
-                                        'activities',
-                                        activity._id
-                                      )}
-                                    />
-                                  ) : (
-                                    <span
-                                      className={
-                                        styles['activity-action-container']
-                                      }
-                                    >
-                                      <BsThreeDotsVertical
-                                        className={styles['activity-menu']}
+                                {isOwner() && (
+                                  <td className={styles['activity-table-data']}>
+                                    {deletingActivity.id === activity._id ? (
+                                      <div
+                                        className={styles['searching-loader2']}
+                                      ></div>
+                                    ) : activitySelectMode.value ? (
+                                      <input
+                                        type="checkbox"
+                                        className={styles['activity-checkbox']}
+                                        ref={addToRef(activitiesRef)}
+                                        defaultChecked={
+                                          activitySelectMode.index === index
+                                        }
+                                        onChange={handleCheckBox(
+                                          'activities',
+                                          activity._id
+                                        )}
                                       />
-
-                                      <ul
+                                    ) : (
+                                      <span
                                         className={
-                                          styles['activity-action-box']
+                                          styles['activity-action-container']
                                         }
                                       >
-                                        <li
-                                          className={styles['action-option']}
-                                          onClick={() => {
-                                            setActivitySelectMode({
-                                              value: true,
-                                              index,
-                                            });
-                                            setDisposableActivities([
-                                              activity._id,
-                                            ]);
-                                          }}
-                                        >
-                                          Select
-                                        </li>
+                                        <BsThreeDotsVertical
+                                          className={styles['activity-menu']}
+                                        />
 
-                                        <li
-                                          className={styles['action-option']}
-                                          onClick={deleteActivity(activity._id)}
+                                        <ul
+                                          className={
+                                            styles['activity-action-box']
+                                          }
                                         >
-                                          Delete
-                                        </li>
-                                      </ul>
-                                    </span>
-                                  )}
-                                </td>
+                                          <li
+                                            className={styles['action-option']}
+                                            onClick={() => {
+                                              setActivitySelectMode({
+                                                value: true,
+                                                index,
+                                              });
+                                              setDisposableActivities([
+                                                activity._id,
+                                              ]);
+                                            }}
+                                          >
+                                            Select
+                                          </li>
+
+                                          <li
+                                            className={styles['action-option']}
+                                            onClick={deleteActivity(
+                                              activity._id
+                                            )}
+                                          >
+                                            Delete
+                                          </li>
+                                        </ul>
+                                      </span>
+                                    )}
+                                  </td>
+                                )}
                               </tr>
                             )
                           )}
@@ -2083,12 +2138,14 @@ const ProjectItem = () => {
                 <div className={styles['task-head-div']}>
                   <h1 className={styles['task-head']}>Tasks</h1>
 
-                  <button
-                    className={styles['add-task-btn']}
-                    onClick={() => setAddTask(true)}
-                  >
-                    Add Task
-                  </button>
+                  {isOwner() && (
+                    <button
+                      className={styles['add-task-btn']}
+                      onClick={() => setAddTask(true)}
+                    >
+                      Add Task
+                    </button>
+                  )}
                 </div>
                 <div className={styles['task-category-div']}>
                   <ul className={styles['tasks-category-list']}>
@@ -2151,6 +2208,11 @@ const ProjectItem = () => {
                     />{' '}
                     Unable to retrieve data
                   </div>
+                ) : tasks.length === 0 ? (
+                  <div className={styles['no-tasks-text']}>
+                    {' '}
+                    No task availaible{' '}
+                  </div>
                 ) : (
                   <ul className={styles['tasks-list']}>
                     {tasks.map((task) => (
@@ -2177,24 +2239,52 @@ const ProjectItem = () => {
                             {task.name}
                           </span>
 
-                          <span className={styles['action-box']}>
+                          {isOwner() && (
+                            <span className={styles['action-box']}>
+                              <span
+                                className={styles['delete-icon-box']}
+                                title="Delete Task"
+                              >
+                                <MdDelete
+                                  className={styles['delete-icon']}
+                                  onClick={() => {
+                                    setDeleteModal({
+                                      value: true,
+                                      type: 'Task',
+                                    });
+                                    setDeleteData({
+                                      id: project._id,
+                                      task: task._id,
+                                    });
+                                  }}
+                                />
+                              </span>
+                            </span>
+                          )}
+                        </span>
+
+                        {isOwner() && (
+                          <span className={styles['alt-action-box']}>
                             <span
                               className={styles['delete-icon-box']}
                               title="Delete Task"
                             >
-                              <MdDelete className={styles['delete-icon']} />
+                              <MdDelete
+                                className={styles['delete-icon']}
+                                onClick={() => {
+                                  setDeleteModal({
+                                    value: true,
+                                    type: 'Task',
+                                  });
+                                  setDeleteData({
+                                    id: project._id,
+                                    task: task._id,
+                                  });
+                                }}
+                              />
                             </span>
                           </span>
-                        </span>
-
-                        <span className={styles['alt-action-box']}>
-                          <span
-                            className={styles['delete-icon-box']}
-                            title="Delete Task"
-                          >
-                            <MdDelete className={styles['delete-icon']} />
-                          </span>
-                        </span>
+                        )}
                       </li>
                     ))}
                   </ul>
