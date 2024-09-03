@@ -53,7 +53,8 @@ const generateNotifications = async (
   task,
   owner,
   project,
-  req
+  req,
+  deadlineRemoval
 ) => {
   let notifications = [];
   // const user = await User.findById(req.user._id).select(
@@ -168,32 +169,34 @@ const generateNotifications = async (
     }
 
     if (fields.includes('deadline')) {
-      const notificationValues = await filterValues(
-        { ...values },
-        'date',
-        'deadline'
-      );
+      if (deadlineRemoval === null) {
+        const notificationValues = await filterValues(
+          { ...values },
+          'date',
+          'deadline'
+        );
 
-      let action;
+        let action;
 
-      if (notificationValues.deadline) {
-        action =
-          new Date(notificationValues.deadline.from) >
-          new Date(notificationValues.deadline.to)
-            ? 'reduction'
-            : 'extension';
+        if (notificationValues.deadline) {
+          action =
+            new Date(notificationValues.deadline.from) >
+            new Date(notificationValues.deadline.to)
+              ? 'reduction'
+              : 'extension';
+        }
+
+        const notification = {
+          user,
+          task: task._id,
+          action,
+          state: notificationValues,
+        };
+
+        notification.type = Object.keys(notification.state);
+
+        if (notification.type.length !== 0) notifications.push(notification);
       }
-
-      const notification = {
-        user,
-        task: task._id,
-        action,
-        state: notificationValues,
-      };
-
-      notification.type = Object.keys(notification.state);
-
-      if (notification.type.length !== 0) notifications.push(notification);
     }
 
     if (fields.includes('assignee')) {
@@ -203,6 +206,22 @@ const generateNotifications = async (
         action: 'assignment',
         state: values,
         type: ['assignee'],
+      });
+    }
+
+    if (deadlineRemoval) {
+      notifications.push({
+        user,
+        task: task._id,
+        action: 'deletion',
+        type: ['deadline'],
+      });
+    } else if (deadlineRemoval === false) {
+      notifications.push({
+        user,
+        task: task._id,
+        action: 'addition',
+        type: ['deadline'],
       });
     }
   }
@@ -438,6 +457,38 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
 
       excludeArray.forEach((value) => delete req.body[value]);
 
+      const fields = Object.keys(req.body);
+
+      let deadlineRemoval = null;
+
+      if (req.body.deadline || req.body.deadline === '') {
+        if (!Date.parse(new Date(req.body.deadline))) {
+          if (task.deadline) deadlineRemoval = true;
+          delete req.body.deadline;
+        } else {
+          if (!task.deadline) {
+            deadlineRemoval = false;
+          } else {
+            // validates deadline field
+            if (
+              Date.parse(new Date(req.body.deadline)) <
+              Date.parse(new Date(task.createdAt))
+            ) {
+              return next(
+                new CustomError(
+                  'Please provide a valid value for the deadline!',
+                  400
+                )
+              );
+            }
+
+            req.body.deadline = new Date(req.body.deadline);
+
+            req.body.deadline.setMinutes(0, 0, 0);
+          }
+        }
+      }
+
       const values = {};
       for (let value in req.body) {
         values[value] = {};
@@ -445,38 +496,17 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
         values[value].to = req.body[value];
       }
 
-      const fields = Object.keys(req.body);
-
-      if (req.body.deadline) {
-        // validates deadline field
-        if (
-          Date.parse(new Date(req.body.deadline)) <
-          Date.parse(new Date(task.createdAt))
-        ) {
-          return next(
-            new CustomError(
-              'Please provide a valid value for the deadline!',
-              400
-            )
-          );
-        }
-
-        req.body.deadline = new Date(req.body.deadline);
-
-        req.body.deadline.setMinutes(0);
-        req.body.deadline.setSeconds(0);
-        req.body.deadline.setMilliseconds(0);
-      }
-
-      // Adds the last Modified property to the request body
-
       if (req.body.status) {
         // Updates the project details
         project.updateDetails(task.status, req.body.status);
       }
 
+      const update = deadlineRemoval
+        ? { ...req.body, $unset: { deadline: '' } }
+        : req.body;
+
       // updates the task
-      task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      task = await Task.findByIdAndUpdate(req.params.id, update, {
         new: true,
         runValidators: true,
       }).populate({
@@ -488,7 +518,7 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
       delete req.body.priority;
 
       // updates assigned tasks
-      await Task.updateMany({ mainTask: req.params.id }, req.body);
+      await Task.updateMany({ mainTask: req.params.id }, update);
 
       // Saves the project
       await project.save();
@@ -512,7 +542,8 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
         task,
         task.user,
         false,
-        req
+        req,
+        deadlineRemoval
       );
     }
   }

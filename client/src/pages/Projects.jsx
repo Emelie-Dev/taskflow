@@ -20,6 +20,7 @@ import {
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
   MdOutlineSignalWifiOff,
+  MdDelete,
 } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
@@ -35,6 +36,7 @@ import Loader from '../components/Loader';
 import { generateName } from './Dashboard';
 import { GrStatusGood } from 'react-icons/gr';
 import { apiClient, AuthContext } from '../App';
+import DeleteComponent from '../components/DeleteComponent';
 
 export const months = [
   'January',
@@ -58,7 +60,7 @@ const Projects = () => {
     userData.personalization.defaultProjectView
   );
   const [showNav, setShowNav] = useState(false);
-  const [displayModal, setdisplayModal] = useState(false);
+  const [displayModal, setDisplayModal] = useState(false);
   const [projects, setProjects] = useState(null);
   const [projectsDetails, setProjectsDetails] = useState({
     category: 'all',
@@ -72,6 +74,10 @@ const Projects = () => {
     pageError: false,
   });
   const [tablePage, setTablePage] = useState(1);
+  const [createCount, setCreateCount] = useState(0);
+  const [deleteCount, setDeleteCount] = useState(0);
+  const [deleteModal, setDeleteModal] = useState({ value: false, type: null });
+  const [deleteData, setDeleteData] = useState({});
 
   const searchRef = useRef();
   const navRef = useRef();
@@ -83,7 +89,9 @@ const Projects = () => {
 
       try {
         const { data } = await apiClient(
-          `/api/v1/projects/my_projects?category=${category}&sort=${sort}&page=${page}`
+          `/api/v1/projects/my_projects?category=${category}&sort=${sort}&page=${page}&deleteCount=${deleteCount}&createCount=${
+            displayFormat === 'table' ? 0 : createCount
+          }`
         );
 
         setProjectData({
@@ -97,8 +105,29 @@ const Projects = () => {
           if (data.data.projects.length === 0) return projectsDetails.page--;
 
           setProjects({
-            grid: [...projects.grid, ...data.data.projects],
-            table: [...projects.table, data.data.projects],
+            grid: [
+              ...projects.grid,
+              ...data.data.projects.filter(
+                (project) =>
+                  !projects.grid.find((elem) => elem._id === project._id)
+              ),
+            ],
+            table: (() => {
+              const table = [...projects.table];
+              const newProjects = data.data.projects;
+
+              if (table[table.length - 1].length < 30) {
+                const diff = 30 - table[table.length - 1].length;
+
+                const replaceProjects = newProjects.slice(0, diff);
+
+                table[table.length - 1].push(...replaceProjects);
+
+                newProjects.splice(0, diff);
+              }
+
+              return [...table, newProjects];
+            })(),
           });
 
           setTablePage((page) => page + 1);
@@ -218,6 +247,8 @@ const Projects = () => {
 
     if (projectsDetails.category === category) return;
 
+    setCreateCount(0);
+    setDeleteCount(0);
     setProjectsDetails({
       category,
       sort,
@@ -231,6 +262,8 @@ const Projects = () => {
   const changeSortBy = (e) => {
     const { category } = projectsDetails;
 
+    setCreateCount(0);
+    setDeleteCount(0);
     setProjectsDetails({
       category,
       sort: e.target.value,
@@ -462,7 +495,27 @@ const Projects = () => {
           </div>
         </header>
 
-        {displayModal && <Project setdisplayModal={setdisplayModal} />}
+        {displayModal && (
+          <Project
+            toast={toast}
+            setDisplayModal={setDisplayModal}
+            projects={projects}
+            setProjects={setProjects}
+            setCreateCount={setCreateCount}
+          />
+        )}
+
+        {deleteModal.value && (
+          <DeleteComponent
+            toast={toast}
+            type={deleteModal.type}
+            typeData={deleteData}
+            setDeleteModal={setDeleteModal}
+            setDeleteCount={setDeleteCount}
+            projectsPage={true}
+            setProjects={setProjects}
+          />
+        )}
 
         <section className={styles['section-content']}>
           <div className={styles['section-head']}>
@@ -558,7 +611,7 @@ const Projects = () => {
               </span>
               <button
                 className={styles['create-project-btn']}
-                onClick={() => setdisplayModal(true)}
+                onClick={() => setDisplayModal(true)}
               >
                 {' '}
                 <HiPlus className={styles['create-project-icon']} />
@@ -648,7 +701,7 @@ const Projects = () => {
 
             <button
               className={styles['alternate-project-btn']}
-              onClick={() => setdisplayModal(true)}
+              onClick={() => setDisplayModal(true)}
             >
               {' '}
               <HiPlus className={styles['alternate-project-icon']} />
@@ -675,35 +728,25 @@ const Projects = () => {
                   </div>
                 ) : projects.grid ? (
                   projects.grid.map((project) => (
-                    <article
-                      key={`${project._id}-${Date.now()}`}
-                      className={styles.article}
-                    >
-                      <div className={styles['menu-div']}>
-                        <BsThreeDotsVertical
-                          className={styles['grid-menu-icon']}
+                    <article key={project._id} className={styles.article}>
+                      <span className={styles['delete-icon-box']}>
+                        {' '}
+                        <MdDelete
+                          className={styles['delete-icon']}
+                          title="Delete Project"
+                          onClick={() => {
+                            setDeleteModal({ value: true, type: 'Project' });
+                            setDeleteData({
+                              id: project._id,
+                              name: project.name,
+                            });
+                          }}
                         />
-                        <ul className={styles['menu-action-list']}>
-                          <a href="#" className={styles['menu-action-link']}>
-                            <li className={styles['menu-action-item']}>
-                              <MdOutlineModeEditOutline
-                                className={styles['action-icon']}
-                              />
-                              Edit
-                            </li>
-                          </a>
-                          <li className={styles['menu-action-item']}>
-                            <RiDeleteBin6Line
-                              className={styles['action-icon']}
-                            />{' '}
-                            Delete
-                          </li>
-                        </ul>
-                      </div>
+                      </span>
 
                       <h1 className={styles['project-name']}>
                         <span className={styles['project-name-value']}>
-                          <a href="#">{project.name}</a>
+                          <a href={`/project/${project._id}`}>{project.name}</a>
                         </span>
                       </h1>
                       <span className={styles['project-tasks']}>
@@ -897,9 +940,9 @@ const Projects = () => {
                       </span>{' '}
                       of{' '}
                       <span className={styles['footer-entry-text']}>
-                        {projects.grid.length}
+                        {projects.table.flat().length}
                       </span>{' '}
-                      {projects.grid.length === 1 ? 'entry' : 'entries'}
+                      {projects.table.flat().length === 1 ? 'entry' : 'entries'}
                     </div>
 
                     <div className={styles['entry-navigation-box']}>
@@ -966,18 +1009,22 @@ const Projects = () => {
                             <th className={styles['table-head']}>Deadline</th>
                             <th className={styles['table-head']}>Progress</th>
                             <th className={styles['table-head']}>Status</th>
-                            <th className={styles['table-head']}>Action</th>
+                            <th className={styles['table-head']}></th>
                           </tr>
                         </thead>
 
                         <tbody>
                           {projects.table[tablePage - 1].map((project) => (
                             <tr key={project._id}>
-                              <td className={styles['table-project-name']}>
-                                <a href="#">{project.name} </a>
+                              <td
+                                className={`${styles['table-project-data']} ${styles['table-project-name']}`}
+                              >
+                                <a href={`/project/${project._id}`}>
+                                  {project.name}{' '}
+                                </a>
                               </td>
 
-                              <td>
+                              <td className={styles['table-project-data']}>
                                 <div className={styles['table-team-box']}>
                                   {project.team.length === 0 ? (
                                     <i className={styles['no-team-text']}>
@@ -1060,7 +1107,9 @@ const Projects = () => {
                                 </div>
                               </td>
 
-                              <td className={styles['table-project-deadline']}>
+                              <td
+                                className={` ${styles['table-project-data']}  ${styles['table-project-deadline']} `}
+                              >
                                 {project.deadline ? (
                                   `${
                                     months[
@@ -1078,7 +1127,7 @@ const Projects = () => {
                                 )}
                               </td>
                               <td
-                                className={`${
+                                className={` ${styles['table-project-data']}  ${
                                   styles['table-project-progress']
                                 } ${
                                   project.details.projectProgress < 40
@@ -1092,7 +1141,9 @@ const Projects = () => {
                               >
                                 {project.details.projectProgress}%
                               </td>
-                              <td className={styles['table-project-status']}>
+                              <td
+                                className={` ${styles['table-project-data']} ${styles['table-project-status']}`}
+                              >
                                 {project.status === 'active' ? (
                                   <span className={styles['active-project']}>
                                     {' '}
@@ -1113,33 +1164,27 @@ const Projects = () => {
                                   </span>
                                 )}
                               </td>
-                              <td className={styles['table-project-action']}>
+                              <td
+                                className={` ${styles['table-project-data']}`}
+                              >
                                 <span
-                                  className={styles['table-project-action-box']}
+                                  className={styles['table-delete-icon-box']}
                                 >
-                                  <BsThreeDotsVertical
-                                    className={styles['table-project-menu']}
+                                  {' '}
+                                  <MdDelete
+                                    className={styles['delete-icon']}
+                                    title="Delete Project"
+                                    onClick={() => {
+                                      setDeleteModal({
+                                        value: true,
+                                        type: 'Project',
+                                      });
+                                      setDeleteData({
+                                        id: project._id,
+                                        name: project.name,
+                                      });
+                                    }}
                                   />
-
-                                  <ul className={`${styles['action-box']} `}>
-                                    <a
-                                      href="#"
-                                      className={styles['menu-action-link']}
-                                    >
-                                      <li className={styles['action-option']}>
-                                        <MdOutlineModeEditOutline
-                                          className={styles['action-icon']}
-                                        />
-                                        Edit
-                                      </li>
-                                    </a>
-                                    <li className={styles['action-option']}>
-                                      <RiDeleteBin6Line
-                                        className={styles['action-icon']}
-                                      />{' '}
-                                      Delete
-                                    </li>
-                                  </ul>
                                 </span>
                               </td>
                             </tr>

@@ -163,7 +163,9 @@ projectSchema.methods.updateDetails = function (oldValue, newValue) {
 // Validates deadline field
 projectSchema.pre('save', function (next) {
   if (this.deadline) {
-    if (this.deadline < this.createdAt) {
+    const deadline = new Date(this.deadline).setHours(0, 0, 0, 0);
+
+    if (Date.parse(deadline) < Date.parse(new Date(this.createdAt))) {
       return next(
         new CustomError('Please provide a valid value for the deadline!', 400)
       );

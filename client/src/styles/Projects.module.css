@@ -507,6 +507,30 @@
   margin-bottom: 1.5rem;
 }
 
+.delete-icon-box {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 4%;
+}
+
+.delete-icon {
+  fill: gray;
+  width: 1.35rem;
+  height: 1.35rem;
+  cursor: pointer;
+  transition: fill 0.3s;
+}
+
+.delete-icon:hover {
+  fill: orange;
+}
+
+.article:hover .delete-icon-box {
+  display: flex;
+}
+
 .menu-div {
   position: absolute;
   right: 3%;
@@ -853,8 +877,8 @@
   padding: 1rem 0.8rem;
 }
 
-td {
-  padding: 0.8rem;
+.table-project-data {
+  padding: 1.3rem 0.8rem;
   text-align: left;
 }
 
@@ -980,6 +1004,11 @@ td {
 .table-project-status {
   font-weight: 600;
   font-family: var(--general-font);
+}
+
+.table-delete-icon-box {
+  display: flex;
+  justify-content: center;
 }
 
 .active-project {

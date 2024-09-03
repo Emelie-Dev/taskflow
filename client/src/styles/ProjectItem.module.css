@@ -1652,6 +1652,11 @@
   color: orange;
 }
 
+.table-project-data {
+  padding: 0.8rem;
+  text-align: left;
+}
+
 /* Animations */
 
 @keyframes showNav {

@@ -12,7 +12,13 @@ import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
 import fs from 'fs';
 
-const generateNotifications = async (fields, values, project, req) => {
+const generateNotifications = async (
+  fields,
+  values,
+  project,
+  req,
+  deadlineRemoval
+) => {
   let notifications = [];
 
   // const user = await User.findById(req.user._id).select(
@@ -42,32 +48,34 @@ const generateNotifications = async (fields, values, project, req) => {
   }
 
   if (fields.includes('deadline')) {
-    const notificationValues = await filterValues(
-      { ...values },
-      'date',
-      'deadline'
-    );
+    if (deadlineRemoval === null) {
+      const notificationValues = await filterValues(
+        { ...values },
+        'date',
+        'deadline'
+      );
 
-    let action;
+      let action;
 
-    if (notificationValues.deadline) {
-      action =
-        new Date(notificationValues.deadline.from) >
-        new Date(notificationValues.deadline.to)
-          ? 'reduction'
-          : 'extension';
+      if (notificationValues.deadline) {
+        action =
+          new Date(notificationValues.deadline.from) >
+          new Date(notificationValues.deadline.to)
+            ? 'reduction'
+            : 'extension';
+      }
+
+      const notification = {
+        user,
+        project: project._id,
+        action,
+        state: notificationValues,
+      };
+
+      notification.type = Object.keys(notification.state);
+
+      if (notification.type.length !== 0) notifications.push(notification);
     }
-
-    const notification = {
-      user,
-      project: project._id,
-      action,
-      state: notificationValues,
-    };
-
-    notification.type = Object.keys(notification.state);
-
-    if (notification.type.length !== 0) notifications.push(notification);
   }
 
   if (fields.includes('status')) {
@@ -106,6 +114,22 @@ const generateNotifications = async (fields, values, project, req) => {
     notification.type = Object.keys(notification.state);
 
     if (notification.type.length !== 0) notifications.push(notification);
+  }
+
+  if (deadlineRemoval) {
+    notifications.push({
+      user,
+      project: project._id,
+      action: 'deletion',
+      type: ['deadline'],
+    });
+  } else if (deadlineRemoval === false) {
+    notifications.push({
+      user,
+      project: project._id,
+      action: 'addition',
+      type: ['deadline'],
+    });
   }
 
   if (notifications.lengtsh !== 0) await Notification.insertMany(notifications);
@@ -270,6 +294,8 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
     user: req.user._id,
   });
 
+  let deadlineRemoval = null;
+
   if (!project) {
     const err = new CustomError(`This project does not exist!`, 404);
     return next(err);
@@ -283,12 +309,24 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  if (req.body.deadline) {
-    // validates deadline field
-    if (new Date(req.body.deadline) < new Date(project.createdAt)) {
-      return next(
-        new CustomError('Please provide a valid value for the deadline!', 400)
-      );
+  if (req.body.deadline || req.body.deadline === '') {
+    if (!Date.parse(new Date(req.body.deadline))) {
+      if (project.deadline) deadlineRemoval = true;
+      delete req.body.deadline;
+    } else {
+      if (!project.deadline) {
+        deadlineRemoval = false;
+      } else {
+        // validates deadline field
+        if (new Date(req.body.deadline) < new Date(project.createdAt)) {
+          return next(
+            new CustomError(
+              'Please provide a valid value for the deadline!',
+              400
+            )
+          );
+        }
+      }
     }
   }
 
@@ -299,13 +337,17 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
     values[value].to = req.body[value];
   }
 
+  const update = deadlineRemoval
+    ? { ...req.body, $unset: { deadline: '' } }
+    : req.body;
+
   // updates the project
   project = await Project.findOneAndUpdate(
     {
       _id: req.params.id,
       user: req.user._id,
     },
-    req.body,
+    update,
     {
       new: true,
       runValidators: true,
@@ -324,7 +366,7 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
   );
 
   // creates notifications
-  await generateNotifications(fields, values, project, req);
+  await generateNotifications(fields, values, project, req, deadlineRemoval);
 
   project = await getAndPopulateProject(req.params.id);
 
@@ -708,6 +750,7 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
 
   const notifications = [];
   const oldMembers = [];
+  let newMembers = 0;
 
   // Gets all members and the leader
   const members = project.team.map((value) => String(value));
@@ -758,6 +801,7 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
       }
 
       updatedTeam.delete(member);
+      newMembers++;
     }
   }
 
@@ -844,7 +888,23 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
     data: {
       project,
       message:
-        'Team invitation sent successfully to new members and old members have been removed.',
+        oldMembers.length !== 0 && newMembers !== 0
+          ? `Team invitation sent successfully to ${
+              newMembers === 1 ? 'the new member' : 'new members'
+            } and ${
+              oldMembers.length !== 0
+                ? 'the old member has been removed'
+                : 'old members have been removed'
+            }.`
+          : newMembers !== 0
+          ? `Team invitation sent successfully to ${
+              newMembers === 1 ? 'the new member' : 'new members'
+            }.`
+          : `${
+              oldMembers.length !== 0
+                ? 'The old member was removed'
+                : 'The old members were removed'
+            } succesfully.`,
     },
   });
 });

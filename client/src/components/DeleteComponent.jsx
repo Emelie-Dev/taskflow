@@ -14,6 +14,8 @@ const DeleteComponent = ({
   setSelectMode,
   setDeleteCount,
   setTasks,
+  projectsPage,
+  setProjects,
 }) => {
   const [isNameValid, setIsNameValid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -47,7 +49,45 @@ const DeleteComponent = ({
     try {
       await apiClient.delete(`/api/v1/projects/${typeData.id}`);
       setIsProcessing(false);
-      navigate('/projects');
+
+      if (projectsPage) {
+        setProjects((projects) => {
+          return {
+            grid: [...projects.grid].filter(
+              (project) => project._id !== typeData.id
+            ),
+            table: (() => {
+              const table = [...projects.table];
+
+              let pageNumber = null;
+
+              table.forEach((page, index, array) => {
+                if (pageNumber === null) {
+                  const deletedIndex = page.findIndex(
+                    (project) => project._id === typeData.id
+                  );
+
+                  if (deletedIndex !== -1) pageNumber = index;
+
+                  page.splice(deletedIndex, 1);
+
+                  if (array[index + 1]) page.push(array[index + 1][0]);
+                } else {
+                  if (array[index + 1]) {
+                    page.push(array[index + 1][0]);
+                    array[index + 1].unshift();
+                  }
+                }
+              });
+
+              return table;
+            })(),
+          };
+        });
+
+        setDeleteCount((prevCount) => prevCount + 1);
+        setDeleteModal({ value: false, type: null });
+      } else navigate('/projects');
     } catch (err) {
       setIsProcessing(false);
 

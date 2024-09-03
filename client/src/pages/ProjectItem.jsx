@@ -735,6 +735,8 @@ const ProjectItem = () => {
             was added to the team
           </>
         );
+      } else if (activity.type.includes('deadline')) {
+        return 'The Project deadline was set.';
       }
     } else if (activity.action === 'deletion') {
       if (activity.type.includes('files')) {
@@ -760,6 +762,8 @@ const ProjectItem = () => {
         );
       } else if (activity.type.includes('task')) {
         return 'A task was deleted';
+      } else if (activity.type.includes('deadline')) {
+        return 'The Project deadline was removed.';
       }
     } else if (activity.action === 'removal') {
       if (activity.type.includes('team')) {
@@ -1319,18 +1323,24 @@ const ProjectItem = () => {
                       <table className={styles.table}>
                         <tbody>
                           <tr>
-                            <td className={styles['table-property']}>Tasks:</td>
-                            <td>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                            >
+                              Tasks:
+                            </td>
+                            <td className={styles['table-project-data']}>
                               {project.details.complete +
                                 project.details.open +
                                 project.details.progress}
                             </td>
                           </tr>
                           <tr>
-                            <td className={styles['table-property']}>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                            >
                               Created:
                             </td>
-                            <td>{`${
+                            <td className={styles['table-project-data']}>{`${
                               months[new Date(project.createdAt).getMonth()]
                             } ${new Date(
                               project.createdAt
@@ -1339,10 +1349,12 @@ const ProjectItem = () => {
                             ).getFullYear()}`}</td>
                           </tr>
                           <tr>
-                            <td className={styles['table-property']}>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                            >
                               Deadline:
                             </td>
-                            <td>
+                            <td className={styles['table-project-data']}>
                               {project.deadline ? (
                                 `${
                                   months[new Date(project.deadline).getMonth()]
@@ -1357,17 +1369,25 @@ const ProjectItem = () => {
                             </td>
                           </tr>
                           <tr>
-                            <td className={styles['table-property']}>Team:</td>
-                            <td>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                            >
+                              Team:
+                            </td>
+                            <td className={styles['table-project-data']}>
                               {project.team.length}{' '}
                               {project.team.length === 1 ? 'member' : 'members'}
                             </td>
                           </tr>
                           <tr>
-                            <td className={styles['table-property']}>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                            >
                               Status:
                             </td>
-                            <td className={styles['project-status']}>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['project-status']}`}
+                            >
                               {project.status}
                             </td>
                           </tr>
@@ -1676,8 +1696,12 @@ const ProjectItem = () => {
                       <table className={styles.table}>
                         <tbody>
                           <tr>
-                            <td className={styles['table-property']}>Tasks:</td>
-                            <td>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                            >
+                              Tasks:
+                            </td>
+                            <td className={styles['table-project-data']}>
                               {' '}
                               {project.details.complete +
                                 project.details.open +
@@ -1685,10 +1709,12 @@ const ProjectItem = () => {
                             </td>
                           </tr>
                           <tr>
-                            <td className={styles['table-property']}>
+                            <td
+                              className={` ${styles['table-project-data']} ${styles['table-property']}`}
+                            >
                               Created:
                             </td>
-                            <td>{`${
+                            <td className={styles['table-project-data']}>{`${
                               months[new Date(project.createdAt).getMonth()]
                             } ${new Date(
                               project.createdAt
@@ -1697,10 +1723,12 @@ const ProjectItem = () => {
                             ).getFullYear()}`}</td>
                           </tr>
                           <tr>
-                            <td className={styles['table-property']}>
+                            <td
+                              className={` ${styles['table-project-data']} ${styles['table-property']}`}
+                            >
                               Deadline:
                             </td>
-                            <td>
+                            <td className={styles['table-project-data']}>
                               {project.deadline ? (
                                 `${
                                   months[new Date(project.deadline).getMonth()]
@@ -1715,18 +1743,26 @@ const ProjectItem = () => {
                             </td>
                           </tr>
                           <tr>
-                            <td className={styles['table-property']}>Team:</td>
-                            <td>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                            >
+                              Team:
+                            </td>
+                            <td className={styles['table-project-data']}>
                               {' '}
                               {project.team.length}{' '}
                               {project.team.length === 1 ? 'member' : 'members'}
                             </td>
                           </tr>
                           <tr>
-                            <td className={styles['table-property']}>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                            >
                               Status:
                             </td>
-                            <td className={styles['project-status']}>
+                            <td
+                              className={`${styles['table-project-data']} ${styles['project-status']}`}
+                            >
                               {' '}
                               {project.status}
                             </td>
@@ -2034,6 +2070,21 @@ const ProjectItem = () => {
                                       File
                                     </span>
                                   )}
+
+                                  {(activity.action === 'addition' ||
+                                    activity.action === 'deletion') &&
+                                    activity.type.includes('deadline') && (
+                                      <span
+                                        className={`${styles['activity-type']} ${styles['activity-type3']}`}
+                                      >
+                                        <RxUpdate
+                                          className={
+                                            styles['activity-type-icon']
+                                          }
+                                        />{' '}
+                                        Update
+                                      </span>
+                                    )}
                                 </td>
 
                                 <td className={styles['activity-table-data']}>

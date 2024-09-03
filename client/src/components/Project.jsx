@@ -12,6 +12,9 @@ const Project = ({
   projectData,
   projectTeam,
   setProject: setNewProject,
+  projects,
+  setProjects,
+  setCreateCount,
 }) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
@@ -162,12 +165,16 @@ const Project = ({
 
     let request = editProject
       ? apiClient.patch(`/api/v1/projects/${project.id}`, body)
-      : '';
+      : apiClient.post('/api/v1/projects', body);
 
     setIsProcessing(true);
 
     try {
       let response = await request;
+
+      const projectId = editProject
+        ? project.id
+        : response.data.data.project._id;
 
       // If team members were updated
       if (String([...project.team]) !== String([...initialData.team])) {
@@ -175,7 +182,7 @@ const Project = ({
 
         try {
           response = await apiClient.patch(
-            `/api/v1/projects/${project.id}/team`,
+            `/api/v1/projects/${projectId}/team`,
             { team: newTeam }
           );
 
@@ -195,15 +202,39 @@ const Project = ({
       if (editProject) {
         setNewProject(response.data.data.project);
       } else {
+        setProjects({
+          grid: [response.data.data.project, ...projects.grid],
+          table: (() => {
+            const table = [...projects.table];
+
+            if (
+              !table[0].find(
+                (page) => page._id === response.data.data.project._id
+              )
+            )
+              table[0].unshift(response.data.data.project);
+
+            table.forEach((page, index, array) => {
+              if (page.length > 30) {
+                if (array[index + 1]) array[index + 1].unshift(page.pop());
+                else page.pop();
+              }
+            });
+
+            return table;
+          })(),
+        });
+        setCreateCount((prevCount) => prevCount + 1);
       }
     } catch (err) {
+      // Fix deadline issue
       const message = editProject
         ? 'An error occured while saving project.'
         : 'An error occured while creating project.';
 
       setIsProcessing(false);
 
-      if (!err.response.data || err.response.status === 500) {
+      if (!err.response || !err.response.data || err.response.status === 500) {
         return toast(message, {
           toastId: 'toast-id2',
         });

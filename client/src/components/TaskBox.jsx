@@ -43,7 +43,7 @@ const TaskBox = ({
     name: taskObj.name,
     status: taskObj.status,
     priority: taskObj.priority,
-    deadline: new Date(taskObj.deadline),
+    deadline: taskObj.deadline ? new Date(taskObj.deadline) : '',
     description: taskObj.description,
     assignees: new Set(taskObj.assignee.map((assignee) => assignee._id)),
   });
@@ -164,6 +164,8 @@ const TaskBox = ({
     }
 
     if (value === 6) return;
+
+    if (String(body.deadline) === 'Invalid Date') body.deadline = '';
 
     try {
       setUpdating(true);
@@ -509,22 +511,36 @@ const TaskBox = ({
           .
         </>
       );
+    } else if (
+      activity.action === 'addition' &&
+      activity.type.includes('deadline')
+    ) {
+      return 'The Task deadline was set.';
+    } else if (
+      activity.action === 'deletion' &&
+      activity.type.includes('deadline')
+    ) {
+      return 'The Task deadline was removed.';
     }
   };
 
   const deadlineValue = () => {
     const date = new Date(taskData.deadline);
 
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    if (Date.parse(date)) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
 
-    const hours =
-      Date.parse(date) < Date.parse(new Date())
-        ? String(new Date().getHours()).padStart(2, '0')
-        : String(date.getHours()).padStart(2, '0');
+      const hours =
+        Date.parse(date) < Date.parse(new Date())
+          ? String(new Date().getHours()).padStart(2, '0')
+          : String(date.getHours()).padStart(2, '0');
 
-    return `${year}-${month}-${day}T${hours}:00`;
+      return `${year}-${month}-${day}T${hours}:00`;
+    } else {
+      return '';
+    }
   };
 
   const addAssignee = () => {
@@ -720,7 +736,7 @@ const TaskBox = ({
                     editTask ? styles['hide-data'] : ''
                   }`}
                 >
-                  No assignees
+                  No assignee
                 </i>
               ) : (
                 taskObj.assignee.map((assignee, index) => (
@@ -870,7 +886,7 @@ const TaskBox = ({
                 !assigned ? (editTask ? styles['hide-data'] : '') : ''
               }`}
             >
-              {taskData.deadline ? (
+              {deadlineValue() ? (
                 `${
                   months[taskData.deadline.getMonth()]
                 } ${taskData.deadline.getDate()} ${taskData.deadline.getFullYear()}, 
