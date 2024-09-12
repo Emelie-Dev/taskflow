@@ -79,10 +79,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
       },
-      taskActivity: {
-        type: Boolean,
-        default: true,
-      },
       reminder: {
         type: Boolean,
         default: true,
@@ -98,7 +94,6 @@ const userSchema = new mongoose.Schema({
     },
     default: {
       taskAssignment: true,
-      taskActivity: true,
       reminder: true,
       projectActivity: true,
       email: true,
@@ -137,7 +132,25 @@ const userSchema = new mongoose.Schema({
           low: '#008000',
         },
       },
-      customFields: [String],
+      customFields: [
+        {
+          type: {
+            field: {
+              type: String,
+              validate: {
+                validator: (value) => {
+                  const name = validator.blacklist(value, '_');
+                  return validator.isAlphanumeric(name);
+                },
+                message:
+                  'Field name must consist of letters, numbers, and underscores only.',
+              },
+              maxLength: [20, 'Field name cannot exceed 20 characters.'],
+            },
+            id: String,
+          },
+        },
+      ],
     },
     default: {
       theme: 'light',
@@ -159,17 +172,17 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
       },
-      mobile: {
+      mobileNumber: {
         type: Boolean,
         default: false,
       },
       country: {
         type: Boolean,
-        default: false,
+        default: true,
       },
       language: {
         type: Boolean,
-        default: false,
+        default: true,
       },
       dob: {
         type: Boolean,
@@ -179,9 +192,9 @@ const userSchema = new mongoose.Schema({
     default: {
       firstName: true,
       lastName: true,
-      mobile: false,
-      country: false,
-      language: false,
+      mobileNumber: false,
+      country: true,
+      language: true,
       dob: false,
     },
   },
@@ -195,10 +208,6 @@ const userSchema = new mongoose.Schema({
   occupation: String,
   country: String,
   language: String,
-  gender: {
-    type: String,
-    enum: ['male', 'female', 'others', 'nil'],
-  },
   emailVerificationToken: String,
   emailVerificationTokenExpires: Date,
   passwordChangedAt: Date,

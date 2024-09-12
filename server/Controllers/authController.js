@@ -99,7 +99,7 @@ export const protectRoute = asyncErrorHandler(async (req, res, next) => {
   }
 
   if (!token) {
-    return next(new CustomError('You are not logged in', 401));
+    return next(new CustomError('You are not logged in.', 401));
   }
 
   // verify the token
@@ -225,7 +225,7 @@ export const login = asyncErrorHandler(async (req, res, next) => {
   const user = await User.findOne({ email, login: true });
 
   if (!user || !(await user.comparePasswordInDb(password, user.password))) {
-    const error = new CustomError('Incorrect email or password', 400);
+    const error = new CustomError('Incorrect email or password', 401);
     return next(error);
   }
 

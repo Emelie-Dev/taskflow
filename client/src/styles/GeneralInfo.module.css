@@ -54,7 +54,7 @@
   border: 2px solid orange;
   background: orange;
   color: white;
-  padding: 0.4rem 0.6rem;
+  padding: 0.6rem 0.6rem;
   font-family: var(--general-font);
   border-radius: 8px;
   font-size: 1.01rem;
@@ -71,7 +71,7 @@
   background: white;
   margin-top: 1rem;
   color: orange;
-  padding: 0.4rem 0.6rem;
+  padding: 0.6rem 0.6rem;
   font-family: var(--general-font);
   border-radius: 8px;
   font-size: 1.01rem;
@@ -88,6 +88,36 @@
 .enable-btn {
   opacity: 1;
   pointer-events: all;
+}
+
+.input-box input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  appearance: none;
+}
+
+.saving-icon {
+  margin-right: 0.6rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  animation: rotate 1s linear 0s infinite normal both;
+  vertical-align: -3px;
+}
+
+.disable-btn {
+  opacity: 0.6 !important;
+  pointer-events: none !important;
+}
+
+/* Animations */
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Media Queries */

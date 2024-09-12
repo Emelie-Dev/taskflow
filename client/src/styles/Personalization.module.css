@@ -224,8 +224,8 @@
 }
 
 .disable-btn {
-  opacity: 0.6;
-  pointer-events: none;
+  opacity: 0.6 !important;
+  pointer-events: none !important;
 }
 
 .reset-btn {
@@ -252,6 +252,26 @@
 .enable-btn {
   opacity: 1;
   pointer-events: all;
+}
+
+.saving-icon {
+  margin-right: 0.6rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  animation: rotate 1s linear 0s infinite normal both;
+  vertical-align: -3px;
+}
+
+/* Animations */
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Media Queries */

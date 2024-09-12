@@ -4,6 +4,7 @@ import { IoCloseSharp } from 'react-icons/io5';
 import { apiClient } from '../App';
 import { SiKashflow } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
+import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 
 const DeleteComponent = ({
   toast,
@@ -20,6 +21,9 @@ const DeleteComponent = ({
   const [isNameValid, setIsNameValid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [focusInput, setFocusInput] = useState(false);
 
   const navigate = useNavigate();
 
@@ -211,6 +215,32 @@ const DeleteComponent = ({
     }
   };
 
+  const deactivateAccount = async () => {
+    setIsProcessing(true);
+
+    try {
+      await apiClient.patch(`/api/v1/users/${typeData.id}/deactivate`, {
+        password,
+      });
+
+      setIsProcessing(false);
+      navigate('/');
+    } catch (err) {
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occured while deactivating account.', {
+          toastId: 'toast-id5',
+          autoClose: 2000,
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id5',
+          autoClose: 2000,
+        });
+      }
+    }
+  };
+
   return (
     <section className={styles.section} onClick={hideDisplayModal}>
       <div className={styles['modal-container']}>
@@ -221,7 +251,10 @@ const DeleteComponent = ({
           <IoCloseSharp className={styles['close-modal-icon']} />
         </span>
 
-        <h1 className={styles['modal-head']}>Delete {type}</h1>
+        <h1 className={styles['modal-head']}>
+          {' '}
+          {type === 'deactivate' ? 'Deactivate Account' : `Delete ${type}`}{' '}
+        </h1>
 
         <div className={styles['delete-content']}>
           {type === 'Project' ? (
@@ -255,6 +288,57 @@ const DeleteComponent = ({
             </span>
           ) : type === 'Task' ? (
             'Are you sure you want to delete this task?'
+          ) : type === 'deactivate' ? (
+            <div className={styles['deactivate-content']}>
+              <span className={styles['deactivate-header']}>
+                If you deactivate your account:
+              </span>
+
+              <ul className={styles['deactivate-list']}>
+                <li className={styles['deactivate-item']}>
+                  Your account and content will no longer be visible to anyone.
+                </li>
+                <li className={styles['deactivate-item']}>
+                  TaskFlow will keep your data so you can easily recover it when
+                  you reactivate your account.
+                </li>
+                <li className={styles['deactivate-item']}>
+                  You can log back in anytime to reactivate your account and
+                  restore all your content.
+                </li>
+              </ul>
+
+              <span className={styles['pswd-text']}>
+                Enter your password to deactivate your account.
+              </span>
+
+              <span
+                className={`${styles['pswd-box']} ${
+                  focusInput ? styles['focus-input'] : ''
+                }`}
+              >
+                <input
+                  className={styles['pswd']}
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onFocus={() => setFocusInput(true)}
+                  onBlur={() => setFocusInput(false)}
+                />
+
+                {showPassword ? (
+                  <IoMdEye
+                    className={styles['show-icon']}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                ) : (
+                  <IoMdEyeOff
+                    className={styles['show-icon']}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                )}
+              </span>
+            </div>
           ) : (
             ''
           )}
@@ -268,6 +352,12 @@ const DeleteComponent = ({
                   ? styles['disable-btn']
                   : ''
                 : ''
+            } ${
+              type === 'deactivate'
+                ? password.length === 0
+                  ? styles['disable-btn']
+                  : ''
+                : ''
             } ${isProcessing ? styles['processing-button'] : ''} `}
             onClick={
               type === 'Project'
@@ -278,16 +368,18 @@ const DeleteComponent = ({
                 ? deleteActivities
                 : type === 'Task'
                 ? deleteTask
+                : type === 'deactivate'
+                ? deactivateAccount
                 : null
             }
           >
             {isProcessing ? (
               <>
                 <SiKashflow className={styles['deleting-icon']} />
-                Deleting....
+                {type === 'deactivate' ? 'Deactivating....' : 'Deleting....'}
               </>
             ) : (
-              'Delete'
+              `${type === 'deactivate' ? 'Deactivate' : 'Delete'}`
             )}
           </button>
         </div>

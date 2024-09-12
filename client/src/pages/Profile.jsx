@@ -55,8 +55,6 @@ const Profile = () => {
     }
   };
 
-  console.log(userData);
-
   return (
     <main className={styles.div}>
       <nav
@@ -326,16 +324,6 @@ const Profile = () => {
                 <span className={styles['property-name']}>Language:</span>
                 <span className={styles['property-value']}>
                   {getValue('language')}
-                </span>
-              </div>
-              <div className={styles['property-box']}>
-                <span className={styles['property-name']}>Gender:</span>
-                <span className={styles['property-value']}>
-                  {getValue('gender') === 'nil' ? (
-                    <i style={{ color: 'gray' }}>Not specified</i>
-                  ) : (
-                    getValue('gender')
-                  )}
                 </span>
               </div>
             </div>

@@ -438,7 +438,7 @@
   font-weight: 600;
   color: gray;
   font-size: 1.05rem;
-  padding: 1rem 0.5rem;
+  padding: 1rem 1rem;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s;
@@ -489,6 +489,7 @@
   z-index: 4;
   display: none;
   justify-content: flex-end;
+  animation: showCategory 0.2s linear 0s;
 }
 
 .show-responsive-settings {
@@ -538,6 +539,15 @@
   }
   to {
     width: 100%;
+  }
+}
+
+@keyframes showCategory {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

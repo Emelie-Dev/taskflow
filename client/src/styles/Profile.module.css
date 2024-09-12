@@ -393,10 +393,6 @@
   width: 100%;
 }
 
-.user-title::first-letter {
-  text-transform: uppercase;
-}
-
 .profile-btn-div {
   margin-top: 2rem;
 }

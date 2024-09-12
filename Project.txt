@@ -39,6 +39,7 @@
     - Test duplicating username when creating account
     - Add !err.response for catch block
     - Enable data update after saving activity
+    - Adjust the user data in profile page
 
 
  -- Data Design

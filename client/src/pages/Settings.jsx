@@ -416,6 +416,7 @@ const Settings = () => {
             className={styles['settings-menu-icon']}
             onClick={() => setDisplayCategory(true)}
           />
+
           {category === 'general' && <GeneralInfo />}
 
           {category === 'notifications' && <NotificationSettings />}

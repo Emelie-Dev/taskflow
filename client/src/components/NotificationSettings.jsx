@@ -1,24 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import styles from '../styles/NotificationSettings.module.css';
-
-const initialData = {
-  assignment: true,
-  tActivity: true,
-  deadline: true,
-  pActivity: true,
-  email: true,
-};
+import { AuthContext, apiClient } from '../App';
+import { ToastContainer, toast } from 'react-toastify';
+import { SiKashflow } from 'react-icons/si';
 
 const NotificationSettings = () => {
-  const [data, setData] = useState({
-    assignment: true,
-    tActivity: true,
-    deadline: true,
-    pActivity: true,
-    email: true,
+  const { userData, setUserData } = useContext(AuthContext);
+  const [initialData, setInitialData] = useState({
+    taskAssignment: userData.notificationSettings.taskAssignment,
+    reminder: userData.notificationSettings.reminder,
+    projectActivity: userData.notificationSettings.projectActivity,
+    email: userData.notificationSettings.email,
   });
-
+  const [data, setData] = useState(initialData);
   const [enableBtn, setEnableBtn] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     let count = 0;
@@ -27,10 +23,10 @@ const NotificationSettings = () => {
       data[prop] === initialData[prop] && count++;
     }
 
-    count !== 5 ? setEnableBtn(true) : setEnableBtn(false);
+    count !== 4 ? setEnableBtn(true) : setEnableBtn(false);
   }, [data]);
 
-  const changeHandler = (e, prop) => {
+  const changeHandler = (prop) => (e) => {
     const newObj = { ...data, [prop]: e.target.checked };
     setData(newObj);
   };
@@ -39,10 +35,47 @@ const NotificationSettings = () => {
     setData(initialData);
   };
 
-  const { assignment, tActivity, deadline, pActivity, email } = data;
+  const submitData = async (e) => {
+    setIsProcessing(true);
+
+    try {
+      const response = await apiClient.patch(
+        `/api/v1/users/notifications`,
+        data
+      );
+
+      const { taskAssignment, reminder, projectActivity, email } =
+        response.data.data.userData.notificationSettings;
+
+      setIsProcessing(false);
+      setUserData(response.data.data.userData);
+      setInitialData({
+        taskAssignment,
+        reminder,
+        projectActivity,
+        email,
+      });
+      setEnableBtn(false);
+    } catch (err) {
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occured while saving data.', {
+          toastId: 'toast-id1',
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id1',
+        });
+      }
+    }
+  };
+
+  const { taskAssignment, reminder, projectActivity, email } = data;
 
   return (
     <section className={styles.section}>
+      <ToastContainer autoClose={2000} />
+
       <h1 className={styles['section-head']}>Notifications</h1>
 
       <ul className={styles['list']}>
@@ -56,24 +89,8 @@ const NotificationSettings = () => {
           <input
             type="checkbox"
             className={styles['item-checkbox']}
-            checked={assignment}
-            onChange={() => changeHandler(event, 'assignment')}
-          />
-        </li>
-
-        <li className={styles['list-item']}>
-          <span className={styles['item-details']}>
-            <span className={styles['item-head']}>Task Activity</span>
-            <span className={styles['item-text']}>
-              Allow you to stay updated by receiving notifications regarding
-              various actions related to tasks.
-            </span>
-          </span>
-          <input
-            type="checkbox"
-            className={styles['item-checkbox']}
-            checked={tActivity}
-            onChange={() => changeHandler(event, 'tActivity')}
+            checked={taskAssignment}
+            onChange={changeHandler('taskAssignment')}
           />
         </li>
 
@@ -88,8 +105,8 @@ const NotificationSettings = () => {
           <input
             type="checkbox"
             className={styles['item-checkbox']}
-            checked={deadline}
-            onChange={() => changeHandler(event, 'deadline')}
+            checked={reminder}
+            onChange={changeHandler('reminder')}
           />
         </li>
 
@@ -104,8 +121,8 @@ const NotificationSettings = () => {
           <input
             type="checkbox"
             className={styles['item-checkbox']}
-            checked={pActivity}
-            onChange={() => changeHandler(event, 'pActivity')}
+            checked={projectActivity}
+            onChange={changeHandler('projectActivity')}
           />
         </li>
 
@@ -120,7 +137,7 @@ const NotificationSettings = () => {
             type="checkbox"
             className={styles['item-checkbox']}
             checked={email}
-            onChange={() => changeHandler(event, 'email')}
+            onChange={changeHandler('email')}
           />
         </li>
       </ul>
@@ -128,9 +145,17 @@ const NotificationSettings = () => {
       <button
         className={`${styles['save-btn']} ${
           enableBtn ? styles['enable-btn'] : ''
-        }`}
+        } ${isProcessing ? styles['disable-btn'] : ''}`}
+        onClick={submitData}
       >
-        Save Changes
+        {isProcessing ? (
+          <>
+            <SiKashflow className={styles['saving-icon']} />
+            Saving....
+          </>
+        ) : (
+          'Save'
+        )}
       </button>
       <button
         className={`${styles['reset-btn']} ${

@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import styles from '../styles/Personalization.module.css';
 import { IoMdClose } from 'react-icons/io';
 
-const FieldInput = ({ value, id, fieldData, setFieldData }) => {
+const FieldInput = ({ field, inputId, customFields, setCustomFields }) => {
   const removeField = () => {
-    const inputId = parseFloat(id);
+    const index = customFields.findIndex(({ id }) => id === inputId);
 
-    const index = fieldData.findIndex(({ id }) => id === inputId);
-
-    const totalData = [...fieldData];
+    const totalData = [...customFields];
 
     totalData.splice(index, 1);
 
-    setFieldData(totalData);
+    setCustomFields(totalData);
   };
 
   return (
@@ -20,7 +18,7 @@ const FieldInput = ({ value, id, fieldData, setFieldData }) => {
       <input
         className={styles['field-input']}
         type="text"
-        value={value}
+        value={field}
         readOnly
       />
       <span

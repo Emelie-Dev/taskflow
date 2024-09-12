@@ -64,6 +64,14 @@ const taskSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    customFields: [
+      {
+        type: {
+          field: String,
+          value: String,
+        },
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },

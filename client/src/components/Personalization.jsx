@@ -1,127 +1,182 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import styles from '../styles/Personalization.module.css';
 import FieldInput from './FieldInput';
 import { ToastContainer, toast } from 'react-toastify';
-
-const initialData = {
-  theme: 'light',
-  view: 'grid',
-  colors: {
-    high: '#ff0000',
-    medium: '#ffd700',
-    low: '#008000',
-  },
-  fields: [
-    { value: 'School', id: 1 },
-    { value: 'Company', id: 2 },
-  ],
-};
+import { apiClient, AuthContext } from '../App';
+import { SiKashflow } from 'react-icons/si';
 
 const customId = 'toast-id';
 
 const Personalization = () => {
+  const { userData, setUserData } = useContext(AuthContext);
+  const [initialData, setInitialData] = useState({
+    theme: userData.personalization.theme,
+    defaultProjectView: userData.personalization.defaultProjectView,
+    priorityColors: {
+      high: userData.personalization.priorityColors.high,
+      medium: userData.personalization.priorityColors.medium,
+      low: userData.personalization.priorityColors.low,
+    },
+    customFields: userData.personalization.customFields,
+  });
   const [newField, setNewField] = useState('');
   const [enableBtn, setEnableBtn] = useState(false);
-  const [inputIndex, setInputIndex] = useState(0);
-  const [fieldData, setFieldData] = useState([
-    { value: 'School', id: Math.random() },
-    { value: 'Company', id: Math.random() },
-  ]);
-  const [view, setView] = useState('grid');
-  const [theme, setTheme] = useState('light');
-  const [colors, setColors] = useState({
-    high: '#ff0000',
-    medium: '#ffd700',
-    low: '#008000',
-  });
+  const [customFields, setCustomFields] = useState(initialData.customFields);
+  const [defaultProjectView, setDefaultProjectView] = useState(
+    initialData.defaultProjectView
+  );
+  const [theme, setTheme] = useState(initialData.theme);
+  const [priorityColors, setPriorityColors] = useState(
+    initialData.priorityColors
+  );
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     let colorCount = 0;
 
-    for (const prop in colors) {
-      colors[prop] === initialData.colors[prop] && colorCount++;
+    for (const prop in priorityColors) {
+      priorityColors[prop] === initialData.priorityColors[prop] && colorCount++;
     }
 
     if (
       colorCount !== 3 ||
       theme !== initialData.theme ||
-      view !== initialData.view ||
-      initialData.fields.length !== fieldData.length
+      defaultProjectView !== initialData.defaultProjectView ||
+      initialData.customFields.length !== customFields.length
     ) {
       setEnableBtn(true);
-    } else if (initialData.fields.length === fieldData.length) {
-      const fieldArray = fieldData.map((field) =>
-        String(field.value).toLowerCase()
-      );
+    } else if (initialData.customFields.length === customFields.length) {
+      if (customFields.length === 0) setEnableBtn(false);
 
-      for (let { value } of initialData.fields) {
-        fieldArray.includes(String(value).toLowerCase()) === false
-          ? setEnableBtn(true)
-          : setEnableBtn(false);
+      for (let { field } of customFields) {
+        if (
+          !initialData.customFields.find(
+            (elem) =>
+              String(elem.field).toLowerCase() === String(field).toLowerCase()
+          )
+        ) {
+          setEnableBtn(true);
+          break;
+        } else {
+          setEnableBtn(false);
+        }
       }
+
+      setEnableBtn(false);
     } else {
       setEnableBtn(false);
     }
-  }, [theme, view, colors, fieldData]);
+  }, [theme, defaultProjectView, priorityColors, customFields]);
 
-  const colorHandler = (e, level) => {
-    const newObj = { ...colors, [level]: e.target.value };
-    setColors(newObj);
+  const colorHandler = (level) => (e) => {
+    const newObj = { ...priorityColors, [level]: e.target.value };
+    setPriorityColors(newObj);
   };
 
   const addField = () => {
-    const fieldArray = fieldData.map((field) =>
-      String(field.value).toLowerCase()
+    const fieldArray = customFields.map((field) =>
+      String(field.field).toLowerCase()
     );
 
-    if (fieldData.length >= 5) {
+    if (customFields.length >= 5) {
       return;
     } else if (fieldArray.includes(String(newField).toLowerCase())) {
-      toast('Field name already exists.', {
+      return toast('Field name already exists.', {
         toastId: customId,
       });
-      return;
     } else if (newField.length === 0) {
-      toast('Field name cannot be empty.', {
+      return toast('Field name cannot be empty.', {
         toastId: customId,
       });
-      return;
     } else if (newField.length > 20) {
-      toast('Field name cannot exceed 20 characters.', {
+      return toast('Field name cannot exceed 20 characters.', {
         toastId: customId,
       });
-      return;
     } else if (newField.match(/\W/)) {
-      toast(
+      return toast(
         'Field name must consist of letters, numbers, and underscores only.',
         {
           toastId: customId,
         }
       );
-      return;
     } else {
       const newObj = {
-        value: newField,
-        id: Math.random(),
+        field: newField,
+        id: (() => {
+          let id = getFieldId();
+          const Ids = customFields.map(({ id }) => String(id));
+
+          while (Ids.includes(id)) {
+            id = getFieldId();
+          }
+
+          return id;
+        })(),
       };
-      const newArr = [...fieldData];
+      const newArr = [...customFields];
       newArr.push(newObj);
 
-      setFieldData(newArr);
+      setCustomFields(newArr);
       setNewField('');
     }
   };
 
   const resetData = () => {
     setTheme(initialData.theme);
-    setView(initialData.view);
-    setColors(initialData.colors);
-    setFieldData(initialData.fields);
+    setDefaultProjectView(initialData.defaultProjectView);
+    setPriorityColors(initialData.priorityColors);
+    setCustomFields(initialData.customFields);
+  };
+
+  const getFieldId = () => {
+    return String(Math.random() + Date.now());
+  };
+
+  const submitData = async () => {
+    setIsProcessing(true);
+
+    try {
+      const { data } = await apiClient.patch(`/api/v1/users/personalization`, {
+        theme,
+        defaultProjectView,
+        priorityColors,
+        customFields,
+      });
+
+      const {
+        theme: theme2,
+        defaultProjectView: defaultProjectView2,
+        priorityColors: priorityColors2,
+        customFields: customFields2,
+      } = data.data.userData.personalization;
+
+      setIsProcessing(false);
+      setUserData(data.data.userData);
+      setInitialData({
+        theme: theme2,
+        defaultProjectView: defaultProjectView2,
+        priorityColors: priorityColors2,
+        customFields: customFields2,
+      });
+      setEnableBtn(false);
+    } catch (err) {
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occured while saving data.', {
+          toastId: 'toast-id1',
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id1',
+        });
+      }
+    }
   };
 
   return (
     <section className={styles.section}>
       <ToastContainer autoClose={2500} />
+
       <h1 className={styles['section-head']}>Personalization</h1>
       <div className={styles['option-div']}>
         <span className={styles['option-head']}>Theme</span>
@@ -183,6 +238,7 @@ const Personalization = () => {
           </span>
         </div>
       </div>
+
       <div
         className={`${styles['option-div']} ${styles['project-div-container']}`}
       >
@@ -194,8 +250,8 @@ const Personalization = () => {
               type="radio"
               name="project-view"
               className={styles['view-radio']}
-              checked={view === 'grid'}
-              onChange={() => setView('grid')}
+              checked={defaultProjectView === 'grid'}
+              onChange={() => setDefaultProjectView('grid')}
             />{' '}
             Grid
           </span>
@@ -204,13 +260,14 @@ const Personalization = () => {
               type="radio"
               name="project-view"
               className={styles['view-radio']}
-              checked={view === 'table'}
-              onChange={() => setView('table')}
+              checked={defaultProjectView === 'table'}
+              onChange={() => setDefaultProjectView('table')}
             />{' '}
             Table
           </span>
         </div>
       </div>
+
       <div className={styles['option-div']}>
         <span className={styles['option-head']}>
           Colors for priority levels
@@ -222,8 +279,8 @@ const Personalization = () => {
             <input
               type="color"
               className={styles['color-input']}
-              value={colors.high}
-              onChange={() => colorHandler(event, 'high')}
+              value={priorityColors.high}
+              onChange={colorHandler('high')}
             />
           </span>
           <span className={styles['color-box']}>
@@ -231,8 +288,8 @@ const Personalization = () => {
             <input
               type="color"
               className={styles['color-input']}
-              value={colors.medium}
-              onChange={() => colorHandler(event, 'medium')}
+              value={priorityColors.medium}
+              onChange={colorHandler('medium')}
             />
           </span>
           <span className={styles['color-box']}>
@@ -240,12 +297,13 @@ const Personalization = () => {
             <input
               type="color"
               className={styles['color-input']}
-              value={colors.low}
-              onChange={() => colorHandler(event, 'low')}
+              value={priorityColors.low}
+              onChange={colorHandler('low')}
             />
           </span>
         </div>
       </div>
+
       <div className={styles['option-div']}>
         <span className={styles['option-head']}>Custom fields</span>
         <p className={styles['description']}>
@@ -253,19 +311,19 @@ const Personalization = () => {
         </p>
 
         <div className={styles['fields-div']}>
-          {fieldData.map(({ value, id }) => (
+          {customFields.map(({ field, id }) => (
             <FieldInput
               key={id}
-              value={value}
-              id={id}
-              fieldData={fieldData}
-              setFieldData={setFieldData}
+              field={field}
+              inputId={id}
+              customFields={customFields}
+              setCustomFields={setCustomFields}
             />
           ))}
 
           <input
             className={`${styles['new-field-input']} ${
-              fieldData.length >= 5 ? styles['hide-new-field'] : ''
+              customFields.length >= 5 ? styles['hide-new-field'] : ''
             }`}
             type="text"
             value={newField}
@@ -273,7 +331,7 @@ const Personalization = () => {
           />
           <button
             className={`${styles['add-btn']} ${
-              fieldData.length >= 5 ? styles['disable-btn'] : ''
+              customFields.length >= 5 ? styles['disable-btn'] : ''
             }`}
             onClick={addField}
           >
@@ -285,9 +343,17 @@ const Personalization = () => {
       <button
         className={`${styles['save-btn']} ${
           enableBtn ? styles['enable-btn'] : ''
-        }`}
+        } ${isProcessing ? styles['disable-btn'] : ''}`}
+        onClick={submitData}
       >
-        Save Changes
+        {isProcessing ? (
+          <>
+            <SiKashflow className={styles['saving-icon']} />
+            Saving....
+          </>
+        ) : (
+          'Save'
+        )}
       </button>
 
       <button

@@ -1,6 +1,12 @@
 import express from 'express';
 
-import { getAllUsers, getUser } from '../Controllers/userController.js';
+import {
+  deactivateUser,
+  deleteUser,
+  getAllUsers,
+  getUser,
+  updateUser,
+} from '../Controllers/userController.js';
 import {
   protectRoute,
   restrictAccessTo,
@@ -8,8 +14,12 @@ import {
 
 const router = express.Router();
 
-router.route('/').get(protectRoute, restrictAccessTo('admin'), getAllUsers);
+router.use(protectRoute);
 
-router.get('/:id', protectRoute, getUser);
+router.route('/').get(restrictAccessTo('admin'), getAllUsers);
+
+router.get('/:id', getUser);
+router.patch('/:category', updateUser);
+router.patch('/:id/:status?', deactivateUser, deleteUser);
 
 export default router;
