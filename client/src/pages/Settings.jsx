@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/Settings.module.css';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
@@ -23,14 +23,17 @@ import Security from '../components/Security';
 import { AiOutlineMenuFold } from 'react-icons/ai';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import ProfilePictureCropper from '../components/ProfilePictureCropper';
+import { AuthContext } from '../App';
 
 const Settings = () => {
+  const { userData, setUserData } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [category, setCategory] = useState('general');
   const [displayCategory, setDisplayCategory] = useState(false);
   const [image, setImage] = useState(null);
-  const [cropData, setCropData] = useState('#');
+  const [cropData, setCropData] = useState(null);
+  const [mode, setMode] = useState(null);
 
   const searchRef = useRef();
   const navRef = useRef();
@@ -69,6 +72,7 @@ const Settings = () => {
       const reader = new FileReader();
       reader.onloadend = () => setImage(reader.result);
       reader.readAsDataURL(file);
+      setMode('edit');
     }
   };
 
@@ -100,7 +104,8 @@ const Settings = () => {
               </span>
               <img
                 className={styles['profile-pics']}
-                src="../../assets/images/download.jpeg"
+                src={`../../assets/images/users/${userData.photo}`}
+                onClick={() => setMode('view')}
               />
             </span>
 
@@ -364,12 +369,16 @@ const Settings = () => {
           </div>
         </header>
 
-        {image && (
+        {mode && (
           <ProfilePictureCropper
+            mode={mode}
+            setMode={setMode}
             image={image}
             setImage={setImage}
             cropData={cropData}
             setCropData={setCropData}
+            imageName={userData.photo}
+            fileRef={fileRef}
           />
         )}
 
@@ -393,7 +402,8 @@ const Settings = () => {
                 </span>
                 <img
                   className={styles['profile-pics']}
-                  src="../../assets/images/download.jpeg"
+                  src={`../../assets/images/users/${userData.photo}`}
+                  onClick={() => setMode('view')}
                 />
               </span>
 
