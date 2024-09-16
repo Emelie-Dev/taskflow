@@ -22,16 +22,27 @@ import Personalization from '../components/Personalization';
 import Security from '../components/Security';
 import { AiOutlineMenuFold } from 'react-icons/ai';
 import { FaRegCircleUser } from 'react-icons/fa6';
+import ProfilePictureCropper from '../components/ProfilePictureCropper';
 
 const Settings = () => {
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [category, setCategory] = useState('general');
   const [displayCategory, setDisplayCategory] = useState(false);
+  const [image, setImage] = useState(null);
+  const [cropData, setCropData] = useState('#');
 
   const searchRef = useRef();
   const navRef = useRef();
   const fileRef = useRef();
+
+  useEffect(() => {
+    if (fileRef.current) {
+      if (!image) {
+        fileRef.current.files = new DataTransfer().files;
+      }
+    }
+  }, [image]);
 
   const hideNav = (e) => {
     if (e.target === navRef.current) {
@@ -42,17 +53,23 @@ const Settings = () => {
   const handleSearchText = (e) => {
     setSearchText(e.target.value);
   };
+
   const clearSearchText = () => {
     setSearchText('');
     searchRef.current.focus();
   };
 
-  const changeImage = () => {
-    fileRef.current.click();
-  };
-
   const hideResponsiveSettings = (e) => {
     e.target === e.currentTarget && setDisplayCategory(false);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setImage(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -75,7 +92,10 @@ const Settings = () => {
             <input type="file" ref={fileRef} className={styles['file-btn']} />
 
             <span className={styles['img-box']}>
-              <span className={styles['change-img-box']} onClick={changeImage}>
+              <span
+                className={styles['change-img-box']}
+                onClick={() => fileRef.current.click()}
+              >
                 <MdModeEditOutline className={styles['change-img-icon']} />
               </span>
               <img
@@ -344,15 +364,30 @@ const Settings = () => {
           </div>
         </header>
 
+        {image && (
+          <ProfilePictureCropper
+            image={image}
+            setImage={setImage}
+            cropData={cropData}
+            setCropData={setCropData}
+          />
+        )}
+
         <section className={styles['section-content']}>
           <div className={styles['settings-category']}>
             <figure className={styles['profile-img-box']}>
-              <input type="file" ref={fileRef} className={styles['file-btn']} />
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileRef}
+                className={styles['file-btn']}
+                onChange={handleFileChange}
+              />
 
               <span className={styles['img-box']}>
                 <span
                   className={styles['change-img-box']}
-                  onClick={changeImage}
+                  onClick={() => fileRef.current.click()}
                 >
                   <MdModeEditOutline className={styles['change-img-icon']} />
                 </span>

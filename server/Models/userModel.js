@@ -213,6 +213,8 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetTokenExpires: Date,
+  deleteAccountToken: String,
+  deleteAccountTokenExpires: Date,
 });
 
 // Encrypts Password
@@ -225,17 +227,19 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.pre(/^find/, function (next) {
+userSchema.pre(/^find/, async function (next) {
   // this keyword points to current query
 
   if (this.getFilter().login) {
     delete this.getFilter().login;
-    this.find({ active: { $ne: false } }).select('-active');
+    this.find().select('-passwordChangedAt');
   } else if (this.getFilter().emailVerificationToken) {
-    this.find({ active: { $ne: false } }).select('-emailVerified -active');
+    this.find({ active: { $ne: false } }).select(
+      '-emailVerified -active -passwordChangedAt'
+    );
   } else {
     this.find({ active: { $ne: false }, emailVerified: { $ne: false } }).select(
-      '-emailVerified -active'
+      '-emailVerified -active -passwordChangedAt'
     );
   }
 
@@ -252,7 +256,7 @@ userSchema.methods.generateToken = function (type) {
       .update(verificationToken)
       .digest('hex');
 
-    this.emailVerificationTokenExpires = Date.now() + 48 * 24 * 60 * 60 * 1000;
+    this.emailVerificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
 
     return verificationToken;
   }

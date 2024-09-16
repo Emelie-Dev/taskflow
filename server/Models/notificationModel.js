@@ -47,6 +47,7 @@ const notificationSchema = new mongoose.Schema({
         'project',
         'files',
         'addFiles',
+        'account',
       ],
       // required: [true, 'Please provide a value for the type field.'],
     },

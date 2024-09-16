@@ -764,6 +764,19 @@ const ProjectItem = () => {
         return 'A task was deleted';
       } else if (activity.type.includes('deadline')) {
         return 'The Project deadline was removed.';
+      } else if (activity.type.includes('account')) {
+        return (
+          <>
+            <span className={styles['deleted-users']}>
+              {generateName(
+                activity.performer.firstName,
+                activity.performer.lastName,
+                activity.performer.username
+              )}
+            </span>{' '}
+            was no longer available and was subsequently removed from the team
+          </>
+        );
       }
     } else if (activity.action === 'removal') {
       if (activity.type.includes('team')) {
@@ -1624,6 +1637,7 @@ const ProjectItem = () => {
                                 download={true}
                               >
                                 <FiDownload
+                                  title="Download"
                                   className={styles['download-icon']}
                                 />
                               </a>
@@ -2043,7 +2057,9 @@ const ProjectItem = () => {
                                   {((activity.action === 'addition' &&
                                     activity.type.includes('team')) ||
                                     (activity.action === 'removal' &&
-                                      activity.type.includes('team'))) && (
+                                      activity.type.includes('team')) ||
+                                    (activity.action === 'deletion' &&
+                                      activity.type.includes('account'))) && (
                                     <span
                                       className={`${styles['activity-type']} ${styles['activity-type2']}`}
                                     >

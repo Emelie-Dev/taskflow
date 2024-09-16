@@ -1,7 +1,12 @@
 import User from '../Models/userModel.js';
 import asyncErrorHandler from '../Utils/asyncErrorHandler.js';
 import CustomError from '../Utils/CustomError.js';
+import Email from '../Utils/Email.js';
 import factory from '../Utils/handlerFactory.js';
+import Task from '../Models/taskModel.js';
+import Notification from '../Models/notificationModel.js';
+import Project from '../Models/projectModel.js';
+import fs from 'fs';
 
 const updateProfie = async (user, body) => {
   const {
@@ -123,7 +128,62 @@ const updateSecuritySettings = async (user, body) => {
   return { userData, passwordMessage };
 };
 
-export const getAllUsers = factory.getAll(User, 'users');
+const generateDeleteToken = () => {
+  const token = Math.floor(Math.random() * 1_000_000);
+
+  return String(token);
+};
+
+const deleteUserTasks = async (user) => {
+  const notifications = [];
+
+  for await (const task of Task.find({ user: user._id })) {
+    if (task.assigned) {
+      notifications.push({
+        user: task.leader,
+        task: task.mainTask,
+        action: 'deletion',
+        type: ['account'],
+        performer: {
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+      });
+
+      await Task.findByIdAndUpdate(task.mainTask, {
+        $pull: { assignee: String(user._id) },
+      });
+    } else {
+      await Task.deleteMany({ mainTask: task._id });
+    }
+
+    await Task.findByIdAndDelete(task._id);
+  }
+
+  await Notification.insertMany(notifications);
+};
+
+const deleteUserProjectsAndFiles = async (user) => {
+  for await (const project of Project.find({ user: user._id })) {
+    if (project.files.length !== 0) {
+      await Promise.allSettled(
+        project.files.map(
+          (file) =>
+            new Promise((resolve, reject) => {
+              fs.unlink(file.path, (err) => {
+                if (err) reject();
+
+                resolve();
+              });
+            })
+        )
+      );
+    }
+
+    await Project.findByIdAndDelete(project._id);
+  }
+};
 
 export const getUser = asyncErrorHandler(async (req, res, next) => {
   const username = req.params.id;
@@ -154,6 +214,10 @@ export const getUser = asyncErrorHandler(async (req, res, next) => {
     },
   });
 });
+
+export const uploadProfileImage = asyncErrorHandler(
+  async (req, res, next) => {}
+);
 
 export const updateUser = asyncErrorHandler(async (req, res, next) => {
   const user = req.user;
@@ -199,7 +263,7 @@ export const updateUser = asyncErrorHandler(async (req, res, next) => {
 export const deactivateUser = asyncErrorHandler(async (req, res, next) => {
   const status = req.params.status;
 
-  if (!status) return next();
+  if (status === 'delete_token') return next();
   else if (status !== 'deactivate')
     return next(new CustomError('Bad request.', 400));
 
@@ -221,10 +285,102 @@ export const deactivateUser = asyncErrorHandler(async (req, res, next) => {
   user.active = false;
   await user.save();
 
+  //send deactivation email
+
   return res.status(204).json({
     status: 'success',
     message: null,
   });
 });
 
-export const deleteUser = asyncErrorHandler(async (req, res, next) => {});
+export const getDeleteToken = asyncErrorHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  const password = req.body.password;
+
+  if (!user) {
+    return next(new CustomError('This user does not exist.', 404));
+  } else if (String(req.user._id) !== String(req.params.id)) {
+    return next(new CustomError('This user does not exist.', 404));
+  }
+
+  if (!(await user.comparePasswordInDb(password, user.password))) {
+    return next(
+      new CustomError('The password you provided is incorrect.', 401)
+    );
+  }
+
+  // Send delete token
+  let token = generateDeleteToken();
+
+  while (token.length < 6) {
+    token = generateDeleteToken();
+  }
+
+  // await new Email(user, token).sendDeleteToken();
+
+  user.deleteAccountToken = token;
+  user.deleteAccountTokenExpires = Date.now() + 60 * 60 * 1000;
+
+  await user.save();
+
+  return res.status(200).json({
+    status: 'success',
+    message: null,
+  });
+});
+
+export const deleteUser = asyncErrorHandler(async (req, res, next) => {
+  const user = await User.findOne({
+    deleteAccountToken: String(req.params.token),
+    deleteAccountTokenExpires: { $gt: Date.now() },
+  });
+  const notifications = [];
+
+  if (!user) {
+    return next(new CustomError('This code is invalid or has expired.', 404));
+  } else if (String(req.user._id) !== String(req.params.id)) {
+    return next(new CustomError('This user does not exist.', 404));
+  }
+
+  // Delete user tasks
+  await deleteUserTasks(user);
+
+  // Delete user projects and files
+  await deleteUserProjectsAndFiles(user);
+
+  // Delete user notifications
+  await Notification.deleteMany({ user: user._id });
+
+  // Delete user profile image
+
+  // Delete user account
+  await User.findByIdAndDelete(user._id);
+
+  // Send notifications to project owners if user is in their team
+  for await (const project of Project.find({ team: String(user._id) })) {
+    notifications.push({
+      user: project.user,
+      project: project._id,
+      action: 'deletion',
+      type: ['account'],
+      performer: {
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    });
+
+    await Project.findByIdAndUpdate(project._id, {
+      $pull: { team: String(user._id) },
+    });
+  }
+
+  await Notification.insertMany(notifications);
+
+  return res.status(204).json({
+    status: 'success',
+    message: null,
+  });
+});
+
+export const getAllUsers = factory.getAll(User, 'users');

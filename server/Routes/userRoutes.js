@@ -1,6 +1,7 @@
 import express from 'express';
 
 import {
+  getDeleteToken,
   deactivateUser,
   deleteUser,
   getAllUsers,
@@ -20,6 +21,7 @@ router.route('/').get(restrictAccessTo('admin'), getAllUsers);
 
 router.get('/:id', getUser);
 router.patch('/:category', updateUser);
-router.patch('/:id/:status?', deactivateUser, deleteUser);
+router.post('/:id/:status?', deactivateUser, getDeleteToken);
+router.delete('/:id/:token', deleteUser);
 
 export default router;

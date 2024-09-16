@@ -217,8 +217,10 @@ export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
         lastName: { $first: '$projectLeader.lastName' },
         leaderPhoto: { $first: '$projectLeader.photo' },
         tasks: { $sum: 1 },
+        active: { $first: '$projectLeader.active' },
       },
     },
+    { $match: { active: true } },
     { $sort: { assignedDate: -1 } },
     { $skip: skip },
     { $limit: 30 },
@@ -262,7 +264,9 @@ export const getProject = asyncErrorHandler(async (req, res, next) => {
     (member) => String(member._id) === String(req.user._id)
   );
 
-  if (String(project.user._id) !== String(req.user._id)) {
+  if (!project.user) {
+    return next(new CustomError('This project does not exist!', 404));
+  } else if (String(project.user._id) !== String(req.user._id)) {
     if (!isMember) {
       return next(new CustomError('This project does not exist!', 404));
     }

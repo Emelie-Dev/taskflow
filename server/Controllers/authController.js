@@ -222,11 +222,24 @@ export const login = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  const user = await User.findOne({ email, login: true });
+  let user = await User.findOne({ email, login: true });
 
   if (!user || !(await user.comparePasswordInDb(password, user.password))) {
     const error = new CustomError('Incorrect email or password', 401);
     return next(error);
+  }
+
+  if (!user.active) {
+    // Send reactivation mail
+
+    user = await User.findOneAndUpdate(
+      { _id: user._id, login: true },
+      { active: true },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select('-active -password');
   }
 
   // Sends verification mail

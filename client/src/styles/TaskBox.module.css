@@ -520,6 +520,10 @@
   animation: rotate 1s linear 0s infinite normal both;
 }
 
+.deleted-users {
+  font-weight: 500;
+}
+
 /* Animation */
 
 @keyframes rotate {

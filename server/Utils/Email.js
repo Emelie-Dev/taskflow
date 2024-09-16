@@ -35,6 +35,14 @@ const resetEmail = fs.readFileSync(
   'utf-8'
 );
 
+const deleteEmail = fs.readFileSync(
+  join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../Public/Templates/deleteToken.html'
+  ),
+  'utf-8'
+);
+
 class Email {
   constructor(user, url) {
     this.url = url;
@@ -113,6 +121,12 @@ class Email {
       .replace('{{URL}}', this.url);
 
     await this.send(template, 'Reset your Password');
+  }
+
+  async sendDeleteToken() {
+    const template = deleteEmail.replace('{{DELETETOKEN}}', this.url);
+
+    await this.send(template, 'Verify Account Deletion');
   }
 }
 

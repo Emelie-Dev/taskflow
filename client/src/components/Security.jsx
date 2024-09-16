@@ -318,7 +318,12 @@ const Security = () => {
         >
           Deactivate Account
         </button>
-        <button className={styles['delete-btn']}>Delete Account</button>
+        <button
+          className={styles['delete-btn']}
+          onClick={() => setDeleteModal({ value: true, type: 'Account' })}
+        >
+          Delete Account
+        </button>
       </div>
     </section>
   );

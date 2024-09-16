@@ -521,6 +521,23 @@ const TaskBox = ({
       activity.type.includes('deadline')
     ) {
       return 'The Task deadline was removed.';
+    } else if (
+      activity.action === 'deletion' &&
+      activity.type.includes('account')
+    ) {
+      return (
+        <>
+          <span className={styles['deleted-users']}>
+            {generateName(
+              activity.performer.firstName,
+              activity.performer.lastName,
+              activity.performer.username
+            )}
+          </span>{' '}
+          was no longer available and was subsequently removed from the
+          assignees.
+        </>
+      );
     }
   };
 

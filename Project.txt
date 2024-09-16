@@ -40,6 +40,9 @@
     - Add !err.response for catch block
     - Enable data update after saving activity
     - Adjust the user data in profile page
+    - Send email for activation and deactivation and deletion of accounts
+    - Handle all request handlers for deactivated members
+    - Handle project deadline update
 
 
  -- Data Design
@@ -107,3 +110,7 @@
     - Project and tasks analytics will cover the page width
 
 
+
+Leonard - (WL) (LW) (L
+MTOOOOO - (LL) (LW) (L
+Kelvinn - (WW) (WW) (LW)

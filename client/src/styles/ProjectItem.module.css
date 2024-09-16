@@ -1657,6 +1657,10 @@
   text-align: left;
 }
 
+.deleted-users {
+  font-weight: 500;
+}
+
 /* Animations */
 
 @keyframes showNav {
