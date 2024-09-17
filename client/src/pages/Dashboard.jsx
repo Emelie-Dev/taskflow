@@ -4,26 +4,19 @@ import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { Link } from 'react-router-dom';
 
 import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
-import {
-  IoIosSearch,
-  IoMdClose,
-  IoIosArrowForward,
-  IoIosArrowBack,
-  IoIosNotifications,
-} from 'react-icons/io';
+import { IoIosNotifications } from 'react-icons/io';
 
-import { HiPlus, HiOutlineLogout } from 'react-icons/hi';
+import { HiPlus } from 'react-icons/hi';
 import { HiMiniArrowTrendingUp } from 'react-icons/hi2';
 import { ImBrightnessContrast } from 'react-icons/im';
 import { Line } from 'react-chartjs-2';
 
-import { FaRegClock, FaRegCircleUser } from 'react-icons/fa6';
+import { FaRegCircleUser } from 'react-icons/fa6';
 import { MdOutlineDashboard } from 'react-icons/md';
 import { FaTasks, FaCalendarAlt } from 'react-icons/fa';
 import { GoProjectTemplate } from 'react-icons/go';
 import Calendar from '../components/Calendar';
-import { MdOutlineSegment, MdOutlineSignalWifiOff } from 'react-icons/md';
-import { FaSearch } from 'react-icons/fa';
+import { MdOutlineSignalWifiOff } from 'react-icons/md';
 
 import {
   Chart as ChartJS,
@@ -39,6 +32,7 @@ import NewTask from '../components/NewTask';
 import { apiClient, AuthContext } from '../App';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
+import Header from '../components/Header';
 
 ChartJS.register(
   CategoryScale,
@@ -68,11 +62,9 @@ export const months = [
 let currentHour = null;
 
 const Dashboard = () => {
-  const [searchText, setSearchText] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [showNav, setShowNav] = useState(false);
-  const [showUserBox, setShowUserBox] = useState(false);
   const [addTask, setAddTask] = useState(false);
   const [userStats, setUserStats] = useState(null);
   const { userData } = useContext(AuthContext);
@@ -105,29 +97,6 @@ const Dashboard = () => {
   const taskBoxRef = useRef();
   const userBoxRef = useRef();
   const imgRef = useRef();
-
-  // For log out box
-  useEffect(() => {
-    const handleUserBox = (e) => {
-      if (showUserBox) {
-        if (
-          e.target === imgRef.current ||
-          e.target === userBoxRef.current ||
-          userBoxRef.current.contains(e.target)
-        ) {
-          return;
-        } else {
-          setShowUserBox(false);
-        }
-      }
-    };
-
-    window.addEventListener('click', handleUserBox);
-
-    return () => {
-      window.removeEventListener('click', handleUserBox);
-    };
-  }, [showUserBox]);
 
   // For user stats
   useEffect(() => {
@@ -251,15 +220,6 @@ const Dashboard = () => {
     } catch {
       setProjectsDetails({ page, error: true });
     }
-  };
-
-  const handleSearchText = (e) => {
-    setSearchText(e.target.value);
-  };
-
-  const clearSearchText = () => {
-    setSearchText('');
-    searchRef.current.focus();
   };
 
   const data = {
@@ -579,80 +539,7 @@ const Dashboard = () => {
       )}
 
       <section className={styles.section}>
-        <header className={styles.header}>
-          <b className={styles['menu-icon-box']}>
-            <MdOutlineSegment
-              className={styles['menu-icon']}
-              onClick={() => setShowNav(true)}
-            />
-          </b>
-
-          <h1 className={styles['page']}>Dashboard</h1>
-
-          <span className={styles['search-box']}>
-            <IoIosSearch className={styles['search-icon']} />
-            <input
-              type="text"
-              className={styles.search}
-              value={searchText}
-              ref={searchRef}
-              placeholder="Search..."
-              onChange={handleSearchText}
-            />
-            <IoMdClose
-              className={`${styles['cancel-icon']} ${
-                searchText.length !== 0 ? styles['show-cancel-icon'] : ''
-              }`}
-              onClick={clearSearchText}
-            />
-          </span>
-          <div className={styles['icon-div']}>
-            <Link className={styles['icon-container']} to={'/notifications'}>
-              <IoIosNotifications className={styles['notification-icon']} />
-            </Link>
-
-            <span className={styles['icon-container']}>
-              <IoChatbubblesSharp className={styles['chat-icon']} />
-            </span>
-          </div>
-
-          <div className={styles['profile-div']}>
-            <div className={styles['profile-box']}>
-              <span className={styles['profile-name']}>Ofoka Vincent</span>
-              <span className={styles['profile-title']}>Web developer</span>
-            </div>
-
-            <span className={styles['alternate-search-box']}>
-              <FaSearch className={styles['alternate-search-icon']} />
-            </span>
-
-            <figure className={styles['profile-picture-box']}>
-              <img
-                className={styles['profile-picture']}
-                src="../../assets/images/download.jpeg"
-                ref={imgRef}
-                onClick={() => setShowUserBox(true)}
-              />
-
-              <ul
-                className={`${styles['user-profile-box']} ${
-                  showUserBox ? styles['show-user-box'] : ''
-                }`}
-                ref={userBoxRef}
-              >
-                <li className={styles['user-profile-item']}>
-                  {' '}
-                  <FaRegCircleUser className={styles['user-profile-icon']} />
-                  My Profile
-                </li>
-                <li className={styles['user-profile-item']}>
-                  <HiOutlineLogout className={styles['user-profile-icon']} />
-                  Log out
-                </li>
-              </ul>
-            </figure>
-          </div>
-        </header>
+        <Header page={'Dashboard'} setShowNav={setShowNav} />
 
         <section className={styles['left-section']}>
           <div className={styles['left-section-head']}>

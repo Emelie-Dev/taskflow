@@ -79,6 +79,7 @@ const Settings = () => {
       reader.onloadend = () => setImage(reader.result);
       reader.readAsDataURL(file);
       setMode('edit');
+      setDisplayCategory(false);
     }
   };
 
@@ -111,9 +112,14 @@ const Settings = () => {
                 <MdModeEditOutline className={styles['change-img-icon']} />
               </span>
               <img
-                className={styles['profile-pics']}
+                className={`${styles['profile-pics']} ${
+                  userData.photo === 'default.jpeg' ? styles['default-pic'] : ''
+                }`}
                 src={`${serverUrl}/users/${userData.photo}`}
-                onClick={() => setMode('view')}
+                onClick={() => {
+                  setMode('view');
+                  setDisplayCategory(false);
+                }}
               />
             </span>
 
@@ -416,7 +422,10 @@ const Settings = () => {
                       : ''
                   }`}
                   src={`${serverUrl}/users/${userData.photo}`}
-                  onClick={() => setMode('view')}
+                  onClick={() => {
+                    setMode('view');
+                    setDisplayCategory(false);
+                  }}
                 />
               </span>
 

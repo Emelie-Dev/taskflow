@@ -1,0 +1,350 @@
+.header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.404);
+  padding: 1.1rem;
+  position: fixed;
+  top: 0;
+  z-index: 3;
+  backdrop-filter: blur(5px);
+  width: 83%;
+}
+
+.page {
+  font-size: 1.25rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: orange;
+}
+
+.search-box {
+  margin-left: 3rem;
+  position: relative;
+}
+
+.search {
+  outline: none;
+  width: 25rem;
+  border-radius: 20px;
+  padding: 0.8rem;
+  padding-left: 2.5rem;
+  border: 1px solid gray;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  font-size: 1.05rem;
+  opacity: 0.7;
+  padding-right: 2.5rem;
+}
+
+.search-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  position: absolute;
+  left: 3%;
+  top: 30%;
+  opacity: 1;
+  z-index: 2;
+}
+
+.cancel-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  position: absolute;
+  right: 3%;
+  top: 30%;
+  opacity: 1;
+  z-index: 2;
+  cursor: pointer;
+  display: none;
+}
+
+.show-cancel-icon {
+  display: inline;
+}
+
+.search-box ::placeholder {
+  color: black;
+  opacity: 0.9;
+  font-family: calligraphy;
+  font-size: 1.08rem;
+}
+
+.icon-div {
+  display: flex;
+  margin: 0 2rem;
+  align-items: center;
+}
+
+.icon-container {
+  border: 1px solid gray;
+  padding: 0.4rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.5rem;
+  cursor: pointer;
+}
+
+.notification-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  fill: gray;
+}
+
+.icon-container:nth-child(2) {
+  padding: 0.45rem;
+}
+
+.chat-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: gray;
+}
+
+.profile-div {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.profile-picture-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.profile-picture {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  border: 1px solid orange;
+  cursor: pointer;
+}
+
+.profile-box {
+  display: flex;
+  flex-direction: column;
+  margin-right: 1rem;
+  align-items: flex-end;
+}
+
+.profile-name {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.profile-title {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: gray;
+  font-size: 0.95rem;
+}
+
+.alternate-search-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 2rem;
+  border: 1px solid rgba(128, 128, 128, 0.404);
+  padding: 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  margin-left: auto;
+}
+
+.alternate-search-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  fill: gray;
+}
+
+.user-profile-box {
+  position: absolute;
+  background: white;
+  list-style-type: none;
+  left: -240%;
+  top: 120%;
+  white-space: nowrap;
+  box-shadow: 1px 1px 10px -4px black;
+  border-radius: 5px;
+  display: none;
+}
+
+.user-profile-item {
+  font-family: var(--general-font);
+  padding: 0.6rem 1rem;
+  padding-right: 2rem;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.profile-link-box {
+  font-family: var(--general-font);
+  padding: 0.6rem 1rem;
+  padding-right: 2rem;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s, color 0.2s;
+  color: black;
+  text-decoration: none;
+}
+
+.user-profile-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+.profile-link-box {
+  border-radius: 5px 5px 0 0;
+}
+
+.user-profile-item {
+  border-radius: 0 0 5px 5px;
+}
+
+.user-profile-item:hover,
+.profile-link-box:hover {
+  background: orange;
+  color: white;
+}
+
+.show-user-box {
+  display: block;
+}
+
+.menu-icon-box {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.menu-icon {
+  width: 2.3rem;
+  height: 2.3rem;
+  fill: gray;
+  transform: translateY(2px);
+}
+
+.menu-icon-box:hover {
+  opacity: 0.7;
+}
+
+/* Animations */
+
+@keyframes showNav {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Media Queries */
+
+@media screen and (max-width: 1174px) {
+  .search {
+    width: 22rem;
+  }
+}
+
+@media screen and (max-width: 1099px) {
+  .header {
+    width: 100%;
+    padding: 1.5rem 1.8rem;
+    padding-left: 1.2rem;
+  }
+
+  .menu-icon-box {
+    display: flex;
+  }
+}
+
+@media screen and (max-width: 999px) {
+  .icon-div {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 899px) {
+  .search {
+    width: 20rem;
+  }
+}
+
+@media screen and (max-width: 799px) {
+  .search-box {
+    margin-left: 2rem;
+  }
+
+  .search {
+    width: 18rem;
+  }
+}
+
+@media screen and (max-width: 699px) {
+  .profile-box {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .search {
+    width: 13rem;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  .search-box {
+    display: none;
+  }
+
+  .menu-icon-box {
+    margin-right: 0.8rem;
+  }
+
+  .alternate-search-box {
+    display: flex;
+  }
+}
+
+@media screen and (max-width: 399px) {
+  .search-box {
+    display: none;
+  }
+
+  .alternate-search-box {
+    margin-right: 1rem;
+    margin-left: 1rem;
+  }
+  .alternate-search-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: gray;
+  }
+}
+
+@media screen and (max-width: 299px) {
+  .alternate-search-box {
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+  }
+
+  .menu-icon-box {
+    margin-right: 0.3rem;
+  }
+}
