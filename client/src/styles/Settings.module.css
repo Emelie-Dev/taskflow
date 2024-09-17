@@ -415,6 +415,10 @@
   box-shadow: 2px 2px 4px -2px black;
 }
 
+.default-pic {
+  border: 2px solid gray;
+}
+
 .username {
   font-weight: bold;
   font-size: 1.15rem;

@@ -1,8 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useContext } from 'react';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css'; // Import Cropper's CSS
 import styles from '../styles/ProfilePictureCropper.module.css';
 import { IoCloseSharp } from 'react-icons/io5';
+import { apiClient, AuthContext } from '../App';
+import { SiKashflow } from 'react-icons/si';
 
 const ProfilePictureCropper = ({
   mode,
@@ -11,13 +13,14 @@ const ProfilePictureCropper = ({
   setImage,
   cropData,
   setCropData,
-  imageName,
   fileRef,
+  toast,
 }) => {
-  const [cropped, setCropped] = useState(false);
+  const { userData, setUserData } = useContext(AuthContext);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [deleteMode, setDeleteMode] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const cropperRef = useRef(null);
 
@@ -36,6 +39,11 @@ const ProfilePictureCropper = ({
     };
   }, []);
 
+  const serverUrl =
+    import.meta.env.MODE === 'production'
+      ? import.meta.env.VITE_BACKEND_URL
+      : import.meta.env.VITE_LOCAL_BACKEND_URL;
+
   const onCrop = () => {
     if (cropperRef.current)
       setCropData(cropperRef.current.cropper.getCroppedCanvas().toDataURL());
@@ -49,7 +57,80 @@ const ProfilePictureCropper = ({
     }
   };
 
-  const changeProfilePicture = async () => {};
+  const dataURItoBlob = (dataURI) => {
+    const byteString = atob(dataURI.split(',')[1]); // Extract the base64 data from the dataURI
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]; // Extract the MIME type
+
+    const byteArray = [];
+    for (let i = 0; i < byteString.length; i++) {
+      byteArray.push(byteString.charCodeAt(i));
+    }
+
+    return new Blob([new Uint8Array(byteArray)], { type: mimeString });
+  };
+
+  const changeProfilePicture = async () => {
+    const formData = new FormData();
+    formData.append('photo', dataURItoBlob(cropData));
+
+    setIsProcessing(true);
+
+    try {
+      const { data } = await apiClient.patch(
+        `/api/v1/users/${userData._id}/photo`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      setIsProcessing(false);
+      setUserData(data.data.user);
+      setImage(null);
+      setCropData(null);
+      setMode(null);
+    } catch (err) {
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occurred during picture upload!', {
+          toastId: 'toast-id1',
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id1',
+        });
+      }
+    }
+  };
+
+  const removeProfilePicture = async () => {
+    setIsProcessing(true);
+
+    try {
+      const { data } = await apiClient.delete(
+        `/api/v1/users/${userData._id}/photo`
+      );
+
+      setIsProcessing(false);
+      setUserData(data.data.user);
+      setImage(null);
+      setCropData(null);
+      setMode(null);
+    } catch (err) {
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occurred while removing profile picture.', {
+          toastId: 'toast-id2',
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id2',
+        });
+      }
+    }
+  };
 
   return (
     <section className={styles.section} onClick={closeCropModal}>
@@ -104,23 +185,47 @@ const ProfilePictureCropper = ({
                   >
                     Cancel
                   </button>
-                  <button className={styles['save-btn']}>Save</button>
+                  <button
+                    className={`${styles['save-btn']} ${
+                      isProcessing ? styles['disable-btn'] : ''
+                    }`}
+                    onClick={changeProfilePicture}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <SiKashflow className={styles['saving-icon']} />
+                        Saving....
+                      </>
+                    ) : (
+                      'Save'
+                    )}
+                  </button>
                 </div>
               </>
             )}
           </>
         ) : mode === 'view' ? (
           <div className={styles['view-container']}>
-            <img
-              className={styles['cropped-image']}
-              style={{ width, height }}
-              src={`../../assets/images/users/${imageName}`}
-              alt="Profile Picture"
-            />
-
+            {userData.photo === 'default.jpeg' ? (
+              <div
+                className={styles['no-picture-div']}
+                style={{ width, height }}
+              >
+                No profile picture
+              </div>
+            ) : (
+              <img
+                className={styles['cropped-image']}
+                style={{ width, height }}
+                src={`${serverUrl}/users/${userData.photo}`}
+                alt="Profile Picture"
+              />
+            )}
             <div className={styles['btn-div']}>
               <button
-                className={styles['cancel-btn']}
+                className={`${styles['cancel-btn']} ${
+                  userData.photo === 'default.jpeg' ? styles['disable-btn'] : ''
+                }`}
                 onClick={() => setDeleteMode(true)}
               >
                 Remove
@@ -141,7 +246,21 @@ const ProfilePictureCropper = ({
                   </span>
 
                   <div className={styles['delete-btn-div']}>
-                    <button className={styles['save-btn']}>Yes</button>
+                    <button
+                      className={`${styles['save-btn']} ${
+                        isProcessing ? styles['disable-btn'] : ''
+                      }`}
+                      onClick={removeProfilePicture}
+                    >
+                      {isProcessing ? (
+                        <>
+                          <SiKashflow className={styles['saving-icon']} />
+                          Removing....
+                        </>
+                      ) : (
+                        'Yes'
+                      )}
+                    </button>
                     <button
                       className={styles['cancel-btn']}
                       onClick={() => setDeleteMode(false)}

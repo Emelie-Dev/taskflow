@@ -24,6 +24,7 @@ import { AiOutlineMenuFold } from 'react-icons/ai';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import ProfilePictureCropper from '../components/ProfilePictureCropper';
 import { AuthContext } from '../App';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Settings = () => {
   const { userData, setUserData } = useContext(AuthContext);
@@ -38,6 +39,11 @@ const Settings = () => {
   const searchRef = useRef();
   const navRef = useRef();
   const fileRef = useRef();
+
+  const serverUrl =
+    import.meta.env.MODE === 'production'
+      ? import.meta.env.VITE_BACKEND_URL
+      : import.meta.env.VITE_LOCAL_BACKEND_URL;
 
   useEffect(() => {
     if (fileRef.current) {
@@ -78,6 +84,8 @@ const Settings = () => {
 
   return (
     <main className={styles.main}>
+      <ToastContainer autoClose={2000} />
+
       <section
         className={`${styles['responsive-settings']} ${
           displayCategory ? styles['show-responsive-settings'] : ''
@@ -104,7 +112,7 @@ const Settings = () => {
               </span>
               <img
                 className={styles['profile-pics']}
-                src={`../../assets/images/users/${userData.photo}`}
+                src={`${serverUrl}/users/${userData.photo}`}
                 onClick={() => setMode('view')}
               />
             </span>
@@ -377,8 +385,9 @@ const Settings = () => {
             setImage={setImage}
             cropData={cropData}
             setCropData={setCropData}
-            imageName={userData.photo}
             fileRef={fileRef}
+            userId={userData._id}
+            toast={toast}
           />
         )}
 
@@ -401,8 +410,12 @@ const Settings = () => {
                   <MdModeEditOutline className={styles['change-img-icon']} />
                 </span>
                 <img
-                  className={styles['profile-pics']}
-                  src={`../../assets/images/users/${userData.photo}`}
+                  className={`${styles['profile-pics']} ${
+                    userData.photo === 'default.jpeg'
+                      ? styles['default-pic']
+                      : ''
+                  }`}
+                  src={`${serverUrl}/users/${userData.photo}`}
                   onClick={() => setMode('view')}
                 />
               </span>

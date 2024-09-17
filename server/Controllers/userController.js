@@ -7,6 +7,22 @@ import Task from '../Models/taskModel.js';
 import Notification from '../Models/notificationModel.js';
 import Project from '../Models/projectModel.js';
 import fs from 'fs';
+import multer from 'multer';
+import sharp from 'sharp';
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new CustomError('Not an image! Please upload only images.', 400), false);
+  }
+};
+
+// Initialize Multer with the storage and filter options
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: multerFilter,
+});
 
 const updateProfie = async (user, body) => {
   const {
@@ -215,9 +231,84 @@ export const getUser = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-export const uploadProfileImage = asyncErrorHandler(
-  async (req, res, next) => {}
-);
+export const formatProfileImage = asyncErrorHandler(async (req, res, next) => {
+  req.file.filename = `user-${req.user._id}-${
+    Math.round(Math.random() * 1e14) + Date.now()
+  }.jpeg`;
+
+  // Formats the image
+  await sharp(req.file.buffer)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`Public/img/users/${req.file.filename}`);
+
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { photo: req.file.filename },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      user,
+    },
+  });
+});
+
+export const uploadProfileImage = asyncErrorHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new CustomError('This user does not exist.', 404));
+  } else if (String(req.user._id) !== String(req.params.id)) {
+    return next(new CustomError('This user does not exist.', 404));
+  }
+
+  // Uploads the file
+  upload.single('photo')(req, res, (error) => {
+    if (error) {
+      return next(
+        new CustomError('An error occurred during picture upload!', 500)
+      );
+    }
+
+    if (!req.file) {
+      return next(new CustomError('Select an image to upload!', 400));
+    }
+
+    next();
+  });
+});
+
+export const removeProfileImage = asyncErrorHandler(async (req, res, next) => {
+  let user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new CustomError('This user does not exist.', 404));
+  } else if (String(req.user._id) !== String(req.params.id)) {
+    return next(new CustomError('This user does not exist.', 404));
+  }
+
+  user = await User.findByIdAndUpdate(
+    req.params.id,
+    { photo: 'default.jpeg' },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      user,
+    },
+  });
+});
 
 export const updateUser = asyncErrorHandler(async (req, res, next) => {
   const user = req.user;

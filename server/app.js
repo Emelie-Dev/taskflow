@@ -81,9 +81,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Render static files
-// app.use(
-//   express.static(join(dirname(fileURLToPath(import.meta.url)), 'Public'))
-// );
+app.use(
+  express.static(join(dirname(fileURLToPath(import.meta.url)), 'Public/img'))
+);
 
 // Adds security headers
 app.use(helmet());
@@ -124,6 +124,7 @@ app.use(compression());
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // Route handlers
+
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/projects', projectRouter);
