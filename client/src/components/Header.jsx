@@ -63,7 +63,7 @@ const Header = ({ page, setShowNav }) => {
       </b>
 
       <h1 className={styles['page']}>{page}</h1>
-      {/* 
+
       <span className={styles['search-box']}>
         <IoIosSearch className={styles['search-icon']} />
         <input
@@ -80,7 +80,7 @@ const Header = ({ page, setShowNav }) => {
           }`}
           onClick={clearSearchText}
         />
-      </span> */}
+      </span>
 
       <div className={styles['icon-div']}>
         <Link className={styles['icon-container']} to={'/notifications'}>
@@ -100,6 +100,7 @@ const Header = ({ page, setShowNav }) => {
               userData.lastName,
               userData.username
             )}
+            mmmmmmmmmmmmmmmm
           </span>
           <span className={styles['profile-title']}>Web developer</span>
         </div>

@@ -105,7 +105,10 @@
 .profile-div {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   margin-left: auto;
+  width: 100%;
+  overflow: hidden;
 }
 
 .profile-picture-box {
@@ -128,6 +131,8 @@
   flex-direction: column;
   margin-right: 1rem;
   align-items: flex-end;
+  overflow: hidden;
+  width: calc(100% - 5rem);
 }
 
 .profile-name {
@@ -135,6 +140,10 @@
     Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-weight: 500;
   font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .profile-title {
