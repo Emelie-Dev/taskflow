@@ -16,7 +16,7 @@ const ProfilePictureCropper = ({
   fileRef,
   toast,
 }) => {
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, setUserData, serverUrl } = useContext(AuthContext);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [deleteMode, setDeleteMode] = useState(false);
@@ -38,11 +38,6 @@ const ProfilePictureCropper = ({
       window.removeEventListener('resize', sizeHandler);
     };
   }, []);
-
-  const serverUrl =
-    import.meta.env.MODE === 'production'
-      ? import.meta.env.VITE_BACKEND_URL
-      : import.meta.env.VITE_LOCAL_BACKEND_URL;
 
   const onCrop = () => {
     if (cropperRef.current)

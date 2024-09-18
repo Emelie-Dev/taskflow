@@ -263,13 +263,16 @@ export const login = asyncErrorHandler(async (req, res, next) => {
 
 export const logout = asyncErrorHandler(async (req, res, next) => {
   res.cookie('jwt', 'loggedout', {
-    maxAge: process.env.JWT_LOGOUT_EXPIRES,
+    maxAge: process.env.JWT_LOGIN_EXPIRES,
+
+    //  Prevents javascript access
     httpOnly: true,
-    // Heroku specific
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+
+    secure: true,
+    sameSite: 'None',
   });
 
-  res.status(200).json({ status: 'success' });
+  return res.status(200).json({ status: 'success', message: null });
 });
 
 export const forgotPassword = asyncErrorHandler(async (req, res, next) => {

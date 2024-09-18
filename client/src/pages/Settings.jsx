@@ -27,7 +27,7 @@ import { AuthContext } from '../App';
 import { ToastContainer, toast } from 'react-toastify';
 
 const Settings = () => {
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, setUserData, serverUrl } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [category, setCategory] = useState('general');
@@ -39,11 +39,6 @@ const Settings = () => {
   const searchRef = useRef();
   const navRef = useRef();
   const fileRef = useRef();
-
-  const serverUrl =
-    import.meta.env.MODE === 'production'
-      ? import.meta.env.VITE_BACKEND_URL
-      : import.meta.env.VITE_LOCAL_BACKEND_URL;
 
   useEffect(() => {
     if (fileRef.current) {

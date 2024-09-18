@@ -15,6 +15,7 @@
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color: orange;
+  margin-left: 0.1rem;
 }
 
 .search-box {
@@ -84,6 +85,7 @@
   justify-content: center;
   margin: 0 0.5rem;
   cursor: pointer;
+  transition: opacity 0.3s;
 }
 
 .notification-icon {
@@ -102,13 +104,16 @@
   fill: gray;
 }
 
+.icon-container:hover {
+  opacity: 0.8;
+}
+
 .profile-div {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   margin-left: auto;
   width: 100%;
-  overflow: hidden;
 }
 
 .profile-picture-box {
@@ -124,13 +129,14 @@
   border-radius: 50%;
   border: 1px solid orange;
   cursor: pointer;
+  object-fit: cover;
 }
 
 .profile-box {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: auto;
+  justify-content: end;
   margin-right: 1rem;
-  align-items: flex-end;
   overflow: hidden;
   width: calc(100% - 5rem);
 }
@@ -143,7 +149,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
+  text-align: right;
 }
 
 .profile-title {
@@ -151,6 +157,10 @@
     Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color: gray;
   font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
 }
 
 .alternate-search-box {
@@ -177,7 +187,7 @@
   background: white;
   list-style-type: none;
   left: -240%;
-  top: 120%;
+  top: 110%;
   white-space: nowrap;
   box-shadow: 1px 1px 10px -4px black;
   border-radius: 5px;
@@ -252,6 +262,26 @@
   opacity: 0.7;
 }
 
+.searching-loader {
+  width: 20px;
+  padding: 3.3px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: black;
+  --_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
+  -webkit-mask: var(--_m);
+  mask: var(--_m);
+  -webkit-mask-composite: source-out;
+  mask-composite: subtract;
+  animation: l3 0.8s infinite linear;
+  margin-right: 0.5rem;
+}
+
+.disable-item {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 /* Animations */
 
 @keyframes showNav {
@@ -260,6 +290,12 @@
   }
   to {
     width: 100%;
+  }
+}
+
+@keyframes l3 {
+  to {
+    transform: rotate(1turn);
   }
 }
 
@@ -286,6 +322,10 @@
 @media screen and (max-width: 999px) {
   .icon-div {
     display: none;
+  }
+
+  .search-box {
+    margin-right: 2rem;
   }
 }
 

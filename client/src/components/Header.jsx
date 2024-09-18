@@ -2,22 +2,26 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/Header.module.css';
 import { MdOutlineSegment } from 'react-icons/md';
 import { IoIosSearch, IoMdClose, IoIosNotifications } from 'react-icons/io';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IoChatbubblesSharp } from 'react-icons/io5';
 import { FaSearch } from 'react-icons/fa';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { HiOutlineLogout } from 'react-icons/hi';
-import { AuthContext } from '../App';
+import { AuthContext, apiClient } from '../App';
 import { generateName } from '../pages/Dashboard';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Header = ({ page, setShowNav }) => {
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, setUserData, serverUrl } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showUserBox, setShowUserBox] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const searchRef = useRef();
   const imgRef = useRef();
   const userBoxRef = useRef();
+
+  const navigate = useNavigate();
 
   // For log out box
   useEffect(() => {
@@ -51,10 +55,32 @@ const Header = ({ page, setShowNav }) => {
     searchRef.current.focus();
   };
 
-  console.log(userData);
+  const logout = async () => {
+    setIsProcessing(true);
+
+    try {
+      await apiClient('/api/v1/auth/logout');
+
+      setIsProcessing(false);
+      navigate('/login');
+    } catch (err) {
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occurred while logging out.', {
+          toastId: 'toast-id1',
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id1',
+        });
+      }
+    }
+  };
 
   return (
     <header className={styles.header}>
+      <ToastContainer autoClose={2000} />
+
       <b className={styles['menu-icon-box']}>
         <MdOutlineSegment
           className={styles['menu-icon']}
@@ -87,9 +113,9 @@ const Header = ({ page, setShowNav }) => {
           <IoIosNotifications className={styles['notification-icon']} />
         </Link>
 
-        <span className={styles['icon-container']}>
+        <Link className={styles['icon-container']} to={'/chats'}>
           <IoChatbubblesSharp className={styles['chat-icon']} />
-        </span>
+        </Link>
       </div>
 
       <div className={styles['profile-div']}>
@@ -100,9 +126,8 @@ const Header = ({ page, setShowNav }) => {
               userData.lastName,
               userData.username
             )}
-            mmmmmmmmmmmmmmmm
           </span>
-          <span className={styles['profile-title']}>Web developer</span>
+          <span className={styles['profile-title']}>{userData.occupation}</span>
         </div>
 
         <span className={styles['alternate-search-box']}>
@@ -112,7 +137,7 @@ const Header = ({ page, setShowNav }) => {
         <figure className={styles['profile-picture-box']}>
           <img
             className={styles['profile-picture']}
-            src="../../assets/images/download.jpeg"
+            src={`${serverUrl}/users/${userData.photo}`}
             ref={imgRef}
             onClick={() => setShowUserBox(true)}
           />
@@ -129,8 +154,17 @@ const Header = ({ page, setShowNav }) => {
                 My Profile
               </Link>
             </li>
-            <li className={styles['user-profile-item']}>
-              <HiOutlineLogout className={styles['user-profile-icon']} />
+            <li
+              className={`${styles['user-profile-item']} ${
+                isProcessing ? styles['disable-item'] : ''
+              }`}
+              onClick={logout}
+            >
+              {isProcessing ? (
+                <div className={styles['searching-loader']}></div>
+              ) : (
+                <HiOutlineLogout className={styles['user-profile-icon']} />
+              )}
               Log out
             </li>
           </ul>

@@ -16,13 +16,15 @@ import ProjectItem from './pages/ProjectItem';
 import ProtectedRoute from './components/ProtectedRoute';
 import axios from 'axios';
 
+const serverUrl =
+  import.meta.env.MODE === 'production'
+    ? import.meta.env.VITE_BACKEND_URL
+    : import.meta.env.VITE_LOCAL_BACKEND_URL;
+
 export const AuthContext = createContext();
 
 export const apiClient = axios.create({
-  baseURL:
-    import.meta.env.MODE === 'production'
-      ? import.meta.env.VITE_BACKEND_URL
-      : import.meta.env.VITE_LOCAL_BACKEND_URL,
+  baseURL: serverUrl,
   withCredentials: true,
 });
 
@@ -32,7 +34,13 @@ const App = () => {
 
   return (
     <AuthContext.Provider
-      value={{ userData, setUserData, isAuthenticated, setIsAuthenticated }}
+      value={{
+        userData,
+        setUserData,
+        isAuthenticated,
+        setIsAuthenticated,
+        serverUrl,
+      }}
     >
       <Routes>
         <Route path="/" element={<Home />} />
