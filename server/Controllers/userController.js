@@ -293,21 +293,36 @@ export const removeProfileImage = asyncErrorHandler(async (req, res, next) => {
     return next(new CustomError('This user does not exist.', 404));
   }
 
-  user = await User.findByIdAndUpdate(
-    req.params.id,
-    { photo: 'default.jpeg' },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  if (user.photo !== 'default.jpeg') {
+    fs.unlink(`Public/img/users/${user.photo}`, async (err) => {
+      if (err) {
+        return next(
+          new CustomError(
+            'An error occurred while removing profile picture.',
+            500
+          )
+        );
+      }
 
-  return res.status(200).json({
-    status: 'success',
-    data: {
-      user,
-    },
-  });
+      user = await User.findByIdAndUpdate(
+        req.params.id,
+        { photo: 'default.jpeg' },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          user,
+        },
+      });
+    });
+  } else {
+    return next(new CustomError('You do not have a profile picture.', 404));
+  }
 });
 
 export const updateUser = asyncErrorHandler(async (req, res, next) => {
@@ -443,6 +458,19 @@ export const deleteUser = asyncErrorHandler(async (req, res, next) => {
   await Notification.deleteMany({ user: user._id });
 
   // Delete user profile image
+  if (user.photo !== 'default.jpeg') {
+    await new Promise((resolve, reject) => {
+      fs.unlink(`Public/img/users/${user.photo}`, (err) => {
+        if (err) {
+          return next(
+            new CustomError('An error occured while deleting account.', 500)
+          );
+        }
+
+        resolve();
+      });
+    });
+  }
 
   // Delete user account
   await User.findByIdAndDelete(user._id);
