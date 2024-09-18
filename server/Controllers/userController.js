@@ -461,11 +461,7 @@ export const deleteUser = asyncErrorHandler(async (req, res, next) => {
   if (user.photo !== 'default.jpeg') {
     await new Promise((resolve, reject) => {
       fs.unlink(`Public/img/users/${user.photo}`, (err) => {
-        if (err) {
-          return next(
-            new CustomError('An error occured while deleting account.', 500)
-          );
-        }
+        if (err) reject();
 
         resolve();
       });
