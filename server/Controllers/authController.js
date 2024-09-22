@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import CustomError from '../Utils/CustomError.js';
 import crypto from 'crypto';
 import util from 'util';
+import Notification from '../Models/notificationModel.js';
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -120,12 +121,11 @@ export const protectRoute = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Checks if the user changed the password after token was issued
-
-  const isPasswordChanged = await user.isPasswordChanged(decodedToken.iat);
+  const isPasswordChanged = user.isPasswordChanged(decodedToken.iat);
 
   if (isPasswordChanged) {
     const error = new CustomError(
-      'The password has been changed recently. Please login again.',
+      'Your password has been changed recently. Please login again.',
       401
     );
     return next(error);
@@ -240,6 +240,12 @@ export const login = asyncErrorHandler(async (req, res, next) => {
         runValidators: true,
       }
     ).select('-active -password');
+
+    await Notification.create({
+      user: user._id,
+      action: 'activation',
+      type: ['security'],
+    });
   }
 
   // Sends verification mail
@@ -359,6 +365,13 @@ export const resetPassword = asyncErrorHandler(async (req, res, next) => {
   user.passwordChangedAt = Date.now();
 
   await user.save();
+
+  await Notification.create({
+    user: user._id,
+    action: 'update',
+    type: ['security'],
+    state: { reset: true },
+  });
 
   sendResponse(user, 200, req, res);
 });

@@ -1,28 +1,29 @@
 import Notification from '../Models/notificationModel.js';
 import Task from '../Models/taskModel.js';
+import User from '../Models/userModel.js';
 import asyncErrorHandler from '../Utils/asyncErrorHandler.js';
 import CustomError from '../Utils/CustomError.js';
 
-export const getAllNotifications = asyncErrorHandler(async (req, res, next) => {
-  const notifications = await Notification.find();
-
-  res.status(200).json({
-    status: 'success',
-    length: notifications.length,
-    data: {
-      notifications,
-    },
-  });
-});
-
-export const createNewNotification = asyncErrorHandler(
+export const getUserNotifications = asyncErrorHandler(
   async (req, res, next) => {
-    const notification = await Notification.create(req.body);
+    const user = await User.findById(req.params.id);
 
-    res.status(200).json({
+    if (!user) {
+      return next(new CustomError('This user does not exist.', 404));
+    } else if (String(req.user._id) !== String(req.params.id)) {
+      return next(new CustomError('This user does not exist.', 404));
+    }
+
+    const notifications = await Notification.find({
+      user: user._id,
+      task: { $exists: false },
+      $or: [{ project: { $exists: false } }, { projectActivity: true }],
+    }).sort('-time _id');
+
+    return res.status(200).json({
       status: 'success',
       data: {
-        notification,
+        notifications,
       },
     });
   }

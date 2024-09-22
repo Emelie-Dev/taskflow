@@ -25,6 +25,7 @@ const notificationSchema = new mongoose.Schema({
       'response',
       'task', // For private notification on task assignment
       'filePermission',
+      'activation',
     ],
     // required: [true, 'Please provide a value for the action field.'],
   },
@@ -48,6 +49,7 @@ const notificationSchema = new mongoose.Schema({
         'files',
         'addFiles',
         'account',
+        'security',
       ],
       // required: [true, 'Please provide a value for the type field.'],
     },
@@ -68,6 +70,7 @@ const notificationSchema = new mongoose.Schema({
     default: Date.now,
     immutable: true,
   },
+  projectActivity: Boolean,
   group: String,
   private: String,
   phone: String,

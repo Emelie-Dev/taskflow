@@ -232,14 +232,12 @@ userSchema.pre(/^find/, async function (next) {
 
   if (this.getFilter().login) {
     delete this.getFilter().login;
-    this.find().select('-passwordChangedAt');
+    this.find();
   } else if (this.getFilter().emailVerificationToken) {
-    this.find({ active: { $ne: false } }).select(
-      '-emailVerified -active -passwordChangedAt'
-    );
+    this.find({ active: { $ne: false } }).select('-emailVerified -active');
   } else {
     this.find({ active: { $ne: false }, emailVerified: { $ne: false } }).select(
-      '-emailVerified -active -passwordChangedAt'
+      '-emailVerified -active'
     );
   }
 
@@ -287,7 +285,6 @@ userSchema.methods.isPasswordChanged = function (JWTTimestamp) {
       this.passwordChangedAt.getTime() / 1000,
       10
     );
-
     return JWTTimestamp < passwordChangedTimestamp;
   }
 

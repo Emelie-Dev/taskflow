@@ -391,6 +391,8 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
+  const owner = await User.findById(project.user);
+
   // Validate request header
   if (!req.headers['x-file-names']) {
     return next(new CustomError('Invalid request!', 400));
@@ -547,10 +549,17 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
         firstName: req.user.firstName,
         lastName: req.user.lastName,
         filesLength: req.files.length,
+        project: project.name,
       },
       project: project._id,
       action: 'addition',
       type: ['files'],
+      projectActivity:
+        String(project.user) !== String(req.user._id)
+          ? owner.notificationSettings.projectActivity
+            ? true
+            : undefined
+          : undefined,
     });
 
     project = await getAndPopulateProject(req.params.id);
@@ -573,6 +582,8 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
     const err = new CustomError(`This project does not exist!`, 404);
     return next(err);
   }
+
+  const owner = await User.findById(project.user);
 
   // Check is the files from the request body is an array
   if (!Array.isArray(req.body.files)) {
@@ -712,10 +723,17 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
         firstName: req.user.firstName,
         lastName: req.user.lastName,
         filesLength: otherFiles,
+        project: project.name,
       },
       project: project._id,
       action: 'deletion',
       type: ['files'],
+      projectActivity:
+        String(project.user) !== String(req.user._id)
+          ? owner.notificationSettings.projectActivity
+            ? true
+            : undefined
+          : undefined,
     });
   }
 
@@ -786,18 +804,19 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
       const oldNotification = await Notification.findOne({
         user: member,
         action: 'invitation',
-        'performer.project': project._id,
+        'performer.projectId': project._id,
       });
 
       if (!oldNotification) {
         notifications.push({
           user: member,
           performer: {
-            name: req.user.username,
             owner: req.user._id,
+            username: req.user.username,
             firstName: req.user.firstName,
             lastName: req.user.lastName,
-            project: project._id,
+            projectId: project._id,
+            project: project.name,
           },
           action: 'invitation',
           type: ['team'],
@@ -821,11 +840,11 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
       notifications.push({
         user: member,
         performer: {
-          owner: req.user._id,
-          name: req.user.username,
+          username: req.user.username,
           firstName: req.user.firstName,
           lastName: req.user.lastName,
-          project: project._id,
+          projectId: project._id,
+          project: project.name,
         },
         action: 'removal',
         type: ['team'],
@@ -961,6 +980,13 @@ export const deleteProject = asyncErrorHandler(async (req, res, next) => {
       user: member,
       action: 'deletion',
       type: ['project'],
+      performer: {
+        id: req.user._id,
+        username: req.user.username,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        project: project.name,
+      },
     });
   });
 
@@ -987,7 +1013,7 @@ export const respondToInvitation = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Checks if project exists
-  const project = await Project.findById(notification.performer.project);
+  const project = await Project.findById(notification.performer.projectId);
 
   if (!project) {
     const err = new CustomError('This project does not exist!', 404);
@@ -1017,6 +1043,13 @@ export const respondToInvitation = asyncErrorHandler(async (req, res, next) => {
         action: 'response',
         type: ['team'],
         state: { response },
+        performer: {
+          projectId: notification.performer.projectId,
+          project: notification.performer.project,
+          username: req.user.username,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+        },
       },
       {
         user: notification.performer.owner,
@@ -1035,10 +1068,17 @@ export const respondToInvitation = asyncErrorHandler(async (req, res, next) => {
 
     // Creates notification for the project owner
     await Notification.create({
-      user: notification.performer.id,
+      user: notification.performer.owner,
       action: 'response',
       type: ['team'],
       state: { response },
+      performer: {
+        projectId: notification.performer.projectId,
+        project: notification.performer.project,
+        username: req.user.username,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+      },
     });
   } else {
     return next(new CustomError('Please provide a valid response!', 400));

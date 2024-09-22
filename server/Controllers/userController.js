@@ -138,6 +138,13 @@ const updateSecuritySettings = async (user, body) => {
       user.password = body.password.newPassword;
       user.passwordChangedAt = Date.now();
       await user.save();
+
+      await Notification.create({
+        user: user._id,
+        action: 'update',
+        type: ['security'],
+        state: { change: true },
+      });
     }
   }
 
@@ -473,6 +480,8 @@ export const deleteUser = asyncErrorHandler(async (req, res, next) => {
 
   // Send notifications to project owners if user is in their team
   for await (const project of Project.find({ team: String(user._id) })) {
+    const owner = await User.findById(project.user);
+
     notifications.push({
       user: project.user,
       project: project._id,
@@ -482,7 +491,11 @@ export const deleteUser = asyncErrorHandler(async (req, res, next) => {
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
+        project: project.name,
       },
+      projectActivity: owner.notificationSettings.projectActivity
+        ? true
+        : undefined,
     });
 
     await Project.findByIdAndUpdate(project._id, {

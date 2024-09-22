@@ -704,8 +704,13 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
         user: assignee,
         action: 'task',
         performer: {
+          projectId: project._id,
           project: project.name,
+          username: req.user.username,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
         },
+        type: ['assignedTask'],
       });
     }
   }
@@ -745,6 +750,19 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
 
       oldAssignees.push(assignee);
       oldAssigneesData.push(userData);
+
+      assignmentNotifications.push({
+        user: assignee,
+        action: 'task',
+        performer: {
+          projectId: project._id,
+          project: project.name,
+          username: req.user.username,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+        },
+        type: ['assignee'],
+      });
 
       await Task.deleteOne({
         mainTask: task._id,

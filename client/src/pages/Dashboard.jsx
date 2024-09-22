@@ -1,20 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import styles from '../styles/Dashboard.module.css';
-import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
-import { Link } from 'react-router-dom';
-
-import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
-import { IoIosNotifications } from 'react-icons/io';
-
 import { HiPlus } from 'react-icons/hi';
 import { HiMiniArrowTrendingUp } from 'react-icons/hi2';
 import { ImBrightnessContrast } from 'react-icons/im';
 import { Line } from 'react-chartjs-2';
-
-import { FaRegCircleUser } from 'react-icons/fa6';
-import { MdOutlineDashboard } from 'react-icons/md';
-import { FaTasks, FaCalendarAlt } from 'react-icons/fa';
-import { GoProjectTemplate } from 'react-icons/go';
 import Calendar from '../components/Calendar';
 import { MdOutlineSignalWifiOff } from 'react-icons/md';
 
@@ -33,6 +22,7 @@ import { apiClient, AuthContext } from '../App';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
 import Header from '../components/Header';
+import NavBar from '../components/NavBar';
 
 ChartJS.register(
   CategoryScale,
@@ -91,12 +81,8 @@ const Dashboard = () => {
     error: false,
   });
   const [reloadProject, setReloadProject] = useState(Symbol('false'));
-  const searchRef = useRef();
   const calenderRef = useRef();
-  const navRef = useRef();
   const taskBoxRef = useRef();
-  const userBoxRef = useRef();
-  const imgRef = useRef();
 
   // For user stats
   useEffect(() => {
@@ -302,12 +288,6 @@ const Dashboard = () => {
     });
   };
 
-  const hideNav = (e) => {
-    if (e.target === navRef.current) {
-      setShowNav(false);
-    }
-  };
-
   const timeOfTheDay = () => {
     const hour = new Date().getHours();
 
@@ -385,146 +365,7 @@ const Dashboard = () => {
     <main className={styles.div}>
       <ToastContainer autoClose={2000} />
 
-      <nav
-        ref={navRef}
-        className={`${styles['responsive-nav']} ${
-          showNav ? styles['show-nav'] : ''
-        }`}
-        onClick={hideNav}
-      >
-        <section className={styles['responsive-section']}>
-          <div className={styles['responsive-head']}>
-            <span className={styles['icon-box']}>
-              <Link to={'/'}>
-                <SiKashflow className={styles.icon} />
-              </Link>
-            </span>
-
-            <span className={styles['head-text']}>TaskFlow</span>
-          </div>
-          <ul className={styles['responsive-side-nav']}>
-            <li className={`${styles['side-nav-item']} ${styles.dashboard}`}>
-              <Link
-                to={'/dashboard'}
-                className={`${styles['side-nav-link']}  ${styles['dashboard-link']}`}
-              >
-                <MdOutlineDashboard
-                  className={`${styles['side-nav-icon']}  ${styles['dashboard-icon']}`}
-                />{' '}
-                Dashboard
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/projects'} className={styles['side-nav-link']}>
-                <GoProjectTemplate className={styles['side-nav-icon']} />{' '}
-                Projects
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/tasks'} className={styles['side-nav-link']}>
-                <FaTasks className={styles['side-nav-icon']} /> Tasks
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/calendar'} className={styles['side-nav-link']}>
-                <FaCalendarAlt className={styles['side-nav-icon']} /> Calendar
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/chats'} className={styles['side-nav-link']}>
-                <IoChatbubblesSharp className={styles['side-nav-icon']} /> Chats
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/analytics'} className={styles['side-nav-link']}>
-                <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
-                Analytics
-              </Link>
-            </li>
-            <li
-              className={`${styles['side-nav-item']} ${styles.notifications}`}
-            >
-              <Link to={'/notifications'} className={styles['side-nav-link']}>
-                <IoIosNotifications className={styles['side-nav-icon']} />{' '}
-                Notifications
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/profile'} className={styles['side-nav-link']}>
-                <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/settings'} className={styles['side-nav-link']}>
-                <IoSettingsOutline className={styles['side-nav-icon']} />{' '}
-                Settings
-              </Link>
-            </li>
-          </ul>
-        </section>
-      </nav>
-
-      <nav className={styles.nav}>
-        {' '}
-        <div className={styles.head}>
-          <span className={styles['icon-box']}>
-            <Link to={'/'}>
-              <SiKashflow className={styles.icon} />
-            </Link>
-          </span>
-
-          <span className={styles['head-text']}>TaskFlow</span>
-        </div>
-        <ul className={styles['side-nav']}>
-          <li className={`${styles['side-nav-item']} ${styles.dashboard}`}>
-            <Link
-              to={'/dashboard'}
-              className={`${styles['side-nav-link']}  ${styles['dashboard-link']}`}
-            >
-              <MdOutlineDashboard
-                className={`${styles['side-nav-icon']} ${styles['dashboard-icon']}`}
-              />{' '}
-              Dashboard
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/projects'} className={styles['side-nav-link']}>
-              <GoProjectTemplate className={styles['side-nav-icon']} /> Projects
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/tasks'} className={styles['side-nav-link']}>
-              <FaTasks className={styles['side-nav-icon']} /> Tasks
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/calendar'} className={styles['side-nav-link']}>
-              <FaCalendarAlt className={styles['side-nav-icon']} /> Calendar
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/chats'} className={styles['side-nav-link']}>
-              <IoChatbubblesSharp className={styles['side-nav-icon']} /> Chats
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/analytics'} className={styles['side-nav-link']}>
-              <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
-              Analytics
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/profile'} className={styles['side-nav-link']}>
-              <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/settings'} className={styles['side-nav-link']}>
-              <IoSettingsOutline className={styles['side-nav-icon']} /> Settings
-            </Link>
-          </li>
-        </ul>
-      </nav>
+      <NavBar page={'Dashboard'} showNav={showNav} setShowNav={setShowNav} />
 
       {addTask && (
         <NewTask

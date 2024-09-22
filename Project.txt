@@ -43,6 +43,7 @@
     - Send email for activation and deactivation and deletion of accounts
     - Handle all request handlers for deactivated members
     - Handle project deadline update
+    - Enable users to leave project teams on purpose
 
 
  -- Data Design

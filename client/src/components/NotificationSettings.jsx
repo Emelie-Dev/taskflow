@@ -114,8 +114,8 @@ const NotificationSettings = () => {
           <span className={styles['item-details']}>
             <span className={styles['item-head']}>Project Activity</span>
             <span className={styles['item-text']}>
-              Enable you to receive notifications about actions concerning
-              projects.
+              Enable you to receive notifications about actions from team
+              members concerning projects.
             </span>
           </span>
           <input
