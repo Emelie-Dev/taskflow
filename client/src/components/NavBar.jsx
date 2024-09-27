@@ -61,18 +61,18 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
 
             <li
               className={`${styles['side-nav-item']} ${
-                page === 'Projects' ? styles.page : ''
+                page.startsWith('Project') ? styles.page : ''
               }`}
             >
               <Link
                 to={'/projects'}
                 className={`${styles['side-nav-link']} ${
-                  page === 'Projects' ? styles['page-link'] : ''
+                  page.startsWith('Project') ? styles['page-link'] : ''
                 }`}
               >
                 <GoProjectSymlink
                   className={`${styles['side-nav-icon']} ${
-                    page === 'Projects' ? styles['page-icon'] : ''
+                    page.startsWith('Project') ? styles['page-icon'] : ''
                   }`}
                 />
                 Projects
@@ -261,18 +261,18 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
 
           <li
             className={`${styles['side-nav-item']} ${
-              page === 'Projects' ? styles.page : ''
+              page.startsWith('Project') ? styles.page : ''
             }`}
           >
             <Link
               to={'/projects'}
               className={`${styles['side-nav-link']} ${
-                page === 'Projects' ? styles['page-link'] : ''
+                page.startsWith('Project') ? styles['page-link'] : ''
               }`}
             >
               <GoProjectSymlink
                 className={`${styles['side-nav-icon']} ${
-                  page === 'Projects' ? styles['page-icon'] : ''
+                  page.startsWith('Project') ? styles['page-icon'] : ''
                 }`}
               />{' '}
               Projects

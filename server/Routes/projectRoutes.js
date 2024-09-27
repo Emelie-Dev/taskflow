@@ -13,6 +13,7 @@ import {
   deleteProjectFiles,
   getProjectActivities,
   deleteProjectActivities,
+  exitProject,
 } from '../Controllers/projectController.js';
 import { protectRoute } from '../Controllers/authController.js';
 import taskRouter from './taskRoutes.js';
@@ -35,7 +36,7 @@ router.route('/:id').get(getProject).patch(updateProject).delete(deleteProject);
 
 router.route('/:id/files').post(uploadProjectFiles).patch(deleteProjectFiles);
 
-router.patch('/:id/team', updateTeam);
+router.route('/:id/team').patch(updateTeam).delete(exitProject);
 
 router.patch('/:invitationId/reply-invitation', respondToInvitation);
 

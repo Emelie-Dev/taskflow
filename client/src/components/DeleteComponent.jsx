@@ -17,6 +17,9 @@ const DeleteComponent = ({
   setTasks,
   projectsPage,
   setProjects,
+  setDeleteMode,
+  setGroups,
+  setDeleteLength,
 }) => {
   const [isNameValid, setIsNameValid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -121,7 +124,7 @@ const DeleteComponent = ({
       setIsProcessing(false);
 
       if (!err.response || !err.response.data || err.response.status === 500) {
-        return toast('An error occured while deleting project.', {
+        return toast('An error occurred while deleting project.', {
           toastId: 'toast-id1',
         });
       } else {
@@ -155,7 +158,7 @@ const DeleteComponent = ({
       setIsProcessing(false);
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast(
-          `An error occured while deleting ${
+          `An error occurred while deleting ${
             typeData.files.length === 1 ? 'file' : 'files'
           }.`,
           {
@@ -189,7 +192,7 @@ const DeleteComponent = ({
       setIsProcessing(false);
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast(
-          `An error occured while deleting ${
+          `An error occurred while deleting ${
             typeData.activities.length !== 1 ? 'activities' : 'activity'
           }.`,
           {
@@ -227,7 +230,7 @@ const DeleteComponent = ({
     } catch (err) {
       setIsProcessing(false);
       if (!err.response || !err.response.data || err.response.status === 500) {
-        return toast('An error occured while deleting task.', {
+        return toast('An error occurred while deleting task.', {
           toastId: 'toast-id4',
           autoClose: 2000,
         });
@@ -253,7 +256,7 @@ const DeleteComponent = ({
     } catch (err) {
       setIsProcessing(false);
       if (!err.response || !err.response.data || err.response.status === 500) {
-        return toast('An error occured while deactivating account.', {
+        return toast('An error occurred while deactivating account.', {
           toastId: 'toast-id5',
           autoClose: 2000,
         });
@@ -287,7 +290,7 @@ const DeleteComponent = ({
       else setIsProcessing(false);
 
       if (!err.response || !err.response.data || err.response.status === 500) {
-        return toast('An error occured while sending verification code.', {
+        return toast('An error occurred while sending verification code.', {
           toastId: 'toast-id6',
           autoClose: 2000,
         });
@@ -312,13 +315,94 @@ const DeleteComponent = ({
       setIsProcessing(false);
 
       if (!err.response || !err.response.data || err.response.status === 500) {
-        return toast('An error occured while deleting account.', {
+        return toast('An error occurred while deleting account.', {
           toastId: 'toast-id7',
           autoClose: 2000,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id7',
+          autoClose: 2000,
+        });
+      }
+    }
+  };
+
+  const exitProject = async () => {
+    setIsProcessing(true);
+
+    try {
+      await apiClient.delete(`/api/v1/projects/${typeData.id}/team`);
+      setIsProcessing(false);
+
+      navigate('/projects');
+    } catch (err) {
+      setIsProcessing(false);
+
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occurred while exiting the project.', {
+          toastId: 'toast-id8',
+          autoClose: 2000,
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id8',
+          autoClose: 2000,
+        });
+      }
+    }
+  };
+
+  const deleteUserNotifications = async () => {
+    setIsProcessing(true);
+
+    const notifications = Array.from(
+      Object.entries(typeData.deleteList).reduce(
+        (accumulator, [key, value]) => {
+          value.forEach((id) => accumulator.add(id));
+          return accumulator;
+        },
+        new Set()
+      )
+    );
+
+    try {
+      await apiClient.patch(`/api/v1/notifications`, { notifications });
+      setDeleteCount((prevCount) => prevCount + typeData.deleteLength);
+      setGroups((groups) => {
+        const newGroups = { ...groups };
+        for (const prop in newGroups) {
+          if (typeData.deleteList[prop]) {
+            newGroups[prop] = newGroups[prop].filter(
+              (elem) => !typeData.deleteList[prop].includes(elem._id)
+            );
+
+            if (newGroups[prop].length === 0) delete newGroups[prop];
+          }
+        }
+
+        return newGroups;
+      });
+      setDeleteLength(0);
+      setIsProcessing(false);
+      setDeleteModal({ value: false, type: null });
+      setDeleteMode({ value: false, all: null });
+    } catch (err) {
+      setIsProcessing(false);
+
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast(
+          `An error occurred while deleting the ${
+            typeData.deleteLength === 1 ? 'notification' : 'notifications'
+          }.`,
+          {
+            toastId: 'toast-id9',
+            autoClose: 2000,
+          }
+        );
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id9',
           autoClose: 2000,
         });
       }
@@ -337,7 +421,15 @@ const DeleteComponent = ({
 
         <h1 className={styles['modal-head']}>
           {' '}
-          {type === 'deactivate' ? 'Deactivate Account' : `Delete ${type}`}{' '}
+          {type === 'deactivate'
+            ? 'Deactivate Account'
+            : type === 'Team'
+            ? 'Exit Project'
+            : type === 'Notifications'
+            ? typeData.deleteLength === 1
+              ? 'Delete Notification'
+              : 'Delete Notifications'
+            : `Delete ${type}`}{' '}
         </h1>
 
         <div className={styles['delete-content']}>
@@ -501,6 +593,30 @@ const DeleteComponent = ({
                 </>
               )}
             </div>
+          ) : type === 'Team' ? (
+            <div className={styles['deactivate-content']}>
+              <span className={styles['deactivate-header']}>
+                If you exit this project:
+              </span>
+
+              <ul className={styles['deactivate-list']}>
+                <li className={styles['deactivate-item']}>
+                  You will be removed from all tasks you were assigned under
+                  this project.
+                </li>
+                <li className={styles['deactivate-item']}>
+                  You will no longer have access to this project or its content.
+                </li>
+              </ul>
+            </div>
+          ) : type === 'Notifications' ? (
+            <>
+              Are you sure you want to delete
+              {typeData.deleteLength !== 1
+                ? ' these notifications'
+                : ' this notification'}
+              ?
+            </>
           ) : (
             ''
           )}
@@ -568,6 +684,10 @@ const DeleteComponent = ({
                 ? tokenMode
                   ? deleteAccount
                   : getDeleteToken()
+                : type === 'Team'
+                ? exitProject
+                : type === 'Notifications'
+                ? deleteUserNotifications
                 : null
             }
           >
@@ -576,7 +696,7 @@ const DeleteComponent = ({
                 <SiKashflow className={styles['deleting-icon']} />
                 {type === 'deactivate'
                   ? 'Deactivating....'
-                  : type === 'Account' && !tokenMode
+                  : (type === 'Account' && !tokenMode) || type === 'Team'
                   ? 'Processing....'
                   : 'Deleting....'}
               </>
@@ -586,6 +706,8 @@ const DeleteComponent = ({
                   ? 'Deactivate'
                   : type === 'Account' && !tokenMode
                   ? 'Continue'
+                  : type === 'Team'
+                  ? 'Exit'
                   : 'Delete'
               }`
             )}

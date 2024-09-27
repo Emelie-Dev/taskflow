@@ -32,7 +32,8 @@
 }
 
 .article-container {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
 }
 
 .article {
@@ -98,6 +99,9 @@
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .decline-btn {
@@ -113,6 +117,9 @@
   cursor: pointer;
   transition: opacity 0.3s;
   margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .accept-btn:hover,
@@ -128,69 +135,6 @@
   font-size: 0.9rem;
 }
 
-.menu-box {
-  margin-left: auto;
-  position: relative;
-  padding: 0;
-  display: none;
-}
-
-.menu-icon {
-  width: 1.2rem;
-  height: 1.2rem;
-  cursor: pointer;
-}
-
-.action-list {
-  position: absolute;
-  background: white;
-  box-shadow: 1px 1px 6px -3px black;
-  border-radius: 5px;
-  list-style-type: none;
-  right: -10%;
-  top: 80%;
-  display: none;
-  z-index: 2;
-}
-
-.menu-box:hover .action-list {
-  display: block;
-}
-
-.action-item {
-  padding: 0.5rem 1.5rem;
-  padding-left: 1rem;
-  font-family: var(--general-font);
-  font-size: 0.9rem;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.view-link {
-  display: flex;
-  padding: 0.5rem 1.5rem;
-  padding-left: 1rem;
-  font-family: var(--general-font);
-  font-size: 0.9rem;
-  cursor: pointer;
-  font-weight: 500;
-  color: black;
-  text-decoration: none;
-}
-
-.view-link {
-  border-radius: 5px 5px 0 0;
-}
-
-.action-item {
-  border-radius: 0 0 5px 5px;
-}
-
-.action-item:hover,
-.view-link:hover {
-  background: rgba(128, 128, 128, 0.185);
-}
-
 .select-box {
   margin-left: auto;
   display: none;
@@ -201,10 +145,15 @@
   width: 1.05rem;
   height: 1.05rem;
   cursor: pointer;
+  outline: none;
 }
 
 .article:hover .menu-box,
 .article:hover .select-box {
+  display: block;
+}
+
+.show-select-box {
   display: block;
 }
 
@@ -233,10 +182,139 @@
   height: 1.4rem;
   margin-right: 0.7rem;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
-.slide-up {
-  animation: slideDown 0.3s ease-in-out 0s 1 alternate both;
+.notifications-loader-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.loader-margin {
+  margin: 6rem 0;
+}
+
+.no-notifications-text {
+  font-family: var(--general-font);
+  color: gray;
+  font-size: 1.15rem;
+  margin: 6rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.network-icon {
+  margin-right: 0.7rem;
+  transform: translateY(2px);
+}
+
+.container-checkbox {
+  accent-color: orange;
+  width: 1.05rem;
+  height: 1.05rem;
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: 1rem;
+  outline: none;
+}
+
+.select-container {
+  position: fixed;
+  z-index: 4;
+  background: white;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.404);
+  border-left: 1px solid rgba(128, 128, 128, 0.404);
+  padding: 1.1rem 2rem;
+  width: 83%;
+  margin-left: 17%;
+  display: flex;
+  align-items: center;
+}
+
+.cancel-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 50%;
+  color: rgba(0, 0, 0, 0.8);
+  transition: background 0.3s, color 0.25s;
+}
+
+.cancel-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.cancel-box:hover {
+  background: orange;
+  color: white;
+}
+
+.select-length-txt {
+  margin-left: 1.5rem;
+  color: black;
+  font-family: var(--general-font);
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.delete-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.delete-notification-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-notification-btn {
+  outline: none;
+  border: 1px solid orange;
+  border-radius: 100px;
+  color: orange;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  background: white;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.delete-notification-btn:hover {
+  background: rgba(227, 227, 227, 0.2);
+}
+
+.select-all-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 3rem;
+  cursor: pointer;
+}
+
+.select-all-icon2 {
+  fill: orange;
+}
+
+.disable-delete-btn {
+  opacity: 0.6 !important;
+  pointer-events: none;
+}
+
+.deleting-icon {
+  margin-right: 0.5rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  animation: rotate 1s linear 0s infinite normal both;
 }
 
 /* Animations */
@@ -250,12 +328,13 @@
   }
 }
 
-@keyframes slideDown {
+@keyframes rotate {
   from {
-    height: 500px;
+    transform: rotate(0deg);
   }
+
   to {
-    height: 0;
+    transform: rotate(360deg);
   }
 }
 
@@ -280,7 +359,8 @@
     display: none;
   }
 
-  .section {
+  .section,
+  .select-container {
     width: 100%;
     margin-left: 0;
   }

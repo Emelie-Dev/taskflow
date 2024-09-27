@@ -44,6 +44,7 @@
     - Handle all request handlers for deactivated members
     - Handle project deadline update
     - Enable users to leave project teams on purpose
+    - Add error boundary o protected route page
 
 
  -- Data Design

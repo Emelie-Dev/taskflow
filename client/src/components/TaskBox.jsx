@@ -273,28 +273,38 @@ const TaskBox = ({
     // A deadline is changed ✔
 
     if (activity.action === 'assignment') {
-      const newNames = activity.state.assignee.newAssigneesData.map(
-        ({ _id, firstName, lastName, username }, index, array) => (
-          <a key={index} href="#" className={styles['activity-names']}>
-            {index !== 0 ? ' ' : ''}
-            {_id === userData._id
-              ? 'You'
-              : generateName(firstName, lastName, username)}
-            {index !== array.length - 1 ? ',' : ''}
-          </a>
-        )
-      );
+      const newNames = activity.state.assignee.newAssigneesData[0]
+        ? activity.state.assignee.newAssigneesData.map(
+            ({ _id, firstName, lastName, username }, index, array) => (
+              <a key={index} href="#" className={styles['activity-names']}>
+                {index !== 0 ? ' ' : ''}
+                {_id === userData._id
+                  ? 'You'
+                  : generateName(firstName, lastName, username)}
+                {index !== array.length - 1 ? ',' : ''}
+              </a>
+            )
+          )
+        : [];
 
       // Update activities message
-      const oldNames = activity.state.assignee.oldAssigneesData.map(
-        ({ firstName, lastName, username }, index, array) => (
-          <a key={index} href="#" className={styles['activity-names']}>
-            {index !== 0 ? ' ' : ''}
-            {generateName(firstName, lastName, username)}
-            {index !== array.length - 1 ? ',' : ''}
-          </a>
-        )
-      );
+      const oldNames = activity.state.assignee.oldAssigneesData[0]
+        ? activity.state.assignee.oldAssigneesData.map(
+            ({ firstName, lastName, username }, index, array) => (
+              <a key={index} href="#" className={styles['activity-names']}>
+                {index !== 0 ? ' ' : ''}
+                {generateName(firstName, lastName, username)}
+                {index !== array.length - 1 ? ',' : ''}
+              </a>
+            )
+          )
+        : [];
+
+      if (!activity.state.assignee.oldAssigneesData[0])
+        activity.state.assignee.oldAssigneesData.length = 0;
+
+      if (!activity.state.assignee.newAssigneesData[0])
+        activity.state.assignee.newAssigneesData.length = 0;
 
       if (activity.state.assignee.oldAssigneesData.length === 0) {
         return (
@@ -536,6 +546,22 @@ const TaskBox = ({
           </span>{' '}
           was no longer available and was subsequently removed from the
           assignees.
+        </>
+      );
+    } else if (
+      activity.action === 'exit' &&
+      activity.type.includes('project')
+    ) {
+      return (
+        <>
+          <span className={styles['deleted-users']}>
+            {generateName(
+              activity.performer.firstName,
+              activity.performer.lastName,
+              activity.performer.username
+            )}
+          </span>{' '}
+          left the project and was subsequently removed from the assignees.
         </>
       );
     }

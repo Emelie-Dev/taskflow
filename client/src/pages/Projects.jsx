@@ -286,7 +286,6 @@ const Projects = () => {
 
         {displayModal && (
           <Project
-            toast={toast}
             setDisplayModal={setDisplayModal}
             projects={projects}
             setProjects={setProjects}

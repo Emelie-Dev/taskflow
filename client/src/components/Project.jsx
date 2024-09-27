@@ -4,9 +4,9 @@ import { IoCloseSharp } from 'react-icons/io5';
 import { apiClient } from '../App';
 import { generateName } from '../pages/Dashboard';
 import { SiKashflow } from 'react-icons/si';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Project = ({
-  toast,
   setDisplayModal,
   editProject,
   projectData,
@@ -248,6 +248,8 @@ const Project = ({
 
   return (
     <section className={styles.section} onClick={hideDisplayModal}>
+      <ToastContainer autoClose={2000} />
+
       <div className={styles['modal-container']}>
         <span
           className={styles['close-modal']}

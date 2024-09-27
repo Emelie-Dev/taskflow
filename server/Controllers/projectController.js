@@ -932,6 +932,89 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+export const exitProject = asyncErrorHandler(async (req, res, next) => {
+  const project = await Project.findById(req.params.id);
+  const notifications = [];
+
+  // Checks if project exist
+  if (!project) {
+    return next(new CustomError('This project does not exist!', 404));
+  }
+
+  if (String(project.user) === String(req.user._id)) {
+    return next(
+      new CustomError(
+        `You can't exit a project you created. You can delete the project if you want.`,
+        403
+      )
+    );
+  }
+
+  const { team } = project;
+
+  const projectTeam = team.map((member) => String(member));
+
+  if (!projectTeam.includes(String(req.user._id))) {
+    return next(new CustomError('This project does not exist!', 404));
+  }
+
+  const owner = await User.findById(project.user);
+
+  // Deletes all tasks assigned to the user under the project
+  for await (const task of Task.find({
+    user: req.user._id,
+    project: project._id,
+    assigned: true,
+  })) {
+    notifications.push({
+      user: task.leader,
+      task: task.mainTask,
+      action: 'exit',
+      type: ['project'],
+      performer: {
+        username: req.user.username,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        userId: req.user._id,
+      },
+    });
+
+    await Task.findByIdAndUpdate(task.mainTask, {
+      $pull: { assignee: String(req.user._id) },
+    });
+
+    await Task.findByIdAndDelete(task._id);
+  }
+
+  // Removes the user from the project team
+  await Project.findByIdAndUpdate(project._id, {
+    $pull: { team: String(req.user._id) },
+  });
+
+  notifications.push({
+    user: project.user,
+    project: project._id,
+    action: 'exit',
+    type: ['project'],
+    performer: {
+      username: req.user.username,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      project: project.name,
+    },
+    projectActivity: owner.notificationSettings.projectActivity
+      ? true
+      : undefined,
+  });
+
+  await Notification.insertMany(notifications);
+
+  return res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
+
 export const deleteProject = asyncErrorHandler(async (req, res, next) => {
   const project = await Project.findOneAndDelete({
     _id: req.params.id,

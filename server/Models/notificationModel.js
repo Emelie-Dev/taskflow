@@ -26,6 +26,7 @@ const notificationSchema = new mongoose.Schema({
       'task', // For private notification on task assignment
       'filePermission',
       'activation',
+      'exit',
     ],
     // required: [true, 'Please provide a value for the action field.'],
   },

@@ -41,6 +41,8 @@ import { BiSolidSelectMultiple } from 'react-icons/bi';
 import { AuthContext } from '../App';
 import { VscIssueReopened } from 'react-icons/vsc';
 import { FiDownload } from 'react-icons/fi';
+import Header from '../components/Header';
+import NavBar from '../components/NavBar';
 
 const ProjectItem = () => {
   const { userData } = useContext(AuthContext);
@@ -800,6 +802,22 @@ const ProjectItem = () => {
       }
     } else if (activity.action === 'creation') {
       return 'A task was created';
+    } else if (
+      activity.action === 'exit' &&
+      activity.type.includes('project')
+    ) {
+      return (
+        <>
+          <span className={styles['deleted-users']}>
+            {generateName(
+              activity.performer.firstName,
+              activity.performer.lastName,
+              activity.performer.username
+            )}
+          </span>{' '}
+          left the project.
+        </>
+      );
     }
   };
 
@@ -928,192 +946,15 @@ const ProjectItem = () => {
 
   return (
     <main className={styles.div}>
-      <nav
-        ref={navRef}
-        className={`${styles['responsive-nav']} ${
-          showNav ? styles['show-nav'] : ''
-        }`}
-        onClick={hideNav}
-      >
-        <section className={styles['responsive-section']}>
-          <div className={styles['responsive-head']}>
-            <span className={styles['icon-box']}>
-              <Link to={'/'}>
-                <SiKashflow className={styles.icon} />
-              </Link>
-            </span>
-
-            <span className={styles['head-text']}>TaskFlow</span>
-          </div>
-          <ul className={styles['responsive-side-nav']}>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/dashboard'} className={styles['side-nav-link']}>
-                <MdOutlineDashboard className={styles['side-nav-icon']} />{' '}
-                Dashboard
-              </Link>
-            </li>
-            <li className={`${styles['side-nav-item']} ${styles.projects}`}>
-              <Link
-                to={'/projects'}
-                className={`${styles['side-nav-link']} ${styles['projects-link']}`}
-              >
-                <GoProjectTemplate
-                  className={`${styles['side-nav-icon']}  ${styles['projects-icon']}`}
-                />{' '}
-                Projects
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/tasks'} className={styles['side-nav-link']}>
-                <FaTasks className={styles['side-nav-icon']} /> Tasks
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/calendar'} className={styles['side-nav-link']}>
-                <FaCalendarAlt className={styles['side-nav-icon']} /> Calendar
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/chats'} className={styles['side-nav-link']}>
-                <IoChatbubblesSharp className={styles['side-nav-icon']} /> Chats
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/analytics'} className={styles['side-nav-link']}>
-                <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
-                Analytics
-              </Link>
-            </li>
-            <li
-              className={`${styles['side-nav-item']} ${styles.notifications}`}
-            >
-              <Link to={'/notifications'} className={styles['side-nav-link']}>
-                <IoIosNotifications className={styles['side-nav-icon']} />{' '}
-                Notifications
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/profile'} className={styles['side-nav-link']}>
-                <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
-              </Link>
-            </li>
-            <li className={styles['side-nav-item']}>
-              <Link to={'/settings'} className={styles['side-nav-link']}>
-                <IoSettingsOutline className={styles['side-nav-icon']} />{' '}
-                Settings
-              </Link>
-            </li>
-          </ul>
-        </section>
-      </nav>
-
-      <nav className={styles.nav}>
-        {' '}
-        <div className={styles.head}>
-          <span className={styles['icon-box']}>
-            <Link to={'/'}>
-              <SiKashflow className={styles.icon} />
-            </Link>
-          </span>
-
-          <span className={styles['head-text']}>TaskFlow</span>
-        </div>
-        <ul className={styles['side-nav']}>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/dashboard'} className={styles['side-nav-link']}>
-              <MdOutlineDashboard className={styles['side-nav-icon']} />{' '}
-              Dashboard
-            </Link>
-          </li>
-          <li className={`${styles['side-nav-item']} ${styles.projects}`}>
-            <Link
-              to={'/projects'}
-              className={`${styles['side-nav-link']} ${styles['projects-link']}`}
-            >
-              <GoProjectTemplate
-                className={`${styles['side-nav-icon']}  ${styles['projects-icon']}`}
-              />{' '}
-              Projects
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/tasks'} className={styles['side-nav-link']}>
-              <FaTasks className={styles['side-nav-icon']} /> Tasks
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/calendar'} className={styles['side-nav-link']}>
-              <FaCalendarAlt className={styles['side-nav-icon']} /> Calendar
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/chats'} className={styles['side-nav-link']}>
-              <IoChatbubblesSharp className={styles['side-nav-icon']} /> Chats
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/analytics'} className={styles['side-nav-link']}>
-              <SiSimpleanalytics className={styles['side-nav-icon']} />{' '}
-              Analytics
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/profile'} className={styles['side-nav-link']}>
-              <FaRegCircleUser className={styles['side-nav-icon']} /> Profile
-            </Link>
-          </li>
-          <li className={styles['side-nav-item']}>
-            <Link to={'/settings'} className={styles['side-nav-link']}>
-              <IoSettingsOutline className={styles['side-nav-icon']} /> Settings
-            </Link>
-          </li>
-        </ul>
-      </nav>
-
       <ToastContainer autoClose={2500} />
 
+      <NavBar page={'Project'} showNav={showNav} setShowNav={setShowNav} />
+
       <section className={styles.section}>
-        <header className={styles.header}>
-          <b className={styles['menu-icon-box']}>
-            <MdOutlineSegment
-              className={styles['menu-icon']}
-              onClick={() => setShowNav(true)}
-            />
-          </b>
-
-          <h1 className={styles['page']}>Project</h1>
-
-          <div className={styles['icon-div']}>
-            <Link className={styles['icon-container']} to={'/notifications'}>
-              <IoIosNotifications className={styles['notification-icon']} />
-            </Link>
-            <span className={styles['icon-container']}>
-              <IoChatbubblesSharp className={styles['chat-icon']} />
-            </span>
-          </div>
-
-          <div className={styles['profile-div']}>
-            <div className={styles['profile-box']}>
-              <span className={styles['profile-name']}>Ofoka Vincent</span>
-              <span className={styles['profile-title']}>Web developer</span>
-            </div>
-
-            <span className={styles['alternate-search-box']}>
-              <FaSearch className={styles['alternate-search-icon']} />
-            </span>
-
-            <figure className={styles['profile-picture-box']}>
-              <img
-                className={styles['profile-picture']}
-                src="../../assets/images/download.jpeg"
-              />
-            </figure>
-          </div>
-        </header>
+        <Header page={'Project'} setShowNav={setShowNav} />
 
         {displayModal && (
           <Project
-            toast={toast}
             setDisplayModal={setDisplayModal}
             editProject={true}
             projectData={projectData}
@@ -1274,7 +1115,7 @@ const ProjectItem = () => {
             <>
               <h1 className={styles['project-name']}>{project.name}</h1>
 
-              {isOwner() && (
+              {isOwner() ? (
                 <div className={styles['edit-btn-div']}>
                   <button
                     className={styles['edit-btn']}
@@ -1291,6 +1132,18 @@ const ProjectItem = () => {
                     }}
                   >
                     Delete Project
+                  </button>
+                </div>
+              ) : (
+                <div className={styles['edit-btn-div']}>
+                  <button
+                    className={styles['delete-btn']}
+                    onClick={() => {
+                      setDeleteModal({ value: true, type: 'Team' });
+                      setDeleteData({ id: project._id });
+                    }}
+                  >
+                    Exit Project
                   </button>
                 </div>
               )}
@@ -2059,7 +1912,9 @@ const ProjectItem = () => {
                                     (activity.action === 'removal' &&
                                       activity.type.includes('team')) ||
                                     (activity.action === 'deletion' &&
-                                      activity.type.includes('account'))) && (
+                                      activity.type.includes('account')) ||
+                                    (activity.action === 'exit' &&
+                                      activity.type.includes('project'))) && (
                                     <span
                                       className={`${styles['activity-type']} ${styles['activity-type2']}`}
                                     >

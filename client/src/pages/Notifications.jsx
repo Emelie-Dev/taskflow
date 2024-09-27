@@ -1,37 +1,16 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import styles from '../styles/Notifications.module.css';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 import { apiClient, AuthContext } from '../App';
 import { ToastContainer, toast } from 'react-toastify';
-import {
-  MdAssignmentTurnedIn,
-  MdPersonAdd,
-  MdPersonAddDisabled,
-  MdSecurity,
-  MdDeleteSweep,
-} from 'react-icons/md';
-import { BsThreeDotsVertical } from 'react-icons/bs';
-import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
-import { months, generateName } from './Dashboard';
-import {
-  GoCheckCircleFill,
-  GoXCircleFill,
-  GoProjectSymlink,
-} from 'react-icons/go';
-import { BsEnvelopeOpenFill } from 'react-icons/bs';
-import { IoPersonRemove } from 'react-icons/io5';
-import { GrProjects } from 'react-icons/gr';
-
-const days = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-];
+import Loader from '../components/Loader';
+import { MdOutlineSignalWifiOff } from 'react-icons/md';
+import NotificationContainer from '../components/NotificationContainer';
+import useDebounce from '../hooks/useDebounce';
+import { IoCloseSharp } from 'react-icons/io5';
+import { BiSolidSelectMultiple } from 'react-icons/bi';
+import DeleteComponent from '../components/DeleteComponent';
 
 const Notifications = () => {
   const { userData, setUserData } = useContext(AuthContext);
@@ -39,23 +18,67 @@ const Notifications = () => {
   const [category, setCategory] = useState('unread');
   const [notifications, setNotifications] = useState(null);
   const [groups, setGroups] = useState(null);
-  const [currentGroup, setCurrentGroup] = useState(null);
+  const [page, setPage] = useState(1);
+  const [notificationData, setNotificationData] = useState({
+    loading: true,
+    lastPage: true,
+    error: false,
+    pageError: false,
+  });
+  const [deleteMode, setDeleteMode] = useState({ value: false, all: null });
+  const [deleteList, setDeleteList] = useState({});
+  const [headerHeight, setHeaderHeight] = useState(null);
+  const [deleteLength, setDeleteLength] = useState(0);
+  const [totalLength, setTotalLength] = useState(0);
+  const [deleteModal, setDeleteModal] = useState({ value: false, type: null });
+  const [deleteCount, setDeleteCount] = useState(0);
+
+  const bodyRef = useRef();
 
   useEffect(() => {
     const getNotifications = async () => {
       try {
+        setNotificationData({
+          loading: true,
+          lastPage: true,
+          error: false,
+          pageError: false,
+        });
+
         const { data } = await apiClient(
-          `/api/v1/notifications/${userData._id}`
+          `/api/v1/notifications/${userData._id}?page=${page}&deleteCount=${deleteCount}`
         );
 
         setNotifications(data.data.notifications);
-      } catch {
+        setNotificationData({
+          loading: false,
+          lastPage: data.data.notifications.length < 100,
+          error: false,
+          pageError: false,
+        });
+      } catch (err) {
+        if (page === 1) {
+          setNotificationData({
+            loading: false,
+            lastPage: true,
+            error: true,
+            pageError: false,
+          });
+        } else {
+          setNotificationData({
+            loading: false,
+            lastPage: false,
+            error: false,
+            pageError: true,
+          });
+        }
+
         if (
           !err.response ||
           !err.response.data ||
           err.response.status === 500
         ) {
-          return toast('An error occured while getting notifications.', {
+          return toast('An error occured while fetching notifications.', {
             toastId: 'toast-id1',
           });
         } else {
@@ -67,7 +90,7 @@ const Notifications = () => {
     };
 
     getNotifications();
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     if (notifications) {
@@ -83,627 +106,205 @@ const Notifications = () => {
 
           return accumulator;
         },
-        {}
+        (() => {
+          if (page === 1) return {};
+          else return groups;
+        })()
       );
 
       setGroups(notificationGroups);
     }
   }, [notifications]);
 
-  // Tasks
-  // - if user is assigned tasks ✔
-  // if the user is deassigned ✔
-
-  // Projects
-  // if a user accepts or denies invitaion request for the project owner ✔
-
-  // Team members project activities
-  // If they delete a file ✔
-  // If they send a file ✔
-  // If they leave the project team whether by deleting of account or leaving on purpose.
-
-  // User activities
-  //  if user is sent a project team invitation request ✔
-  // if the user is removed from a team ✔
-  // deadline notifications
-  // password change or reset ✔
-  // Account reactivation ✔
-  // if a project was deleted by the owner ✔
-
-  const generateMessage = (notification) => {
-    if (notification.action === 'task') {
-      if (notification.type.includes('assignedTask')) {
-        return (
-          <article key={notification._id} className={styles.article}>
-            <span className={styles['icon-box']}>
-              <MdPersonAdd className={styles.icon} />
-            </span>
-
-            <div className={styles['message-box']}>
-              <span className={styles.message}>
-                <a className={styles['link-text']} href="#">
-                  {generateName(
-                    notification.performer.firstName,
-                    notification.performer.lastName,
-                    notification.performer.username
-                  )}
-                </a>{' '}
-                added you to the assignees of a task in the{' '}
-                <a
-                  className={styles['link-text']}
-                  href={`/project/${notification.performer.projectId}`}
-                >
-                  {notification.performer.project}
-                </a>{' '}
-                project.
-              </span>
-
-              <time className={styles.time}>
-                {' '}
-                {new Date(notification.time).getHours() === 0 ||
-                new Date(notification.time).getHours() === 12
-                  ? 12
-                  : new Date(notification.time).getHours() > 12
-                  ? String(
-                      new Date(notification.time).getHours() - 12
-                    ).padStart(2, '0')
-                  : String(new Date(notification.time).getHours()).padStart(
-                      2,
-                      '0'
-                    )}
-                :
-                {String(new Date(notification.time).getMinutes()).padStart(
-                  2,
-                  '0'
-                )}{' '}
-                {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-              </time>
-            </div>
-
-            <div className={styles['menu-box']}>
-              <BsThreeDotsVertical className={styles['menu-icon']} />
-
-              <ul className={styles['action-list']}>
-                <li>
-                  <a className={styles['view-link']} href="/tasks">
-                    View
-                  </a>
-                </li>
-                <li className={styles['action-item']}>Select</li>
-              </ul>
-            </div>
-          </article>
-        );
-      } else if (notification.type.includes('assignee')) {
-        return (
-          <article key={notification._id} className={styles.article}>
-            <span className={styles['icon-box']}>
-              <MdPersonAddDisabled className={styles.icon} />
-            </span>
-
-            <div className={styles['message-box']}>
-              <span className={styles.message}>
-                <a className={styles['link-text']} href="#">
-                  {generateName(
-                    notification.performer.firstName,
-                    notification.performer.lastName,
-                    notification.performer.username
-                  )}
-                </a>{' '}
-                removed you from the assignees of a task in the{' '}
-                <a
-                  className={styles['link-text']}
-                  href={`/project/${notification.performer.projectId}`}
-                >
-                  {notification.performer.project}
-                </a>{' '}
-                project.
-              </span>
-
-              <time className={styles.time}>
-                {' '}
-                {new Date(notification.time).getHours() === 0 ||
-                new Date(notification.time).getHours() === 12
-                  ? 12
-                  : new Date(notification.time).getHours() > 12
-                  ? String(
-                      new Date(notification.time).getHours() - 12
-                    ).padStart(2, '0')
-                  : String(new Date(notification.time).getHours()).padStart(
-                      2,
-                      '0'
-                    )}
-                :
-                {String(new Date(notification.time).getMinutes()).padStart(
-                  2,
-                  '0'
-                )}{' '}
-                {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-              </time>
-            </div>
-
-            <div className={styles['select-box']}>
-              <input type="checkbox" className={styles.checkbox} />{' '}
-            </div>
-          </article>
-        );
-      }
-    } else if (
-      notification.action === 'response' &&
-      notification.type.includes('team')
-    ) {
-      return (
-        <article key={notification._id} className={styles.article}>
-          <span className={styles['icon-box']}>
-            {notification.state.response === 'confirm' ? (
-              <GoCheckCircleFill className={styles.icon} />
-            ) : (
-              <GoXCircleFill className={styles.icon} />
-            )}
-          </span>
-
-          <div className={styles['message-box']}>
-            <span className={styles.message}>
-              <a className={styles['link-text']} href="#">
-                {generateName(
-                  notification.performer.firstName,
-                  notification.performer.lastName,
-                  notification.performer.username
-                )}
-              </a>{' '}
-              {notification.state.response === 'confirm'
-                ? 'accepted'
-                : 'declined'}{' '}
-              the invitation to join the team for your project,{' '}
-              <a
-                className={styles['link-text']}
-                href={`/project/${notification.performer.projectId}`}
-              >
-                {notification.performer.project}
-              </a>
-              .
-            </span>
-
-            <time className={styles.time}>
-              {' '}
-              {new Date(notification.time).getHours() === 0 ||
-              new Date(notification.time).getHours() === 12
-                ? 12
-                : new Date(notification.time).getHours() > 12
-                ? String(new Date(notification.time).getHours() - 12).padStart(
-                    2,
-                    '0'
-                  )
-                : String(new Date(notification.time).getHours()).padStart(
-                    2,
-                    '0'
-                  )}
-              :
-              {String(new Date(notification.time).getMinutes()).padStart(
-                2,
-                '0'
-              )}{' '}
-              {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-            </time>
-          </div>
-
-          <div className={styles['select-box']}>
-            <input type="checkbox" className={styles.checkbox} />
-          </div>
-        </article>
-      );
-    } else if (
-      notification.action === 'invitation' &&
-      notification.type.includes('team')
-    ) {
-      return (
-        <article key={notification._id} className={styles.article}>
-          <span className={styles['icon-box']}>
-            <BsEnvelopeOpenFill className={styles.icon} />
-          </span>
-          <div className={styles['message-box']}>
-            <span className={styles.message}>
-              <a className={styles['link-text']} href="#">
-                {generateName(
-                  notification.performer.firstName,
-                  notification.performer.lastName,
-                  notification.performer.username
-                )}
-              </a>{' '}
-              sent you an invitation to join the project team for{' '}
-              <span className={styles['bold-text']}>
-                {notification.performer.project}
-              </span>
-              .
-            </span>
-
-            <span className={styles['btn-box']}>
-              <button className={styles['accept-btn']}>Accept</button>
-              <button className={styles['decline-btn']}>Decline</button>
-            </span>
-
-            <time className={styles.time}>
-              {' '}
-              {new Date(notification.time).getHours() === 0 ||
-              new Date(notification.time).getHours() === 12
-                ? 12
-                : new Date(notification.time).getHours() > 12
-                ? String(new Date(notification.time).getHours() - 12).padStart(
-                    2,
-                    '0'
-                  )
-                : String(new Date(notification.time).getHours()).padStart(
-                    2,
-                    '0'
-                  )}
-              :
-              {String(new Date(notification.time).getMinutes()).padStart(
-                2,
-                '0'
-              )}{' '}
-              {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-            </time>
-          </div>
-
-          <div className={styles['select-box']}>
-            <input type="checkbox" className={styles.checkbox} />
-          </div>
-        </article>
-      );
-    } else if (
-      notification.action === 'removal' &&
-      notification.type.includes('team')
-    ) {
-      return (
-        <article key={notification._id} className={styles.article}>
-          <span className={styles['icon-box']}>
-            <IoPersonRemove className={styles.icon} />
-          </span>
-          <div className={styles['message-box']}>
-            <span className={styles.message}>
-              <a className={styles['link-text']} href="#">
-                {generateName(
-                  notification.performer.firstName,
-                  notification.performer.lastName,
-                  notification.performer.username
-                )}
-              </a>{' '}
-              removed you from the project team for{' '}
-              <span className={styles['bold-text']}>
-                {notification.performer.project}
-              </span>
-              .
-            </span>
-
-            <time className={styles.time}>
-              {' '}
-              {new Date(notification.time).getHours() === 0 ||
-              new Date(notification.time).getHours() === 12
-                ? 12
-                : new Date(notification.time).getHours() > 12
-                ? String(new Date(notification.time).getHours() - 12).padStart(
-                    2,
-                    '0'
-                  )
-                : String(new Date(notification.time).getHours()).padStart(
-                    2,
-                    '0'
-                  )}
-              :
-              {String(new Date(notification.time).getMinutes()).padStart(
-                2,
-                '0'
-              )}{' '}
-              {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-            </time>
-          </div>
-
-          <div className={styles['select-box']}>
-            <input type="checkbox" className={styles.checkbox} />
-          </div>
-        </article>
-      );
-    } else if (
-      notification.action === 'update' &&
-      notification.type.includes('security')
-    ) {
-      return (
-        <article key={notification._id} className={styles.article}>
-          <span className={styles['icon-box']}>
-            <MdSecurity className={styles.icon} />
-          </span>
-          <div className={styles['message-box']}>
-            <span className={styles.message}>
-              {notification.state.reset
-                ? 'Your password reset was successful.'
-                : 'Your password was changed successfully.'}
-            </span>
-
-            <time className={styles.time}>
-              {' '}
-              {new Date(notification.time).getHours() === 0 ||
-              new Date(notification.time).getHours() === 12
-                ? 12
-                : new Date(notification.time).getHours() > 12
-                ? String(new Date(notification.time).getHours() - 12).padStart(
-                    2,
-                    '0'
-                  )
-                : String(new Date(notification.time).getHours()).padStart(
-                    2,
-                    '0'
-                  )}
-              :
-              {String(new Date(notification.time).getMinutes()).padStart(
-                2,
-                '0'
-              )}{' '}
-              {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-            </time>
-          </div>
-
-          <div className={styles['select-box']}>
-            <input type="checkbox" className={styles.checkbox} />
-          </div>
-        </article>
-      );
-    } else if (
-      notification.action === 'activation' &&
-      notification.type.includes('security')
-    ) {
-      return (
-        <article key={notification._id} className={styles.article}>
-          <span className={styles['icon-box']}>
-            <MdSecurity className={styles.icon} />
-          </span>
-          <div className={styles['message-box']}>
-            <span className={styles.message}>
-              Your account was reactivated successfully. You will regain access
-              to all your content.
-            </span>
-
-            <time className={styles.time}>
-              {' '}
-              {new Date(notification.time).getHours() === 0 ||
-              new Date(notification.time).getHours() === 12
-                ? 12
-                : new Date(notification.time).getHours() > 12
-                ? String(new Date(notification.time).getHours() - 12).padStart(
-                    2,
-                    '0'
-                  )
-                : String(new Date(notification.time).getHours()).padStart(
-                    2,
-                    '0'
-                  )}
-              :
-              {String(new Date(notification.time).getMinutes()).padStart(
-                2,
-                '0'
-              )}{' '}
-              {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-            </time>
-          </div>
-
-          <div className={styles['select-box']}>
-            <input type="checkbox" className={styles.checkbox} />
-          </div>
-        </article>
-      );
-    } else if (notification.projectActivity) {
-      if (
-        notification.action === 'addition' ||
-        (notification.action === 'deletion' &&
-          !notification.type.includes('account'))
-      ) {
-        return (
-          <article key={notification._id} className={styles.article}>
-            <span className={styles['icon-box']}>
-              <GoProjectSymlink className={styles.icon} />
-            </span>
-            <div className={styles['message-box']}>
-              <span className={styles.message}>
-                <a className={styles['link-text']} href="#">
-                  {generateName(
-                    notification.performer.firstName,
-                    notification.performer.lastName,
-                    notification.performer.username
-                  )}
-                </a>
-                {notification.action === 'addition' ? ' added' : ' deleted'}
-                {notification.performer.filesLength === 1
-                  ? ' a file'
-                  : ` ${notification.performer.filesLength} files`}
-                {notification.action === 'addition' ? ' to ' : ' from '} the{' '}
-                <a
-                  className={styles['link-text']}
-                  href={`/project/${notification.project}`}
-                >
-                  {notification.performer.project}
-                </a>{' '}
-                project.
-              </span>
-
-              <time className={styles.time}>
-                {' '}
-                {new Date(notification.time).getHours() === 0 ||
-                new Date(notification.time).getHours() === 12
-                  ? 12
-                  : new Date(notification.time).getHours() > 12
-                  ? String(
-                      new Date(notification.time).getHours() - 12
-                    ).padStart(2, '0')
-                  : String(new Date(notification.time).getHours()).padStart(
-                      2,
-                      '0'
-                    )}
-                :
-                {String(new Date(notification.time).getMinutes()).padStart(
-                  2,
-                  '0'
-                )}{' '}
-                {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-              </time>
-            </div>
-
-            <div className={styles['select-box']}>
-              <input type="checkbox" className={styles.checkbox} />
-            </div>
-          </article>
-        );
-      } else if (
-        notification.action === 'deletion' &&
-        notification.type.includes('account')
-      ) {
-        return (
-          <article key={notification._id} className={styles.article}>
-            <span className={styles['icon-box']}>
-              <GoProjectSymlink className={styles.icon} />
-            </span>
-            <div className={styles['message-box']}>
-              <span className={styles.message}>
-                <span className={styles['bold-text']}>
-                  {generateName(
-                    notification.performer.firstName,
-                    notification.performer.lastName,
-                    notification.performer.username
-                  )}
-                </span>{' '}
-                was no longer available and was subsequently removed from the
-                project team for{' '}
-                <a
-                  className={styles['link-text']}
-                  href={`/project/${notification.project}`}
-                >
-                  {notification.performer.project}
-                </a>
-                .
-              </span>
-
-              <time className={styles.time}>
-                {' '}
-                {new Date(notification.time).getHours() === 0 ||
-                new Date(notification.time).getHours() === 12
-                  ? 12
-                  : new Date(notification.time).getHours() > 12
-                  ? String(
-                      new Date(notification.time).getHours() - 12
-                    ).padStart(2, '0')
-                  : String(new Date(notification.time).getHours()).padStart(
-                      2,
-                      '0'
-                    )}
-                :
-                {String(new Date(notification.time).getMinutes()).padStart(
-                  2,
-                  '0'
-                )}{' '}
-                {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-              </time>
-            </div>
-
-            <div className={styles['select-box']}>
-              <input type="checkbox" className={styles.checkbox} />
-            </div>
-          </article>
-        );
-      }
-    } else if (
-      notification.action === 'deletion' &&
-      notification.type.includes('project')
-    ) {
-      return (
-        <article key={notification._id} className={styles.article}>
-          <span className={styles['icon-box']}>
-            <MdDeleteSweep className={styles.icon} />
-          </span>
-          <div className={styles['message-box']}>
-            <span className={styles.message}>
-              <a className={styles['link-text']} href="#">
-                {generateName(
-                  notification.performer.firstName,
-                  notification.performer.lastName,
-                  notification.performer.username
-                )}
-              </a>{' '}
-              deleted the{' '}
-              <span className={styles['bold-text']}>
-                {notification.performer.project}
-              </span>{' '}
-              project.
-            </span>
-
-            <time className={styles.time}>
-              {' '}
-              {new Date(notification.time).getHours() === 0 ||
-              new Date(notification.time).getHours() === 12
-                ? 12
-                : new Date(notification.time).getHours() > 12
-                ? String(new Date(notification.time).getHours() - 12).padStart(
-                    2,
-                    '0'
-                  )
-                : String(new Date(notification.time).getHours()).padStart(
-                    2,
-                    '0'
-                  )}
-              :
-              {String(new Date(notification.time).getMinutes()).padStart(
-                2,
-                '0'
-              )}{' '}
-              {new Date(notification.time).getHours() >= 12 ? 'PM' : 'AM'}
-            </time>
-          </div>
-
-          <div className={styles['select-box']}>
-            <input type="checkbox" className={styles.checkbox} />
-          </div>
-        </article>
+  // Updates total length
+  useEffect(() => {
+    if (groups) {
+      setTotalLength(
+        Object.entries(groups).reduce(
+          (accumulator, [key, value]) => accumulator + value.length,
+          0
+        )
       );
     }
+  }, [groups]);
+
+  // Fetches next page of notifications
+  useEffect(() => {
+    const scrollHandler = () => {
+      const scrollLevel =
+        bodyRef.current.scrollTop + bodyRef.current.offsetHeight;
+
+      if (!(notificationData.error || notificationData.lastPage)) {
+        if (scrollLevel >= bodyRef.current.scrollHeight - 10) {
+          if (notificationData.pageError) setPage(new Number(page));
+          else setPage((prev) => prev + 1);
+        }
+      }
+    };
+
+    const debouncedScrollHandler = useDebounce(scrollHandler, 200);
+
+    if (bodyRef.current)
+      bodyRef.current.addEventListener('scroll', debouncedScrollHandler);
+
+    return () => {
+      if (bodyRef.current)
+        bodyRef.current.removeEventListener('scroll', debouncedScrollHandler);
+    };
+  }, [notificationData]);
+
+  useEffect(() => {
+    const data = Object.entries(deleteList);
+
+    const itemLength = data.reduce(
+      (accumulator, [key, value]) => accumulator + value.length,
+      0
+    );
+
+    setDeleteLength(itemLength);
+
+    if (deleteMode.value) {
+      if (itemLength === totalLength) deleteMode.all = true;
+      else deleteModal.all = null;
+    }
+  }, [deleteList]);
+
+  const selectAll = () => {
+    if (!deleteMode.all) {
+      const list = { ...groups };
+
+      for (let prop in list) list[prop] = list[prop].map((data) => data._id);
+
+      setDeleteList(list);
+      setDeleteMode({ value: true, all: true });
+    } else {
+      setDeleteList([]);
+      setDeleteMode({ value: true, all: false });
+    }
   };
+
+  // Do responsive for this page
 
   return (
     <main className={styles.div}>
       <ToastContainer autoClose={2000} />
+
       <NavBar
         page={'Notifications'}
         showNav={showNav}
         setShowNav={setShowNav}
       />
 
+      {deleteModal.value && (
+        <DeleteComponent
+          toast={toast}
+          type={'Notifications'}
+          typeData={{ deleteList, deleteLength }}
+          setDeleteModal={setDeleteModal}
+          setDeleteCount={setDeleteCount}
+          setDeleteMode={setDeleteMode}
+          setGroups={setGroups}
+          setDeleteLength={setDeleteLength}
+        />
+      )}
+
+      {deleteMode.value && (
+        <div
+          className={styles['select-container']}
+          style={{ height: `${headerHeight}px` }}
+        >
+          <span
+            className={styles['cancel-box']}
+            onClick={() => {
+              setDeleteMode({ value: false, all: null });
+              setDeleteList({});
+            }}
+          >
+            <IoCloseSharp className={styles['cancel-icon']} />
+          </span>
+
+          <span className={styles['select-length-txt']}>
+            {deleteLength} selected
+          </span>
+
+          <span className={styles['delete-container']}>
+            <BiSolidSelectMultiple
+              className={`${styles['select-all-icon']} ${
+                deleteLength === totalLength ? styles['select-all-icon2'] : ''
+              }`}
+              onClick={selectAll}
+            />
+
+            <span className={styles['delete-notification-box']}>
+              <button
+                className={`${styles['delete-notification-btn']} ${
+                  deleteLength === 0 ? styles['disable-delete-btn'] : ''
+                }`}
+                onClick={() => {
+                  setDeleteModal({ value: true });
+                }}
+              >
+                Delete
+              </button>
+            </span>
+          </span>
+        </div>
+      )}
+
       <section className={styles.section}>
-        <Header page={'Notifications'} setShowNav={setShowNav} />
-        {/* //Fix empty notifications // Loading notifications and error */}
+        <Header
+          page={'Notifications'}
+          setShowNav={setShowNav}
+          setHeaderHeight={setHeaderHeight}
+        />
 
-        <section className={styles['section-content']}>
+        <section className={styles['section-content']} ref={bodyRef}>
           <div className={styles['notification-container']}>
-            {groups
-              ? Object.entries(groups).map(([key, value], index) => (
-                  <div
-                    key={key}
-                    className={`${styles['article-container']} ${
-                      index === currentGroup ? styles['slide-up'] : ''
-                    }`}
-                  >
-                    <h1 className={styles.head}>
-                      <IoIosArrowDown
-                        className={styles.arrow}
-                        onClick={() => setCurrentGroup(index)}
-                      />
-                      <span className={styles['date-length']}>
-                        {value.length > 1_000_000 ? '1,000,000+' : value.length}
-                      </span>{' '}
-                      {days[new Date(key).getDay()]},{' '}
-                      {months[new Date(key).getMonth()]}{' '}
-                      {new Date(key).getDate()}, {new Date(key).getFullYear()}
-                    </h1>
+            {groups === null ? (
+              ''
+            ) : Object.entries(groups).length === 0 ? (
+              <div className={styles['no-notifications-text']}>
+                No notifications available
+              </div>
+            ) : groups ? (
+              Object.entries(groups).map(([key, value]) => (
+                <NotificationContainer
+                  key={key}
+                  date={key}
+                  group={value}
+                  setGroups={setGroups}
+                  deleteMode={deleteMode}
+                  setDeleteMode={setDeleteMode}
+                  deleteList={deleteList}
+                  setDeleteList={setDeleteList}
+                  setDeleteCount={setDeleteCount}
+                />
+              ))
+            ) : (
+              ''
+            )}
 
-                    {value.map((notification) => generateMessage(notification))}
-                  </div>
-                ))
-              : ''}
+            {notificationData.loading && (
+              <div
+                className={`${styles['notifications-loader-div']} ${
+                  page === 1 ? styles['loader-margin'] : ''
+                }`}
+              >
+                <Loader
+                  style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                  }}
+                />
+              </div>
+            )}
+
+            {notificationData.error && (
+              <div className={styles['no-notifications-text']}>
+                <MdOutlineSignalWifiOff className={styles['network-icon']} />
+                Unable to retrieve data
+              </div>
+            )}
           </div>
         </section>
       </section>

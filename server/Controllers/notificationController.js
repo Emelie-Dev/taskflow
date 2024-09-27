@@ -14,11 +14,19 @@ export const getUserNotifications = asyncErrorHandler(
       return next(new CustomError('This user does not exist.', 404));
     }
 
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 100;
+    const deleteCount = req.query.deleteCount || 0;
+    const skip = (Number(page) - 1) * Number(limit) - Number(deleteCount);
+
     const notifications = await Notification.find({
       user: user._id,
       task: { $exists: false },
       $or: [{ project: { $exists: false } }, { projectActivity: true }],
-    }).sort('-time _id');
+    })
+      .sort('-time _id')
+      .skip(skip)
+      .limit(limit);
 
     return res.status(200).json({
       status: 'success',
@@ -29,22 +37,31 @@ export const getUserNotifications = asyncErrorHandler(
   }
 );
 
-export const deleteNotification = asyncErrorHandler(async (req, res, next) => {
-  let notification;
-
-  if (req.params.projectId) {
-    notification = await Notification.findOne({
-      _id: req.params.id,
-      user: req.user._id,
-      project: req.params.projectId,
-    });
-
-    if (!notification) {
-      return next(new CustomError(`This activity does not exist!`, 404));
+export const deleteUserNotifications = asyncErrorHandler(
+  async (req, res, next) => {
+    if (!req.body.notifications || req.body.notifications.length === 0) {
+      return next(
+        new CustomError(
+          'Please select the notifications you want to delete.',
+          400
+        )
+      );
     }
+
+    // Deletes notifications
+    await Promise.allSettled(
+      req.body.notifications.map(
+        (notification) =>
+          new Promise(async (resolve, reject) => {
+            try {
+              resolve(await Notification.findByIdAndDelete(notification));
+            } catch {
+              reject();
+            }
+          })
+      )
+    );
+
+    return res.status(204).json({ status: 'success', message: null });
   }
-
-  await notification.deleteOne();
-
-  return res.status(204).json({ status: 'success' });
-});
+);

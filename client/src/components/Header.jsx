@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useContext,
+  forwardRef,
+} from 'react';
 import styles from '../styles/Header.module.css';
 import { MdOutlineSegment } from 'react-icons/md';
 import { IoIosSearch, IoMdClose, IoIosNotifications } from 'react-icons/io';
@@ -11,7 +17,7 @@ import { AuthContext, apiClient } from '../App';
 import { generateName } from '../pages/Dashboard';
 import { ToastContainer, toast } from 'react-toastify';
 
-const Header = ({ page, setShowNav }) => {
+const Header = ({ page, setShowNav, setHeaderHeight }) => {
   const { userData, setUserData, serverUrl } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showUserBox, setShowUserBox] = useState(false);
@@ -20,8 +26,26 @@ const Header = ({ page, setShowNav }) => {
   const searchRef = useRef();
   const imgRef = useRef();
   const userBoxRef = useRef();
+  const headerRef = useRef();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const resizeHandler = () => {
+      setHeaderHeight(headerRef.current.offsetHeight);
+    };
+
+    if (page === 'Notifications') {
+      resizeHandler();
+
+      window.addEventListener('resize', resizeHandler);
+    }
+
+    return () => {
+      if (page === 'Notifications')
+        window.removeEventListener('resize', resizeHandler);
+    };
+  }, []);
 
   // For log out box
   useEffect(() => {
@@ -78,7 +102,7 @@ const Header = ({ page, setShowNav }) => {
   };
 
   return (
-    <header className={styles.header}>
+    <header className={styles.header} ref={headerRef}>
       <ToastContainer autoClose={2000} />
 
       <b className={styles['menu-icon-box']}>
