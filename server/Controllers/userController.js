@@ -211,9 +211,21 @@ const deleteUserProjectsAndFiles = async (user) => {
 export const getUser = asyncErrorHandler(async (req, res, next) => {
   const username = req.params.id;
 
-  const user = await User.findOne({
-    username: { $regex: new RegExp(`^${username}$`, 'i') },
-  }).select('username firstName lastName photo');
+  let user;
+
+  if (req.query.team) {
+    user = await User.findOne({
+      username: { $regex: new RegExp(`^${username}$`, 'i') },
+    }).select('username firstName lastName photo');
+  } else {
+    user = await User.findOne({
+      username: { $regex: new RegExp(`^${username}$`, 'i') },
+    })
+      .select(
+        'username firstName lastName photo occupation dob email country language mobileNumber dataVisibility'
+      )
+      .lean();
+  }
 
   if (!user) {
     return next(new CustomError('This user does not exist.', 404));
@@ -227,6 +239,14 @@ export const getUser = asyncErrorHandler(async (req, res, next) => {
           400
         )
       );
+    }
+  } else {
+    const { dataVisibility } = user;
+    delete user.dataVisibility;
+    for (const prop in user) {
+      if (prop in dataVisibility) {
+        if (!dataVisibility[prop]) delete user[prop];
+      }
     }
   }
 

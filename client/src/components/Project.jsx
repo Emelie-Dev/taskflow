@@ -117,7 +117,7 @@ const Project = ({
     } catch (err) {
       setSearching(false);
 
-      if (!err.response.data || err.response.status === 500) {
+      if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occured while searching for user.', {
           toastId: 'toast-id1',
         });
