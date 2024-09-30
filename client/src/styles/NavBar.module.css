@@ -88,7 +88,7 @@
 .side-nav-link:hover .side-nav-icon {
   color: orange;
   fill: orange;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .page {
@@ -97,14 +97,11 @@
 
 .page-link {
   color: orange;
+  font-weight: 500;
 }
 
 .page-icon {
   fill: orange;
-}
-
-.page-link:hover {
-  font-weight: 500;
 }
 
 .responsive-nav {

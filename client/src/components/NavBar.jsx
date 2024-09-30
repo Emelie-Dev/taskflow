@@ -199,6 +199,28 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               </Link>
             </li>
 
+            {page === 'Users' && (
+              <li
+                className={`${styles['side-nav-item']} ${
+                  page === 'Users' ? styles.page : ''
+                }`}
+              >
+                <Link
+                  to={'#'}
+                  className={`${styles['side-nav-link']} ${
+                    page === 'Users' ? styles['page-link'] : ''
+                  }`}
+                >
+                  <FaRegCircleUser
+                    className={`${styles['side-nav-icon']} ${
+                      page === 'Users' ? styles['page-icon'] : ''
+                    }`}
+                  />{' '}
+                  Users
+                </Link>
+              </li>
+            )}
+
             <li
               className={`${styles['side-nav-item']} ${
                 page === 'Settings' ? styles.page : ''
@@ -398,6 +420,28 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               Profile
             </Link>
           </li>
+
+          {page === 'Users' && (
+            <li
+              className={`${styles['side-nav-item']} ${
+                page === 'Users' ? styles.page : ''
+              }`}
+            >
+              <Link
+                to={'#'}
+                className={`${styles['side-nav-link']} ${
+                  page === 'Users' ? styles['page-link'] : ''
+                }`}
+              >
+                <FaRegCircleUser
+                  className={`${styles['side-nav-icon']} ${
+                    page === 'Users' ? styles['page-icon'] : ''
+                  }`}
+                />{' '}
+                Users
+              </Link>
+            </li>
+          )}
 
           <li
             className={`${styles['side-nav-item']} ${

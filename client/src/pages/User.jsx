@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styles from '../styles/Profile.module.css';
 import { months } from './Dashboard';
 import Header from '../components/Header';
@@ -7,11 +7,12 @@ import { useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { apiClient, AuthContext } from '../App';
 import Loader from '../components/Loader';
+import { MdOutlineSignalWifiOff } from 'react-icons/md';
 
 const User = () => {
   const { username } = useParams();
   const { serverUrl } = useContext(AuthContext);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState('loading');
   const [showNav, setShowNav] = useState(false);
 
   useEffect(() => {
@@ -21,16 +22,21 @@ const User = () => {
 
         setUserData(data.data.user);
       } catch (err) {
-        setUserData(false);
         if (
           !err.response ||
           !err.response.data ||
           err.response.status === 500
         ) {
+          setUserData(false);
           return toast('An error occured while searching for user.', {
             toastId: 'toast-id',
           });
         } else {
+          if (err.response.status === 404) {
+            setUserData(null);
+          } else {
+            setUserData(false);
+          }
           return toast(err.response.data.message, {
             toastId: 'toast-id',
           });
@@ -63,13 +69,13 @@ const User = () => {
     <main className={styles.div}>
       <ToastContainer autoClose={2000} />
 
-      <NavBar page={'Profile'} showNav={showNav} setShowNav={setShowNav} />
+      <NavBar page={'Users'} showNav={showNav} setShowNav={setShowNav} />
 
       <section className={styles.section}>
-        <Header page={'Profile'} setShowNav={setShowNav} />
+        <Header page={'Users'} setShowNav={setShowNav} />
 
         <section className={styles['section-content']}>
-          {userData === null ? (
+          {userData === 'loading' ? (
             <div className={styles['loader-div']}>
               <Loader
                 style={{
@@ -78,6 +84,8 @@ const User = () => {
                 }}
               />
             </div>
+          ) : userData === null ? (
+            <div className={styles['error-text']}>This user does not exist</div>
           ) : userData ? (
             <div className={styles['profile-container']}>
               <div className={styles['left-section']}>
@@ -145,7 +153,10 @@ const User = () => {
               </div>
             </div>
           ) : (
-            <div></div>
+            <div className={styles['error-text']}>
+              <MdOutlineSignalWifiOff className={styles['network-icon']} />
+              Unable to retrieve user data
+            </div>
           )}
         </section>
       </section>
