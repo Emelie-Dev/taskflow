@@ -44,6 +44,7 @@
   padding: 1rem;
   align-items: flex-start;
   margin-bottom: 1rem;
+  overflow: auto;
 }
 
 .icon-box {
@@ -163,6 +164,8 @@
   font-size: 1.05rem;
   display: flex;
   align-items: center;
+  overflow: auto;
+  width: 100%;
 }
 
 .date-length {
@@ -219,6 +222,7 @@
   margin-left: auto;
   margin-right: 1rem;
   outline: none;
+  flex-shrink: 0;
 }
 
 .select-container {
@@ -340,23 +344,9 @@
 
 /* Media Queries */
 
-@media screen and (max-width: 1174px) {
-  .search {
-    width: 22rem;
-  }
-}
-
 @media screen and (max-width: 1099px) {
-  .responsive-section {
-    width: 25%;
-  }
-
   .section-content {
     margin-top: 5.9rem;
-  }
-
-  .nav {
-    display: none;
   }
 
   .section,
@@ -364,200 +354,117 @@
     width: 100%;
     margin-left: 0;
   }
-
-  .header {
-    width: 100%;
-    padding: 1.5rem 1.8rem;
-    padding-left: 1.2rem;
-  }
-
-  .menu-icon-box {
-    display: flex;
-  }
 }
 
 @media screen and (max-width: 999px) {
-  .responsive-section {
-    width: 28%;
-  }
-
-  .icon-div {
-    display: none;
-  }
-
-  .notifications {
-    display: block;
-  }
 }
 
 @media screen and (max-width: 899px) {
-  .responsive-section {
-    width: 32%;
-  }
-
-  .search {
-    width: 20rem;
-  }
 }
 
 @media screen and (max-width: 799px) {
-  .responsive-section {
-    width: 35%;
-  }
-  .search-box {
-    margin-left: 2rem;
-  }
-
-  .search {
-    width: 18rem;
-  }
-
   .section-content {
     padding: 1rem 0.5rem 2rem;
   }
 
-  .notification-img {
-    width: 3rem;
-    height: 3rem;
-  }
-
-  .content-icon {
-    width: 1.5rem;
-    height: 1.5rem;
+  .select-container {
+    padding-left: 1rem;
   }
 }
 
 @media screen and (max-width: 699px) {
-  .responsive-section {
-    width: 40%;
-  }
-  .profile-box {
-    display: none;
-  }
+}
+
+@media screen and (max-width: 599px) {
+}
+
+@media screen and (max-width: 499px) {
   .section-content {
     padding: 1rem 0 2rem;
   }
 
-  .notification-box {
-    padding: 0.7rem 1rem;
-    padding-right: 2rem;
-  }
-}
-
-@media screen and (max-width: 599px) {
-  .responsive-section {
-    width: 47%;
-  }
-  .search {
-    width: 13rem;
+  .select-all-icon {
+    margin-right: 2rem;
   }
 
-  .notification-img {
-    display: none;
-  }
-  .content-icon {
-    margin-right: 0.75rem;
-    width: 1.3rem;
-    height: 1.3rem;
-    transform: translateY(0.3rem);
-  }
-}
-
-@media screen and (max-width: 499px) {
-  .responsive-section {
-    width: 54%;
-  }
-  .search-box {
-    display: none;
+  .select-container {
+    padding-left: 0.65rem;
   }
 
-  .menu-icon-box {
-    margin-right: 0.8rem;
+  .icon-box {
+    padding: 0.5rem;
   }
 
-  .alternate-search-box {
-    display: flex;
+  .icon {
+    width: 1.2rem;
+    height: 1.2rem;
   }
 
-  .notification-text {
-    font-size: 1.03rem;
-  }
-  .content-name {
-    font-size: 1.02rem;
-  }
-
-  .notification-time {
+  .message {
     font-size: 0.95rem;
   }
 
-  .important-text {
-    font-size: 1.05rem;
+  .head {
+    font-size: 1rem;
+  }
+
+  .date-length {
+    padding: 0.15rem 0.45rem;
+    font-size: 0.95rem;
   }
 }
 
 @media screen and (max-width: 399px) {
-  .responsive-section {
-    width: 65%;
-  }
-  .alternate-search-box {
+  .select-all-icon {
     margin-right: 1rem;
-    margin-left: 1rem;
-  }
-  .alternate-search-icon {
-    width: 1.1rem;
-    height: 1.1rem;
-    fill: gray;
   }
 
-  .content-icon {
-    display: none;
-  }
-
-  .notification-container {
-    padding: 0 0.5rem;
-  }
-
-  .article-head {
-    font-size: 1.2rem;
-    margin: 0.5rem 0 1rem;
-    padding: 0 0.5rem;
+  .select-container {
+    padding-right: 1.5rem;
   }
 }
 
-@media screen and (max-width: 329px) {
-  .responsive-section {
-    width: 70%;
-  }
-  .alternate-search-box {
+@media screen and (max-width: 335px) {
+  .container-checkbox {
+    margin-left: 1rem;
     margin-right: 0.5rem;
+  }
+
+  .icon-box {
+    padding: 0.4rem;
+  }
+
+  .icon {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .arrow {
+    width: 1.3rem;
+    height: 1.3rem;
+    margin-right: 0.4rem;
+  }
+
+  .select-length-txt {
     margin-left: 0.5rem;
-  }
-  .project-btn,
-  .decline-btn {
-    padding: 0.2rem 0.5rem;
-    font-size: 0.85rem;
-  }
-  .menu-icon-box {
-    margin-right: 0.3rem;
+    font-size: 1rem;
   }
 
-  .profile-picture {
-    width: 2.5rem;
-    height: 2.5rem;
+  .delete-notification-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
   }
 
-  .alternate-search-box {
-    padding: 0.5rem;
+  .select-all-icon {
+    width: 1.3rem;
+    height: 1.3rem;
   }
-  .alternate-search-icon {
-    width: 1rem;
-    height: 1rem;
-    fill: gray;
+
+  .cancel-icon {
+    width: 1.3rem;
+    height: 1.3rem;
   }
 }
 
 @media screen and (max-width: 299px) {
-  .responsive-section {
-    width: 80%;
-  }
 }

@@ -112,7 +112,13 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
         />
       </b>
 
-      <h1 className={styles['page']}>{page}</h1>
+      <h1
+        className={`${styles['page']} ${
+          page === 'Notifications' ? styles['page2'] : ''
+        }`}
+      >
+        {page}
+      </h1>
 
       <span className={styles['search-box']}>
         <IoIosSearch className={styles['search-icon']} />
