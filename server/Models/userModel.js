@@ -6,7 +6,6 @@ import bcrypt from 'bcryptjs';
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    unique: true,
     trim: true,
     required: [true, 'Please provide a value for the username field.'],
     validate: {
@@ -217,6 +216,12 @@ const userSchema = new mongoose.Schema({
   deleteAccountTokenExpires: Date,
 });
 
+// Create a case insensitive index for the username field
+userSchema.index(
+  { username: 1 },
+  { unique: true, collation: { locale: 'en', strength: 2 } }
+);
+
 // Encrypts Password
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
@@ -292,5 +297,8 @@ userSchema.methods.isPasswordChanged = function (JWTTimestamp) {
 };
 
 const User = mongoose.model('User', userSchema);
+
+// Forces mongoose to rebuild the indexes
+User.syncIndexes();
 
 export default User;

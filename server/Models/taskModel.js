@@ -81,7 +81,10 @@ const taskSchema = new mongoose.Schema(
 );
 
 // Prevents duplicate tasks from a user
-taskSchema.index({ name: 1, user: 1, project: 1 }, { unique: true });
+taskSchema.index(
+  { name: 1, user: 1, project: 1 },
+  { unique: true, collation: { locale: 'en', strength: 2 } }
+);
 
 // Creates virtual field for activities
 taskSchema.virtual('activities', {
@@ -149,5 +152,7 @@ taskSchema.pre('save', function (next) {
 });
 
 const Task = mongoose.model('Task', taskSchema);
+
+Task.syncIndexes();
 
 export default Task;

@@ -107,7 +107,10 @@ const projectSchema = new mongoose.Schema(
 );
 
 // Prevents duplicate project from a user
-projectSchema.index({ name: 1, user: 1 }, { unique: true });
+projectSchema.index(
+  { name: 1, user: 1 },
+  { unique: true, collation: { locale: 'en', strength: 2 } }
+);
 
 // Create index for details field
 projectSchema.index({ 'details.projectProgress': 1 });
@@ -202,5 +205,7 @@ projectSchema.pre('findOneAndUpdate', function (next) {
 });
 
 const Project = mongoose.model('Project', projectSchema);
+
+Project.syncIndexes();
 
 export default Project;

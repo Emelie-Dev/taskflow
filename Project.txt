@@ -45,6 +45,7 @@
     - Handle project deadline update
     - Enable users to leave project teams on purpose
     - Add page for 404 error on the frontend.
+    - Fix month configuration for analytics page
 
 
 
