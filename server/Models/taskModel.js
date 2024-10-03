@@ -67,8 +67,14 @@ const taskSchema = new mongoose.Schema(
     customFields: [
       {
         type: {
-          field: String,
-          value: String,
+          field: {
+            type: String,
+            maxLength: [20, 'Custom field name cannot exceed 20 characters.'],
+          },
+          value: {
+            type: String,
+            maxLength: [30, 'Custom field value cannot exceed 30 characters.'],
+          },
         },
       },
     ],

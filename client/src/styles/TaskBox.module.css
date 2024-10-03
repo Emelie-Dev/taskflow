@@ -524,6 +524,70 @@
   font-weight: 500;
 }
 
+.disable-add-btn {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.custom-field-box {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.custom-property-name {
+  font-family: var(--general-font);
+  color: gray;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  display: flex;
+  align-items: center;
+  word-break: break-all;
+}
+
+.custom-property-label {
+  font-family: var(--general-font);
+  color: gray;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  display: flex;
+  align-items: center;
+  word-break: break-all;
+  margin-bottom: 0.5rem;
+}
+
+.custom-icon {
+  fill: orange;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.custom-field-value {
+  font-family: var(--general-font);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.add-margin {
+  margin-top: 1rem;
+}
+
+.custom-field {
+  outline: none;
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid rgba(128, 128, 128, 0.404);
+  transition: border 0.3s;
+  width: 100%;
+}
+
+.custom-field:focus {
+  border: 1px solid orange;
+}
+
 /* Animation */
 
 @keyframes rotate {

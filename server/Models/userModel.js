@@ -136,6 +136,7 @@ const userSchema = new mongoose.Schema({
           type: {
             field: {
               type: String,
+              trim: true,
               validate: {
                 validator: (value) => {
                   const name = validator.blacklist(value, '_');

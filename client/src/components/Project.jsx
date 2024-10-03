@@ -183,7 +183,7 @@ const Project = ({
         try {
           response = await apiClient.patch(
             `/api/v1/projects/${projectId}/team`,
-            { team: newTeam }
+            { team: newTeam, status: editProject ? body.status : 'active' }
           );
 
           toast(response.data.data.message, {

@@ -902,6 +902,8 @@ const NotificationContainer = ({
       setGroups((groups) => {
         const newGroups = { ...groups };
         newGroups[date] = newGroups[date].filter((elem) => elem._id !== id);
+
+        if (newGroups[date].length === 0) delete newGroups[date];
         return newGroups;
       });
     } catch (err) {

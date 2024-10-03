@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styles from '../styles/TaskBox.module.css';
 import { GrStatusGood } from 'react-icons/gr';
 import { RxCross2 } from 'react-icons/rx';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-
+import { ToastContainer, toast } from 'react-toastify';
 import { MdOutlineModeEditOutline } from 'react-icons/md';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { apiClient, AuthContext } from '../App';
@@ -13,6 +13,7 @@ import { months } from '../pages/Projects';
 import Loader from './Loader';
 import { SiKashflow } from 'react-icons/si';
 import DeleteModal from './DeleteModal';
+import { IoColorPaletteSharp } from 'react-icons/io5';
 
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth();
@@ -25,7 +26,6 @@ const TaskBox = ({
   currentProject,
   setCurrentProject,
   setDeleteCount,
-  toast,
 }) => {
   const { userData } = useContext(AuthContext);
   const [showDetails, setShowDetails] = useState(false);
@@ -46,6 +46,7 @@ const TaskBox = ({
     deadline: taskObj.deadline ? new Date(taskObj.deadline) : '',
     description: taskObj.description,
     assignees: new Set(taskObj.assignee.map((assignee) => assignee._id)),
+    customFields: [...taskObj.customFields],
   });
   const [isDataChanged, setIsDataChanged] = useState(false);
   const [updating, setUpdating] = useState(false);
@@ -61,6 +62,7 @@ const TaskBox = ({
     deadline: new Date(taskObj.deadline),
     description: taskObj.description,
     assignees: new Set(taskObj.assignee.map((assignee) => assignee._id)),
+    customFields: [...taskObj.customFields],
   };
 
   // For fetching task activities
@@ -122,6 +124,23 @@ const TaskBox = ({
           String([...taskData.assignees]) === String([...initalData.assignees])
         )
           value++;
+      } else if (prop === 'customFields') {
+        const isChanged = taskData.customFields.some((field) => {
+          const initialField = initalData.customFields.find(
+            (elem) => elem.field === field.field
+          );
+
+          if (initialField) {
+            return (
+              String(field.value).trim() !== String(initialField.value).trim()
+            );
+          } else if (String(field.value).trim() === '') {
+            return false;
+          } else return true;
+        });
+
+        if (isChanged) value--;
+        else value++;
       } else {
         if (String(taskData[prop]).trim() === String(initalData[prop]).trim()) {
           value++;
@@ -129,7 +148,7 @@ const TaskBox = ({
       }
     }
 
-    setIsDataChanged(value !== 6);
+    setIsDataChanged(value !== 7);
   }, [taskData]);
 
   const toggleDetails = () => {
@@ -144,7 +163,7 @@ const TaskBox = ({
 
   const updateTask = async () => {
     // Checks if task data is changed
-    let value = 6;
+    let value = 7;
     const body = {};
     for (const prop in taskData) {
       if (prop === 'assignees') {
@@ -163,7 +182,7 @@ const TaskBox = ({
       }
     }
 
-    if (value === 6) return;
+    if (value === 7) return;
 
     if (String(body.deadline) === 'Invalid Date') body.deadline = '';
 
@@ -611,8 +630,23 @@ const TaskBox = ({
     setTaskData({ ...taskData, assignees });
   };
 
+  const handleCustomField = (field) => (e) => {
+    const customFields = [...taskData.customFields];
+    const index = customFields.findIndex((elem) => elem.field === field);
+
+    if (index === -1) {
+      customFields.push({ field, value: e.target.value });
+    } else {
+      customFields[index].value = e.target.value;
+    }
+
+    setTaskData({ ...taskData, customFields });
+    console.log({ taskData, taskObj });
+  };
+
   return (
     <article className={styles['task-box']}>
+      <ToastContainer autoClose={2000} />
       {showDeleteBox && (
         <DeleteModal
           setShowDeleteBox={setShowDeleteBox}
@@ -860,7 +894,9 @@ const TaskBox = ({
                 </select>
 
                 <button
-                  className={styles['add-assignee-btn']}
+                  className={`${styles['add-assignee-btn']} ${
+                    project.team.length === 0 ? styles['disable-add-btn'] : ''
+                  }`}
                   onClick={addAssignee}
                 >
                   Add
@@ -984,8 +1020,70 @@ const TaskBox = ({
             </div>
           </div>
 
+          {!editTask && taskData.customFields.length > 0 && (
+            <>
+              {taskData.customFields.map((obj) => (
+                <div
+                  key={obj._id}
+                  className={`${styles['more-property-div']} ${styles['custom-field-box']}`}
+                >
+                  <span
+                    className={styles['custom-property-name']}
+                    title="Custom Field"
+                  >
+                    <IoColorPaletteSharp className={styles['custom-icon']} />
+                    {obj.field}:
+                  </span>
+
+                  <span className={styles['custom-field-value']}>
+                    {obj.value}
+                  </span>
+                </div>
+              ))}
+            </>
+          )}
+
+          {editTask && userData.personalization.customFields.length > 0 && (
+            <>
+              {userData.personalization.customFields.map((obj) => (
+                <div
+                  key={obj._id}
+                  className={`${styles['more-property-div']} ${styles['custom-field-box']}`}
+                >
+                  <label
+                    className={styles['custom-property-label']}
+                    title="Custom Field"
+                    htmlFor={obj.field}
+                  >
+                    <IoColorPaletteSharp className={styles['custom-icon']} />
+                    {obj.field}:
+                  </label>
+
+                  <input
+                    className={styles['custom-field']}
+                    id={obj.field}
+                    type="text"
+                    defaultValue={
+                      taskData.customFields.find(
+                        (elem) => elem.field === obj.field
+                      )
+                        ? taskData.customFields.find(
+                            (elem) => elem.field === obj.field
+                          ).value
+                        : ''
+                    }
+                    maxLength={30}
+                    onChange={handleCustomField(obj.field)}
+                  />
+                </div>
+              ))}
+            </>
+          )}
+
           <div
-            className={`${styles['more-property-div']} ${styles['activity-log-box']}`}
+            className={`${styles['more-property-div']} ${
+              styles['activity-log-box']
+            } ${task.customFields.length > 0 ? styles['add-margin'] : ''}`}
           >
             <span className={styles['property-name']}>Activity Log:</span>
             <div className={styles['activity-log']}>

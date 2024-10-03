@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useContext, useRef, useState } from 'react';
 import styles from '../styles/NewTask.module.css';
 import { IoCloseSharp } from 'react-icons/io5';
 import { generateName } from '../pages/Dashboard';
 import { ToastContainer, toast } from 'react-toastify';
 import { SiKashflow } from 'react-icons/si';
-import { apiClient } from '../App';
+import { apiClient, AuthContext } from '../App';
 
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth();
@@ -27,6 +27,7 @@ const NewTask = ({
   setTasks,
   category,
 }) => {
+  const { userData, setUserData } = useContext(AuthContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [taskData, setTaskData] = useState({
     name: '',
@@ -53,6 +54,12 @@ const NewTask = ({
   const [validAssignee, setValidAssignee] = useState(false);
   const [enableSubmit, setEnableSubmit] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [customFields, setCustomFields] = useState(
+    userData.personalization.customFields.map((obj) => ({
+      field: obj.field,
+      value: '',
+    }))
+  );
 
   const assigneeRef = useRef();
 
@@ -165,6 +172,16 @@ const NewTask = ({
 
     const body = { ...taskData };
     delete body.assignees;
+
+    if (customFields.length > 0) {
+      const fields = customFields.reduce((accumulator, field) => {
+        if (String(field.value).trim().length !== 0) accumulator.push(field);
+
+        return accumulator;
+      }, []);
+      body.customFields = fields;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -249,6 +266,15 @@ const NewTask = ({
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleFieldChange = (field) => (e) => {
+    setCustomFields((fields) => {
+      const newFields = [...fields];
+      const updatedField = newFields.find((obj) => obj.field === field);
+      updatedField.value = e.target.value;
+      return newFields;
+    });
   };
 
   return (
@@ -487,6 +513,37 @@ const NewTask = ({
                 }
               ></textarea>
             </div>
+
+            {customFields.length > 0 && (
+              <div className={styles.category}>
+                <span className={styles['label-box']}>
+                  <label className={styles['form-label']} htmlFor="description">
+                    Custom Fields
+                  </label>
+
+                  <div className={styles['custom-fields-container']}>
+                    {customFields.map((obj, index) => (
+                      <div key={index} className={styles['custom-field-box']}>
+                        <label
+                          className={styles['custom-field-label']}
+                          htmlFor={obj.field}
+                        >
+                          {obj.field}:
+                        </label>
+                        <input
+                          className={styles['custom-field']}
+                          id={obj.field}
+                          type="text"
+                          maxLength={30}
+                          value={obj.value}
+                          onChange={handleFieldChange(obj.field)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </span>
+              </div>
+            )}
           </div>
 
           <div className={styles['btn-box']}>

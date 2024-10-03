@@ -307,7 +307,7 @@ const Personalization = () => {
       <div className={styles['option-div']}>
         <span className={styles['option-head']}>Custom fields</span>
         <p className={styles['description']}>
-          Enable users to create and customize additional fields for tasks.
+          Enable users to create additional fields for tasks.
         </p>
 
         <div className={styles['fields-div']}>

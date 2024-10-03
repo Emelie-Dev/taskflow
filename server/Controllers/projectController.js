@@ -9,7 +9,7 @@ import { filterValues } from './taskController.js';
 import User from '../Models/userModel.js';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
-import { dirname, join, resolve } from 'path';
+import { dirname, join } from 'path';
 import fs from 'fs';
 
 const generateNotifications = async (
@@ -305,6 +305,18 @@ export const updateProject = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
+  // Checks if this project is active
+  if (project.status !== 'active') {
+    if (req.body.status !== 'active') {
+      const err = new CustomError(
+        'This action could not be completed because this project is inactive.',
+        403
+      );
+
+      return next(err);
+    }
+  }
+
   const fields = Object.keys(req.body);
 
   if (fields.length === 0) {
@@ -388,6 +400,16 @@ export const uploadProjectFiles = asyncErrorHandler(async (req, res, next) => {
   // Check if project exist
   if (!project) {
     const err = new CustomError(`This project does not exist!`, 404);
+    return next(err);
+  }
+
+  // Checks if this project is active
+  if (project.status !== 'active') {
+    const err = new CustomError(
+      'This action could not be completed because this project is inactive.',
+      403
+    );
+
     return next(err);
   }
 
@@ -583,6 +605,16 @@ export const deleteProjectFiles = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
+  // Checks if this project is active
+  if (project.status !== 'active') {
+    const err = new CustomError(
+      'This action could not be completed because this project is inactive.',
+      403
+    );
+
+    return next(err);
+  }
+
   const owner = await User.findById(project.user);
 
   // Check is the files from the request body is an array
@@ -758,6 +790,18 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
   if (!project) {
     const err = new CustomError(`This project does not exist!`, 404);
     return next(err);
+  }
+
+  // Checks if this project is active
+  if (project.status !== 'active') {
+    if (req.body.status !== 'active') {
+      const err = new CustomError(
+        'This action could not be completed because this project is inactive.',
+        403
+      );
+
+      return next(err);
+    }
   }
 
   // Checks if the team field is in the request body
@@ -1108,6 +1152,16 @@ export const respondToInvitation = asyncErrorHandler(async (req, res, next) => {
   let message = '';
 
   if (response === 'confirm') {
+    // Checks if this project is active
+    if (project.status !== 'active') {
+      const err = new CustomError(
+        'This action could not be completed because this project is inactive.',
+        403
+      );
+
+      return next(err);
+    }
+
     const team = project.team.map((value) => String(value));
     const user = String(req.user._id);
 
@@ -1276,6 +1330,16 @@ export const deleteProjectActivities = asyncErrorHandler(
     // Checks if the project exists
     if (!project) {
       return next(new CustomError('This project does not exist!', 404));
+    }
+
+    // Checks if this project is active
+    if (project.status !== 'active') {
+      const err = new CustomError(
+        'This action could not be completed because this project is inactive.',
+        403
+      );
+
+      return next(err);
     }
 
     await Promise.allSettled(

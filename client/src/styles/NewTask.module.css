@@ -191,7 +191,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
 }
 
 .add-task-btn {
@@ -303,6 +303,48 @@
   opacity: 0.85;
 }
 
+.custom-fields-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 1rem;
+  padding-left: 0.5rem;
+}
+
+.custom-field-box {
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.custom-field-box:last-child {
+  margin-bottom: 0;
+}
+
+.custom-field-label {
+  color: gray;
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-right: 1rem;
+  white-space: nowrap;
+}
+
+.custom-field {
+  outline: none;
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid rgba(128, 128, 128, 0.404);
+  transition: border 0.3s;
+  width: 100%;
+}
+
+.custom-field:focus {
+  border: 1px solid orange;
+}
+
 /* Animations */
 
 @keyframes fadeIn {
@@ -367,6 +409,16 @@
 @media screen and (max-width: 599px) {
   .modal-container {
     width: 75%;
+  }
+
+  .custom-field-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .custom-field-label {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
   }
 }
 

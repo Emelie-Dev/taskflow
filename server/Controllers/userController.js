@@ -82,6 +82,12 @@ const updateNotificationSettings = async (user, body) => {
 const updatePersonalizationSettings = async (user, body) => {
   const { theme, defaultProjectView, priorityColors, customFields } = body;
 
+  const newCustomFields = new Set(customFields);
+
+  if (newCustomFields.size !== customFields.length) {
+    return 'error';
+  }
+
   const userData = await User.findByIdAndUpdate(
     user._id,
     {
@@ -383,6 +389,12 @@ export const updateUser = asyncErrorHandler(async (req, res, next) => {
       break;
     case 'security':
       userData = await updateSecuritySettings(user, req.body);
+  }
+
+  if (userData === 'error') {
+    return next(
+      new CustomError(`You can't have duplicate custom fields.`, 400)
+    );
   }
 
   return res.status(200).json({

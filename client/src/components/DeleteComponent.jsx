@@ -5,9 +5,9 @@ import { apiClient } from '../App';
 import { SiKashflow } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
+import { ToastContainer, toast } from 'react-toastify';
 
 const DeleteComponent = ({
-  toast,
   type,
   typeData,
   setDeleteModal,
@@ -411,6 +411,8 @@ const DeleteComponent = ({
 
   return (
     <section className={styles.section} onClick={hideDisplayModal}>
+      <ToastContainer autoClose={2000} />
+
       <div className={styles['modal-container']}>
         <span
           className={styles['close-modal']}

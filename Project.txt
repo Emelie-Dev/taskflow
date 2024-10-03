@@ -4,16 +4,15 @@
 
     - Write enough comments ✔
     - Add project activity to project item page ✔
-    - Add project active state when editing projects
+    - Add project active state when editing projects ✔
     - Add projects and tasks created to the analytics page ✔
     - Implement search functionality with queries
     - Remove leader from tasks ✔
-    - Show project leader on hover of leader img
+    - Show project leader on hover of leader img ✔
     - Add select year and month for projects and tasks ✔
     - Add fields to hpp whitelist
     - Set all createdAt field to immutable ✔
     - Edit project page ✔
-    - Modify nested routes
     - Encrypt admin
     - Resolve custom fields
     - Enable viewing project group chat from project item page
@@ -46,6 +45,7 @@
     - Enable users to leave project teams on purpose
     - Add page for 404 error on the frontend.
     - Fix month configuration for analytics page
+    - Fix sidenav for settings page(hover functionality)
 
 
 

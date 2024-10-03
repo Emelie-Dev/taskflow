@@ -1,5 +1,4 @@
 import Task from '../Models/taskModel.js';
-import { ApiFeatures, QueryFeatures } from '../Utils/ApiFeatures.js';
 import CustomError from '../Utils/CustomError.js';
 import asyncErrorHandler from '../Utils/asyncErrorHandler.js';
 import factory from '../Utils/handlerFactory.js';
@@ -278,9 +277,30 @@ export const createNewTask = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
+  // Checks if the project is active
+  if (project.status !== 'active') {
+    const err = new CustomError(
+      `This action could not be completed because this project is inactive.`,
+      403
+    );
+
+    return next(err);
+  }
+
   const excludeArray = ['assigned', 'mainTask', 'assignee'];
 
   excludeArray.forEach((value) => delete req.body[value]);
+
+  if (req.body.customFields) {
+    req.body.customFields = req.body.customFields.reduce(
+      (accumulator, field) => {
+        if (String(field.value).trim().length !== 0) accumulator.push(field);
+
+        return accumulator;
+      },
+      []
+    );
+  }
 
   const task = await Task.create(req.body);
 
@@ -384,6 +404,16 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
       return next(err);
     }
   } else {
+    // Checks if the project is active
+    if (project.status !== 'active') {
+      const err = new CustomError(
+        'This action could not be completed because this project is inactive.',
+        403
+      );
+
+      return next(err);
+    }
+
     if (task.assigned) {
       const fields = [];
       const values = {};
@@ -578,6 +608,16 @@ export const deleteTask = asyncErrorHandler(async (req, res, next) => {
       return next(err);
     }
   } else {
+    // Checks if the project is active
+    if (project.status !== 'active') {
+      const err = new CustomError(
+        'This action could not be completed because this project is inactive.',
+        403
+      );
+
+      return next(err);
+    }
+
     if (task.assigned) {
       const mainTask = await Task.findById(task.mainTask);
 
@@ -667,6 +707,16 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
   const taskAssignees = task.assignee.map((value) => String(value));
 
   const project = await Project.findById(task.project);
+
+  // Checks if the project is active
+  if (project.status !== 'active') {
+    const err = new CustomError(
+      'This action could not be completed because this project is inactive.',
+      403
+    );
+
+    return next(err);
+  }
 
   const newAssignees = [];
   const newAssigneesData = [];
