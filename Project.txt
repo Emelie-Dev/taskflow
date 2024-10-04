@@ -26,7 +26,7 @@
     - Delete project files when deleting projects ✔
     - Complete links to other resources in each page ✔✔
     - Make the header of all pages and the left nav bar, each a single component ✔
-    - Add error boundary to the protected routes
+    - Add error boundary to the protected routes ✔✔
     - Add delete project to project item page ✔
     - Use database calues for priority colors ✔
     - Limit user data been sent to the client as response payload ✔

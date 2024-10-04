@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import styles from '../styles/Project.module.css';
 import { IoCloseSharp } from 'react-icons/io5';
-import { apiClient } from '../App';
+import { apiClient, AuthContext } from '../App';
 import { generateName } from '../pages/Dashboard';
 import { SiKashflow } from 'react-icons/si';
 import { ToastContainer, toast } from 'react-toastify';
@@ -16,6 +16,7 @@ const Project = ({
   setProjects,
   setCreateCount,
 }) => {
+  const { serverUrl } = useContext(AuthContext);
   const currentYear = new Date().getFullYear();
   const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
   const currentDate = String(new Date().getDate()).padStart(2, '0');
@@ -390,7 +391,7 @@ const Project = ({
 
                         <img
                           className={styles['assignee-img']}
-                          src={`../../assets/images/users/${member.photo}`}
+                          src={`${serverUrl}/users/${member.photo}`}
                         />
                       </span>
                     </span>

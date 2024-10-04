@@ -100,7 +100,10 @@ const NotificationContainer = ({
 
             <div className={styles['message-box']}>
               <span className={styles.message}>
-                <a className={styles['link-text']} href="#">
+                <a
+                  className={styles['link-text']}
+                  href={`/user/${notification.performer.username}`}
+                >
                   {generateName(
                     notification.performer.firstName,
                     notification.performer.lastName,
@@ -162,7 +165,10 @@ const NotificationContainer = ({
 
             <div className={styles['message-box']}>
               <span className={styles.message}>
-                <a className={styles['link-text']} href="#">
+                <a
+                  className={styles['link-text']}
+                  href={`/user/${notification.performer.username}`}
+                >
                   {generateName(
                     notification.performer.firstName,
                     notification.performer.lastName,
@@ -232,7 +238,10 @@ const NotificationContainer = ({
 
           <div className={styles['message-box']}>
             <span className={styles.message}>
-              <a className={styles['link-text']} href="#">
+              <a
+                className={styles['link-text']}
+                href={`/user/${notification.performer.username}`}
+              >
                 {generateName(
                   notification.performer.firstName,
                   notification.performer.lastName,
@@ -300,7 +309,10 @@ const NotificationContainer = ({
           </span>
           <div className={styles['message-box']}>
             <span className={styles.message}>
-              <a className={styles['link-text']} href="#">
+              <a
+                className={styles['link-text']}
+                href={`/user/${notification.performer.username}`}
+              >
                 {generateName(
                   notification.performer.firstName,
                   notification.performer.lastName,
@@ -395,7 +407,10 @@ const NotificationContainer = ({
           </span>
           <div className={styles['message-box']}>
             <span className={styles.message}>
-              <a className={styles['link-text']} href="#">
+              <a
+                className={styles['link-text']}
+                href={`/user/${notification.performer.username}`}
+              >
                 {generateName(
                   notification.performer.firstName,
                   notification.performer.lastName,
@@ -564,7 +579,10 @@ const NotificationContainer = ({
             </span>
             <div className={styles['message-box']}>
               <span className={styles.message}>
-                <a className={styles['link-text']} href="#">
+                <a
+                  className={styles['link-text']}
+                  href={`/user/${notification.performer.username}`}
+                >
                   {generateName(
                     notification.performer.firstName,
                     notification.performer.lastName,
@@ -697,7 +715,10 @@ const NotificationContainer = ({
             </span>
             <div className={styles['message-box']}>
               <span className={styles.message}>
-                <a className={styles['link-text']} href="#">
+                <a
+                  className={styles['link-text']}
+                  href={`/user/${notification.performer.username}`}
+                >
                   {generateName(
                     notification.performer.firstName,
                     notification.performer.lastName,
@@ -762,7 +783,10 @@ const NotificationContainer = ({
           </span>
           <div className={styles['message-box']}>
             <span className={styles.message}>
-              <a className={styles['link-text']} href="#">
+              <a
+                className={styles['link-text']}
+                href={`/user/${notification.performer.username}`}
+              >
                 {generateName(
                   notification.performer.firstName,
                   notification.performer.lastName,

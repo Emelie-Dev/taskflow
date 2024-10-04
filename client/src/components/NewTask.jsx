@@ -27,7 +27,7 @@ const NewTask = ({
   setTasks,
   category,
 }) => {
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, serverUrl } = useContext(AuthContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [taskData, setTaskData] = useState({
     name: '',
@@ -487,7 +487,7 @@ const NewTask = ({
 
                         <img
                           className={styles['assignee-img']}
-                          src={`../../assets/images/users/${assignee.photo}`}
+                          src={`${serverUrl}/users/${assignee.photo}`}
                         />
                       </span>
                     </span>

@@ -45,7 +45,7 @@ import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 
 const ProjectItem = () => {
-  const { userData } = useContext(AuthContext);
+  const { userData, serverUrl } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [displayModal, setDisplayModal] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
@@ -709,7 +709,10 @@ const ProjectItem = () => {
             {userData._id === activity.performer.id ? (
               'You '
             ) : (
-              <a href="#" className={styles['activity-names']}>
+              <a
+                href={`/user/${activity.performer.username}`}
+                className={styles['activity-names']}
+              >
                 {generateName(
                   activity.performer.firstName,
                   activity.performer.lastName,
@@ -727,7 +730,10 @@ const ProjectItem = () => {
       } else if (activity.type.includes('team')) {
         return (
           <>
-            <a href="#" className={styles['activity-names']}>
+            <a
+              href={`/user/${activity.state.username}`}
+              className={styles['activity-names']}
+            >
               {generateName(
                 activity.state.firstName,
                 activity.state.lastName,
@@ -747,7 +753,10 @@ const ProjectItem = () => {
             {userData._id === activity.performer.id ? (
               'You '
             ) : (
-              <a href="#" className={styles['activity-names']}>
+              <a
+                href={`/user/${activity.performer.username}`}
+                className={styles['activity-names']}
+              >
                 {generateName(
                   activity.performer.firstName,
                   activity.performer.lastName,
@@ -785,7 +794,11 @@ const ProjectItem = () => {
         return (
           <>
             {activity.state.oldMembers.map((member, index, array) => (
-              <a key={member._id} href="#" className={styles['activity-names']}>
+              <a
+                key={member._id}
+                href={`/user/${member.username}`}
+                className={styles['activity-names']}
+              >
                 {index !== 0 ? ' ' : ''}
                 {generateName(
                   member.firstName,
@@ -808,13 +821,16 @@ const ProjectItem = () => {
     ) {
       return (
         <>
-          <span className={styles['deleted-users']}>
+          <a
+            href={`/user/${activity.performer.username}`}
+            className={styles['activity-names']}
+          >
             {generateName(
               activity.performer.firstName,
               activity.performer.lastName,
               activity.performer.username
             )}
-          </span>{' '}
+          </a>{' '}
           left the project.
         </>
       );
@@ -1158,15 +1174,26 @@ const ProjectItem = () => {
                         Project Leader:
                       </span>
                       <span className={styles['leader']}>
-                        <img
-                          src={`../../assets/images/users/${project.user.photo}`}
-                          className={styles['leader-img']}
-                        />{' '}
-                        {generateName(
-                          project.user.firstName,
-                          project.user.lastName,
-                          project.user.username
-                        )}
+                        <a
+                          href={
+                            isOwner() ? null : `/user/${project.user.username}`
+                          }
+                          className={styles['project-leader-link']}
+                        >
+                          <img
+                            src={`${serverUrl}/users/${project.user.photo}`}
+                            className={`${styles['leader-img']} ${
+                              project.user.photo === 'default.jpeg'
+                                ? styles['default-pic']
+                                : ''
+                            }`}
+                          />{' '}
+                          {generateName(
+                            project.user.firstName,
+                            project.user.lastName,
+                            project.user.username
+                          )}
+                        </a>
                       </span>
                     </span>
 
@@ -1175,7 +1202,13 @@ const ProjectItem = () => {
                         Project Description:
                       </span>
                       <div className={styles['description']}>
-                        {project.description}
+                        {project.description.length === 0 ? (
+                          <i className={styles['italic-text']}>
+                            No description
+                          </i>
+                        ) : (
+                          project.description
+                        )}
                       </div>
                     </span>
                   </div>
@@ -1292,13 +1325,22 @@ const ProjectItem = () => {
                         </div>
                       ) : (
                         project.team.map((member) => (
-                          <div
+                          <a
                             key={member._id}
                             className={styles['member-box']}
+                            href={
+                              member._id === userData._id
+                                ? '/profile'
+                                : `/user/${member.username}`
+                            }
                           >
                             <img
-                              src={`../../assets/images/users/${member.photo}`}
-                              className={styles['member-img']}
+                              src={`${serverUrl}/users/${member.photo}`}
+                              className={`${styles['member-img']} ${
+                                member.photo === 'default.jpeg'
+                                  ? styles['default-pic']
+                                  : ''
+                              }`}
                             />
                             <span className={styles['member-details']}>
                               <span className={styles['member-name']}>
@@ -1312,7 +1354,7 @@ const ProjectItem = () => {
                                 {member.occupation}
                               </span>
                             </span>
-                          </div>
+                          </a>
                         ))
                       )}
                     </div>
@@ -1440,12 +1482,26 @@ const ProjectItem = () => {
                                 <span className={styles['file-property']}>
                                   Sender:
                                 </span>
-                                <span className={styles['file-sender']}>
-                                  {generateName(
-                                    file.sender.firstName,
-                                    file.sender.lastName,
-                                    file.sender.username
-                                  )}
+                                <span
+                                  className={`${styles['file-sender']} ${
+                                    file.sender.userId !== userData._id
+                                      ? styles['file-sender2']
+                                      : ''
+                                  }`}
+                                >
+                                  <a
+                                    href={
+                                      file.sender.userId === userData._id
+                                        ? null
+                                        : `/user/${file.sender.username}`
+                                    }
+                                  >
+                                    {generateName(
+                                      file.sender.firstName,
+                                      file.sender.lastName,
+                                      file.sender.username
+                                    )}
+                                  </a>
                                 </span>
                               </span>
                               <span className={styles['file-details']}>
@@ -1670,13 +1726,22 @@ const ProjectItem = () => {
                         </div>
                       ) : (
                         project.team.map((member) => (
-                          <div
+                          <a
                             key={member._id}
                             className={styles['member-box']}
+                            href={
+                              member._id === userData._id
+                                ? '/profile'
+                                : `/user/${member.username}`
+                            }
                           >
                             <img
-                              src={`../../assets/images/users/${member.photo}`}
-                              className={styles['member-img']}
+                              src={`${serverUrl}/users/${member.photo}`}
+                              className={`${styles['member-img']} ${
+                                member.photo === 'default.jpeg'
+                                  ? styles['default-pic']
+                                  : ''
+                              }`}
                             />
                             <span className={styles['member-details']}>
                               <span className={styles['member-name']}>
@@ -1690,7 +1755,7 @@ const ProjectItem = () => {
                                 {member.occupation}
                               </span>
                             </span>
-                          </div>
+                          </a>
                         ))
                       )}
                     </div>

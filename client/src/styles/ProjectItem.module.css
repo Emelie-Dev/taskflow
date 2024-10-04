@@ -355,8 +355,12 @@
   font-weight: 700;
   display: flex;
   align-items: flex-end;
-  cursor: pointer;
   word-break: break-all;
+}
+
+.project-leader-link {
+  text-decoration: none;
+  color: black;
 }
 
 .project-description {
@@ -495,11 +499,15 @@
   text-overflow: ellipsis;
   overflow: hidden;
   color: orange;
-  cursor: pointer;
   font-weight: 500;
 }
 
-.file-sender:hover {
+.file-sender a {
+  color: orange;
+  text-decoration: none;
+}
+
+.file-sender2:hover {
   text-decoration: underline;
 }
 
@@ -613,6 +621,8 @@
   width: fit-content;
   cursor: pointer;
   transition: opacity 0.2s;
+  color: black;
+  text-decoration: none;
 }
 
 .member-box:hover {
@@ -1659,6 +1669,10 @@
 
 .deleted-users {
   font-weight: 500;
+}
+
+.default-pic {
+  border: 1px solid orange;
 }
 
 /* Animations */
