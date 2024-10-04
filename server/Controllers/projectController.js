@@ -1117,6 +1117,24 @@ export const deleteProject = asyncErrorHandler(async (req, res, next) => {
     });
   });
 
+  // Delete project files
+  const { files } = project;
+
+  if (files.length > 0) {
+    await Promise.allSettled(
+      files.map((file) => {
+        return new Promise((resolve, reject) => {
+          fs.unlink(file.path, (err) => {
+            if (err) {
+              reject();
+            }
+            resolve();
+          });
+        });
+      })
+    );
+  }
+
   // Sends notifications
   await Notification.insertMany(notifications);
 

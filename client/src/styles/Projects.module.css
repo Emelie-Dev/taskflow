@@ -1037,6 +1037,10 @@
   opacity: 0.8;
 }
 
+.default-pic {
+  border: 1px solid orange;
+}
+
 /* Animations */
 
 @keyframes showNav {

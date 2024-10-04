@@ -6,26 +6,8 @@ import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 
 const Profile = () => {
-  const { userData } = useContext(AuthContext);
-  const [searchText, setSearchText] = useState('');
+  const { userData, serverUrl } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
-  const searchRef = useRef();
-  const navRef = useRef();
-
-  const handleSearchText = (e) => {
-    setSearchText(e.target.value);
-  };
-
-  const clearSearchText = () => {
-    setSearchText('');
-    searchRef.current.focus();
-  };
-
-  const hideNav = (e) => {
-    if (e.target === navRef.current) {
-      setShowNav(false);
-    }
-  };
 
   const getValue = (property) => {
     if (property === 'dob') {
@@ -65,7 +47,7 @@ const Profile = () => {
             <div className={styles['left-section']}>
               <figure className={styles['profile-pics-box']}>
                 <img
-                  src={`../../assets/images/users/${userData.photo}`}
+                  src={`${serverUrl}/users/${userData.photo}`}
                   className={styles['profile-pics']}
                 />
               </figure>

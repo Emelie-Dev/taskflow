@@ -11,7 +11,7 @@ import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 
 const CalendarPage = () => {
-  const { userData } = useContext(AuthContext);
+  const { userData, serverUrl } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
@@ -148,21 +148,6 @@ const CalendarPage = () => {
 
     getTasks();
   }, [requestData]);
-
-  const hideNav = (e) => {
-    if (e.target === navRef.current) {
-      setShowNav(false);
-    }
-  };
-
-  const handleSearchText = (e) => {
-    setSearchText(e.target.value);
-  };
-
-  const clearSearchText = () => {
-    setSearchText('');
-    searchRef.current.focus();
-  };
 
   const month = [
     'January',
@@ -380,7 +365,7 @@ const CalendarPage = () => {
                                   Project:
                                 </span>
                                 <a
-                                  href="#"
+                                  href={`/project/${elem.project._id}`}
                                   className={
                                     styles['scheduled-task-project-name']
                                   }
@@ -415,10 +400,16 @@ const CalendarPage = () => {
                             <div className={styles['scheduled-task-pics-box']}>
                               {elem.assigned ? (
                                 <span className={styles['task-tooltip-box']}>
-                                  <a href="#">
+                                  <a href={`/user/${elem.leader.username}`}>
                                     <img
-                                      className={styles['scheduled-task-pics']}
-                                      src={`../../assets/images/users/${elem.leader.photo}`}
+                                      className={`${
+                                        styles['scheduled-task-pics']
+                                      } ${
+                                        elem.leader.photo === 'default.jpeg'
+                                          ? styles['default-pic']
+                                          : ''
+                                      }`}
+                                      src={`${serverUrl}/users/${elem.leader.photo}`}
                                     />
                                   </a>
                                   <span className={styles['task-tooltip-text']}>
@@ -431,19 +422,16 @@ const CalendarPage = () => {
                                 </span>
                               ) : (
                                 <span className={styles['task-tooltip-box']}>
-                                  <a href="#">
-                                    <img
-                                      className={styles['scheduled-task-pics']}
-                                      src={`../../assets/images/users/${elem.user.photo}`}
-                                    />
-                                  </a>
-                                  <span className={styles['task-tooltip-text']}>
-                                    {generateName(
-                                      elem.user.firstName,
-                                      elem.user.lastName,
-                                      elem.user.username
-                                    )}
-                                  </span>
+                                  <img
+                                    className={`${
+                                      styles['scheduled-task-pics']
+                                    } ${styles['scheduled-task-pics2']} ${
+                                      elem.user.photo === 'default.jpeg'
+                                        ? styles['default-pic']
+                                        : ''
+                                    }`}
+                                    src={`${serverUrl}/users/${elem.user.photo}`}
+                                  />
                                 </span>
                               )}
                             </div>

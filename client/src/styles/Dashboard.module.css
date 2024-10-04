@@ -717,6 +717,15 @@
 .more-task-btn:hover {
   opacity: 0.8;
 }
+
+.default-pic {
+  border: 1px solid orange;
+}
+
+.scheduled-task-pics2 {
+  cursor: default;
+}
+
 /* Animations */
 
 @keyframes showNav {

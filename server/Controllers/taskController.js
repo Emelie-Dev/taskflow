@@ -207,6 +207,30 @@ const generateNotifications = async (
       });
     }
 
+    if (fields.includes('customFields')) {
+      const customFields = values.customFields.to.filter((field) => {
+        const index = values.customFields.from.findIndex(
+          (elem) => elem.field === field.field
+        );
+
+        if (index !== -1) {
+          return (
+            String(field.value).trim() !==
+            String(values.customFields.from[index].value).trim()
+          );
+        } else return true;
+      });
+
+      if (customFields.length > 0) {
+        notifications.push({
+          user,
+          task: task._id,
+          action: 'update',
+          type: ['custom'],
+        });
+      }
+    }
+
     if (deadlineRemoval) {
       notifications.push({
         user,
@@ -519,6 +543,7 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
       }
 
       const values = {};
+
       for (let value in req.body) {
         values[value] = {};
         values[value].from = task[value];
@@ -528,6 +553,18 @@ export const updateTask = asyncErrorHandler(async (req, res, next) => {
       if (req.body.status) {
         // Updates the project details
         project.updateDetails(task.status, req.body.status);
+      }
+
+      if (req.body.customFields) {
+        req.body.customFields = req.body.customFields.reduce(
+          (accumulator, field) => {
+            if (String(field.value).trim().length !== 0)
+              accumulator.push(field);
+
+            return accumulator;
+          },
+          []
+        );
       }
 
       const update = deadlineRemoval

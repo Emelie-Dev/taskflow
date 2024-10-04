@@ -15,9 +15,10 @@ import { apiClient, AuthContext } from '../App';
 import { generateName } from './Dashboard';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
+import { LuExternalLink } from 'react-icons/lu';
 
 const Tasks = () => {
-  const { userData } = useContext(AuthContext);
+  const { userData, serverUrl } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
@@ -409,8 +410,12 @@ const Tasks = () => {
                           }
                         >
                           <img
-                            src={`../../assets/images/users/${userData.photo}`}
-                            className={styles['projects-item-img']}
+                            src={`${serverUrl}/users/${userData.photo}`}
+                            className={`${styles['projects-item-img']} ${
+                              userData.photo === 'default.jpeg'
+                                ? styles['default-pic']
+                                : ''
+                            }`}
                           />
                           <span
                             className={`${styles['projects-item-details']} ${
@@ -426,25 +431,21 @@ const Tasks = () => {
                               {taskLength(project)}
                             </span>
                           </span>
-                          <span className={styles['projects-item-action']}>
-                            <BsThreeDotsVertical
-                              className={`${styles['projects-item-menu']} ${
-                                currentProjectData.id === project._id
-                                  ? styles['current-projects-item-menu']
-                                  : ''
-                              }`}
-                              onClick={(e) => e.stopPropagation()}
-                            />
 
-                            <a href="#" className={styles['']}>
-                              <span
-                                className={styles['view-project-link']}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                View Project
-                              </span>
-                            </a>
-                          </span>
+                          <a
+                            href={`/project/${project._id}`}
+                            className={`${styles['view-project-link']} ${
+                              currentProjectData.id === project._id
+                                ? styles['current-view-project-link']
+                                : ''
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                            title="View Project"
+                          >
+                            <LuExternalLink
+                              className={styles['view-project-icon']}
+                            />
+                          </a>
                         </li>
                       ))
                     : ''}
@@ -515,10 +516,14 @@ const Tasks = () => {
                           }
                         >
                           <span className={styles['leader-box']}>
-                            <a href="#">
+                            <a href={`/user/${project.username}`}>
                               <img
-                                src={`../../assets/images/users/${project.leaderPhoto}`}
-                                className={styles['projects-item-img']}
+                                src={`${serverUrl}/users/${project.leaderPhoto}`}
+                                className={`${styles['projects-item-img']} ${
+                                  project.leaderPhoto === 'default.jpeg'
+                                    ? styles['default-pic']
+                                    : ''
+                                }`}
                               />
                               <span className={styles['leader-tooltip-text']}>
                                 {generateName(
@@ -544,26 +549,21 @@ const Tasks = () => {
                               {taskLength(project, 'assigned')}
                             </span>
                           </span>
-                          <span className={styles['projects-item-action']}>
-                            <BsThreeDotsVertical
-                              className={`${styles['projects-item-menu']} ${
-                                currentProjectData.id === project._id
-                                  ? styles['current-projects-item-menu']
-                                  : ''
-                              }`}
-                              onClick={(e) => e.stopPropagation()}
-                            />
 
-                            <a href="#">
-                              {' '}
-                              <span
-                                className={styles['view-project-link']}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                View Project
-                              </span>
-                            </a>
-                          </span>
+                          <a
+                            href={`/project/${project._id}`}
+                            className={`${styles['view-project-link']} ${
+                              currentProjectData.id === project._id
+                                ? styles['current-view-project-link']
+                                : ''
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                            title="View Project"
+                          >
+                            <LuExternalLink
+                              className={styles['view-project-icon']}
+                            />
+                          </a>
                         </li>
                       ))
                     : ''}
@@ -654,9 +654,14 @@ const Tasks = () => {
                               }
                             >
                               <img
-                                src={`../../assets/images/users/${userData.photo}`}
-                                className={styles['projects-item-img']}
+                                src={`${serverUrl}/users/${userData.photo}`}
+                                className={`${styles['projects-item-img']} ${
+                                  userData.photo === 'default.jpeg'
+                                    ? styles['default-pic']
+                                    : ''
+                                }`}
                               />
+
                               <span
                                 className={`${
                                   styles['projects-item-details']
@@ -673,25 +678,21 @@ const Tasks = () => {
                                   {taskLength(project)}
                                 </span>
                               </span>
-                              <span className={styles['projects-item-action']}>
-                                <BsThreeDotsVertical
-                                  className={`${styles['projects-item-menu']} ${
-                                    currentProjectData.id === project._id
-                                      ? styles['current-projects-item-menu']
-                                      : ''
-                                  }`}
-                                  onClick={(e) => e.stopPropagation()}
-                                />
 
-                                <a href="#" className={styles['']}>
-                                  <span
-                                    className={styles['view-project-link']}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    View Project
-                                  </span>
-                                </a>
-                              </span>
+                              <a
+                                href={`/project/${project._id}`}
+                                className={`${styles['view-project-link']} ${
+                                  currentProjectData.id === project._id
+                                    ? styles['current-view-project-link']
+                                    : ''
+                                }`}
+                                onClick={(e) => e.stopPropagation()}
+                                title="View Project"
+                              >
+                                <LuExternalLink
+                                  className={styles['view-project-icon']}
+                                />
+                              </a>
                             </li>
                           ))
                         : ''}
@@ -766,10 +767,16 @@ const Tasks = () => {
                               }
                             >
                               <span className={styles['leader-box']}>
-                                <a href="#">
+                                <a href={`/user/${project.username}`}>
                                   <img
-                                    src={`../../assets/images/users/${project.leaderPhoto}`}
-                                    className={styles['projects-item-img']}
+                                    src={`${serverUrl}/users/${project.leaderPhoto}`}
+                                    className={`${
+                                      styles['projects-item-img']
+                                    } ${
+                                      project.leaderPhoto === 'default.jpeg'
+                                        ? styles['default-pic']
+                                        : ''
+                                    }`}
                                   />
                                   <span
                                     className={styles['leader-tooltip-text']}
@@ -799,26 +806,21 @@ const Tasks = () => {
                                   {taskLength(project, 'assigned')}
                                 </span>
                               </span>
-                              <span className={styles['projects-item-action']}>
-                                <BsThreeDotsVertical
-                                  className={`${styles['projects-item-menu']} ${
-                                    currentProjectData.id === project._id
-                                      ? styles['current-projects-item-menu']
-                                      : ''
-                                  }`}
-                                  onClick={(e) => e.stopPropagation()}
-                                />
 
-                                <a href="#">
-                                  {' '}
-                                  <span
-                                    className={styles['view-project-link']}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    View Project
-                                  </span>
-                                </a>
-                              </span>
+                              <a
+                                href={`/project/${project._id}`}
+                                className={`${styles['view-project-link']} ${
+                                  currentProjectData.id === project._id
+                                    ? styles['current-view-project-link']
+                                    : ''
+                                }`}
+                                onClick={(e) => e.stopPropagation()}
+                                title="View Project"
+                              >
+                                <LuExternalLink
+                                  className={styles['view-project-icon']}
+                                />
+                              </a>
                             </li>
                           ))
                         : ''}

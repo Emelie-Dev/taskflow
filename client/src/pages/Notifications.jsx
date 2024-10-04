@@ -13,7 +13,7 @@ import { BiSolidSelectMultiple } from 'react-icons/bi';
 import DeleteComponent from '../components/DeleteComponent';
 
 const Notifications = () => {
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, serverUrl } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [category, setCategory] = useState('unread');
   const [notifications, setNotifications] = useState(null);

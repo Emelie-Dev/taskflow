@@ -311,6 +311,14 @@
   opacity: 1;
 }
 
+.default-pic {
+  border: 1px solid orange;
+}
+
+.scheduled-task-pics2 {
+  cursor: default;
+}
+
 /* Animations */
 
 @keyframes showNav {

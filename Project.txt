@@ -14,23 +14,22 @@
     - Set all createdAt field to immutable ✔
     - Edit project page ✔
     - Encrypt admin
-    - Resolve custom fields
+    - Resolve custom fields ✔
     - Enable viewing project group chat from project item page
     - Enable add files functionality for project members ✔
     - Update current project after each project update ✔
     - Enable addition of task on projectitem page ✔
-    - Set limit for the performed by data(username length) in the activities table
     - Enable limiting of response data
-    - Handle errors effectively
-    - Limit user data been sent to the client
-    - When fetching tasks, remember assigned and not assigned
-    - Delete project files when deleting projects
-    - Complete links to other resources in each page
-    - Make the header of all pages and the left nav bar, each a single component
+    - Handle errors effectively ✔
+    - Limit user data been sent to the client ✔
+    - When fetching tasks, remember assigned and not assigned ✔
+    - Delete project files when deleting projects ✔
+    - Complete links to other resources in each page ✔✔
+    - Make the header of all pages and the left nav bar, each a single component ✔
     - Add error boundary to the protected routes
-    - Add delete project to project item page
+    - Add delete project to project item page ✔
     - Use database calues for priority colors ✔
-    - Limit user data been sent to the client as response payload
+    - Limit user data been sent to the client as response payload ✔
     - Add loader in protected route page
     - Check project and task model for timestamp (schema option)
     - Create page for wrong routes in the frontend
@@ -46,6 +45,7 @@
     - Add page for 404 error on the frontend.
     - Fix month configuration for analytics page
     - Fix sidenav for settings page(hover functionality)
+    - Fix profile settings update(mobile number)
 
 
 

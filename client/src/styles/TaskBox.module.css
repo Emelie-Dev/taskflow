@@ -588,6 +588,10 @@
   border: 1px solid orange;
 }
 
+.default-pic {
+  border: 1px solid orange;
+}
+
 /* Animation */
 
 @keyframes rotate {

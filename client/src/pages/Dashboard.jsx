@@ -57,7 +57,7 @@ const Dashboard = () => {
   const [showNav, setShowNav] = useState(false);
   const [addTask, setAddTask] = useState(false);
   const [userStats, setUserStats] = useState(null);
-  const { userData } = useContext(AuthContext);
+  const { userData, serverUrl } = useContext(AuthContext);
   const [chartDetails, setChartDetails] = useState({ view: 0, option: '1m' });
   const [chartData, setChartData] = useState(null);
   const [taskCategory, setTaskCategory] = useState('recent');
@@ -714,7 +714,9 @@ const Dashboard = () => {
                   return (
                     <article key={task._id} className={styles['task-item']}>
                       <h1 className={styles['task-item-head']}>
-                        <a href="#">{task.project.name}</a>
+                        <a href={`/project/${task.project._id}`}>
+                          {task.project.name}
+                        </a>
                       </h1>
                       <p className={styles['task-item-details']}>{task.name}</p>
 
@@ -732,11 +734,17 @@ const Dashboard = () => {
                             <>
                               {' '}
                               {task.project.team.slice(0, 4).map((member) => (
-                                <img
-                                  key={member._id}
-                                  className={styles['task-group-pic']}
-                                  src={`../../assets/images/users/${member.photo}`}
-                                />
+                                <a href={`/user/${member.username}`}>
+                                  <img
+                                    key={member._id}
+                                    className={`${styles['task-group-pic']} ${
+                                      member.photo === 'default.jpeg'
+                                        ? styles['default-pic']
+                                        : ''
+                                    }`}
+                                    src={`${serverUrl}/users/${member.photo}`}
+                                  />
+                                </a>
                               ))}
                               <span className={styles['team-icon-box']}>
                                 <span className={styles['plus-sign']}>+</span>
@@ -749,11 +757,15 @@ const Dashboard = () => {
                                 key={member._id}
                                 className={styles['task-tooltip-box']}
                               >
-                                <a href="#">
+                                <a href={`/user/${member.username}`}>
                                   <img
                                     key={member._id}
-                                    className={styles['task-group-pic']}
-                                    src={`../../assets/images/users/${member.photo}`}
+                                    className={`${styles['task-group-pic']} ${
+                                      member.photo === 'default.jpeg'
+                                        ? styles['default-pic']
+                                        : ''
+                                    }`}
+                                    src={`${serverUrl}/users/${member.photo}`}
                                   />
                                 </a>
                                 <span
@@ -777,10 +789,16 @@ const Dashboard = () => {
                             Project Leader:
                           </span>
                           <span className={styles['task-tooltip-box']}>
-                            <a href="#">
+                            <a href={`/user/${task.leader.username}`}>
                               <img
-                                className={styles['task-item-assigned-img']}
-                                src={`../../assets/images/users/${task.leader.photo}`}
+                                className={`${
+                                  styles['task-item-assigned-img']
+                                } ${
+                                  task.leader.photo === 'default.jpeg'
+                                    ? styles['default-pic']
+                                    : ''
+                                }`}
+                                src={`${serverUrl}/users/${task.leader.photo}`}
                               />
                             </a>
                             <span className={styles['task-tooltip-text']}>
@@ -914,7 +932,7 @@ const Dashboard = () => {
                             Project:
                           </span>
                           <a
-                            href="#"
+                            href={`/project/${task.project._id}`}
                             className={styles['scheduled-task-project-name']}
                           >
                             {task.project.name}
@@ -940,10 +958,14 @@ const Dashboard = () => {
                       <div className={styles['scheduled-task-pics-box']}>
                         {task.assigned ? (
                           <span className={styles['task-tooltip-box']}>
-                            <a href="#">
+                            <a href={`/user/${task.leader.username}`}>
                               <img
-                                className={styles['scheduled-task-pics']}
-                                src={`../../assets/images/users/${task.leader.photo}`}
+                                className={`${styles['scheduled-task-pics']} ${
+                                  task.leader.photo === 'default.jpeg'
+                                    ? styles['default-pic']
+                                    : ''
+                                }`}
+                                src={`${serverUrl}/users/${task.leader.photo}`}
                               />
                             </a>
                             <span className={styles['task-tooltip-text']}>
@@ -956,19 +978,16 @@ const Dashboard = () => {
                           </span>
                         ) : (
                           <span className={styles['task-tooltip-box']}>
-                            <a href="#">
-                              <img
-                                className={styles['scheduled-task-pics']}
-                                src={`../../assets/images/users/${task.user.photo}`}
-                              />
-                            </a>
-                            <span className={styles['task-tooltip-text']}>
-                              {generateName(
-                                task.user.firstName,
-                                task.user.lastName,
-                                task.user.username
-                              )}
-                            </span>
+                            <img
+                              className={`${styles['scheduled-task-pics']} ${
+                                styles['scheduled-task-pics2']
+                              } ${
+                                task.user.photo === 'default.jpeg'
+                                  ? styles['default-pic']
+                                  : ''
+                              }`}
+                              src={`${serverUrl}/users/${task.user.photo}`}
+                            />
                           </span>
                         )}
                       </div>

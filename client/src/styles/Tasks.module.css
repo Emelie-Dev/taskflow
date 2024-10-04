@@ -131,40 +131,28 @@
   font-family: var(--general-font);
 }
 
-.projects-item-action {
-  align-self: flex-start;
-  margin-left: auto;
-  position: relative;
-}
-
-.projects-item-menu {
-  width: 1.2rem;
-  height: 1.2rem;
-  fill: gray;
-}
-
 .view-project-link {
-  position: absolute;
-  font-family: var(--general-font);
-  padding: 0.5rem;
-  white-space: nowrap;
-  right: 0;
-  top: 90%;
-  z-index: 20;
-  display: none;
-  background: white;
-  box-shadow: 1px 1px 10px -3px black;
-  font-size: 0.9rem;
-  transition: background 0.2s;
-  cursor: pointer;
+  margin-left: auto;
+  align-self: flex-start;
   color: black;
+  display: none;
 }
 
-.view-project-link:hover {
-  background: #dcdcdc;
+.view-project-icon {
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
-.projects-item-action:hover .view-project-link {
+.current-view-project-link {
+  color: white;
+  display: inline;
+}
+
+.default-pic {
+  border: 1px solid orange;
+}
+
+.projects-list-item:hover .view-project-link {
   display: inline;
 }
 
@@ -285,7 +273,7 @@
   box-shadow: 1px 1px 10px -3px black;
   z-index: 3;
   width: 55%;
-  max-height: 90vh;
+  max-height: 60vh;
   padding: 1rem;
   padding-bottom: 1.5rem;
   border-radius: 5px;
@@ -297,8 +285,6 @@
 .alt-projects-list {
   list-style-type: none;
   margin-top: 1rem;
-  overflow: auto;
-  max-height: 25vh;
 }
 
 .alt-projects-list-item {
@@ -315,6 +301,10 @@
 
 .alt-projects-list-item:hover {
   border: 1px solid orange;
+}
+
+.alt-projects-list-item:hover .view-project-link {
+  display: inline;
 }
 
 .show-projects {

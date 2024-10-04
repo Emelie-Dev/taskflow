@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import styles from '../styles/Notifications.module.css';
 import {
   MdPersonAdd,
@@ -16,7 +16,7 @@ import {
 } from 'react-icons/go';
 import { BsEnvelopeOpenFill } from 'react-icons/bs';
 import { IoPersonRemove } from 'react-icons/io5';
-import { apiClient } from '../App';
+import { apiClient, AuthContext } from '../App';
 import { ToastContainer, toast } from 'react-toastify';
 import { SiKashflow } from 'react-icons/si';
 
@@ -40,6 +40,7 @@ const NotificationContainer = ({
   setDeleteList,
   setDeleteCount,
 }) => {
+  const { serverUrl } = useContext(AuthContext);
   const [showData, setShowData] = useState(true);
   const [containerHeight, setContainerHeight] = useState(null);
   const [deleteArray, setDeleteArray] = useState([]);

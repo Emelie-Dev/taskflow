@@ -27,7 +27,7 @@ const TaskBox = ({
   setCurrentProject,
   setDeleteCount,
 }) => {
-  const { userData } = useContext(AuthContext);
+  const { userData, serverUrl } = useContext(AuthContext);
   const [showDetails, setShowDetails] = useState(false);
   const [editTask, setEditTask] = useState(false);
   const [taskObj, setTaskObj] = useState(task);
@@ -46,7 +46,7 @@ const TaskBox = ({
     deadline: taskObj.deadline ? new Date(taskObj.deadline) : '',
     description: taskObj.description,
     assignees: new Set(taskObj.assignee.map((assignee) => assignee._id)),
-    customFields: [...taskObj.customFields],
+    customFields: taskObj.customFields.map((elem) => ({ ...elem })),
   });
   const [isDataChanged, setIsDataChanged] = useState(false);
   const [updating, setUpdating] = useState(false);
@@ -62,7 +62,7 @@ const TaskBox = ({
     deadline: new Date(taskObj.deadline),
     description: taskObj.description,
     assignees: new Set(taskObj.assignee.map((assignee) => assignee._id)),
-    customFields: [...taskObj.customFields],
+    customFields: taskObj.customFields.map((elem) => ({ ...elem })),
   };
 
   // For fetching task activities
@@ -114,6 +114,20 @@ const TaskBox = ({
     getActivities();
   }, [activitiesDetails]);
 
+  useEffect(() => {
+    setTaskData((prevData) => {
+      let { customFields } = prevData;
+
+      customFields = customFields.reduce((accumulator, field) => {
+        if (String(field.value).trim().length !== 0) accumulator.push(field);
+
+        return accumulator;
+      }, []);
+
+      return { ...prevData, customFields };
+    });
+  }, [taskObj]);
+
   // For detecting change in taskData
   useEffect(() => {
     let value = 0;
@@ -139,8 +153,7 @@ const TaskBox = ({
           } else return true;
         });
 
-        if (isChanged) value--;
-        else value++;
+        if (!isChanged) value++;
       } else {
         if (String(taskData[prop]).trim() === String(initalData[prop]).trim()) {
           value++;
@@ -165,6 +178,7 @@ const TaskBox = ({
     // Checks if task data is changed
     let value = 7;
     const body = {};
+
     for (const prop in taskData) {
       if (prop === 'assignees') {
         if (
@@ -172,6 +186,26 @@ const TaskBox = ({
         ) {
           value--;
           body[prop] = taskData[prop];
+        }
+      } else if (prop === 'customFields') {
+        const isChanged = taskData.customFields.some((field) => {
+          const initialField = initalData.customFields.find(
+            (elem) => elem.field === field.field
+          );
+
+          if (initialField) {
+            return (
+              String(field.value).trim() !== String(initialField.value).trim()
+            );
+          } else if (String(field.value).trim() === '') {
+            return false;
+          } else return true;
+        });
+
+        if (isChanged) {
+          value--;
+          body.customFields = taskData.customFields;
+          body.otherFields = true;
         }
       } else {
         if (String(taskData[prop]).trim() !== String(initalData[prop]).trim()) {
@@ -206,7 +240,11 @@ const TaskBox = ({
             }
           );
         } catch (err) {
-          if (!err.response.data || err.response.status === 500) {
+          if (
+            !err.response ||
+            !err.response.data ||
+            err.response.status === 500
+          ) {
             toast('An error occured while updating the assignees.', {
               toastId: 'toast-id2',
             });
@@ -230,7 +268,7 @@ const TaskBox = ({
     } catch (err) {
       setUpdating(false);
 
-      if (!err.response.data) {
+      if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occured while saving the task.', {
           toastId: 'toast-id2',
         });
@@ -383,24 +421,43 @@ const TaskBox = ({
         </>
       );
     } else if (activity.action === 'update') {
-      return (
-        <>
-          {userData._id === activity.user._id ? (
-            'You'
-          ) : (
-            <a href="#" className={styles['activity-names']}>
-              {generateName(
-                activity.user.firstName,
-                activity.user.lastName,
-                activity.user.username
-              )}
-            </a>
-          )}{' '}
-          updated the task's {activity.type.includes('name') ? 'name' : ''}
-          {activity.type.length > 1 ? ' and ' : ''}
-          {activity.type.includes('description') ? 'description' : ''}.
-        </>
-      );
+      if (activity.type.includes('custom')) {
+        return (
+          <>
+            {userData._id === activity.user._id ? (
+              'You'
+            ) : (
+              <a href="#" className={styles['activity-names']}>
+                {generateName(
+                  activity.user.firstName,
+                  activity.user.lastName,
+                  activity.user.username
+                )}
+              </a>
+            )}{' '}
+            updated the task's custom fields.
+          </>
+        );
+      } else {
+        return (
+          <>
+            {userData._id === activity.user._id ? (
+              'You'
+            ) : (
+              <a href="#" className={styles['activity-names']}>
+                {generateName(
+                  activity.user.firstName,
+                  activity.user.lastName,
+                  activity.user.username
+                )}
+              </a>
+            )}{' '}
+            updated the task's {activity.type.includes('name') ? 'name' : ''}
+            {activity.type.length > 1 ? ' and ' : ''}
+            {activity.type.includes('description') ? 'description' : ''}.
+          </>
+        );
+      }
     } else if (activity.action === 'transition') {
       if (!activity.performer) {
         return (
@@ -631,7 +688,7 @@ const TaskBox = ({
   };
 
   const handleCustomField = (field) => (e) => {
-    const customFields = [...taskData.customFields];
+    const customFields = taskData.customFields.map((elem) => ({ ...elem }));
     const index = customFields.findIndex((elem) => elem.field === field);
 
     if (index === -1) {
@@ -641,7 +698,6 @@ const TaskBox = ({
     }
 
     setTaskData({ ...taskData, customFields });
-    console.log({ taskData, taskObj });
   };
 
   return (
@@ -823,10 +879,17 @@ const TaskBox = ({
                       editTask ? styles['hide-data'] : ''
                     }`}
                   >
-                    <a href="#" className={styles['assignee-link']}>
+                    <a
+                      href={`/user/${assignee.username}`}
+                      className={styles['assignee-link']}
+                    >
                       <img
-                        src={`../../assets/images/users/${assignee.photo}`}
-                        className={styles['assignee-img']}
+                        src={`${serverUrl}/users/${assignee.photo}`}
+                        className={`${styles['assignee-img']} ${
+                          assignee.photo === 'default.jpeg'
+                            ? styles['default-pic']
+                            : ''
+                        }`}
                       />
 
                       <span className={styles['assignee-name']}>
@@ -863,8 +926,12 @@ const TaskBox = ({
                 {taskAssignees.map((assignee, index) => (
                   <span key={assignee._id} className={styles['assignee-box']}>
                     <img
-                      className={styles['assignee-pics']}
-                      src={`../../assets/images/users/${assignee.photo}`}
+                      src={`${serverUrl}/users/${assignee.photo}`}
+                      className={`${styles['assignee-pics']} ${
+                        assignee.photo === 'default.jpeg'
+                          ? styles['default-pic']
+                          : ''
+                      }`}
                     />
                     <RxCross2
                       className={styles['remove-assignee-icon']}

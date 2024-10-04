@@ -36,7 +36,7 @@ export const months = [
 ];
 
 const Projects = () => {
-  const { userData } = useContext(AuthContext);
+  const { userData, serverUrl } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [displayFormat, setDisplayFormat] = useState(
     userData.personalization.defaultProjectView
@@ -592,10 +592,14 @@ const Projects = () => {
                                   key={member._id}
                                   className={styles['team-pics-tooltip']}
                                 >
-                                  <a href="#">
+                                  <a href={`/user/${member.username}`}>
                                     <img
-                                      src={`../../assets/images/users/${member.photo}`}
-                                      className={styles['team-pics']}
+                                      src={`${serverUrl}/users/${member.photo}`}
+                                      className={`${styles['team-pics']} ${
+                                        member.photo === 'default.jpeg'
+                                          ? styles['default-pic']
+                                          : ''
+                                      }`}
                                     />
                                   </a>
                                   <span
@@ -623,10 +627,14 @@ const Projects = () => {
                                 key={member._id}
                                 className={styles['team-pics-tooltip']}
                               >
-                                <a href="#">
+                                <a href={`/user/${member.username}`}>
                                   <img
-                                    src={`../../assets/images/users/${member.photo}`}
-                                    className={styles['team-pics']}
+                                    src={`${serverUrl}/users/${member.photo}`}
+                                    className={`${styles['team-pics']} ${
+                                      member.photo === 'default.jpeg'
+                                        ? styles['default-pic']
+                                        : ''
+                                    }`}
                                   />
                                 </a>
                                 <span
@@ -829,12 +837,19 @@ const Projects = () => {
                                               styles['table-team-pics-box']
                                             }
                                           >
-                                            <a href="#">
+                                            <a
+                                              href={`/user/${member.username}`}
+                                            >
                                               <img
-                                                className={
+                                                className={`${
                                                   styles['table-team-pics']
-                                                }
-                                                src={`../../assets/images/users/${member.photo}`}
+                                                } ${
+                                                  member.photo ===
+                                                  'default.jpeg'
+                                                    ? styles['default-pic']
+                                                    : ''
+                                                }`}
+                                                src={`${serverUrl}/users/${member.photo}`}
                                               />
                                             </a>
                                             <span
@@ -872,12 +887,16 @@ const Projects = () => {
                                           styles['table-team-pics-box']
                                         }
                                       >
-                                        <a href="#">
+                                        <a href={`/user/${member.username}`}>
                                           <img
-                                            className={
+                                            className={`${
                                               styles['table-team-pics']
-                                            }
-                                            src={`../../assets/images/users/${member.photo}`}
+                                            } ${
+                                              member.photo === 'default.jpeg'
+                                                ? styles['default-pic']
+                                                : ''
+                                            }`}
+                                            src={`${serverUrl}/users/${member.photo}`}
                                           />
                                         </a>
                                         <span
