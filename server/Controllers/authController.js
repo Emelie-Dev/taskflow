@@ -230,7 +230,10 @@ export const login = asyncErrorHandler(async (req, res, next) => {
   }
 
   if (!user.active) {
-    // Send reactivation mail
+    // send reactivation email
+    try {
+      await new Email(user).sendReactivationEmail();
+    } catch {}
 
     user = await User.findOneAndUpdate(
       { _id: user._id, login: true },

@@ -5,7 +5,6 @@ import {
   MdKeyboardDoubleArrowDown,
   MdOutlineSignalWifiOff,
 } from 'react-icons/md';
-import { BsThreeDotsVertical } from 'react-icons/bs';
 import TaskBox from '../components/TaskBox';
 import { HiPlus } from 'react-icons/hi';
 import NewTask from '../components/NewTask';
@@ -19,7 +18,6 @@ import { LuExternalLink } from 'react-icons/lu';
 
 const Tasks = () => {
   const { userData, serverUrl } = useContext(AuthContext);
-  const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [taskType, setTaskType] = useState('personal');
@@ -58,8 +56,6 @@ const Tasks = () => {
   });
   const [deleteCount, setDeleteCount] = useState(0);
   const [createCount, setCreateCount] = useState(0);
-  const searchRef = useRef();
-  const navRef = useRef();
 
   // For personal tasks
   useEffect(() => {
@@ -241,20 +237,6 @@ const Tasks = () => {
 
     getProjectTasks();
   }, [currentProjectData]);
-
-  const hideNav = (e) => {
-    if (e.target === navRef.current) {
-      setShowNav(false);
-    }
-  };
-
-  const handleSearchText = (e) => {
-    setSearchText(e.target.value);
-  };
-  const clearSearchText = () => {
-    setSearchText('');
-    searchRef.current.focus();
-  };
 
   const handleProjects = () => {
     setShowProjects(!showProjects);

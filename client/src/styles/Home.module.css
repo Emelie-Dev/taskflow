@@ -24,7 +24,7 @@
   height: 2rem;
   margin-right: 1rem;
   fill: black;
-  animation:  rotate 0.5s linear 0s infinite;
+  /* animation: rotate 0.5s linear 0s infinite; */
 }
 
 .login-link {
@@ -191,13 +191,12 @@
 /* Coloured cards */
 
 .card-box {
-
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
 }
- .article {
+.article {
   border-radius: 30px;
   padding: 0.2rem;
   width: 28%;
@@ -292,7 +291,7 @@
   border-radius: 30px 70% 30px 30px;
   width: 100%;
   height: 210px;
-}  
+}
 
 .footer {
   background: orange;

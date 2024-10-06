@@ -16,6 +16,8 @@ import ProjectItem from './pages/ProjectItem';
 import ProtectedRoute from './components/ProtectedRoute';
 import axios from 'axios';
 import User from './pages/User';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorPage from './pages/ErrorPage';
 
 const serverUrl =
   import.meta.env.MODE === 'production'
@@ -43,47 +45,53 @@ const App = () => {
         serverUrl,
       }}
     >
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route
-          path="/dashboard"
-          element={<ProtectedRoute element={Dashboard} />}
-        />
-        <Route
-          path="/projects"
-          element={<ProtectedRoute element={Projects} />}
-        />
-        <Route path="/tasks" element={<ProtectedRoute element={Tasks} />} />
-        <Route
-          path="/calendar"
-          element={<ProtectedRoute element={CalendarPage} />}
-        />
-        <Route path="/chats" element={<ProtectedRoute element={Chats} />} />
-        <Route
-          path="/analytics"
-          element={<ProtectedRoute element={Analytics} />}
-        />
-        <Route
-          path="/settings"
-          element={<ProtectedRoute element={Settings} />}
-        />
-        <Route path="/profile" element={<ProtectedRoute element={Profile} />} />
-        <Route
-          path="/notifications"
-          element={<ProtectedRoute element={Notifications} />}
-        />
-        <Route
-          path={'/project/:projectId'}
-          element={<ProtectedRoute element={ProjectItem} />}
-        />
-        <Route
-          path={'/user/:username'}
-          element={<ProtectedRoute element={User} />}
-        />
-      </Routes>
+      <ErrorBoundary FallbackComponent={ErrorPage}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/dashboard"
+            element={<ProtectedRoute element={Dashboard} />}
+          />
+          <Route
+            path="/projects"
+            element={<ProtectedRoute element={Projects} />}
+          />
+          <Route path="/tasks" element={<ProtectedRoute element={Tasks} />} />
+          <Route
+            path="/calendar"
+            element={<ProtectedRoute element={CalendarPage} />}
+          />
+          <Route path="/chats" element={<ProtectedRoute element={Chats} />} />
+          <Route
+            path="/analytics"
+            element={<ProtectedRoute element={Analytics} />}
+          />
+          <Route
+            path="/settings"
+            element={<ProtectedRoute element={Settings} />}
+          />
+          <Route
+            path="/profile"
+            element={<ProtectedRoute element={Profile} />}
+          />
+          <Route
+            path="/notifications"
+            element={<ProtectedRoute element={Notifications} />}
+          />
+          <Route
+            path={'/project/:projectId'}
+            element={<ProtectedRoute element={ProjectItem} />}
+          />
+          <Route
+            path={'/user/:username'}
+            element={<ProtectedRoute element={User} />}
+          />
+          <Route path="*" element={<ErrorPage page={'404'} />} />
+        </Routes>
+      </ErrorBoundary>
     </AuthContext.Provider>
   );
 };

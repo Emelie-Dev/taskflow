@@ -41,7 +41,6 @@ ChartJS.register(
 // Continue from view and show button
 
 const Analytics = () => {
-  const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [projectOption, setProjectOption] = useState({
     value: '',
@@ -77,8 +76,6 @@ const Analytics = () => {
   const [lineInputData, setLineInputData] = useState({ type: null, value: '' });
   const [isLineInputValid, setIsLineInputValid] = useState(false);
 
-  const searchRef = useRef();
-  const navRef = useRef();
   const mainNavRef = useRef();
   const projectViewRef = useRef();
   const taskViewRef = useRef();
@@ -359,21 +356,6 @@ const Analytics = () => {
       }
     }
   }, [lineInputData]);
-
-  const hideNav = (e) => {
-    if (e.target === navRef.current) {
-      setShowNav(false);
-    }
-  };
-
-  const handleSearchText = (e) => {
-    setSearchText(e.target.value);
-  };
-
-  const clearSearchText = () => {
-    setSearchText('');
-    searchRef.current.focus();
-  };
 
   const handleChartOptions = (type) => (e) => {
     const value = `${e.target.value}`;

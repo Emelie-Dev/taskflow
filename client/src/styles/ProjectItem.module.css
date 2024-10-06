@@ -306,6 +306,24 @@
   font-size: 1.5rem;
   word-wrap: break-word;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.active-icon {
+  margin-left: 0.5rem;
+  fill: green;
+  transform: translateY(1px);
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+.inactive-icon {
+  margin-left: 0.5rem;
+  fill: red;
+  transform: translateY(1px);
+  width: 1.7rem;
+  height: 1.7rem;
 }
 
 .project-container {

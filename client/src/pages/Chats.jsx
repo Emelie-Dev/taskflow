@@ -11,14 +11,11 @@ import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 
 const Chat = () => {
-  const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [chatMode, setChatMode] = useState('private');
   const [emptyMode, setEmptyMode] = useState({ private: true, group: true });
   const [hideContacts, setHideContacts] = useState(false);
   const [showChats, setShowChats] = useState(false);
-  const searchRef = useRef();
-  const navRef = useRef();
 
   useEffect(() => {
     const resizeHandler = () => {
@@ -33,20 +30,6 @@ const Chat = () => {
       window.removeEventListener('resize', resizeHandler);
     };
   }, []);
-
-  const hideNav = (e) => {
-    if (e.target === navRef.current) {
-      setShowNav(false);
-    }
-  };
-
-  const handleSearchText = (e) => {
-    setSearchText(e.target.value);
-  };
-  const clearSearchText = () => {
-    setSearchText('');
-    searchRef.current.focus();
-  };
 
   const handlePrivateChat = () => {
     setEmptyMode({ ...emptyMode, private: false });

@@ -37,7 +37,6 @@ export const months = [
 
 const Projects = () => {
   const { userData, serverUrl } = useContext(AuthContext);
-  const [searchText, setSearchText] = useState('');
   const [displayFormat, setDisplayFormat] = useState(
     userData.personalization.defaultProjectView
   );
@@ -60,9 +59,6 @@ const Projects = () => {
   const [deleteCount, setDeleteCount] = useState(0);
   const [deleteModal, setDeleteModal] = useState({ value: false, type: null });
   const [deleteData, setDeleteData] = useState({});
-
-  const searchRef = useRef();
-  const navRef = useRef();
 
   // For the Projects
   useEffect(() => {
@@ -144,21 +140,6 @@ const Projects = () => {
 
     getUserProjects();
   }, [projectsDetails]);
-
-  const handleSearchText = (e) => {
-    setSearchText(e.target.value);
-  };
-
-  const clearSearchText = () => {
-    setSearchText('');
-    searchRef.current.focus();
-  };
-
-  const hideNav = (e) => {
-    if (e.target === navRef.current) {
-      setShowNav(false);
-    }
-  };
 
   const nextPage = () => {
     const { category, sort, page } = projectsDetails;

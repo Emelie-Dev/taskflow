@@ -24,28 +24,29 @@
     - Limit user data been sent to the client ✔
     - When fetching tasks, remember assigned and not assigned ✔
     - Delete project files when deleting projects ✔
-    - Complete links to other resources in each page ✔✔
+    - Complete links to other resources in each page ✔
     - Make the header of all pages and the left nav bar, each a single component ✔
-    - Add error boundary to the protected routes ✔✔
+    - Add error boundary to the protected routes ✔
     - Add delete project to project item page ✔
     - Use database calues for priority colors ✔
     - Limit user data been sent to the client as response payload ✔
-    - Add loader in protected route page
-    - Check project and task model for timestamp (schema option)
-    - Create page for wrong routes in the frontend
-    - Enable detecting of active and inactive projects
-    - Test duplicating username when creating account
-    - Add !err.response for catch block
+    - Add loader in protected route page ✔
+    - Check project and task model for timestamp (schema option) ✔
+    - Create page for wrong routes in the frontend ✔
+    - Enable detecting of active and inactive projects ✔
+    - Test duplicating username when creating account ✔
+    - Add !err.response for catch block ✔
     - Enable data update after saving activity
-    - Adjust the user data in profile page
-    - Send email for activation and deactivation and deletion of accounts
-    - Handle all request handlers for deactivated members
-    - Handle project deadline update
-    - Enable users to leave project teams on purpose
-    - Add page for 404 error on the frontend.
+    - Adjust the user data in profile page ✔
+    - Send email for activation and deactivation of accounts ✔
+    - Handle all request handlers for deactivated members ✔
+    - Handle project deadline update ✔✔
+    - Enable users to leave project teams on purpose ✔
     - Fix month configuration for analytics page
     - Fix sidenav for settings page(hover functionality)
     - Fix profile settings update(mobile number)
+    - Fix email verification message
+    - Fix task creation in dashboard page(project loading)
 
 
 

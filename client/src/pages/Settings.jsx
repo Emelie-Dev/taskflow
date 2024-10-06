@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/Settings.module.css';
-import { IoIosSearch, IoMdClose, IoIosNotifications } from 'react-icons/io';
+import { IoMdClose, IoIosNotifications } from 'react-icons/io';
 
 import { MdModeEditOutline, MdOutlineSecurity } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
@@ -18,7 +18,6 @@ import NavBar from '../components/NavBar';
 
 const Settings = () => {
   const { userData, setUserData, serverUrl } = useContext(AuthContext);
-  const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [category, setCategory] = useState('general');
   const [displayCategory, setDisplayCategory] = useState(false);
@@ -26,8 +25,6 @@ const Settings = () => {
   const [cropData, setCropData] = useState(null);
   const [mode, setMode] = useState(null);
 
-  const searchRef = useRef();
-  const navRef = useRef();
   const fileRef = useRef();
 
   useEffect(() => {
@@ -37,21 +34,6 @@ const Settings = () => {
       }
     }
   }, [image]);
-
-  const hideNav = (e) => {
-    if (e.target === navRef.current) {
-      setShowNav(false);
-    }
-  };
-
-  const handleSearchText = (e) => {
-    setSearchText(e.target.value);
-  };
-
-  const clearSearchText = () => {
-    setSearchText('');
-    searchRef.current.focus();
-  };
 
   const hideResponsiveSettings = (e) => {
     e.target === e.currentTarget && setDisplayCategory(false);

@@ -12,7 +12,6 @@ import NavBar from '../components/NavBar';
 
 const CalendarPage = () => {
   const { userData, serverUrl } = useContext(AuthContext);
-  const [searchText, setSearchText] = useState('');
   const [showNav, setShowNav] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -34,8 +33,6 @@ const CalendarPage = () => {
     pageError: false,
   });
 
-  const searchRef = useRef();
-  const navRef = useRef();
   const calenderRef = useRef();
 
   const priorityColors = userData.personalization.priorityColors;
@@ -68,7 +65,11 @@ const CalendarPage = () => {
         setLoading({ status: false, error: true });
         setTasksData(null);
 
-        if (!err.response.data) {
+        if (
+          !err.response ||
+          !err.response.data ||
+          err.response.status === 500
+        ) {
           return toast('An error occured while fetching calendar details.', {
             toastId: 'toast-id1',
           });

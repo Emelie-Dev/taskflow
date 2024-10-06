@@ -1,31 +1,16 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/ProjectItem.module.css';
-import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
-import { Link } from 'react-router-dom';
-
-import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
-import { IoIosNotifications } from 'react-icons/io';
-
+import { SiKashflow } from 'react-icons/si';
 import {
-  MdOutlineDashboard,
-  MdOutlineSegment,
   MdDelete,
-  MdRemoveRedEye,
-  MdOpenInNew,
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
   MdOutlineSignalWifiOff,
 } from 'react-icons/md';
-import { FaTasks, FaCalendarAlt, FaSearch, FaFileAlt } from 'react-icons/fa';
-import { GoProjectTemplate } from 'react-icons/go';
-import { FaRegCircleUser, FaFileImage } from 'react-icons/fa6';
-import {
-  BsFileEarmarkPdfFill,
-  BsThreeDotsVertical,
-  BsPeopleFill,
-} from 'react-icons/bs';
+import { FaTasks, FaFileAlt } from 'react-icons/fa';
+import { BsThreeDotsVertical, BsPeopleFill } from 'react-icons/bs';
 import { GrStatusGood } from 'react-icons/gr';
-import { RiContrastLine, RiDeleteBin6Line } from 'react-icons/ri';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 import { RxUpdate } from 'react-icons/rx';
 import Project from '../components/Project';
 import { IoCloseSharp } from 'react-icons/io5';
@@ -43,6 +28,10 @@ import { VscIssueReopened } from 'react-icons/vsc';
 import { FiDownload } from 'react-icons/fi';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
+import {
+  IoIosCheckmarkCircleOutline,
+  IoIosCloseCircleOutline,
+} from 'react-icons/io';
 
 const ProjectItem = () => {
   const { userData, serverUrl } = useContext(AuthContext);
@@ -1129,7 +1118,18 @@ const ProjectItem = () => {
             )
           ) : (
             <>
-              <h1 className={styles['project-name']}>{project.name}</h1>
+              <h1 className={styles['project-name']}>
+                {project.name}{' '}
+                {project.status === 'inactive' ? (
+                  <IoIosCloseCircleOutline
+                    className={styles['inactive-icon']}
+                  />
+                ) : (
+                  <IoIosCheckmarkCircleOutline
+                    className={styles['active-icon']}
+                  />
+                )}
+              </h1>
 
               {isOwner() ? (
                 <div className={styles['edit-btn-div']}>

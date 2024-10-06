@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { apiClient, AuthContext } from '../App';
 import { Navigate } from 'react-router-dom';
+import Loader from '../components/Loader';
 
 const ProtectedRoute = ({ element: Component, ...prop }) => {
   const { userData, setUserData, isAuthenticated, setIsAuthenticated } =
@@ -26,8 +27,12 @@ const ProtectedRoute = ({ element: Component, ...prop }) => {
   }, []);
 
   if (isAuthenticated === null) {
-    // Still loading, you might want to show a loading indicator
-    return <></>;
+    return (
+      <div className="auth-loader-box">
+        <Loader style={{ width: '2.5rem', height: '2.5rem' }} />
+        <span className="auth-loader-text">Loading page....</span>
+      </div>
+    );
   }
 
   return isAuthenticated ? <Component {...prop} /> : <Navigate to={'/login'} />;

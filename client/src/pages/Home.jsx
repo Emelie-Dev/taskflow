@@ -327,7 +327,6 @@ const Home = () => {
                   </svg>
                 )}
               </span>
-
             </article>
 
             // <article className={styles.card}>

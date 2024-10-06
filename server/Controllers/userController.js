@@ -430,7 +430,13 @@ export const deactivateUser = asyncErrorHandler(async (req, res, next) => {
   user.active = false;
   await user.save();
 
-  //send deactivation email
+  // send deactivation email
+  try {
+    await new Email(
+      user,
+      'https://taskflow-266v.onrender.com/login'
+    ).sendDeactivationEmail();
+  } catch {}
 
   return res.status(204).json({
     status: 'success',

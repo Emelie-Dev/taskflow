@@ -43,6 +43,22 @@ const deleteEmail = fs.readFileSync(
   'utf-8'
 );
 
+const deactivationEmail = fs.readFileSync(
+  join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../Public/Templates/deactivationEmail.html'
+  ),
+  'utf-8'
+);
+
+const reactivationEmail = fs.readFileSync(
+  join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../Public/Templates/reactivationEmail.html'
+  ),
+  'utf-8'
+);
+
 class Email {
   constructor(user, url) {
     this.url = url;
@@ -127,6 +143,20 @@ class Email {
     const template = deleteEmail.replace('{{DELETETOKEN}}', this.url);
 
     await this.send(template, 'Verify Account Deletion');
+  }
+
+  async sendDeactivationEmail() {
+    const template = deactivationEmail
+      .replace('{{USERNAME}}', this.username)
+      .replace('{{URL}}', this.url);
+
+    await this.send(template, 'Account Deactivation');
+  }
+
+  async sendReactivationEmail() {
+    const template = reactivationEmail.replace('{{USERNAME}}', this.username);
+
+    await this.send(template, 'Account Reactivation');
   }
 }
 
