@@ -206,6 +206,6 @@ projectSchema.pre('findOneAndUpdate', function (next) {
 
 const Project = mongoose.model('Project', projectSchema);
 
-Project.syncIndexes();
+// Project.syncIndexes();
 
 export default Project;

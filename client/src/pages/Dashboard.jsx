@@ -83,6 +83,7 @@ const Dashboard = () => {
   const [reloadProject, setReloadProject] = useState(Symbol('false'));
   const calenderRef = useRef();
   const taskBoxRef = useRef();
+  const graphRef = useRef();
 
   // For user stats
   useEffect(() => {
@@ -193,16 +194,18 @@ const Dashboard = () => {
 
   const getUserProjects = async (page) => {
     try {
-      let data = await apiClient(`/api/v1/projects/my_projects?page=${page}`);
-      setProjects([...projects, ...data.data.data.projects]);
+      let projects = [];
+      let data;
 
-      setProjectsDetails({ page, error: false });
-
-      while (data.data.data.projects.length >= 30) {
-        page++;
+      do {
         data = await apiClient(`/api/v1/projects/my_projects?page=${page}`);
-        setProjects([...projects, ...data.data.data.projects]);
-      }
+        projects = [...projects, ...data.data.data.projects];
+
+        setProjectsDetails({ page, error: false });
+        page++;
+      } while (data.data.data.projects.length >= 30);
+
+      setProjects(projects);
     } catch {
       setProjectsDetails({ page, error: true });
     }
@@ -258,6 +261,7 @@ const Dashboard = () => {
         // More tooltip options...
       },
     },
+    responsive: false,
   };
 
   const moveToCurrentDate = () => {
@@ -629,11 +633,9 @@ const Dashboard = () => {
                 />{' '}
               </div>
             ) : chartData ? (
-              <Line
-                className={styles['chart-container']}
-                data={data}
-                options={options}
-              />
+              <div ref={graphRef} className={styles['chart-container']}>
+                <Line data={data} options={options} width={610} height={330} />
+              </div>
             ) : (
               <div className={styles['chart-error-msg']}>
                 Unable to retrieve data

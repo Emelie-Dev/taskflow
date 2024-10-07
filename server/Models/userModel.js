@@ -48,7 +48,13 @@ const userSchema = new mongoose.Schema({
   mobileNumber: {
     type: String,
     trim: true,
-    validate: [validator.isMobilePhone, 'Please provide a valid Phone Number.'],
+    validate: {
+      validator: (value) => {
+        if (String(value).trim().length === 0) return true;
+        else return validator.isMobilePhone(value);
+      },
+      message: 'Please provide a valid Phone Number.',
+    },
   },
   active: {
     type: Boolean,
@@ -300,6 +306,6 @@ userSchema.methods.isPasswordChanged = function (JWTTimestamp) {
 const User = mongoose.model('User', userSchema);
 
 // Forces mongoose to rebuild the indexes
-User.syncIndexes();
+// User.syncIndexes();
 
 export default User;

@@ -23,6 +23,8 @@ const AccountAccess = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    document.title = 'TaskFlow - Signup';
+
     const checkAuth = async () => {
       try {
         const { data } = await apiClient('/api/v1/auth/auth-check');

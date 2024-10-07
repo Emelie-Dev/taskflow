@@ -1,11 +1,15 @@
 import React, { useContext, useEffect } from 'react';
 import { apiClient, AuthContext } from '../App';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import Loader from '../components/Loader';
 
 const ProtectedRoute = ({ element: Component, ...prop }) => {
   const { userData, setUserData, isAuthenticated, setIsAuthenticated } =
     useContext(AuthContext);
+  const path = useLocation().pathname.split('/')[1];
+
+  const firstLetter = path[0].toUpperCase();
+  document.title = `TaskFlow - ${firstLetter}${path.slice(1)}`;
 
   useEffect(() => {
     const checkAuth = async () => {

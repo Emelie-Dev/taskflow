@@ -44,9 +44,11 @@
     - Enable users to leave project teams on purpose ✔
     - Fix month configuration for analytics page ✔✔
     - Fix sidenav for settings page(hover functionality) ✔
-    - Fix profile settings update(mobile number) ✔✔
-    - Fix email verification message
-    - Fix task creation in dashboard page(project loading)
+    - Fix profile settings update(mobile number) ✔
+    - Fix email verification message ✔
+    - Fix task creation in dashboard page(project loading) ✔
+    - Fix google or facebooka api for login or signup ✔✔
+    - Fix title for all pages ✔
 
 
 

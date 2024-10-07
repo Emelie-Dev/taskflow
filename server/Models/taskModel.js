@@ -159,6 +159,6 @@ taskSchema.pre('save', function (next) {
 
 const Task = mongoose.model('Task', taskSchema);
 
-Task.syncIndexes();
+// Task.syncIndexes();
 
 export default Task;

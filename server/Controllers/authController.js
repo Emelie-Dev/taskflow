@@ -6,6 +6,17 @@ import CustomError from '../Utils/CustomError.js';
 import crypto from 'crypto';
 import util from 'util';
 import Notification from '../Models/notificationModel.js';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const verifyResult = fs.readFileSync(
+  join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../Public/Templates/verifyResult.html'
+  ),
+  'utf-8'
+);
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -172,14 +183,23 @@ export const verifyEmail = asyncErrorHandler(async (req, res, next) => {
     emailVerificationTokenExpires: { $gt: Date.now() },
   });
 
+  const url =
+    process.env.NODE_ENV === 'production'
+      ? 'https://taskflow-266v.onrender.com'
+      : 'http://localhost:5173';
+
   // If user does not exist
   if (!user) {
-    return next(
-      new CustomError(
-        'The verification link is invalid or has expired! Log in to your account to generate a new one.',
-        404
-      )
+    const message = verifyResult.replace(
+      '{{CONTENT}}',
+      `<div class="body body-fail">The verification link is invalid or has expired! Log in to your account to generate a new one.
+    
+    <div class="btn-div"><a href="${url}/login"><button class='btn'>Login</button></a></div>
+    
+    </div>`
     );
+
+    return res.status(404).send(message);
   }
 
   // If user exists
@@ -198,12 +218,24 @@ export const verifyEmail = asyncErrorHandler(async (req, res, next) => {
     // secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   });
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      user,
-    },
-  });
+  const message = verifyResult
+    .replace(
+      '{{CONTENT}}',
+      `<div class="body body-success">Your email has been successfully verified.
+    </div>`
+    )
+    .replace(
+      '{{CONTENT2}}',
+      `<script>
+   (() => {
+   setInterval(() => {
+    window.location.href = '${url}/dashboard'
+    }, 3000)
+      })();
+   </script>`
+    );
+
+  res.status(200).send(message);
 
   try {
     const url = `${req.protocol}://${req.get('host')}/settings`;

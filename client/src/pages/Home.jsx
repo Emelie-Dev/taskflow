@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SiKashflow } from 'react-icons/si';
 import styles from '../styles/Home.module.css';
 import Slideshow from '../components/Slideshow';
