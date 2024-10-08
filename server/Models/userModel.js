@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Please provide a value for the password field.'],
+    // required: [true, 'Please provide a value for the password field.'],
     validate: {
       validator: (value) => {
         return (
@@ -208,6 +208,7 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'Project',
   },
+  isGoogleAuth: { type: Boolean, default: false },
   firstName: String,
   lastName: String,
   dob: Date,

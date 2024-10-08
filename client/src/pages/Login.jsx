@@ -6,7 +6,7 @@ import { RiLockPasswordFill } from 'react-icons/ri';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { GrGoogle } from 'react-icons/gr';
 import { FaFacebookF } from 'react-icons/fa6';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,11 +18,27 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const query = new URLSearchParams(useLocation().search);
 
   useEffect(() => {
     document.title = 'TaskFlow - Login';
 
     const checkAuth = async () => {
+      const error = query.get('error');
+      const code = parseInt(query.get('statusCode'));
+
+      if (error) {
+        if (code === 404) {
+          return toast('There’s no account linked to this Google login.');
+        } else if (code === 400) {
+          return toast(
+            'You did not sign up with Google. Please log in with your email and password.'
+          );
+        } else {
+          return toast('An error occurred while logging in with Google.');
+        }
+      }
+
       try {
         const { data } = await apiClient('/api/v1/auth/auth-check');
 
@@ -56,7 +72,7 @@ const Login = () => {
 
     setIsProcessing(true);
 
-    // Makes an api call to create a new account
+    // Makes an api login to account
     try {
       const { data } = await apiClient({
         method: 'POST',
@@ -80,13 +96,32 @@ const Login = () => {
 
       return setIsProcessing(false);
     } catch (err) {
-      toast(err.response.data.message, {
-        toastId: customId,
-        autoClose: 3000,
-      });
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occured while logging in.', {
+          toastId: customId,
+        });
+      }
 
-      return setIsProcessing(false);
+      return toast(err.response.data.message, {
+        toastId: customId,
+        autoClose: 2500,
+      });
     }
+  };
+
+  const googleAuth = async () => {
+    try {
+      const { data } = await apiClient.post('/api/v1/auth/google');
+
+      window.location.href = data.url;
+    } catch {
+      return toast('An error occurred while logging in with Google.', {
+        toastId: customId,
+      });
+    }
+
+    // window.location.href = data.url;
   };
 
   return (
@@ -175,17 +210,14 @@ const Login = () => {
           <span className={styles['login-text']}>- or login with -</span>
 
           <div className={styles['alternate-method-div']}>
-            <button className={styles['alternate-btn']}>
+            <button
+              className={styles['alternate-btn']}
+              onClick={() => googleAuth()}
+            >
               <span className={styles['alternate-icon-box']}>
                 <GrGoogle className={styles['alternate-icon']} />
               </span>
               Google
-            </button>
-            <button className={styles['alternate-btn']}>
-              <span className={styles['alternate-icon-box']}>
-                <FaFacebookF className={styles['alternate-icon']} />
-              </span>
-              Facebook
             </button>
           </div>
         </div>

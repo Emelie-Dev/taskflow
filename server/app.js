@@ -124,7 +124,6 @@ app.use(compression());
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // Route handlers
-
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/projects', projectRouter);

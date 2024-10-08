@@ -219,7 +219,7 @@
 .alternate-method-div {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin: 2rem 4rem;
 }
 

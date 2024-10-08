@@ -8,7 +8,7 @@ import { GrGoogle } from 'react-icons/gr';
 import { FaFacebookF } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { IoPersonCircleSharp } from 'react-icons/io5';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -21,11 +21,23 @@ const AccountAccess = () => {
   const [email, setEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const query = new URLSearchParams(useLocation().search);
 
   useEffect(() => {
     document.title = 'TaskFlow - Signup';
 
     const checkAuth = async () => {
+      const error = query.get('error');
+      const isOperational = query.get('isOperational');
+
+      if (error) {
+        if (isOperational.toLowerCase() === 'true') {
+          return toast('This email already exists.');
+        } else {
+          return toast('An error occurred while signing up with Google');
+        }
+      }
+
       try {
         const { data } = await apiClient('/api/v1/auth/auth-check');
 
@@ -123,6 +135,14 @@ const AccountAccess = () => {
 
       return setIsProcessing(false);
     } catch (err) {
+      setIsProcessing(false);
+
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occured while creating account.', {
+          toastId: customId,
+        });
+      }
+
       toast(err.response.data.message, {
         toastId: customId,
         autoClose: 3000,
@@ -131,9 +151,21 @@ const AccountAccess = () => {
       if (err.response.data.isSignup) {
         setTimeout(() => navigate('/login'), 3500);
       }
-
-      return setIsProcessing(false);
     }
+  };
+
+  const googleAuth = async () => {
+    try {
+      const { data } = await apiClient.post('/api/v1/auth/google?signup=true');
+
+      window.location.href = data.url;
+    } catch {
+      return toast('An error occurred while signing up with Google.', {
+        toastId: customId,
+      });
+    }
+
+    // window.location.href = data.url;
   };
 
   return (
@@ -234,18 +266,21 @@ const AccountAccess = () => {
           <span className={styles['login-text']}>- or sign up with -</span>
 
           <div className={styles['alternate-method-div']}>
-            <button className={styles['alternate-btn']}>
+            <button
+              className={styles['alternate-btn']}
+              onClick={() => googleAuth()}
+            >
               <span className={styles['alternate-icon-box']}>
                 <GrGoogle className={styles['alternate-icon']} />
               </span>
               Google
             </button>
-            <button className={styles['alternate-btn']}>
+            {/* <button className={styles['alternate-btn']}>
               <span className={styles['alternate-icon-box']}>
                 <FaFacebookF className={styles['alternate-icon']} />
               </span>
               Facebook
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

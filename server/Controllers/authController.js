@@ -9,6 +9,8 @@ import Notification from '../Models/notificationModel.js';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { OAuth2Client } from 'google-auth-library';
+import axios from 'axios';
 
 const verifyResult = fs.readFileSync(
   join(
@@ -86,6 +88,75 @@ const sendEmailLink = async (user, signup, req, res, next) => {
 
     error.isSignup = true;
     return next(error);
+  }
+};
+
+const handleGoogleSignup = async (data) => {
+  const user = await User.findOne({ email: data.email });
+
+  if (!user) {
+    const newUser = new User({
+      firstName: data.given_name,
+      lastName: data.family_name,
+      emailVerified: true,
+      email: data.email,
+      photo: data.picture,
+      isGoogleAuth: true,
+    });
+
+    newUser.username = `user${newUser._id}`;
+
+    try {
+      await newUser.save();
+      return newUser;
+    } catch {
+      throw new Error();
+    }
+  } else {
+    throw new CustomError('This email already exists.', 400);
+  }
+};
+
+const handleGoogleLogin = async (data) => {
+  let user = await User.findOne({ email: data.email, login: true });
+
+  if (user) {
+    if (!user.isGoogleAuth) {
+      throw new CustomError(
+        'You did not sign up with Google. Please log in with your email and password.',
+        400
+      );
+    }
+
+    if (!user.active) {
+      // send reactivation email
+      try {
+        await new Email(user).sendReactivationEmail();
+      } catch {}
+
+      user = await User.findOneAndUpdate(
+        { _id: user._id, login: true },
+        { active: true },
+        {
+          new: true,
+          runValidators: true,
+        }
+      ).select('-active -password');
+
+      // sends reactivation notification
+      await Notification.create({
+        user: user._id,
+        action: 'activation',
+        type: ['security'],
+      });
+    }
+
+    return user;
+  } else {
+    throw new CustomError(
+      'There’s no account linked to this Google login.',
+      404
+    );
   }
 };
 
@@ -256,6 +327,15 @@ export const login = asyncErrorHandler(async (req, res, next) => {
 
   let user = await User.findOne({ email, login: true });
 
+  if (user.isGoogleAuth) {
+    return next(
+      new CustomError(
+        'It looks like you signed up with Google. Please log in using Google to access your account.',
+        400
+      )
+    );
+  }
+
   if (!user || !(await user.comparePasswordInDb(password, user.password))) {
     const error = new CustomError('Incorrect email or password', 401);
     return next(error);
@@ -409,4 +489,97 @@ export const resetPassword = asyncErrorHandler(async (req, res, next) => {
   });
 
   sendResponse(user, 200, req, res);
+});
+
+export const googleAuth = asyncErrorHandler(async (req, res, next) => {
+  const redirectUrl =
+    process.env.NODE_ENV === 'production'
+      ? 'https://taskflow-vuni.onrender.com/api/v1/auth/google/callback'
+      : 'http://localhost:2005/api/v1/auth/google/callback';
+
+  const auth2Client = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    redirectUrl
+  );
+
+  const authorizeUrl = auth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['profile', 'email'],
+    prompt: 'consent',
+    state: JSON.stringify({
+      signup: req.query.signup ? true : false,
+      clientUrl: req.headers.origin,
+    }),
+  });
+
+  res.header('Referrer-policy', 'no-referrer-when-downgrade');
+
+  return res.json({ url: authorizeUrl });
+});
+
+export const googleAuthCallback = asyncErrorHandler(async (req, res, next) => {
+  const { code } = req.query;
+  const { signup, clientUrl } = JSON.parse(req.query.state);
+
+  try {
+    const redirectUrl =
+      process.env.NODE_ENV === 'production'
+        ? 'https://taskflow-vuni.onrender.com/api/v1/auth/google/callback'
+        : 'http://localhost:2005/api/v1/auth/google/callback';
+
+    const auth2Client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      redirectUrl
+    );
+
+    const response = await auth2Client.getToken(code);
+    await auth2Client.setCredentials(response.tokens);
+    const { access_token } = auth2Client.credentials;
+
+    const { data } = await axios(
+      `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`
+    );
+
+    if (signup) {
+      const user = await handleGoogleSignup(data);
+      const jwtToken = signToken(user._id);
+
+      res.cookie('jwt', jwtToken, {
+        maxAge: process.env.JWT_LOGIN_EXPIRES,
+
+        //  Prevents javascript access
+        httpOnly: true,
+
+        secure: true,
+        sameSite: 'None',
+      });
+      res.redirect(`${clientUrl}/dashboard`);
+    } else {
+      const user = await handleGoogleLogin(data);
+      const jwtToken = signToken(user._id);
+
+      res.cookie('jwt', jwtToken, {
+        maxAge: process.env.JWT_LOGIN_EXPIRES,
+
+        //  Prevents javascript access
+        httpOnly: true,
+
+        secure: true,
+        sameSite: 'None',
+      });
+      res.redirect(`${clientUrl}/dashboard`);
+    }
+  } catch (err) {
+    if (signup) {
+      res.redirect(
+        `${clientUrl}/signup?error=true&isOperational=${err.isOperational}`
+      );
+    } else {
+      res.redirect(
+        `${clientUrl}/login?error=true&statusCode=${err.statusCode}`
+      );
+    }
+  }
 });
