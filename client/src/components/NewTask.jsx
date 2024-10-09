@@ -5,6 +5,7 @@ import { generateName } from '../pages/Dashboard';
 import { ToastContainer, toast } from 'react-toastify';
 import { SiKashflow } from 'react-icons/si';
 import { apiClient, AuthContext } from '../App';
+import { getProfilePhoto } from './Header';
 
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth();
@@ -487,7 +488,7 @@ const NewTask = ({
 
                         <img
                           className={styles['assignee-img']}
-                          src={`${serverUrl}/users/${assignee.photo}`}
+                          src={getProfilePhoto(assignee, serverUrl)}
                         />
                       </span>
                     </span>

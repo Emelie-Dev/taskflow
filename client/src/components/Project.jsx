@@ -5,6 +5,7 @@ import { apiClient, AuthContext } from '../App';
 import { generateName } from '../pages/Dashboard';
 import { SiKashflow } from 'react-icons/si';
 import { ToastContainer, toast } from 'react-toastify';
+import { getProfilePhoto } from './Header';
 
 const Project = ({
   setDisplayModal,
@@ -391,7 +392,7 @@ const Project = ({
 
                         <img
                           className={styles['assignee-img']}
-                          src={`${serverUrl}/users/${member.photo}`}
+                          src={getProfilePhoto(member, serverUrl)}
                         />
                       </span>
                     </span>

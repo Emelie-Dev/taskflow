@@ -244,12 +244,12 @@ export class ApiFeatures {
             select: 'name details',
             populate: {
               path: 'team',
-              select: 'photo username firstName lastName',
+              select: 'photo username firstName lastName isGoogleAuth',
             },
           })
           .populate({
             path: 'leader',
-            select: 'username firstName lastName photo',
+            select: 'username firstName lastName photo isGoogleAuth',
           });
       } else if (this.queryString.calendar) {
         const { year, month, day } = this.queryString;
@@ -259,7 +259,7 @@ export class ApiFeatures {
           .find(queryOptions)
           .populate({
             path: 'leader user',
-            select: 'username firstName lastName photo',
+            select: 'username firstName lastName photo isGoogleAuth',
           })
           .populate({
             path: 'project',
@@ -271,7 +271,7 @@ export class ApiFeatures {
     } else if (this.collection === 'projects') {
       this.query.find(queryOptions).populate({
         path: 'team',
-        select: 'username firstName lastName photo',
+        select: 'username firstName lastName photo isGoogleAuth',
       });
 
       this.query.filterByCategory(this.queryString.category);

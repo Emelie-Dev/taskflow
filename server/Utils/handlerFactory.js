@@ -52,7 +52,7 @@ const getAll = (Model, collection) =>
       result.query
         .populate({
           path: 'assignee',
-          select: 'username firstName lastName photo',
+          select: 'username firstName lastName photo isGoogleAuth',
         })
         .populate({
           path: 'activities',

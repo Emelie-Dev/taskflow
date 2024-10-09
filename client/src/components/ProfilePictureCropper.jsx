@@ -5,6 +5,7 @@ import styles from '../styles/ProfilePictureCropper.module.css';
 import { IoCloseSharp } from 'react-icons/io5';
 import { apiClient, AuthContext } from '../App';
 import { SiKashflow } from 'react-icons/si';
+import { getProfilePhoto } from './Header';
 
 const ProfilePictureCropper = ({
   mode,
@@ -212,7 +213,7 @@ const ProfilePictureCropper = ({
               <img
                 className={styles['cropped-image']}
                 style={{ width, height }}
-                src={`${serverUrl}/users/${userData.photo}`}
+                src={getProfilePhoto(userData, serverUrl)}
                 alt="Profile Picture"
               />
             )}

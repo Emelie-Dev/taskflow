@@ -32,6 +32,7 @@ import {
   IoIosCheckmarkCircleOutline,
   IoIosCloseCircleOutline,
 } from 'react-icons/io';
+import { getProfilePhoto } from '../components/Header';
 
 const ProjectItem = () => {
   const { userData, serverUrl } = useContext(AuthContext);
@@ -1181,7 +1182,7 @@ const ProjectItem = () => {
                           className={styles['project-leader-link']}
                         >
                           <img
-                            src={`${serverUrl}/users/${project.user.photo}`}
+                            src={getProfilePhoto(project.user, serverUrl)}
                             className={`${styles['leader-img']} ${
                               project.user.photo === 'default.jpeg'
                                 ? styles['default-pic']
@@ -1335,7 +1336,7 @@ const ProjectItem = () => {
                             }
                           >
                             <img
-                              src={`${serverUrl}/users/${member.photo}`}
+                              src={getProfilePhoto(member, serverUrl)}
                               className={`${styles['member-img']} ${
                                 member.photo === 'default.jpeg'
                                   ? styles['default-pic']
@@ -1736,7 +1737,7 @@ const ProjectItem = () => {
                             }
                           >
                             <img
-                              src={`${serverUrl}/users/${member.photo}`}
+                              src={getProfilePhoto(member, serverUrl)}
                               className={`${styles['member-img']} ${
                                 member.photo === 'default.jpeg'
                                   ? styles['default-pic']

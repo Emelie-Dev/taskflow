@@ -9,6 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { generateName } from './Dashboard';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
+import { getProfilePhoto } from '../components/Header';
 
 const CalendarPage = () => {
   const { userData, serverUrl } = useContext(AuthContext);
@@ -410,7 +411,10 @@ const CalendarPage = () => {
                                           ? styles['default-pic']
                                           : ''
                                       }`}
-                                      src={`${serverUrl}/users/${elem.leader.photo}`}
+                                      src={getProfilePhoto(
+                                        elem.leader,
+                                        serverUrl
+                                      )}
                                     />
                                   </a>
                                   <span className={styles['task-tooltip-text']}>
@@ -431,7 +435,7 @@ const CalendarPage = () => {
                                         ? styles['default-pic']
                                         : ''
                                     }`}
-                                    src={`${serverUrl}/users/${elem.user.photo}`}
+                                    src={getProfilePhoto(elem.user, serverUrl)}
                                   />
                                 </span>
                               )}

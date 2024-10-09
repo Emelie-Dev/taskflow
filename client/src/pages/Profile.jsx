@@ -4,6 +4,7 @@ import { AuthContext } from '../App';
 import { months } from './Dashboard';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
+import { getProfilePhoto } from '../components/Header';
 
 const Profile = () => {
   const { userData, serverUrl } = useContext(AuthContext);
@@ -47,7 +48,7 @@ const Profile = () => {
             <div className={styles['left-section']}>
               <figure className={styles['profile-pics-box']}>
                 <img
-                  src={`${serverUrl}/users/${userData.photo}`}
+                  src={getProfilePhoto(userData, serverUrl)}
                   className={styles['profile-pics']}
                 />
               </figure>

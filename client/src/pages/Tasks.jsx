@@ -15,6 +15,7 @@ import { generateName } from './Dashboard';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 import { LuExternalLink } from 'react-icons/lu';
+import { getProfilePhoto } from '../components/Header';
 
 const Tasks = () => {
   const { userData, serverUrl } = useContext(AuthContext);
@@ -392,7 +393,7 @@ const Tasks = () => {
                           }
                         >
                           <img
-                            src={`${serverUrl}/users/${userData.photo}`}
+                            src={getProfilePhoto(userData, serverUrl)}
                             className={`${styles['projects-item-img']} ${
                               userData.photo === 'default.jpeg'
                                 ? styles['default-pic']
@@ -500,7 +501,7 @@ const Tasks = () => {
                           <span className={styles['leader-box']}>
                             <a href={`/user/${project.username}`}>
                               <img
-                                src={`${serverUrl}/users/${project.leaderPhoto}`}
+                                src={getProfilePhoto(project, serverUrl)}
                                 className={`${styles['projects-item-img']} ${
                                   project.leaderPhoto === 'default.jpeg'
                                     ? styles['default-pic']
@@ -636,7 +637,7 @@ const Tasks = () => {
                               }
                             >
                               <img
-                                src={`${serverUrl}/users/${userData.photo}`}
+                                src={getProfilePhoto(userData, serverUrl)}
                                 className={`${styles['projects-item-img']} ${
                                   userData.photo === 'default.jpeg'
                                     ? styles['default-pic']
@@ -751,7 +752,7 @@ const Tasks = () => {
                               <span className={styles['leader-box']}>
                                 <a href={`/user/${project.username}`}>
                                   <img
-                                    src={`${serverUrl}/users/${project.leaderPhoto}`}
+                                    src={getProfilePhoto(project, serverUrl)}
                                     className={`${
                                       styles['projects-item-img']
                                     } ${

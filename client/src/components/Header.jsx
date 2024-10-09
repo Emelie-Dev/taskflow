@@ -167,7 +167,7 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
         <figure className={styles['profile-picture-box']}>
           <img
             className={styles['profile-picture']}
-            src={`${serverUrl}/users/${userData.photo}`}
+            src={getProfilePhoto(userData, serverUrl)}
             ref={imgRef}
             onClick={() => setShowUserBox(true)}
           />
@@ -202,6 +202,14 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
       </div>
     </header>
   );
+};
+
+export const getProfilePhoto = (user, serverUrl) => {
+  if (user.isGoogleAuth) {
+    return `${user.photo || user.leaderPhoto}`;
+  } else {
+    return `${serverUrl}/users/${user.photo || user.leaderPhoto}`;
+  }
 };
 
 export default Header;

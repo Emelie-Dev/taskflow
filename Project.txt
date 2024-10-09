@@ -47,8 +47,11 @@
     - Fix profile settings update(mobile number) ✔
     - Fix email verification message ✔
     - Fix task creation in dashboard page(project loading) ✔
-    - Fix google or facebooka api for login or signup ✔✔
+    - Fix google or facebooka api for login or signup ✔
     - Fix title for all pages ✔
+    - Fix profile images  ✔
+    - Fix forgot password ✔
+    - Fix Deactivate and delete account for google auth users.(Check if user has password in security page) ✔✔
 
 
 

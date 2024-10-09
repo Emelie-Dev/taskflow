@@ -299,7 +299,7 @@ export const verifyEmail = asyncErrorHandler(async (req, res, next) => {
       '{{CONTENT2}}',
       `<script>
    (() => {
-   setInterval(() => {
+   setTimeout(() => {
     window.location.href = '${url}/dashboard'
     }, 3000)
       })();
@@ -408,22 +408,29 @@ export const forgotPassword = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
+  if (user.isGoogleAuth) {
+    return next(
+      new CustomError(
+        'It looks like you signed up with Google. Please log in using Google to access your account.',
+        400
+      )
+    );
+  }
+
   // Generate reset token
   const passwordResetToken = user.generateToken('password');
   await user.save({ validateBeforeSave: false });
 
   try {
     // Generates reset token url
-    const resetUrl = `${req.protocol}://${req.get(
-      'host'
-    )}/api/v1/auth/reset_password/${passwordResetToken}`;
+    const resetUrl = `${req.headers.origin}/reset_password/${passwordResetToken}`;
 
     // Sends email to user with token
     await new Email(user, resetUrl).sendPasswordReset();
 
     return res.status(200).json({
       status: 'success',
-      message: 'A password reset link has been sent to your email',
+      message: 'A password reset link has been sent to your email.',
     });
   } catch (err) {
     // Removes reset token from user data
@@ -456,13 +463,20 @@ export const resetPassword = asyncErrorHandler(async (req, res, next) => {
   // If user does not exist
   if (!user) {
     const error = new CustomError(
-      'The reset link is invalid or has expired',
+      'This reset link is invalid or has expired.',
       400
     );
     return next(error);
   }
 
-  // If user exists
+  if (user.isGoogleAuth) {
+    return next(
+      new CustomError(
+        'It looks like you signed up with Google. Please log in using Google to access your account.',
+        400
+      )
+    );
+  }
 
   // If request body is not good
   if (!req.body.password || !req.body.confirmPassword) {
@@ -471,6 +485,12 @@ export const resetPassword = asyncErrorHandler(async (req, res, next) => {
       400
     );
     return next(error);
+  }
+
+  if (req.body.password !== req.body.confirmPassword) {
+    return next(
+      new CustomError('Password and confirm password do not match.', 400)
+    );
   }
 
   user.password = req.body.password;
@@ -488,7 +508,10 @@ export const resetPassword = asyncErrorHandler(async (req, res, next) => {
     state: { reset: true },
   });
 
-  sendResponse(user, 200, req, res);
+  return res.status(200).json({
+    status: 'success',
+    message: 'Password reset was successful.',
+  });
 });
 
 export const googleAuth = asyncErrorHandler(async (req, res, next) => {
@@ -542,35 +565,26 @@ export const googleAuthCallback = asyncErrorHandler(async (req, res, next) => {
       `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`
     );
 
+    let user;
+
     if (signup) {
-      const user = await handleGoogleSignup(data);
-      const jwtToken = signToken(user._id);
-
-      res.cookie('jwt', jwtToken, {
-        maxAge: process.env.JWT_LOGIN_EXPIRES,
-
-        //  Prevents javascript access
-        httpOnly: true,
-
-        secure: true,
-        sameSite: 'None',
-      });
-      res.redirect(`${clientUrl}/dashboard`);
+      user = await handleGoogleSignup(data);
     } else {
-      const user = await handleGoogleLogin(data);
-      const jwtToken = signToken(user._id);
-
-      res.cookie('jwt', jwtToken, {
-        maxAge: process.env.JWT_LOGIN_EXPIRES,
-
-        //  Prevents javascript access
-        httpOnly: true,
-
-        secure: true,
-        sameSite: 'None',
-      });
-      res.redirect(`${clientUrl}/dashboard`);
+      user = await handleGoogleLogin(data);
     }
+
+    const jwtToken = signToken(user._id);
+
+    res.cookie('jwt', jwtToken, {
+      maxAge: process.env.JWT_LOGIN_EXPIRES,
+
+      //  Prevents javascript access
+      httpOnly: true,
+
+      secure: true,
+      sameSite: 'None',
+    });
+    res.redirect(`${clientUrl}/dashboard`);
   } catch (err) {
     if (signup) {
       res.redirect(

@@ -19,6 +19,7 @@ import { apiClient, AuthContext } from '../App';
 import DeleteComponent from '../components/DeleteComponent';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
+import { getProfilePhoto } from '../components/Header';
 
 export const months = [
   'January',
@@ -575,7 +576,7 @@ const Projects = () => {
                                 >
                                   <a href={`/user/${member.username}`}>
                                     <img
-                                      src={`${serverUrl}/users/${member.photo}`}
+                                      src={getProfilePhoto(member, serverUrl)}
                                       className={`${styles['team-pics']} ${
                                         member.photo === 'default.jpeg'
                                           ? styles['default-pic']
@@ -610,7 +611,7 @@ const Projects = () => {
                               >
                                 <a href={`/user/${member.username}`}>
                                   <img
-                                    src={`${serverUrl}/users/${member.photo}`}
+                                    src={getProfilePhoto(member, serverUrl)}
                                     className={`${styles['team-pics']} ${
                                       member.photo === 'default.jpeg'
                                         ? styles['default-pic']
@@ -830,7 +831,10 @@ const Projects = () => {
                                                     ? styles['default-pic']
                                                     : ''
                                                 }`}
-                                                src={`${serverUrl}/users/${member.photo}`}
+                                                src={getProfilePhoto(
+                                                  member,
+                                                  serverUrl
+                                                )}
                                               />
                                             </a>
                                             <span
@@ -877,7 +881,10 @@ const Projects = () => {
                                                 ? styles['default-pic']
                                                 : ''
                                             }`}
-                                            src={`${serverUrl}/users/${member.photo}`}
+                                            src={getProfilePhoto(
+                                              member,
+                                              serverUrl
+                                            )}
                                           />
                                         </a>
                                         <span

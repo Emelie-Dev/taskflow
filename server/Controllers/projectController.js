@@ -218,6 +218,7 @@ export const getAssignedProjects = asyncErrorHandler(async (req, res, next) => {
         leaderPhoto: { $first: '$projectLeader.photo' },
         tasks: { $sum: 1 },
         active: { $first: '$projectLeader.active' },
+        isGoogleAuth: { $first: '$projectLeader.isGoogleAuth' },
       },
     },
     { $match: { active: true } },
@@ -238,11 +239,11 @@ export const getProject = asyncErrorHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id).populate([
     {
       path: 'user',
-      select: 'firstName lastName username photo',
+      select: 'firstName lastName username photo isGoogleAuth',
     },
     {
       path: 'team',
-      select: 'firstName lastName username occupation photo',
+      select: 'firstName lastName username occupation photo isGoogleAuth',
     },
     {
       path: 'activities',

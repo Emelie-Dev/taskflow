@@ -14,6 +14,7 @@ import Loader from './Loader';
 import { SiKashflow } from 'react-icons/si';
 import DeleteModal from './DeleteModal';
 import { IoColorPaletteSharp } from 'react-icons/io5';
+import { getProfilePhoto } from './Header';
 
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth();
@@ -884,7 +885,7 @@ const TaskBox = ({
                       className={styles['assignee-link']}
                     >
                       <img
-                        src={`${serverUrl}/users/${assignee.photo}`}
+                        src={getProfilePhoto(assignee, serverUrl)}
                         className={`${styles['assignee-img']} ${
                           assignee.photo === 'default.jpeg'
                             ? styles['default-pic']
@@ -926,7 +927,7 @@ const TaskBox = ({
                 {taskAssignees.map((assignee, index) => (
                   <span key={assignee._id} className={styles['assignee-box']}>
                     <img
-                      src={`${serverUrl}/users/${assignee.photo}`}
+                      src={getProfilePhoto(assignee, serverUrl)}
                       className={`${styles['assignee-pics']} ${
                         assignee.photo === 'default.jpeg'
                           ? styles['default-pic']

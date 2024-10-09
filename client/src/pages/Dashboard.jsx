@@ -23,6 +23,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
+import { getProfilePhoto } from '../components/Header';
 
 ChartJS.register(
   CategoryScale,
@@ -744,7 +745,7 @@ const Dashboard = () => {
                                         ? styles['default-pic']
                                         : ''
                                     }`}
-                                    src={`${serverUrl}/users/${member.photo}`}
+                                    src={getProfilePhoto(member, serverUrl)}
                                   />
                                 </a>
                               ))}
@@ -767,7 +768,7 @@ const Dashboard = () => {
                                         ? styles['default-pic']
                                         : ''
                                     }`}
-                                    src={`${serverUrl}/users/${member.photo}`}
+                                    src={getProfilePhoto(member, serverUrl)}
                                   />
                                 </a>
                                 <span
@@ -800,7 +801,7 @@ const Dashboard = () => {
                                     ? styles['default-pic']
                                     : ''
                                 }`}
-                                src={`${serverUrl}/users/${task.leader.photo}`}
+                                src={getProfilePhoto(task.leader, serverUrl)}
                               />
                             </a>
                             <span className={styles['task-tooltip-text']}>
@@ -967,7 +968,7 @@ const Dashboard = () => {
                                     ? styles['default-pic']
                                     : ''
                                 }`}
-                                src={`${serverUrl}/users/${task.leader.photo}`}
+                                src={getProfilePhoto(task.leader, serverUrl)}
                               />
                             </a>
                             <span className={styles['task-tooltip-text']}>
@@ -988,7 +989,7 @@ const Dashboard = () => {
                                   ? styles['default-pic']
                                   : ''
                               }`}
-                              src={`${serverUrl}/users/${task.user.photo}`}
+                              src={getProfilePhoto(task.user, serverUrl)}
                             />
                           </span>
                         )}

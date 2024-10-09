@@ -18,6 +18,8 @@ import axios from 'axios';
 import User from './pages/User';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorPage from './pages/ErrorPage';
+import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './pages/ForgotPassword';
 
 const serverUrl =
   import.meta.env.MODE === 'production'
@@ -51,6 +53,8 @@ const App = () => {
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path={'/reset_password/:token'} element={<ResetPassword />} />
+          <Route path={'/forgot_password'} element={<ForgotPassword />} />
           <Route
             path="/dashboard"
             element={<ProtectedRoute element={Dashboard} />}
@@ -89,6 +93,7 @@ const App = () => {
             path={'/user/:username'}
             element={<ProtectedRoute element={User} />}
           />
+
           <Route path="*" element={<ErrorPage page={'404'} />} />
         </Routes>
       </ErrorBoundary>

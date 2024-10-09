@@ -15,6 +15,7 @@ import { AuthContext } from '../App';
 import { ToastContainer, toast } from 'react-toastify';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
+import { getProfilePhoto } from '../components/Header';
 
 const Settings = () => {
   const { userData, setUserData, serverUrl } = useContext(AuthContext);
@@ -82,7 +83,7 @@ const Settings = () => {
                 className={`${styles['profile-pics']} ${
                   userData.photo === 'default.jpeg' ? styles['default-pic'] : ''
                 }`}
-                src={`${serverUrl}/users/${userData.photo}`}
+                src={getProfilePhoto(userData, serverUrl)}
                 onClick={() => {
                   setMode('view');
                   setDisplayCategory(false);
@@ -195,7 +196,7 @@ const Settings = () => {
                       ? styles['default-pic']
                       : ''
                   }`}
-                  src={`${serverUrl}/users/${userData.photo}`}
+                  src={getProfilePhoto(userData, serverUrl)}
                   onClick={() => {
                     setMode('view');
                     setDisplayCategory(false);
@@ -204,8 +205,13 @@ const Settings = () => {
               </span>
 
               <figcaption className={styles['profile-img-caption']}>
-                <span className={styles['username']}>Ofoka Vincent</span>
-                <span className={styles['user-title']}>Web Developer</span>
+                <span className={styles['username']}>
+                  {userData.firstName} {userData.lastName}
+                </span>
+                <span className={styles['user-title']}>
+                  {' '}
+                  {userData.occupation}
+                </span>
               </figcaption>
             </figure>
 

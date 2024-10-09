@@ -8,6 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { apiClient, AuthContext } from '../App';
 import Loader from '../components/Loader';
 import { MdOutlineSignalWifiOff } from 'react-icons/md';
+import { getProfilePhoto } from '../components/Header';
 
 const User = () => {
   const { username } = useParams();
@@ -91,7 +92,7 @@ const User = () => {
               <div className={styles['left-section']}>
                 <figure className={styles['profile-pics-box']}>
                   <img
-                    src={`${serverUrl}/users/${userData.photo}`}
+                    src={getProfilePhoto(userData, serverUrl)}
                     className={styles['profile-pics']}
                   />
                 </figure>

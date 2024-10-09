@@ -18,6 +18,8 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+
   const query = new URLSearchParams(useLocation().search);
 
   useEffect(() => {
@@ -201,7 +203,10 @@ const Login = () => {
           </div>
 
           <div className={styles['options-div']}>
-            <span className={styles.text}>Forgot password</span>
+            <span className={styles.text}>
+              {' '}
+              <Link to="/forgot_password">Forgot password </Link>
+            </span>
             <span className={styles.text}>
               <Link to="/signup">Sign up</Link>
             </span>

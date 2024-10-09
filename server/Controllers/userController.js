@@ -222,13 +222,13 @@ export const getUser = asyncErrorHandler(async (req, res, next) => {
   if (req.query.team) {
     user = await User.findOne({
       username: { $regex: new RegExp(`^${username}$`, 'i') },
-    }).select('username firstName lastName photo');
+    }).select('username firstName lastName photo isGoogleAuth');
   } else {
     user = await User.findOne({
       username: { $regex: new RegExp(`^${username}$`, 'i') },
     })
       .select(
-        'username firstName lastName photo occupation dob email country language mobileNumber dataVisibility'
+        'username firstName lastName photo occupation dob email country language mobileNumber dataVisibility isGoogleAuth'
       )
       .lean();
   }
@@ -413,6 +413,16 @@ export const deactivateUser = asyncErrorHandler(async (req, res, next) => {
     return next(new CustomError('Bad request.', 400));
 
   const user = await User.findById(req.params.id);
+
+  if (user.isGoogleAuth && !user.password) {
+    return next(
+      new CustomError(
+        'Please set up a password before deactivating your account.',
+        400
+      )
+    );
+  }
+
   const password = req.body.password;
 
   if (!user) {
@@ -446,6 +456,16 @@ export const deactivateUser = asyncErrorHandler(async (req, res, next) => {
 
 export const getDeleteToken = asyncErrorHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
+
+  if (user.isGoogleAuth && !user.password) {
+    return next(
+      new CustomError(
+        'Please set up a password before deleting your account.',
+        400
+      )
+    );
+  }
+
   const password = req.body.password;
 
   if (!user) {
@@ -485,6 +505,16 @@ export const deleteUser = asyncErrorHandler(async (req, res, next) => {
     deleteAccountToken: String(req.params.token),
     deleteAccountTokenExpires: { $gt: Date.now() },
   });
+
+  if (user.isGoogleAuth && !user.password) {
+    return next(
+      new CustomError(
+        'Please set up a password before deleting your account.',
+        400
+      )
+    );
+  }
+
   const notifications = [];
 
   if (!user) {
