@@ -472,7 +472,9 @@ const NotificationContainer = ({
           </span>
           <div className={styles['message-box']}>
             <span className={styles.message}>
-              {notification.state.reset
+              {notification.state.set
+                ? 'Your password was set successfully.'
+                : notification.state.reset
                 ? 'Your password reset was successful.'
                 : 'Your password was changed successfully.'}
             </span>

@@ -136,7 +136,7 @@ app.get('/project-files/:projectId/:file', protectRoute, getProjectFile);
 // For wrong endpoints
 app.all('*', (req, res, next) => {
   const error = new CustomError(
-    `Cant find ${req.originalUrl} on the server.`,
+    `Can't find ${req.originalUrl} on the server.`,
     404
   );
 

@@ -205,10 +205,16 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
 };
 
 export const getProfilePhoto = (user, serverUrl) => {
+  const photo = user.photo || user.leaderPhoto;
+
   if (user.isGoogleAuth) {
-    return `${user.photo || user.leaderPhoto}`;
+    if (photo.startsWith('user-') || photo === 'default.jpeg') {
+      return `${serverUrl}/users/${photo}`;
+    }
+
+    return `${photo}`;
   } else {
-    return `${serverUrl}/users/${user.photo || user.leaderPhoto}`;
+    return `${serverUrl}/users/${photo}`;
   }
 };
 

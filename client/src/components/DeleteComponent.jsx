@@ -312,6 +312,7 @@ const DeleteComponent = ({
 
       navigate('/');
     } catch (err) {
+      console.log(err);
       setIsProcessing(false);
 
       if (!err.response || !err.response.data || err.response.status === 500) {
@@ -629,7 +630,7 @@ const DeleteComponent = ({
             <span className={styles['resend-token-box']}>
               <span
                 className={`${styles['resend-token-txt']} ${
-                  fetching ? styles['fetching-token'] : ''
+                  fetching || isProcessing ? styles['fetching-token'] : ''
                 } ${showCounter ? styles['fetching-token'] : ''}`}
                 onClick={getDeleteToken('link')}
               >

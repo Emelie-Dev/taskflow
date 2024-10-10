@@ -112,7 +112,7 @@ const updateSecuritySettings = async (user, body) => {
   const { firstName, lastName, language, mobileNumber, country, dob } =
     body.dataVisibility;
 
-  const userData = await User.findByIdAndUpdate(
+  let userData = await User.findByIdAndUpdate(
     user._id,
     {
       dataVisibility: {
@@ -133,24 +133,43 @@ const updateSecuritySettings = async (user, body) => {
   if (body.password) {
     const currentUser = await User.findById(userData._id);
 
-    if (
-      !(await currentUser.comparePasswordInDb(
-        body.password.oldPassword,
-        currentUser.password
-      ))
-    ) {
-      passwordMessage = 'The current password you provided is incorrect.';
-    } else {
-      user.password = body.password.newPassword;
-      user.passwordChangedAt = Date.now();
-      await user.save();
+    if (currentUser.password) {
+      if (
+        !(await currentUser.comparePasswordInDb(
+          body.password.oldPassword,
+          currentUser.password
+        ))
+      ) {
+        passwordMessage = 'The current password you provided is incorrect.';
+      } else {
+        user.password = body.password.newPassword;
+        user.passwordChangedAt = Date.now();
+        await user.save();
 
-      await Notification.create({
-        user: user._id,
-        action: 'update',
-        type: ['security'],
-        state: { change: true },
-      });
+        await Notification.create({
+          user: user._id,
+          action: 'update',
+          type: ['security'],
+          state: { reset: false },
+        });
+      }
+    } else {
+      if (body.password.oldPassword !== body.password.newPassword) {
+        passwordMessage = 'Password and confirm password do not match.';
+      } else {
+        user.password = body.password.newPassword;
+        user.passwordChangedAt = Date.now();
+        await user.save();
+
+        userData = await User.findById(userData._id);
+
+        await Notification.create({
+          user: user._id,
+          action: 'update',
+          type: ['security'],
+          state: { set: true },
+        });
+      }
     }
   }
 
@@ -326,7 +345,7 @@ export const removeProfileImage = asyncErrorHandler(async (req, res, next) => {
     return next(new CustomError('This user does not exist.', 404));
   }
 
-  if (user.photo !== 'default.jpeg') {
+  if (user.photo.startsWith('user-')) {
     fs.unlink(`Public/img/users/${user.photo}`, async (err) => {
       if (err) {
         return next(
@@ -353,8 +372,24 @@ export const removeProfileImage = asyncErrorHandler(async (req, res, next) => {
         },
       });
     });
-  } else {
+  } else if (user.photo === 'default.jpeg') {
     return next(new CustomError('You do not have a profile picture.', 404));
+  } else {
+    user = await User.findByIdAndUpdate(
+      req.params.id,
+      { photo: 'default.jpeg' },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        user,
+      },
+    });
   }
 });
 
@@ -414,21 +449,21 @@ export const deactivateUser = asyncErrorHandler(async (req, res, next) => {
 
   const user = await User.findById(req.params.id);
 
-  if (user.isGoogleAuth && !user.password) {
-    return next(
-      new CustomError(
-        'Please set up a password before deactivating your account.',
-        400
-      )
-    );
-  }
-
   const password = req.body.password;
 
   if (!user) {
     return next(new CustomError('This user does not exist.', 404));
   } else if (String(req.user._id) !== String(req.params.id)) {
     return next(new CustomError('This user does not exist.', 404));
+  }
+
+  if (!user.password) {
+    return next(
+      new CustomError(
+        'Please set up a password before deactivating your account.',
+        400
+      )
+    );
   }
 
   if (!(await user.comparePasswordInDb(password, user.password))) {
@@ -457,21 +492,21 @@ export const deactivateUser = asyncErrorHandler(async (req, res, next) => {
 export const getDeleteToken = asyncErrorHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
-  if (user.isGoogleAuth && !user.password) {
-    return next(
-      new CustomError(
-        'Please set up a password before deleting your account.',
-        400
-      )
-    );
-  }
-
   const password = req.body.password;
 
   if (!user) {
     return next(new CustomError('This user does not exist.', 404));
   } else if (String(req.user._id) !== String(req.params.id)) {
     return next(new CustomError('This user does not exist.', 404));
+  }
+
+  if (!user.password) {
+    return next(
+      new CustomError(
+        'Please set up a password before deleting your account.',
+        400
+      )
+    );
   }
 
   if (!(await user.comparePasswordInDb(password, user.password))) {
@@ -487,7 +522,7 @@ export const getDeleteToken = asyncErrorHandler(async (req, res, next) => {
     token = generateDeleteToken();
   }
 
-  // await new Email(user, token).sendDeleteToken();
+  await new Email(user, token).sendDeleteToken();
 
   user.deleteAccountToken = token;
   user.deleteAccountTokenExpires = Date.now() + 60 * 60 * 1000;
@@ -506,21 +541,21 @@ export const deleteUser = asyncErrorHandler(async (req, res, next) => {
     deleteAccountTokenExpires: { $gt: Date.now() },
   });
 
-  if (user.isGoogleAuth && !user.password) {
-    return next(
-      new CustomError(
-        'Please set up a password before deleting your account.',
-        400
-      )
-    );
-  }
-
   const notifications = [];
 
   if (!user) {
     return next(new CustomError('This code is invalid or has expired.', 404));
   } else if (String(req.user._id) !== String(req.params.id)) {
     return next(new CustomError('This user does not exist.', 404));
+  }
+
+  if (!user.password) {
+    return next(
+      new CustomError(
+        'Please set up a password before deleting your account.',
+        400
+      )
+    );
   }
 
   // Delete user tasks
@@ -533,7 +568,7 @@ export const deleteUser = asyncErrorHandler(async (req, res, next) => {
   await Notification.deleteMany({ user: user._id });
 
   // Delete user profile image
-  if (user.photo !== 'default.jpeg') {
+  if (user.photo !== 'default.jpeg' || user.photo.startsWith('user-')) {
     await new Promise((resolve, reject) => {
       fs.unlink(`Public/img/users/${user.photo}`, (err) => {
         if (err) reject();

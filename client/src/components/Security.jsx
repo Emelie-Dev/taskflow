@@ -61,33 +61,69 @@ const Security = () => {
 
     if (oldPassword.length !== 0 || password.length !== 0) {
       changePassword = true;
-      if (oldPassword.length === 0 || password.length === 0) {
-        return toast(
-          `Please provide a value for the ${
-            oldPassword.length === 0 ? 'current' : 'new'
-          } password.`,
-          {
+
+      if (userData.hasPassword) {
+        if (oldPassword.length === 0 || password.length === 0) {
+          return toast(
+            `Please provide a value for the ${
+              oldPassword.length === 0 ? 'current' : 'new'
+            } password.`,
+            {
+              toastId: 'toast-id1',
+            }
+          );
+        } else if (
+          !(
+            password.match(/[A-z]/) &&
+            password.match(/[0-9]/) &&
+            password.match(/\W/)
+          )
+        ) {
+          return toast(
+            'The new password must consist of a letter, digit, and special character.',
+            {
+              toastId: 'toast-id1',
+              autoClose: 2500,
+            }
+          );
+        } else if (password.length < 8) {
+          return toast('The new password must be more than 8 characters.', {
             toastId: 'toast-id1',
-          }
-        );
-      } else if (
-        !(
-          password.match(/[A-z]/) &&
-          password.match(/[0-9]/) &&
-          password.match(/\W/)
-        )
-      ) {
-        return toast(
-          'The new password must consist of a letter, digit, and special character.',
-          {
+          });
+        }
+      } else {
+        if (oldPassword.length === 0 || password.length === 0) {
+          return toast(
+            `Please provide a value for the ${
+              oldPassword.length === 0 ? 'password' : 'confirm password'
+            }.`,
+            {
+              toastId: 'toast-id1',
+            }
+          );
+        } else if (
+          !(
+            oldPassword.match(/[A-z]/) &&
+            oldPassword.match(/[0-9]/) &&
+            oldPassword.match(/\W/)
+          )
+        ) {
+          return toast(
+            'Password must consist of a letter, digit, and special character.',
+            {
+              toastId: 'toast-id1',
+              autoClose: 2500,
+            }
+          );
+        } else if (oldPassword.length < 8) {
+          return toast('Password must be more than 8 characters.', {
             toastId: 'toast-id1',
-            autoClose: 2500,
-          }
-        );
-      } else if (password.length < 8) {
-        return toast('The new password must be more than 8 characters.', {
-          toastId: 'toast-id1',
-        });
+          });
+        } else if (oldPassword !== password) {
+          return toast('Password and confirm password do not match.', {
+            toastId: 'toast-id1',
+          });
+        }
       }
     }
 
@@ -121,7 +157,24 @@ const Security = () => {
         });
       }
 
-      if (changePassword) navigate('/login');
+      if (changePassword) {
+        if (!userData.isGoogleAuth) navigate('/login');
+        else if (userData.hasPassword) {
+          setOldPassword('');
+          setNewPassword('');
+          setShowNewPassword(false);
+          setShowOldPassword(false);
+        } else {
+          setOldPassword('');
+          setNewPassword('');
+          setShowNewPassword(false);
+          setShowOldPassword(false);
+
+          return toast('Your password has been set successfully.', {
+            toastId: 'toast-id1',
+          });
+        }
+      }
     } catch (err) {
       setIsProcessing(false);
       if (!err.response || !err.response.data || err.response.status === 500) {
@@ -156,7 +209,11 @@ const Security = () => {
 
         <div className={styles['password-box']}>
           <div className={styles['input-box']}>
-            <label className={styles.label}>Current Password:</label>
+            <label className={styles.label}>
+              {' '}
+              {userData.hasPassword ? 'Current ' : ''}
+              Password:
+            </label>
             <span
               className={`${styles['password-input-box']} ${
                 focusInput === 'old' ? styles['focus-input'] : ''
@@ -186,7 +243,10 @@ const Security = () => {
           </div>
 
           <div className={styles['input-box']}>
-            <label className={styles.label}>New Password:</label>
+            <label className={styles.label}>
+              {' '}
+              {userData.hasPassword ? 'New ' : 'Confirm '} Password:
+            </label>
             <span
               className={`${styles['password-input-box']} ${
                 focusInput === 'new' ? styles['focus-input'] : ''

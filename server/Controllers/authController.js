@@ -202,15 +202,17 @@ export const protectRoute = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
-  // Checks if the user changed the password after token was issued
-  const isPasswordChanged = user.isPasswordChanged(decodedToken.iat);
+  if (!user.isGoogleAuth) {
+    // Checks if the user changed the password after token was issued
+    const isPasswordChanged = user.isPasswordChanged(decodedToken.iat);
 
-  if (isPasswordChanged) {
-    const error = new CustomError(
-      'Your password has been changed recently. Please login again.',
-      401
-    );
-    return next(error);
+    if (isPasswordChanged) {
+      const error = new CustomError(
+        'Your password has been changed recently. Please login again.',
+        401
+      );
+      return next(error);
+    }
   }
 
   req.user = user;

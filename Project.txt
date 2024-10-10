@@ -51,7 +51,7 @@
     - Fix title for all pages ✔
     - Fix profile images  ✔
     - Fix forgot password ✔
-    - Fix Deactivate and delete account for google auth users.(Check if user has password in security page) ✔✔
+    - Fix Deactivate and delete account for google auth users.(Check if user has password in security page) ✔
 
 
 
