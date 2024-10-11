@@ -589,18 +589,6 @@
   border-radius: 10px;
 }
 
-.scheduled-task-medium {
-  border-top: 3px solid green;
-}
-
-.scheduled-task-high {
-  border-top: 3px solid red;
-}
-
-.scheduled-task-low {
-  border-top: 3px solid gold;
-}
-
 .scheduled-task-box {
   display: flex;
   flex-direction: column;
@@ -732,6 +720,38 @@
 
 .scheduled-task-pics2 {
   cursor: default;
+}
+
+/* Dark Mode */
+
+.dark-username {
+  color: var(--dark-theme-text);
+}
+
+.dark-user-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-task-image {
+  background: var(--dark-theme-background);
+}
+
+.dark-article {
+  background: var(--dark-theme-background);
+  box-shadow: 1px 1px 8px -4px var(--dark-theme-text);
+}
+
+.dark-border-green {
+  border: 2px solid green;
+}
+
+.dark-border-red {
+  border: 2px solid red;
+}
+
+.dark-green,
+.dark-red {
+  font-weight: 700;
 }
 
 /* Animations */

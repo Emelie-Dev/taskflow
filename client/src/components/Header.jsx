@@ -18,7 +18,7 @@ import { generateName } from '../pages/Dashboard';
 import { ToastContainer, toast } from 'react-toastify';
 
 const Header = ({ page, setShowNav, setHeaderHeight }) => {
-  const { userData, setUserData, serverUrl } = useContext(AuthContext);
+  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
   const [showUserBox, setShowUserBox] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -102,12 +102,19 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
   };
 
   return (
-    <header className={styles.header} ref={headerRef}>
+    <header
+      className={`${styles.header} ${
+        mode === 'dark' ? styles['dark-theme'] : ''
+      }`}
+      ref={headerRef}
+    >
       <ToastContainer autoClose={2000} />
 
       <b className={styles['menu-icon-box']}>
         <MdOutlineSegment
-          className={styles['menu-icon']}
+          className={`${styles['menu-icon']} ${
+            mode === 'dark' ? styles['dark-icon'] : ''
+          }`}
           onClick={() => setShowNav(true)}
         />
       </b>
@@ -124,7 +131,9 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
         <IoIosSearch className={styles['search-icon']} />
         <input
           type="text"
-          className={styles.search}
+          className={`${styles.search} ${
+            mode === 'dark' ? styles['dark-search'] : ''
+          }`}
           value={searchText}
           ref={searchRef}
           placeholder="Search..."
@@ -139,34 +148,72 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
       </span>
 
       <div className={styles['icon-div']}>
-        <Link className={styles['icon-container']} to={'/notifications'}>
-          <IoIosNotifications className={styles['notification-icon']} />
+        <Link
+          className={`${styles['icon-container']}  ${
+            mode === 'dark' ? styles['dark-icon-box'] : ''
+          }`}
+          to={'/notifications'}
+        >
+          <IoIosNotifications
+            className={`${styles['notification-icon']}  ${
+              mode === 'dark' ? styles['dark-icon'] : ''
+            }`}
+          />
         </Link>
 
-        <Link className={styles['icon-container']} to={'/chats'}>
-          <IoChatbubblesSharp className={styles['chat-icon']} />
+        <Link
+          className={`${styles['icon-container']}  ${
+            mode === 'dark' ? styles['dark-icon-box'] : ''
+          }`}
+          to={'/chats'}
+        >
+          <IoChatbubblesSharp
+            className={`${styles['chat-icon']}  ${
+              mode === 'dark' ? styles['dark-icon'] : ''
+            }`}
+          />
         </Link>
       </div>
 
       <div className={styles['profile-div']}>
         <div className={styles['profile-box']}>
-          <span className={styles['profile-name']}>
+          <span
+            className={`${styles['profile-name']}  ${
+              mode === 'dark' ? styles['dark-text'] : ''
+            }`}
+          >
             {generateName(
               userData.firstName,
               userData.lastName,
               userData.username
             )}
           </span>
-          <span className={styles['profile-title']}>{userData.occupation}</span>
+          <span
+            className={`${styles['profile-title']}  ${
+              mode === 'dark' ? styles['dark-title'] : ''
+            }`}
+          >
+            {userData.occupation}
+          </span>
         </div>
 
-        <span className={styles['alternate-search-box']}>
-          <FaSearch className={styles['alternate-search-icon']} />
+        <span
+          className={`${styles['alternate-search-box']} ${
+            mode === 'dark' ? styles['dark-icon-box'] : ''
+          }`}
+        >
+          <FaSearch
+            className={`${styles['alternate-search-icon']}  ${
+              mode === 'dark' ? styles['dark-icon'] : ''
+            }`}
+          />
         </span>
 
         <figure className={styles['profile-picture-box']}>
           <img
-            className={styles['profile-picture']}
+            className={`${styles['profile-picture']}  ${
+              mode === 'dark' ? styles['dark-pics'] : ''
+            }`}
             src={getProfilePhoto(userData, serverUrl)}
             ref={imgRef}
             onClick={() => setShowUserBox(true)}
@@ -175,11 +222,16 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
           <ul
             className={`${styles['user-profile-box']} ${
               showUserBox ? styles['show-user-box'] : ''
-            }`}
+            } ${mode === 'dark' ? styles['dark-profile-box'] : ''}`}
             ref={userBoxRef}
           >
             <li>
-              <Link className={styles['profile-link-box']} to={'/profile'}>
+              <Link
+                className={`${styles['profile-link-box']}  ${
+                  mode === 'dark' ? styles['dark-link-box'] : ''
+                }`}
+                to={'/profile'}
+              >
                 <FaRegCircleUser className={styles['user-profile-icon']} />
                 My Profile
               </Link>
@@ -187,7 +239,7 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
             <li
               className={`${styles['user-profile-item']} ${
                 isProcessing ? styles['disable-item'] : ''
-              }`}
+              }  ${mode === 'dark' ? styles['dark-profile-item'] : ''}`}
               onClick={logout}
             >
               {isProcessing ? (

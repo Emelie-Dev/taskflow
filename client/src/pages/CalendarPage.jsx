@@ -344,7 +344,7 @@ const CalendarPage = () => {
                           <div
                             className={`${styles['scheduled-task-content']}`}
                             style={{
-                              borderTop: `0.18rem solid ${
+                              borderTop: `0.185rem solid ${
                                 priorityColors[elem.priority]
                               }`,
                             }}

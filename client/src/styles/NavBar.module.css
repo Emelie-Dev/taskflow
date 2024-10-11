@@ -72,7 +72,7 @@
   width: 1.25rem;
   height: 1.25rem;
   margin-right: 1rem;
-  fill: gray;
+  /* fill: gray; */
   transition: fill 0.3s;
 }
 
@@ -96,12 +96,12 @@
 }
 
 .page-link {
-  color: orange;
+  color: orange !important;
   font-weight: 500;
 }
 
 .page-icon {
-  fill: orange;
+  fill: orange !important;
 }
 
 .responsive-nav {
@@ -147,6 +147,22 @@
 
 .notifications {
   display: none;
+}
+
+.dark-nav {
+  background: #252525;
+}
+
+.dark-head {
+  border-bottom: 1px solid var(--dark-theme-text);
+}
+
+.dark-head-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-side-nav {
+  color: var(--dark-theme-text);
 }
 
 /* Animations */

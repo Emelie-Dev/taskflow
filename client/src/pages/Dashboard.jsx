@@ -58,7 +58,7 @@ const Dashboard = () => {
   const [showNav, setShowNav] = useState(false);
   const [addTask, setAddTask] = useState(false);
   const [userStats, setUserStats] = useState(null);
-  const { userData, serverUrl } = useContext(AuthContext);
+  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [chartDetails, setChartDetails] = useState({ view: 0, option: '1m' });
   const [chartData, setChartData] = useState(null);
   const [taskCategory, setTaskCategory] = useState('recent');
@@ -85,6 +85,8 @@ const Dashboard = () => {
   const calenderRef = useRef();
   const taskBoxRef = useRef();
   const graphRef = useRef();
+
+  const priorityColors = userData.personalization.priorityColors;
 
   // For user stats
   useEffect(() => {
@@ -390,11 +392,19 @@ const Dashboard = () => {
         <section className={styles['left-section']}>
           <div className={styles['left-section-head']}>
             <div className={styles['username-box']}>
-              <span className={styles.username}>
+              <span
+                className={`${styles.username} ${
+                  mode === 'dark' ? styles['dark-username'] : ''
+                }`}
+              >
                 {timeOfTheDay()} {userData.username}
               </span>
 
-              <span className={styles['user-text']}>
+              <span
+                className={`${styles['user-text']} ${
+                  mode === 'dark' ? styles['dark-user-text'] : ''
+                }`}
+              >
                 {userStats
                   ? `You have got ${userStats.data.todayTasks} ${
                       userStats.data.todayTasks === 1 ? 'task' : 'tasks'
@@ -403,9 +413,13 @@ const Dashboard = () => {
               </span>
             </div>
 
-            <figure className={styles['task-image-box']}>
+            <figure
+              className={`${styles['task-image-box']} ${
+                mode === 'dark-task-image' ? styles['dark-icon'] : ''
+              }`}
+            >
               <img
-                src="../../assets/images/task.jpg"
+                src="../../assets/images/task2.png"
                 className={styles['task-image']}
               />
             </figure>
@@ -423,27 +437,49 @@ const Dashboard = () => {
             ) : userStats ? (
               <>
                 {' '}
-                <article className={styles.article}>
+                <article
+                  className={`${styles.article} ${
+                    mode === 'dark' ? styles['dark-article'] : ''
+                  }`}
+                >
                   <span
-                    className={`${styles['article-icon-box']} ${styles['border-green']}`}
+                    className={`${styles['article-icon-box']} ${
+                      styles['border-green']
+                    } ${mode === 'dark' ? styles['dark-border-green'] : ''}`}
                   >
                     <HiMiniArrowTrendingUp
-                      className={`${styles['article-icon']} ${styles.green}`}
+                      className={`${styles['article-icon']} ${styles.green} ${
+                        mode === 'dark' ? styles['dark-green'] : ''
+                      }`}
                     />
                   </span>
 
                   <div className={styles['article-details']}>
-                    <span className={styles['article-name']}>
+                    <span
+                      className={`${styles['article-name']} ${
+                        mode === 'dark' ? styles['dark-user-text'] : ''
+                      }`}
+                    >
                       Tasks Created
                     </span>
-                    <span className={styles['article-size']}>
+                    <span
+                      className={`${styles['article-size']} ${
+                        mode === 'dark' ? styles['dark-user-text'] : ''
+                      } `}
+                    >
                       {userStats.data.tasks > 500
                         ? '500+'
                         : userStats.data.tasks}{' '}
                     </span>
-                    <span className={styles['article-increase']}>
+                    <span
+                      className={`${styles['article-increase']} ${
+                        mode === 'dark' ? styles['dark-user-text'] : ''
+                      }`}
+                    >
                       <span
-                        className={`${styles['article-increase-rate']} ${styles.green}`}
+                        className={`${styles['article-increase-rate']} ${
+                          styles.green
+                        } ${mode === 'dark' ? styles['dark-green'] : ''}`}
                       >
                         {userStats.data.tasks === 0
                           ? ''
@@ -463,26 +499,46 @@ const Dashboard = () => {
                     </span>{' '}
                   </div>
                 </article>
-                <article className={styles.article}>
+                <article
+                  className={`${styles.article} ${
+                    mode === 'dark' ? styles['dark-article'] : ''
+                  }`}
+                >
                   <span
-                    className={`${styles['article-icon-box']} ${styles['border-red']}`}
+                    className={`${styles['article-icon-box']} ${
+                      styles['border-red']
+                    } ${mode === 'dark' ? styles['dark-border-red'] : ''} `}
                   >
                     <ImBrightnessContrast
-                      className={`${styles['article-icon']} ${styles.red}`}
+                      className={`${styles['article-icon']} ${styles.red} ${
+                        mode === 'dark' ? styles['dark-red'] : ''
+                      }`}
                     />
                   </span>
 
                   <div className={styles['article-details']}>
-                    <span className={styles['article-name']}>
+                    <span
+                      className={`${styles['article-name']} ${
+                        mode === 'dark' ? styles['dark-user-text'] : ''
+                      }`}
+                    >
                       Current Project
                     </span>
-                    <span className={styles['article-size']}>
+                    <span
+                      className={`${styles['article-size']} ${
+                        mode === 'dark' ? styles['dark-user-text'] : ''
+                      }`}
+                    >
                       {userStats.data.currentProject.completedTasks}
                       <span className={styles['projects-size']}>
                         / {userStats.data.currentProject.tasks}
                       </span>
                     </span>
-                    <span className={styles['article-increase']}>
+                    <span
+                      className={`${styles['article-increase']} ${
+                        mode === 'dark' ? styles['dark-user-text'] : ''
+                      }`}
+                    >
                       {userStats.data.currentProject.completedTasks === 0 ? (
                         'Completed zero tasks.'
                       ) : userStats.data.currentProject.percent === 100 ? (
@@ -491,7 +547,9 @@ const Dashboard = () => {
                         <>
                           Completed over{' '}
                           <span
-                            className={`${styles['article-increase-rate']} ${styles.red}`}
+                            className={`${styles['article-increase-rate']} ${
+                              styles.red
+                            } ${mode === 'dark' ? styles['dark-red'] : ''}`}
                           >
                             {userStats.data.currentProject.percent}%{' '}
                           </span>
@@ -505,7 +563,7 @@ const Dashboard = () => {
             ) : (
               <>
                 {' '}
-                <article className={styles.article}>
+                <article className={`${styles.article} `}>
                   <span
                     className={`${styles['article-icon-box']} ${styles['border-green']}`}
                   >
@@ -919,9 +977,12 @@ const Dashboard = () => {
                       {String(hour).length === 1 ? `0${String(hour)}` : hour}:00
                     </time>
                     <div
-                      className={`${styles['scheduled-task-content']} ${
-                        styles[`scheduled-task-${task.priority}`]
-                      }`}
+                      className={styles['scheduled-task-content']}
+                      style={{
+                        borderTop: `0.185rem solid ${
+                          priorityColors[task.priority]
+                        }`,
+                      }}
                     >
                       <div className={styles['scheduled-task-box']}>
                         <span className={styles['scheduled-task-name']}>

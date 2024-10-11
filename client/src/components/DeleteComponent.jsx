@@ -312,7 +312,6 @@ const DeleteComponent = ({
 
       navigate('/');
     } catch (err) {
-      console.log(err);
       setIsProcessing(false);
 
       if (!err.response || !err.response.data || err.response.status === 500) {

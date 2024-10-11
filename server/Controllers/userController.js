@@ -568,7 +568,7 @@ export const deleteUser = asyncErrorHandler(async (req, res, next) => {
   await Notification.deleteMany({ user: user._id });
 
   // Delete user profile image
-  if (user.photo !== 'default.jpeg' || user.photo.startsWith('user-')) {
+  if (user.photo !== 'default.jpeg' && user.photo.startsWith('user-')) {
     await new Promise((resolve, reject) => {
       fs.unlink(`Public/img/users/${user.photo}`, (err) => {
         if (err) reject();

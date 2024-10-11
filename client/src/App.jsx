@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import Home from './pages/Home';
 import { Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
@@ -36,6 +36,42 @@ export const apiClient = axios.create({
 const App = () => {
   const [userData, setUserData] = useState({});
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [mode, setMode] = useState('');
+
+  useEffect(() => {
+    if (userData.personalization) {
+      const theme = userData.personalization.theme;
+
+      switch (theme) {
+        case 'light':
+          setMode('light');
+          break;
+
+        case 'dark':
+          setMode('dark');
+          break;
+
+        case 'system':
+          setMode(
+            window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+          );
+          break;
+
+        default:
+          setMode('light');
+      }
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (mode === 'dark') {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+  }, [mode]);
 
   return (
     <AuthContext.Provider
@@ -45,6 +81,8 @@ const App = () => {
         isAuthenticated,
         setIsAuthenticated,
         serverUrl,
+        mode,
+        setMode,
       }}
     >
       <ErrorBoundary FallbackComponent={ErrorPage}>

@@ -178,7 +178,7 @@ const Personalization = () => {
       <ToastContainer autoClose={2500} />
 
       <h1 className={styles['section-head']}>Personalization</h1>
-      {/* <div className={styles['option-div']}>
+      <div className={styles['option-div']}>
         <span className={styles['option-head']}>Theme</span>
         <div className={styles['theme-container']}>
           <span className={styles['img-box']}>
@@ -237,7 +237,7 @@ const Personalization = () => {
             <span className={styles['theme-type']}>System default</span>
           </span>
         </div>
-      </div> */}
+      </div>
 
       <div
         className={`${styles['option-div']} ${styles['project-div-container']}`}

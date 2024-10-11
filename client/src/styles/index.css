@@ -15,6 +15,14 @@
   --toastify-text-color-light: orange;
   --toastify-text-color-dark: white;
   --toastify-color-progress-light: orange;
+  --dark-theme-background: #252525;
+  --dark-theme-color: rgb(255, 250, 250);
+  --dark-theme-foreground: white;
+  --dark-theme-text: #e0e0e0;
+}
+
+.dark-theme {
+  background: var(--dark-theme-background);
 }
 
 @font-face {

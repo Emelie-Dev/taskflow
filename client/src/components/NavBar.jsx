@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef, useRef, useContext } from 'react';
 import styles from '../styles/NavBar.module.css';
 import { Link } from 'react-router-dom';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
@@ -8,8 +8,10 @@ import { FaTasks, FaCalendarAlt } from 'react-icons/fa';
 import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
 import { IoIosNotifications } from 'react-icons/io';
 import { FaRegCircleUser } from 'react-icons/fa6';
+import { AuthContext } from '../App';
 
 const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
+  const { mode } = useContext(AuthContext);
   const navRef = useRef();
 
   const hideNav = (e) => {
@@ -24,18 +26,32 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
         ref={navRef}
         className={`${styles['responsive-nav']} ${
           showNav ? styles['show-nav'] : ''
-        }`}
+        } `}
         onClick={hideNav}
       >
-        <section className={styles['responsive-section']}>
-          <div className={styles['responsive-head']}>
+        <section
+          className={`${styles['responsive-section']}  ${
+            mode === 'dark' ? styles['dark-nav'] : ''
+          }`}
+        >
+          <div
+            className={`${styles['responsive-head']} ${
+              mode === 'dark' ? styles['dark-head'] : ''
+            } `}
+          >
             <span className={styles['icon-box']}>
               <Link to={'/'}>
                 <SiKashflow className={styles.icon} />
               </Link>
             </span>
 
-            <span className={styles['head-text']}>TaskFlow</span>
+            <span
+              className={`${styles['head-text']} ${
+                mode === 'dark' ? styles['dark-head-text'] : ''
+              } `}
+            >
+              TaskFlow
+            </span>
           </div>
 
           <ul className={styles['responsive-side-nav']}>
@@ -48,7 +64,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                 to={'/dashboard'}
                 className={`${styles['side-nav-link']} ${
                   page === 'Dashboard' ? styles['page-link'] : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <MdOutlineDashboard
                   className={`${styles['side-nav-icon']} ${
@@ -68,7 +84,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                 to={'/projects'}
                 className={`${styles['side-nav-link']} ${
                   page.startsWith('Project') ? styles['page-link'] : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <GoProjectSymlink
                   className={`${styles['side-nav-icon']} ${
@@ -82,13 +98,13 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
             <li
               className={`${styles['side-nav-item']} ${
                 page === 'Tasks' ? styles.page : ''
-              }`}
+              }  `}
             >
               <Link
                 to={'/tasks'}
                 className={`${styles['side-nav-link']} ${
                   page === 'Tasks' ? styles['page-link'] : ''
-                }`}
+                } ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <FaTasks
                   className={`${styles['side-nav-icon']} ${
@@ -108,7 +124,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                 to={'/calendar'}
                 className={`${styles['side-nav-link']} ${
                   page === 'Calendar' ? styles['page-link'] : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <FaCalendarAlt
                   className={`${styles['side-nav-icon']} ${
@@ -128,7 +144,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                 to={'/chats'}
                 className={`${styles['side-nav-link']} ${
                   page === 'Chats' ? styles['page-link'] : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <IoChatbubblesSharp
                   className={`${styles['side-nav-icon']} ${
@@ -148,7 +164,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                 to={'/analytics'}
                 className={`${styles['side-nav-link']} ${
                   page === 'Analytics' ? styles['page-link'] : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <SiSimpleanalytics
                   className={`${styles['side-nav-icon']} ${
@@ -168,7 +184,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                 to={'/notifications'}
                 className={`${styles['side-nav-link']} ${
                   page === 'Notifications' ? styles['page-link'] : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <IoIosNotifications
                   className={`${styles['side-nav-icon2']} ${
@@ -188,7 +204,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                 to={'/profile'}
                 className={`${styles['side-nav-link']} ${
                   page === 'Profile' ? styles['page-link'] : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <FaRegCircleUser
                   className={`${styles['side-nav-icon']} ${
@@ -209,7 +225,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                   to={'#'}
                   className={`${styles['side-nav-link']} ${
                     page === 'Users' ? styles['page-link'] : ''
-                  }`}
+                  }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
                 >
                   <FaRegCircleUser
                     className={`${styles['side-nav-icon']} ${
@@ -230,7 +246,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                 to={'/settings'}
                 className={`${styles['side-nav-link']} ${
                   page === 'Settings' ? styles['page-link'] : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <IoSettingsOutline
                   className={`${styles['side-nav-icon']} ${
@@ -247,17 +263,27 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
       <nav
         className={`${styles.nav} ${
           page === 'Dashboard' ? styles['dashboard-nav'] : ''
-        }`}
+        }  ${mode === 'dark' ? styles['dark-nav'] : ''}`}
         ref={ref}
       >
-        <div className={styles.head}>
+        <div
+          className={`${styles.head}  ${
+            mode === 'dark' ? styles['dark-head'] : ''
+          } `}
+        >
           <span className={styles['icon-box']}>
             <Link to={'/'}>
               <SiKashflow className={styles.icon} />
             </Link>
           </span>
 
-          <span className={styles['head-text']}>TaskFlow</span>
+          <span
+            className={`${styles['head-text']} ${
+              mode === 'dark' ? styles['dark-head-text'] : ''
+            } `}
+          >
+            TaskFlow
+          </span>
         </div>
 
         <ul className={styles['side-nav']}>
@@ -270,7 +296,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               to={'/dashboard'}
               className={`${styles['side-nav-link']} ${
                 page === 'Dashboard' ? styles['page-link'] : ''
-              }`}
+              }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
             >
               <MdOutlineDashboard
                 className={`${styles['side-nav-icon']} ${
@@ -290,7 +316,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               to={'/projects'}
               className={`${styles['side-nav-link']} ${
                 page.startsWith('Project') ? styles['page-link'] : ''
-              }`}
+              } ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
             >
               <GoProjectSymlink
                 className={`${styles['side-nav-icon']} ${
@@ -304,13 +330,13 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
           <li
             className={`${styles['side-nav-item']} ${
               page === 'Tasks' ? styles.page : ''
-            }`}
+            } `}
           >
             <Link
               to={'/tasks'}
               className={`${styles['side-nav-link']} ${
                 page === 'Tasks' ? styles['page-link'] : ''
-              }`}
+              }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
             >
               <FaTasks
                 className={`${styles['side-nav-icon']} ${
@@ -330,7 +356,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               to={'/calendar'}
               className={`${styles['side-nav-link']} ${
                 page === 'Calendar' ? styles['page-link'] : ''
-              }`}
+              }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
             >
               <FaCalendarAlt
                 className={`${styles['side-nav-icon']} ${
@@ -350,7 +376,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               to={'/chats'}
               className={`${styles['side-nav-link']} ${
                 page === 'Chats' ? styles['page-link'] : ''
-              }`}
+              }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
             >
               <IoChatbubblesSharp
                 className={`${styles['side-nav-icon']} ${
@@ -370,7 +396,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               to={'/analytics'}
               className={`${styles['side-nav-link']} ${
                 page === 'Analytics' ? styles['page-link'] : ''
-              }`}
+              }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
             >
               <SiSimpleanalytics
                 className={`${styles['side-nav-icon']} ${
@@ -390,7 +416,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               to={'/notifications'}
               className={`${styles['side-nav-link']} ${
                 page === 'Notifications' ? styles['page-link'] : ''
-              }`}
+              }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
             >
               <IoIosNotifications
                 className={`${styles['side-nav-icon2']} ${
@@ -410,7 +436,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               to={'/profile'}
               className={`${styles['side-nav-link']} ${
                 page === 'Profile' ? styles['page-link'] : ''
-              }`}
+              }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
             >
               <FaRegCircleUser
                 className={`${styles['side-nav-icon']} ${
@@ -431,7 +457,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
                 to={'#'}
                 className={`${styles['side-nav-link']} ${
                   page === 'Users' ? styles['page-link'] : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
               >
                 <FaRegCircleUser
                   className={`${styles['side-nav-icon']} ${
@@ -452,7 +478,7 @@ const NavBar = forwardRef(({ page, showNav, setShowNav }, ref) => {
               to={'/settings'}
               className={`${styles['side-nav-link']} ${
                 page === 'Settings' ? styles['page-link'] : ''
-              }`}
+              }  ${mode === 'dark' ? styles['dark-side-nav'] : ''}`}
             >
               <IoSettingsOutline
                 className={`${styles['side-nav-icon']} ${
