@@ -592,6 +592,32 @@
   border: 1px solid orange;
 }
 
+/* Dark Mode */
+
+.dark-word {
+  color: var(--dark-theme-text);
+  fill: var(--dark-theme-text);
+}
+
+.dark-article {
+  background: var(--dark-theme-background);
+  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px white;
+}
+
+.dark-menu {
+  color: var(--dark-theme-color);
+  background: var(--dark-theme-background);
+}
+
+.dark-list {
+  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px white,
+    -1px -1px 2px -1px white;
+}
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
 /* Animation */
 
 @keyframes rotate {

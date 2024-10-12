@@ -28,7 +28,7 @@ const TaskBox = ({
   setCurrentProject,
   setDeleteCount,
 }) => {
-  const { userData, serverUrl } = useContext(AuthContext);
+  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [showDetails, setShowDetails] = useState(false);
   const [editTask, setEditTask] = useState(false);
   const [taskObj, setTaskObj] = useState(task);
@@ -702,7 +702,11 @@ const TaskBox = ({
   };
 
   return (
-    <article className={styles['task-box']}>
+    <article
+      className={`${styles['task-box']} ${
+        mode === 'dark' ? styles['dark-article'] : ''
+      }`}
+    >
       <ToastContainer autoClose={2000} />
       {showDeleteBox && (
         <DeleteModal
@@ -719,11 +723,19 @@ const TaskBox = ({
               : showDeleteBox
               ? styles['hide-data']
               : ''
-          }`}
+          } `}
         >
-          <BsThreeDotsVertical className={styles['task-menu-icon']} />
+          <BsThreeDotsVertical
+            className={`${styles['task-menu-icon']} ${
+              mode === 'dark' ? styles['dark-word'] : ''
+            }`}
+          />
 
-          <ul className={styles['menu-action-list']}>
+          <ul
+            className={`${styles['menu-action-list']} ${
+              mode === 'dark' ? styles['dark-menu'] : ''
+            } ${mode === 'dark' ? styles['dark-list'] : ''}`}
+          >
             <li className={styles['menu-action-item']} onClick={toggleEdit}>
               <MdOutlineModeEditOutline className={styles['action-icon']} />
               Edit
@@ -748,7 +760,7 @@ const TaskBox = ({
         <h1
           className={`${styles['task-name']}  ${
             !assigned ? (editTask ? styles['show-editable'] : '') : ''
-          }`}
+          } ${mode === 'dark' ? styles['dark-text'] : ''}`}
           contentEditable={!assigned && editTask}
           onBlur={(e) =>
             setTaskData({ ...taskData, name: e.target.textContent.trim() })

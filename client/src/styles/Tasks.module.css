@@ -236,8 +236,8 @@
 }
 
 .active-select-btn {
-  background: orange;
-  color: white;
+  background: orange !important;
+  color: white !important;
 }
 
 .select-btn-icon {
@@ -368,6 +368,26 @@
 .network-icon {
   margin-right: 0.7rem;
   transform: translateY(2px);
+}
+
+/* Dark Mode */
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-btn {
+  color: var(--dark-theme-color);
+  background: var(--dark-theme-background);
+}
+
+.dark-bg {
+  background: var(--dark-theme-background);
+  box-shadow: 1px 1px 10px -3px black, 1px 1px 8px -4px white;
 }
 
 /* Animations */

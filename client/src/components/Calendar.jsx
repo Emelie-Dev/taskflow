@@ -1,6 +1,7 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useContext } from 'react';
 import styles from '../styles/Calendar.module.css';
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
+import { AuthContext } from '../App';
 
 const Calendar = forwardRef(
   (
@@ -16,6 +17,8 @@ const Calendar = forwardRef(
     },
     ref
   ) => {
+    const { mode } = useContext(AuthContext);
+
     const moveNextMonth = () => {
       if (currentMonth === 12) {
         setCurrentMonth(1);
@@ -214,26 +217,70 @@ const Calendar = forwardRef(
         <h1
           className={`${styles['current-month']} ${
             displayMonth ? styles['hide-month'] : ''
-          }`}
+          } ${mode === 'dark' ? styles['dark-data'] : ''}`}
         >
           {month[currentMonth - 1]} {currentYear}{' '}
         </h1>
 
         <div className={styles['calendar-box']}>
           <IoIosArrowBack
-            className={styles['calendar-back-arrow']}
+            className={`${styles['calendar-back-arrow']} ${
+              mode === 'dark' ? styles['dark-arrow'] : ''
+            } `}
             onClick={movePreviousMonth}
           />
           <table className={styles['calendar-table']} ref={ref}>
             <thead>
               <tr className={styles['calendar-row']}>
-                <th className={styles['calendar-head']}>Mon</th>
-                <th className={styles['calendar-head']}>Tue</th>
-                <th className={styles['calendar-head']}>Wed</th>
-                <th className={styles['calendar-head']}>Thu</th>
-                <th className={styles['calendar-head']}>Fri</th>
-                <th className={styles['calendar-head']}>Sat</th>
-                <th className={styles['calendar-head']}>Sun</th>
+                <th
+                  className={`${styles['calendar-head']} ${
+                    mode === 'dark' ? styles['dark-head'] : ''
+                  }`}
+                >
+                  Mon
+                </th>
+                <th
+                  className={`${styles['calendar-head']} ${
+                    mode === 'dark' ? styles['dark-head'] : ''
+                  }`}
+                >
+                  Tue
+                </th>
+                <th
+                  className={`${styles['calendar-head']} ${
+                    mode === 'dark' ? styles['dark-head'] : ''
+                  }`}
+                >
+                  Wed
+                </th>
+                <th
+                  className={`${styles['calendar-head']} ${
+                    mode === 'dark' ? styles['dark-head'] : ''
+                  }`}
+                >
+                  Thu
+                </th>
+                <th
+                  className={`${styles['calendar-head']} ${
+                    mode === 'dark' ? styles['dark-head'] : ''
+                  }`}
+                >
+                  Fri
+                </th>
+                <th
+                  className={`${styles['calendar-head']} ${
+                    mode === 'dark' ? styles['dark-head'] : ''
+                  }`}
+                >
+                  Sat
+                </th>
+                <th
+                  className={`${styles['calendar-head']} ${
+                    mode === 'dark' ? styles['dark-head'] : ''
+                  }`}
+                >
+                  Sun
+                </th>
               </tr>
             </thead>
 
@@ -246,6 +293,8 @@ const Calendar = forwardRef(
                         <td
                           key={index}
                           className={`${styles['calendar-data']} ${
+                            mode === 'dark' ? styles['dark-data'] : ''
+                          }  ${
                             checkCurrentDate(current)
                               ? styles['current-date']
                               : ''
@@ -271,7 +320,9 @@ const Calendar = forwardRef(
           </table>
 
           <IoIosArrowForward
-            className={styles['calendar-front-arrow']}
+            className={`${styles['calendar-front-arrow']} ${
+              mode === 'dark' ? styles['dark-arrow'] : ''
+            } `}
             onClick={moveNextMonth}
           />
         </div>

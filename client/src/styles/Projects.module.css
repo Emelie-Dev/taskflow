@@ -831,7 +831,7 @@
 
 .current-page {
   background: gray;
-  color: white;
+  color: white !important;
 }
 
 .current-page:hover {
@@ -1039,6 +1039,62 @@
 
 .default-pic {
   border: 1px solid orange;
+}
+
+.dark-text,
+.dark-text a {
+  color: var(--dark-theme-color);
+}
+
+.dark-select {
+  color: var(--dark-theme-color);
+  background: var(--dark-theme-background);
+}
+
+.dark-msg {
+  color: var(--dark-theme-text);
+  fill: var(--dark-theme-text);
+}
+
+.dark-article {
+  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px var(--dark-theme-text);
+}
+
+.dark-progress {
+  background: var(--dark-theme-color);
+}
+
+.dark-navigation-box {
+  box-shadow: 1px 1px 5px -3px black, -1px -1px 4px -2px var(--dark-theme-text),
+    1px 1px 4px -2px var(--dark-theme-text);
+}
+
+.dark-num {
+  color: orange;
+}
+
+.dark-active {
+  color: #7cfc00;
+}
+
+.dark-inactive {
+  color: #ffb6c1;
+}
+
+.dark-low-progress {
+  color: #ffb6c1;
+}
+
+.dark-medium-progress {
+  color: orange;
+}
+
+.dark-high-progress {
+  color: #00bfff;
+}
+
+.dark-complete-progress {
+  color: #7cfc00;
 }
 
 /* Animations */

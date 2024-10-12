@@ -37,7 +37,7 @@ export const months = [
 ];
 
 const Projects = () => {
-  const { userData, serverUrl } = useContext(AuthContext);
+  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [displayFormat, setDisplayFormat] = useState(
     userData.personalization.defaultProjectView
   );
@@ -290,8 +290,19 @@ const Projects = () => {
         <section className={styles['section-content']}>
           <div className={styles['section-head']}>
             <div className={styles['sort-div']}>
-              <span className={styles['sort-text']}>Sort by:</span>
-              <select className={styles['sort-select']} onChange={changeSortBy}>
+              <span
+                className={`${styles['sort-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
+                Sort by:
+              </span>
+              <select
+                className={`${styles['sort-select']} ${
+                  mode === 'dark' ? styles['dark-select'] : ''
+                }`}
+                onChange={changeSortBy}
+              >
                 <option value={'-createdAt'}>Newest</option>
                 <option value={'createdAt'}>Oldest</option>
                 <option value={'name'}>Alphabetically</option>
@@ -493,16 +504,27 @@ const Projects = () => {
                 {projects === null ? (
                   ''
                 ) : projects.grid.length === 0 ? (
-                  <div className={styles['no-projects-text']}>
+                  <div
+                    className={`${styles['no-projects-text']}  ${
+                      mode === 'dark' ? styles['dark-msg'] : ''
+                    }`}
+                  >
                     {noProjectMessage(projectsDetails.category)}
                   </div>
                 ) : projects.grid ? (
                   projects.grid.map((project) => (
-                    <article key={project._id} className={styles.article}>
+                    <article
+                      key={project._id}
+                      className={`${styles.article} ${
+                        mode === 'dark' ? styles['dark-article'] : ''
+                      } `}
+                    >
                       <span className={styles['delete-icon-box']}>
                         {' '}
                         <MdDelete
-                          className={styles['delete-icon']}
+                          className={`${styles['delete-icon']} ${
+                            mode === 'dark' ? styles['dark-msg'] : ''
+                          } `}
                           title="Delete Project"
                           onClick={() => {
                             setDeleteModal({ value: true, type: 'Project' });
@@ -515,11 +537,19 @@ const Projects = () => {
                       </span>
 
                       <h1 className={styles['project-name']}>
-                        <span className={styles['project-name-value']}>
+                        <span
+                          className={`${styles['project-name-value']}  ${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
+                        >
                           <a href={`/project/${project._id}`}>{project.name}</a>
                         </span>
                       </h1>
-                      <span className={styles['project-tasks']}>
+                      <span
+                        className={`${styles['project-tasks']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
+                      >
                         <span className={styles['open-tasks']}>
                           {project.details.open}
                         </span>{' '}
@@ -530,7 +560,11 @@ const Projects = () => {
                         </span>{' '}
                         completed
                       </span>
-                      <p className={styles['project-details']}>
+                      <p
+                        className={`${styles['project-details']} ${
+                          mode === 'dark' ? styles['dark-msg'] : ''
+                        }`}
+                      >
                         {project.description.length === 0 ? (
                           <i>No project description</i>
                         ) : (
@@ -539,10 +573,18 @@ const Projects = () => {
                       </p>
 
                       <div className={styles['property-div']}>
-                        <span className={styles['property-name']}>
+                        <span
+                          className={`${styles['property-name']} ${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
+                        >
                           Deadline:
                         </span>
-                        <span className={styles['deadline-value']}>
+                        <span
+                          className={`${styles['deadline-value']} ${
+                            mode === 'dark' ? styles['dark-msg'] : ''
+                          }`}
+                        >
                           {project.deadline ? (
                             `${
                               months[new Date(project.deadline).getMonth()]
@@ -556,8 +598,16 @@ const Projects = () => {
                           )}
                         </span>
                       </div>
+
                       <div className={styles['property-div']}>
-                        <span className={styles['property-name']}>Team:</span>
+                        <span
+                          className={`${styles['property-name']} ${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
+                        >
+                          Team:
+                        </span>
+
                         <div
                           className={`${styles['team-pics-box']} ${
                             project.team.length === 0
@@ -566,7 +616,13 @@ const Projects = () => {
                           }`}
                         >
                           {project.team.length === 0 ? (
-                            <i>No team members</i>
+                            <i
+                              className={`${
+                                mode === 'dark' ? styles['dark-msg'] : ''
+                              }`}
+                            >
+                              No team members
+                            </i>
                           ) : project.team.length > 4 ? (
                             <>
                               {project.team.slice(0, 4).map((member) => (
@@ -636,7 +692,11 @@ const Projects = () => {
 
                       <div className={styles['progess-div']}>
                         <div className={styles['progess-box']}>
-                          <span className={styles['progess-text']}>
+                          <span
+                            className={`${styles['progess-text']} ${
+                              mode === 'dark' ? styles['dark-text'] : ''
+                            }`}
+                          >
                             Progress
                           </span>
 
@@ -645,7 +705,11 @@ const Projects = () => {
                           </span>
                         </div>
 
-                        <div className={styles['progress-bar']}>
+                        <div
+                          className={`${styles['progress-bar']} ${
+                            mode === 'dark' ? styles['dark-progress'] : ''
+                          }`}
+                        >
                           <span
                             className={styles['progress-bar-value']}
                             style={{
@@ -664,7 +728,11 @@ const Projects = () => {
               </div>
 
               {projectData.error && (
-                <div className={styles['no-projects-text']}>
+                <div
+                  className={`${styles['no-projects-text']} ${
+                    mode === 'dark' ? styles['dark-msg'] : ''
+                  }`}
+                >
                   <MdOutlineSignalWifiOff className={styles['network-icon']} />{' '}
                   Unable to retrieve data
                 </div>
@@ -700,13 +768,21 @@ const Projects = () => {
               {projects === null ? (
                 ''
               ) : projects.table[tablePage - 1].length === 0 ? (
-                <div className={styles['no-projects-text']}>
+                <div
+                  className={`${styles['no-projects-text']}  ${
+                    mode === 'dark' ? styles['dark-msg'] : ''
+                  }`}
+                >
                   {noProjectMessage(projectsDetails.category)}
                 </div>
               ) : projects.table ? (
                 <>
                   <header className={styles.footer}>
-                    <div className={styles['footer-text']}>
+                    <div
+                      className={`${styles['footer-text']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
                       Showing{' '}
                       <span className={styles['footer-entry-text']}>
                         {(tablePage - 1) * 30 + 1}
@@ -723,15 +799,21 @@ const Projects = () => {
                       {projects.table.flat().length === 1 ? 'entry' : 'entries'}
                     </div>
 
-                    <div className={styles['entry-navigation-box']}>
+                    <div
+                      className={`${styles['entry-navigation-box']} ${
+                        mode === 'dark' ? styles['dark-navigation-box'] : ''
+                      } `}
+                    >
                       <span
                         className={`${styles['footer-content-box']} ${
                           styles['footer-arrow-box']
-                        } ${tablePage === 1 ? styles['disable-box'] : ''}`}
+                        } ${tablePage === 1 ? styles['disable-box'] : ''} `}
                         onClick={() => goToPage(tablePage - 1)}
                       >
                         <MdKeyboardDoubleArrowLeft
-                          className={styles['footer-icon']}
+                          className={`${styles['footer-icon']} ${
+                            mode === 'dark' ? styles['dark-msg'] : ''
+                          }`}
                         />
                       </span>
 
@@ -744,7 +826,7 @@ const Projects = () => {
                                 tablePage === index + 1
                                   ? styles['current-page']
                                   : ''
-                              }`}
+                              } ${mode === 'dark' ? styles['dark-num'] : ''}`}
                               onClick={() => goToPage(index + 1)}
                             >
                               {index + 1}
@@ -753,7 +835,9 @@ const Projects = () => {
 
                           {!projectData.lastPage && (
                             <span
-                              className={styles['footer-content-box']}
+                              className={`${styles['footer-content-box']} ${
+                                mode === 'dark' ? styles['dark-num'] : ''
+                              }`}
                               onClick={() =>
                                 goToPage(projects.table.length + 1)
                               }
@@ -771,7 +855,9 @@ const Projects = () => {
                         onClick={() => goToPage(tablePage + 1)}
                       >
                         <MdKeyboardDoubleArrowRight
-                          className={styles['footer-icon']}
+                          className={`${styles['footer-icon']} ${
+                            mode === 'dark' ? styles['dark-msg'] : ''
+                          }`}
                         />
                       </span>
                     </div>
@@ -795,9 +881,20 @@ const Projects = () => {
                           {projects.table[tablePage - 1].map((project) => (
                             <tr key={project._id}>
                               <td
-                                className={`${styles['table-project-data']} ${styles['table-project-name']}`}
+                                className={`${styles['table-project-data']} ${
+                                  styles['table-project-name']
+                                } ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
+                                }`}
                               >
-                                <a href={`/project/${project._id}`}>
+                                <a
+                                  className={`${
+                                    mode === 'dark'
+                                      ? styles['dark-table-name']
+                                      : ''
+                                  }`}
+                                  href={`/project/${project._id}`}
+                                >
                                   {project.name}{' '}
                                 </a>
                               </td>
@@ -805,7 +902,13 @@ const Projects = () => {
                               <td className={styles['table-project-data']}>
                                 <div className={styles['table-team-box']}>
                                   {project.team.length === 0 ? (
-                                    <i className={styles['no-team-text']}>
+                                    <i
+                                      className={`${styles['no-team-text']} ${
+                                        mode === 'dark'
+                                          ? styles['dark-msg']
+                                          : ''
+                                      }`}
+                                    >
                                       No team members
                                     </i>
                                   ) : project.team.length > 4 ? (
@@ -903,7 +1006,11 @@ const Projects = () => {
                               </td>
 
                               <td
-                                className={` ${styles['table-project-data']}  ${styles['table-project-deadline']} `}
+                                className={` ${styles['table-project-data']}  ${
+                                  styles['table-project-deadline']
+                                }  ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
+                                }`}
                               >
                                 {project.deadline ? (
                                   `${
@@ -916,31 +1023,55 @@ const Projects = () => {
                                     project.deadline
                                   ).getFullYear()}`
                                 ) : (
-                                  <i className={styles['no-deadline']}>
+                                  <i
+                                    className={`${styles['no-deadline']} ${
+                                      mode === 'dark' ? styles['dark-msg'] : ''
+                                    }`}
+                                  >
                                     No deadline
                                   </i>
                                 )}
                               </td>
+
                               <td
                                 className={` ${styles['table-project-data']}  ${
                                   styles['table-project-progress']
                                 } ${
-                                  project.details.projectProgress < 40
-                                    ? styles['low-progress']
-                                    : project.details.projectProgress < 70
-                                    ? styles['medium-progress']
-                                    : project.details.projectProgress < 100
-                                    ? styles['high-progress']
-                                    : styles['complete-progress']
+                                  mode === 'light'
+                                    ? project.details.projectProgress < 40
+                                      ? styles['low-progress']
+                                      : project.details.projectProgress < 70
+                                      ? styles['medium-progress']
+                                      : project.details.projectProgress < 100
+                                      ? styles['high-progress']
+                                      : styles['complete-progress']
+                                    : ''
+                                } ${
+                                  mode === 'dark'
+                                    ? project.details.projectProgress < 40
+                                      ? styles['dark-low-progress']
+                                      : project.details.projectProgress < 70
+                                      ? styles['dark-medium-progress']
+                                      : project.details.projectProgress < 100
+                                      ? styles['dark-high-progress']
+                                      : styles['dark-complete-progress']
+                                    : ''
                                 }`}
                               >
                                 {project.details.projectProgress}%
                               </td>
+
                               <td
                                 className={` ${styles['table-project-data']} ${styles['table-project-status']}`}
                               >
                                 {project.status === 'active' ? (
-                                  <span className={styles['active-project']}>
+                                  <span
+                                    className={`${styles['active-project']} ${
+                                      mode === 'dark'
+                                        ? styles['dark-active']
+                                        : ''
+                                    }`}
+                                  >
                                     {' '}
                                     <GrStatusGood
                                       className={styles['active-project-icon']}
@@ -948,7 +1079,13 @@ const Projects = () => {
                                     Active
                                   </span>
                                 ) : (
-                                  <span className={styles['inactive-project']}>
+                                  <span
+                                    className={`${styles['inactive-project']} ${
+                                      mode === 'dark'
+                                        ? styles['dark-inactive']
+                                        : ''
+                                    }`}
+                                  >
                                     {' '}
                                     <IoIosCloseCircleOutline
                                       className={
@@ -959,6 +1096,7 @@ const Projects = () => {
                                   </span>
                                 )}
                               </td>
+
                               <td
                                 className={` ${styles['table-project-data']}`}
                               >
@@ -967,7 +1105,9 @@ const Projects = () => {
                                 >
                                   {' '}
                                   <MdDelete
-                                    className={styles['delete-icon']}
+                                    className={`${styles['delete-icon']} ${
+                                      mode === 'dark' ? styles['dark-msg'] : ''
+                                    }`}
                                     title="Delete Project"
                                     onClick={() => {
                                       setDeleteModal({
@@ -994,7 +1134,11 @@ const Projects = () => {
               )}
 
               {projectData.error && (
-                <div className={styles['no-projects-text']}>
+                <div
+                  className={`${styles['no-projects-text']} ${
+                    mode === 'dark' ? styles['dark-msg'] : ''
+                  }`}
+                >
                   <MdOutlineSignalWifiOff className={styles['network-icon']} />{' '}
                   Unable to retrieve data
                 </div>

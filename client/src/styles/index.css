@@ -15,10 +15,12 @@
   --toastify-text-color-light: orange;
   --toastify-text-color-dark: white;
   --toastify-color-progress-light: orange;
-  --dark-theme-background: #252525;
+  --dark-theme-background: rgb(37, 37, 37);
   --dark-theme-color: rgb(255, 250, 250);
   --dark-theme-foreground: white;
-  --dark-theme-text: #e0e0e0;
+  /* --dark-theme-text: #fdf5e6; */
+  --dark-theme-text: #b0c4de;
+  /* --dark-theme-text: #e0e0e0; */
 }
 
 .dark-theme {

@@ -93,6 +93,7 @@ const Dashboard = () => {
     const fetchUserStats = async () => {
       try {
         const { data } = await apiClient('/api/v1/analytics?dashboard=true');
+
         setUserStats(data);
       } catch {
         setUserStats(false);
@@ -112,6 +113,7 @@ const Dashboard = () => {
         const { data } = await apiClient(
           `/api/v1/tasks/my_tasks?range=${chartDetails.option}&view=${chartDetails.view}`
         );
+
         setChartData(data.data.graph);
       } catch {
         setChartData(false);
@@ -131,6 +133,7 @@ const Dashboard = () => {
         const { data } = await apiClient(
           `/api/v1/tasks/my_tasks?filter=${taskCategory}&fields=name&sort=-updatedAt&limit=4`
         );
+
         setUserTasks(data.data.tasks);
       } catch {
         setUserTasks(false);
@@ -236,16 +239,21 @@ const Dashboard = () => {
         },
         ticks: {
           padding: 15,
+          color: `${mode === 'dark' ? 'rgb(253, 245, 230)' : 'gray'}`,
         },
       },
       y: {
+        color: 'red',
         grid: {
           borderDash: [5, 5],
-          color: 'rgba(0, 0, 0, 0.1)',
+          color: `${
+            mode === 'dark' ? 'rgb(253, 245, 230)' : 'rgba(0, 0, 0, 0.1)'
+          }`,
         },
         ticks: {
           stepSize: 10,
           padding: 15,
+          color: `${mode === 'dark' ? 'rgb(253, 245, 230)' : 'gray'}`,
         },
       },
     },
@@ -255,9 +263,9 @@ const Dashboard = () => {
       },
       tooltip: {
         enabled: true,
-        backgroundColor: 'white',
+        backgroundColor: `${mode === 'dark' ? 'rgb(37, 37, 37)' : 'white'}`,
         titleColor: 'orange',
-        bodyColor: 'black',
+        bodyColor: `${mode === 'dark' ? 'white' : 'black'}`,
         borderColor: 'orange',
         borderWidth: 2,
         padding: 10,
@@ -457,7 +465,7 @@ const Dashboard = () => {
                   <div className={styles['article-details']}>
                     <span
                       className={`${styles['article-name']} ${
-                        mode === 'dark' ? styles['dark-user-text'] : ''
+                        mode === 'dark' ? styles['dark-article-text'] : ''
                       }`}
                     >
                       Tasks Created
@@ -519,7 +527,7 @@ const Dashboard = () => {
                   <div className={styles['article-details']}>
                     <span
                       className={`${styles['article-name']} ${
-                        mode === 'dark' ? styles['dark-user-text'] : ''
+                        mode === 'dark' ? styles['dark-article-text'] : ''
                       }`}
                     >
                       Current Project
@@ -563,20 +571,36 @@ const Dashboard = () => {
             ) : (
               <>
                 {' '}
-                <article className={`${styles.article} `}>
+                <article
+                  className={`${styles.article} ${
+                    mode === 'dark' ? styles['dark-article'] : ''
+                  }`}
+                >
                   <span
-                    className={`${styles['article-icon-box']} ${styles['border-green']}`}
+                    className={`${styles['article-icon-box']} ${
+                      styles['border-green']
+                    } ${mode === 'dark' ? styles['dark-border-green'] : ''}`}
                   >
                     <HiMiniArrowTrendingUp
-                      className={`${styles['article-icon']} ${styles.green}`}
+                      className={`${styles['article-icon']} ${styles.green} ${
+                        mode === 'dark' ? styles['dark-green'] : ''
+                      }`}
                     />
                   </span>
 
                   <div className={styles['article-details']}>
-                    <span className={styles['article-name']}>
+                    <span
+                      className={`${styles['article-name']} ${
+                        mode === 'dark' ? styles['dark-article-text'] : ''
+                      }`}
+                    >
                       Tasks Created
                     </span>
-                    <span className={styles['article-fail-text']}>
+                    <span
+                      className={`${styles['article-fail-text']} ${
+                        mode === 'dark' ? styles['dark-user-text'] : ''
+                      }`}
+                    >
                       <MdOutlineSignalWifiOff
                         className={styles['network-icon']}
                       />{' '}
@@ -584,20 +608,36 @@ const Dashboard = () => {
                     </span>
                   </div>
                 </article>
-                <article className={styles.article}>
+                <article
+                  className={`${styles.article} ${
+                    mode === 'dark' ? styles['dark-article'] : ''
+                  }`}
+                >
                   <span
-                    className={`${styles['article-icon-box']} ${styles['border-red']}`}
+                    className={`${styles['article-icon-box']} ${
+                      styles['border-red']
+                    } ${mode === 'dark' ? styles['dark-border-red'] : ''}`}
                   >
                     <ImBrightnessContrast
-                      className={`${styles['article-icon']} ${styles.red}`}
+                      className={`${styles['article-icon']} ${styles.red}  ${
+                        mode === 'dark' ? styles['dark-red'] : ''
+                      }`}
                     />
                   </span>
 
                   <div className={styles['article-details']}>
-                    <span className={styles['article-name']}>
+                    <span
+                      className={`${styles['article-name']} ${
+                        mode === 'dark' ? styles['dark-article-text'] : ''
+                      }`}
+                    >
                       Current Project
                     </span>
-                    <span className={styles['article-fail-text']}>
+                    <span
+                      className={`${styles['article-fail-text']} ${
+                        mode === 'dark' ? styles['dark-user-text'] : ''
+                      }`}
+                    >
                       <MdOutlineSignalWifiOff
                         className={styles['network-icon']}
                       />{' '}
@@ -611,14 +651,20 @@ const Dashboard = () => {
 
           <div className={styles['chart-box']}>
             <div className={styles['chart-head']}>
-              <h2 className={styles['chart-head-text']}>Tasks completed</h2>
+              <h2
+                className={`${styles['chart-head-text']} ${
+                  mode === 'dark' ? styles['dark-user-text'] : ''
+                }`}
+              >
+                Tasks completed
+              </h2>
               <ul className={styles['chart-head-list']}>
                 <li
                   className={`${styles['chart-head-item']} ${
                     chartDetails.option === '1d'
                       ? styles['chart-head-current-item']
                       : ''
-                  }`}
+                  }  ${mode === 'dark' ? styles['dark-username'] : ''}`}
                   onClick={(e) => updateChartOption(e, '1d')}
                 >
                   1d
@@ -628,7 +674,7 @@ const Dashboard = () => {
                     chartDetails.option === '1w'
                       ? styles['chart-head-current-item']
                       : ''
-                  }`}
+                  } ${mode === 'dark' ? styles['dark-username'] : ''}`}
                   onClick={(e) => updateChartOption(e, '1w')}
                 >
                   1w
@@ -638,18 +684,18 @@ const Dashboard = () => {
                     chartDetails.option === '1m'
                       ? styles['chart-head-current-item']
                       : ''
-                  }`}
+                  } ${mode === 'dark' ? styles['dark-username'] : ''}`}
                   onClick={(e) => updateChartOption(e, '1m')}
                 >
                   1m
                 </li>
-                {/* <li className={styles['chart-head-item']}>6m</li> */}
+
                 <li
                   className={`${styles['chart-head-item']} ${
                     chartDetails.option === '1y'
                       ? styles['chart-head-current-item']
                       : ''
-                  }`}
+                  } ${mode === 'dark' ? styles['dark-username'] : ''}`}
                   onClick={(e) => updateChartOption(e, '1y')}
                 >
                   1y
@@ -659,9 +705,17 @@ const Dashboard = () => {
 
             {(chartDetails.option === '1m' || chartDetails.option === '1d') && (
               <div className={styles['chart-view']}>
-                <span className={styles['chart-view-text']}>View:</span>
+                <span
+                  className={`${styles['chart-view-text']} ${
+                    mode === 'dark' ? styles['dark-user-text'] : ''
+                  }`}
+                >
+                  View:
+                </span>
                 <select
-                  className={styles['chart-view-select']}
+                  className={`${styles['chart-view-select']} ${
+                    mode === 'dark' ? styles['dark-view-select'] : ''
+                  }`}
                   value={chartDetails.view}
                   onChange={(e) => {
                     setChartDetails({
@@ -696,14 +750,24 @@ const Dashboard = () => {
                 <Line data={data} options={options} width={610} height={330} />
               </div>
             ) : (
-              <div className={styles['chart-error-msg']}>
+              <div
+                className={`${styles['chart-error-msg']} ${
+                  mode === 'dark' ? styles['dark-username'] : ''
+                }`}
+              >
                 Unable to retrieve data
               </div>
             )}
           </div>
 
           <div className={styles['tasks-box']}>
-            <h1 className={styles['task-box-head']}>Tasks</h1>
+            <h1
+              className={`${styles['task-box-head']} ${
+                mode === 'dark' ? styles['dark-user-text'] : ''
+              }`}
+            >
+              Tasks
+            </h1>
 
             <ul className={styles['task-category']}>
               <li
@@ -711,7 +775,7 @@ const Dashboard = () => {
                   taskCategory === 'recent'
                     ? styles['task-current-category']
                     : ''
-                }`}
+                } ${mode === 'dark' ? styles['dark-username'] : ''}`}
                 onClick={(e) => updateTaskCategory(e, 'recent')}
               >
                 Recent
@@ -721,7 +785,7 @@ const Dashboard = () => {
                   taskCategory === 'urgent'
                     ? styles['task-current-category']
                     : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-username'] : ''}`}
                 onClick={(e) => updateTaskCategory(e, 'urgent')}
               >
                 Urgent
@@ -731,7 +795,7 @@ const Dashboard = () => {
                   taskCategory === 'assigned'
                     ? styles['task-current-category']
                     : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-username'] : ''}`}
                 onClick={(e) => updateTaskCategory(e, 'assigned')}
               >
                 Assigned
@@ -741,7 +805,7 @@ const Dashboard = () => {
                   taskCategory === 'later'
                     ? styles['task-current-category']
                     : ''
-                }`}
+                }  ${mode === 'dark' ? styles['dark-username'] : ''}`}
                 onClick={(e) => updateTaskCategory(e, 'later')}
               >
                 Later
@@ -767,19 +831,43 @@ const Dashboard = () => {
                   />
                 </div>
               ) : userTasks.length === 0 ? (
-                <div className={styles['user-tasks-text']}>
+                <div
+                  className={`${styles['user-tasks-text']}  ${
+                    mode === 'dark' ? styles['dark-username'] : ''
+                  }`}
+                >
                   No task available
                 </div>
               ) : userTasks ? (
                 userTasks.map((task) => {
                   return (
-                    <article key={task._id} className={styles['task-item']}>
-                      <h1 className={styles['task-item-head']}>
-                        <a href={`/project/${task.project._id}`}>
+                    <article
+                      key={task._id}
+                      className={`${styles['task-item']} ${
+                        mode === 'dark' ? styles['dark-task-item'] : ''
+                      }`}
+                    >
+                      <h1
+                        className={`${styles['task-item-head']}  ${
+                          mode === 'dark' ? styles['dark-task-text'] : ''
+                        }`}
+                      >
+                        <a
+                          className={`${
+                            mode === 'dark' ? styles['dark-task-text'] : ''
+                          }`}
+                          href={`/project/${task.project._id}`}
+                        >
                           {task.project.name}
                         </a>
                       </h1>
-                      <p className={styles['task-item-details']}>{task.name}</p>
+                      <p
+                        className={`${styles['task-item-details']} ${
+                          mode === 'dark' ? styles['dark-username'] : ''
+                        }`}
+                      >
+                        {task.name}
+                      </p>
 
                       {taskCategory !== 'assigned' && (
                         <div
@@ -790,7 +878,13 @@ const Dashboard = () => {
                           }`}
                         >
                           {task.project.team.length === 0 ? (
-                            <i>No team members</i>
+                            <i
+                              className={` ${
+                                mode === 'dark' ? styles['dark-username'] : ''
+                              }`}
+                            >
+                              No team members
+                            </i>
                           ) : task.project.team.length > 5 ? (
                             <>
                               {' '}
@@ -846,7 +940,13 @@ const Dashboard = () => {
 
                       {taskCategory === 'assigned' && (
                         <div className={styles['task-item-assigned-box']}>
-                          <span className={styles['task-item-assigned-text']}>
+                          <span
+                            className={`${
+                              styles['task-item-assigned-text']
+                            }   ${
+                              mode === 'dark' ? styles['dark-username'] : ''
+                            }`}
+                          >
                             Project Leader:
                           </span>
                           <span className={styles['task-tooltip-box']}>
@@ -875,7 +975,11 @@ const Dashboard = () => {
 
                       <div className={styles['task-progress-div']}>
                         <div className={styles['task-progress-box']}>
-                          <span className={styles['task-progress-text']}>
+                          <span
+                            className={`${styles['task-progress-text']} ${
+                              mode === 'dark' ? styles['dark-user-text'] : ''
+                            }`}
+                          >
                             Progress
                           </span>
                           <span className={styles['task-progress-value']}>
@@ -883,7 +987,11 @@ const Dashboard = () => {
                           </span>
                         </div>
 
-                        <span className={styles['task-progress']}>
+                        <span
+                          className={`${styles['task-progress']} ${
+                            mode === 'dark' ? styles['dark-task-progress'] : ''
+                          }`}
+                        >
                           <span
                             className={styles['task-progress-bar']}
                             style={{
@@ -898,7 +1006,11 @@ const Dashboard = () => {
                   );
                 })
               ) : (
-                <div className={styles['user-tasks-text']}>
+                <div
+                  className={`${styles['user-tasks-text']} ${
+                    mode === 'dark' ? styles['dark-username'] : ''
+                  }`}
+                >
                   Unable to retrieve data
                 </div>
               )}
@@ -910,12 +1022,18 @@ const Dashboard = () => {
           <header className={styles['right-section-header']}>
             <div className={styles['right-section-head']}>
               <span
-                className={styles['right-section-text']}
+                className={`${styles['right-section-text']} ${
+                  mode === 'dark' ? styles['dark-user-text'] : ''
+                }`}
                 onClick={moveToCurrentDate}
               >
                 Today
               </span>
-              <span className={styles['right-section-date']}>
+              <span
+                className={`${styles['right-section-date']} ${
+                  mode === 'dark' ? styles['dark-username'] : ''
+                }`}
+              >
                 {months[new Date().getMonth()]} {new Date().getDate()},{' '}
                 {new Date().getFullYear()}
               </span>
@@ -950,7 +1068,11 @@ const Dashboard = () => {
             {scheduledTasks === null ? (
               ''
             ) : scheduledTasks.length === 0 ? (
-              <div className={styles['scheduled-tasks-text']}>
+              <div
+                className={`${styles['scheduled-tasks-text']} ${
+                  mode === 'dark' ? styles['dark-username'] : ''
+                }`}
+              >
                 {scheduledTaskMessage()}
               </div>
             ) : scheduledTasks ? (
@@ -972,12 +1094,14 @@ const Dashboard = () => {
                     <time
                       className={`${styles['scheduled-time']} ${
                         !showTime ? styles['hide-time'] : ''
-                      }`}
+                      } ${mode === 'dark' ? styles['dark-username'] : ''}`}
                     >
                       {String(hour).length === 1 ? `0${String(hour)}` : hour}:00
                     </time>
                     <div
-                      className={styles['scheduled-task-content']}
+                      className={`${styles['scheduled-task-content']} ${
+                        mode === 'dark' ? styles['dark-task-item'] : ''
+                      }`}
                       style={{
                         borderTop: `0.185rem solid ${
                           priorityColors[task.priority]
@@ -985,19 +1109,31 @@ const Dashboard = () => {
                       }}
                     >
                       <div className={styles['scheduled-task-box']}>
-                        <span className={styles['scheduled-task-name']}>
+                        <span
+                          className={`${styles['scheduled-task-name']} ${
+                            mode === 'dark' ? styles['dark-user-text'] : ''
+                          }`}
+                        >
                           {task.name}
                         </span>
 
                         <span className={styles['scheduled-task-property-box']}>
                           <span
-                            className={styles['scheduled-task-property-name']}
+                            className={`${
+                              styles['scheduled-task-property-name']
+                            } ${
+                              mode === 'dark' ? styles['dark-username'] : ''
+                            }`}
                           >
                             Project:
                           </span>
                           <a
                             href={`/project/${task.project._id}`}
-                            className={styles['scheduled-task-project-name']}
+                            className={`${
+                              styles['scheduled-task-project-name']
+                            } ${
+                              mode === 'dark' ? styles['dark-user-text'] : ''
+                            }`}
                           >
                             {task.project.name}
                           </a>
@@ -1005,11 +1141,19 @@ const Dashboard = () => {
 
                         <span className={styles['scheduled-task-property-box']}>
                           <span
-                            className={styles['scheduled-task-property-name']}
+                            className={`${
+                              styles['scheduled-task-property-name']
+                            } ${
+                              mode === 'dark' ? styles['dark-username'] : ''
+                            }`}
                           >
                             Status:
                           </span>
-                          <span>
+                          <span
+                            className={`${
+                              mode === 'dark' ? styles['dark-user-text'] : ''
+                            }`}
+                          >
                             {task.status === 'open'
                               ? 'Open'
                               : task.status === 'progress'
@@ -1064,7 +1208,11 @@ const Dashboard = () => {
             )}
 
             {scheduleData.error === true && (
-              <div className={styles['scheduled-tasks-text']}>
+              <div
+                className={`${styles['scheduled-tasks-text']} ${
+                  mode === 'dark' ? styles['dark-username'] : ''
+                }`}
+              >
                 Unable to retrieve data
               </div>
             )}

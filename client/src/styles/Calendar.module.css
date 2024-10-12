@@ -70,6 +70,11 @@
   color: orange;
 }
 
+.scheduled-date {
+  color: orange !important;
+  font-weight: 700;
+}
+
 .current-date {
   background: orange;
   color: white !important;
@@ -95,13 +100,23 @@
   visibility: hidden;
 }
 
-.scheduled-date {
-  color: orange;
-  font-weight: 700;
-}
-
 .no-input {
   pointer-events: none;
+}
+
+/* Dark mode */
+
+.dark-head {
+  color: var(--dark-theme-text);
+}
+
+.dark-data {
+  color: var(--dark-theme-color);
+}
+
+.dark-arrow {
+  color: var(--dark-theme-text);
+  box-shadow: 1px 1px 2px 1px black, 1px 1px 2px 1px var(--dark-theme-text);
 }
 
 /* Media Queries */

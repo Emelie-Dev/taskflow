@@ -18,7 +18,7 @@ import { LuExternalLink } from 'react-icons/lu';
 import { getProfilePhoto } from '../components/Header';
 
 const Tasks = () => {
-  const { userData, serverUrl } = useContext(AuthContext);
+  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [taskType, setTaskType] = useState('personal');
@@ -367,11 +367,23 @@ const Tasks = () => {
 
         <section className={styles['section-content']}>
           <section className={`${styles['projects-section']} `}>
-            <h1 className={styles['projects-section-head']}>Projects</h1>
+            <h1
+              className={`${styles['projects-section-head']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
+              Projects
+            </h1>
 
             {/* Personal Tasks */}
             <div className={styles['projects-div']}>
-              <p className={styles['projects-head']}>Personal</p>
+              <p
+                className={`${styles['projects-head']} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
+                Personal
+              </p>
 
               <div className={styles['projects-box']}>
                 <ul className={styles['projects-list']}>
@@ -400,12 +412,13 @@ const Tasks = () => {
                                 : ''
                             }`}
                           />
+
                           <span
                             className={`${styles['projects-item-details']} ${
                               currentProjectData.id === project._id
                                 ? styles['current-projects-item-details']
                                 : ''
-                            }`}
+                            } ${mode === 'dark' ? styles['dark-text'] : ''}`}
                           >
                             <span className={styles['projects-item-name']}>
                               {project.name}
@@ -421,7 +434,7 @@ const Tasks = () => {
                               currentProjectData.id === project._id
                                 ? styles['current-view-project-link']
                                 : ''
-                            }`}
+                            } ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             onClick={(e) => e.stopPropagation()}
                             title="View Project"
                           >
@@ -447,7 +460,11 @@ const Tasks = () => {
                 )}
 
                 {personalProjects !== null && personalProjects.length === 0 && (
-                  <div className={styles['no-projects-text']}>
+                  <div
+                    className={`${styles['no-projects-text']}  ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
                     You currently don't have any projects yet.
                   </div>
                 )}
@@ -464,7 +481,11 @@ const Tasks = () => {
                 )}
 
                 {personalProjectsDetails.error && (
-                  <div className={styles['no-projects-text']}>
+                  <div
+                    className={`${styles['no-projects-text']}  ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
                     <MdOutlineSignalWifiOff
                       className={styles['network-icon']}
                     />{' '}
@@ -478,7 +499,13 @@ const Tasks = () => {
 
             {/* Assigned Tasks */}
             <div className={styles['projects-div']}>
-              <p className={styles['projects-head']}>Assigned</p>
+              <p
+                className={`${styles['projects-head']} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
+                Assigned
+              </p>
               <div className={styles['projects-box']}>
                 <ul className={styles['projects-list']}>
                   {assignedProjects === null
@@ -523,7 +550,7 @@ const Tasks = () => {
                               currentProjectData.id === project._id
                                 ? styles['current-projects-item-details']
                                 : ''
-                            }`}
+                            } ${mode === 'dark' ? styles['dark-text'] : ''}`}
                           >
                             <span className={styles['projects-item-name']}>
                               {project.name}
@@ -539,7 +566,7 @@ const Tasks = () => {
                               currentProjectData.id === project._id
                                 ? styles['current-view-project-link']
                                 : ''
-                            }`}
+                            } ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             onClick={(e) => e.stopPropagation()}
                             title="View Project"
                           >
@@ -565,7 +592,11 @@ const Tasks = () => {
                 )}
 
                 {assignedProjects !== null && assignedProjects.length === 0 && (
-                  <div className={styles['no-projects-text']}>
+                  <div
+                    className={`${styles['no-projects-text']}  ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
                     You don't have any assigned tasks.
                   </div>
                 )}
@@ -582,7 +613,11 @@ const Tasks = () => {
                 )}
 
                 {assignedProjectsDetails.error && (
-                  <div className={styles['no-projects-text']}>
+                  <div
+                    className={`${styles['no-projects-text']}  ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
                     <MdOutlineSignalWifiOff
                       className={styles['network-icon']}
                     />{' '}
@@ -598,7 +633,7 @@ const Tasks = () => {
               <button
                 className={`${styles['select-btn']} ${
                   showProjects ? styles['active-select-btn'] : ''
-                }`}
+                } ${mode === 'dark' ? styles['dark-btn'] : ''}`}
                 onClick={handleProjects}
               >
                 Select Project{' '}
@@ -610,12 +645,18 @@ const Tasks = () => {
               <div
                 className={`${styles['alt-projects-section']} ${
                   showProjects ? styles['show-projects'] : ''
-                }`}
+                } ${mode === 'dark' ? styles['dark-bg'] : ''}`}
               >
                 {/* Personal Tasks */}
 
                 <div className={styles['projects-div']}>
-                  <p className={styles['projects-head']}>Personal</p>
+                  <p
+                    className={`${styles['projects-head']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    Personal
+                  </p>
 
                   <div className={styles['projects-box']}>
                     <ul className={styles['alt-projects-list']}>
@@ -652,6 +693,8 @@ const Tasks = () => {
                                   currentProjectData.id === project._id
                                     ? styles['current-projects-item-details']
                                     : ''
+                                } ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
                                 }`}
                               >
                                 <span className={styles['projects-item-name']}>
@@ -668,6 +711,8 @@ const Tasks = () => {
                                   currentProjectData.id === project._id
                                     ? styles['current-view-project-link']
                                     : ''
+                                } ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
                                 }`}
                                 onClick={(e) => e.stopPropagation()}
                                 title="View Project"
@@ -695,7 +740,11 @@ const Tasks = () => {
 
                     {personalProjects !== null &&
                       personalProjects.length === 0 && (
-                        <div className={styles['no-projects-text']}>
+                        <div
+                          className={`${styles['no-projects-text']}  ${
+                            mode === 'dark' ? styles['dark-word'] : ''
+                          }`}
+                        >
                           You currently don't have any projects yet.
                         </div>
                       )}
@@ -712,7 +761,11 @@ const Tasks = () => {
                     )}
 
                     {personalProjectsDetails.error && (
-                      <div className={styles['no-projects-text']}>
+                      <div
+                        className={`${styles['no-projects-text']}  ${
+                          mode === 'dark' ? styles['dark-word'] : ''
+                        }`}
+                      >
                         <MdOutlineSignalWifiOff
                           className={styles['network-icon']}
                         />{' '}
@@ -726,7 +779,13 @@ const Tasks = () => {
 
                 {/* Assigned Tasks */}
                 <div className={styles['projects-div']}>
-                  <p className={styles['projects-head']}>Assigned</p>
+                  <p
+                    className={`${styles['projects-head']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    Assigned
+                  </p>
 
                   <div className={styles['projects-box']}>
                     <ul className={styles['alt-projects-list']}>
@@ -780,6 +839,8 @@ const Tasks = () => {
                                   currentProjectData.id === project._id
                                     ? styles['current-projects-item-details']
                                     : ''
+                                } ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
                                 }`}
                               >
                                 <span className={styles['projects-item-name']}>
@@ -796,6 +857,8 @@ const Tasks = () => {
                                   currentProjectData.id === project._id
                                     ? styles['current-view-project-link']
                                     : ''
+                                } ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
                                 }`}
                                 onClick={(e) => e.stopPropagation()}
                                 title="View Project"
@@ -823,7 +886,11 @@ const Tasks = () => {
 
                     {assignedProjects !== null &&
                       assignedProjects.length === 0 && (
-                        <div className={styles['no-projects-text']}>
+                        <div
+                          className={`${styles['no-projects-text']}  ${
+                            mode === 'dark' ? styles['dark-word'] : ''
+                          }`}
+                        >
                           You don't have any assigned tasks.
                         </div>
                       )}
@@ -840,7 +907,11 @@ const Tasks = () => {
                     )}
 
                     {assignedProjectsDetails.error && (
-                      <div className={styles['no-projects-text']}>
+                      <div
+                        className={`${styles['no-projects-text']}  ${
+                          mode === 'dark' ? styles['dark-word'] : ''
+                        }`}
+                      >
                         <MdOutlineSignalWifiOff
                           className={styles['network-icon']}
                         />{' '}
@@ -852,7 +923,13 @@ const Tasks = () => {
               </div>
             </div>
 
-            <h1 className={styles['tasks-section-head']}>Tasks</h1>
+            <h1
+              className={`${styles['tasks-section-head']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
+              Tasks
+            </h1>
 
             <div className={styles['add-task-btn-div']}>
               <h1 className={styles['tasks-section-text']}>Tasks</h1>
@@ -877,13 +954,21 @@ const Tasks = () => {
                 currentProjectDetails.lastPage ? (
                 <>
                   {taskType === 'personal' && (
-                    <div className={styles['no-projects-text']}>
+                    <div
+                      className={`${styles['no-projects-text']}  ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       You currently don't have any task on this project
                     </div>
                   )}
 
                   {taskType === 'assigned' && (
-                    <div className={styles['no-projects-text']}>
+                    <div
+                      className={`${styles['no-projects-text']}  ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       You were not assigned any task on this project
                     </div>
                   )}
@@ -915,7 +1000,11 @@ const Tasks = () => {
                   )
                 )
               ) : (
-                <div className={styles['no-projects-text']}>
+                <div
+                  className={`${styles['no-projects-text']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   No tasks available
                 </div>
               )}
@@ -944,7 +1033,11 @@ const Tasks = () => {
               )}
 
               {currentProjectDetails.error && (
-                <div className={styles['no-projects-text']}>
+                <div
+                  className={`${styles['no-projects-text']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   <MdOutlineSignalWifiOff className={styles['network-icon']} />{' '}
                   Unable to retrieve data
                 </div>

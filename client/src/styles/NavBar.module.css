@@ -154,7 +154,7 @@
 }
 
 .dark-head {
-  border-bottom: 1px solid var(--dark-theme-text);
+  border-bottom: 1px solid var(--dark-theme-color);
 }
 
 .dark-head-text {
