@@ -1100,7 +1100,7 @@ const Dashboard = () => {
                     </time>
                     <div
                       className={`${styles['scheduled-task-content']} ${
-                        mode === 'dark' ? styles['dark-task-item'] : ''
+                        mode === 'dark' ? styles['dark-task-item2'] : ''
                       }`}
                       style={{
                         borderTop: `0.185rem solid ${

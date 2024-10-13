@@ -126,7 +126,7 @@ const userSchema = new mongoose.Schema(
             },
             medium: {
               type: String,
-              default: '#ffd700',
+              default: '#ffa500',
             },
             low: {
               type: String,
@@ -135,7 +135,7 @@ const userSchema = new mongoose.Schema(
           },
           default: {
             high: '#ff0000',
-            medium: '#ffd700',
+            medium: '#ffa500',
             low: '#008000',
           },
         },

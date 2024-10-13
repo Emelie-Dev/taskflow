@@ -53,6 +53,7 @@
     - Fix forgot password ✔
     - Fix Deactivate and delete account for google auth users.(Check if user has password in security page) ✔
     - Add settings to header dropdown
+    - Fix color priority in personalization page on theme toogle
 
 
 

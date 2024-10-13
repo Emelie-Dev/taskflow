@@ -1057,7 +1057,8 @@
 }
 
 .dark-article {
-  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px var(--dark-theme-text);
+  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px var(--dark-theme-text),
+    -1px -1px 4px -2px var(--dark-theme-text);
 }
 
 .dark-progress {

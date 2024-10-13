@@ -334,7 +334,13 @@ const TaskBox = ({
       const newNames = activity.state.assignee.newAssigneesData[0]
         ? activity.state.assignee.newAssigneesData.map(
             ({ _id, firstName, lastName, username }, index, array) => (
-              <a key={index} href="#" className={styles['activity-names']}>
+              <a
+                key={index}
+                href="#"
+                className={`${styles['activity-names']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 {index !== 0 ? ' ' : ''}
                 {_id === userData._id
                   ? 'You'
@@ -701,6 +707,50 @@ const TaskBox = ({
     setTaskData({ ...taskData, customFields });
   };
 
+  const getPriorityValue = (priority) => {
+    const lightInitialValues = {
+      high: '#ff0000',
+      medium: '#ffa500',
+      low: '#008000',
+    };
+
+    const darkInitialValues = {
+      high: '#ffb6c1',
+      medium: '#ffa500',
+      low: '#7cfc00',
+    };
+
+    const values = mode === 'dark' ? darkInitialValues : lightInitialValues;
+
+    let num = 0;
+    let color = '';
+    let background = '';
+
+    for (const prop in userData.personalization.priorityColors) {
+      if (
+        userData.personalization.priorityColors[prop] ===
+        lightInitialValues[prop]
+      )
+        num++;
+    }
+
+    if (num === 3) {
+      color = values[priority];
+      if (priority === 'low') {
+        background = `${values[priority]}30`;
+      } else if (priority === 'medium') {
+        background = `${values[priority]}33`;
+      } else {
+        background = `${values[priority]}25`;
+      }
+    } else {
+      color = userData.personalization.priorityColors[priority];
+      background = `${userData.personalization.priorityColors[priority]}30`;
+    }
+
+    return { color, background };
+  };
+
   return (
     <article
       className={`${styles['task-box']} ${
@@ -752,14 +802,20 @@ const TaskBox = ({
         <RxCross2
           className={`${styles['cancel-edit-icon']} ${
             editTask ? styles['show-cancel-icon'] : ''
-          }`}
+          } ${mode === 'dark' ? styles['dark-edit-icon'] : ''}`}
           title="Cancel"
           onClick={toggleEdit}
         />
 
         <h1
           className={`${styles['task-name']}  ${
-            !assigned ? (editTask ? styles['show-editable'] : '') : ''
+            !assigned
+              ? editTask
+                ? mode === 'dark'
+                  ? styles['dark-show-editable']
+                  : styles['show-editable']
+                : ''
+              : ''
           } ${mode === 'dark' ? styles['dark-text'] : ''}`}
           contentEditable={!assigned && editTask}
           onBlur={(e) =>
@@ -770,7 +826,13 @@ const TaskBox = ({
         </h1>
 
         <div className={styles['property-div']}>
-          <span className={styles['property-name']}>Status:</span>
+          <span
+            className={`${styles['property-name']} ${
+              mode === 'dark' ? styles['dark-word'] : ''
+            }`}
+          >
+            Status:
+          </span>
           <span
             className={`${styles['status-value']} ${
               editTask ? styles['hide-data'] : ''
@@ -778,13 +840,17 @@ const TaskBox = ({
           >
             {taskData.status === 'complete' ? (
               <span
-                className={`${styles['status-box']} ${styles['status-box1']}`}
+                className={`${styles['status-box']} ${styles['status-box1']} ${
+                  mode === 'dark' ? styles['dark-status-box1'] : ''
+                }`}
               >
                 <GrStatusGood className={styles['status-icon']} /> Completed
               </span>
             ) : taskData.status === 'progress' ? (
               <span
-                className={`${styles['status-box']} ${styles['status-box2']}`}
+                className={`${styles['status-box']} ${styles['status-box2']} ${
+                  mode === 'dark' ? styles['dark-status-box2'] : ''
+                }`}
               >
                 {' '}
                 <svg
@@ -799,17 +865,20 @@ const TaskBox = ({
               </span>
             ) : (
               <span
-                className={`${styles['status-box']} ${styles['status-box3']}`}
+                className={`${styles['status-box']} ${styles['status-box3']} ${
+                  mode === 'dark' ? styles['dark-status-box3'] : ''
+                }`}
               >
                 {' '}
                 <VscIssueReopened className={styles['status-icon']} /> Open{' '}
               </span>
             )}
           </span>
+
           <select
             className={`${styles['status-select']} ${
               editTask ? styles['show-data'] : ''
-            }`}
+            } ${mode === 'dark' ? styles['dark-menu'] : ''}`}
             value={taskData.status}
             onChange={(e) =>
               setTaskData({ ...taskData, status: e.target.value })
@@ -822,27 +891,21 @@ const TaskBox = ({
         </div>
 
         <div className={styles['property-div']}>
-          <span className={styles['property-name']}>Priority:</span>
+          <span
+            className={`${styles['property-name']} ${
+              mode === 'dark' ? styles['dark-word'] : ''
+            }`}
+          >
+            Priority:
+          </span>
 
           <span
             className={`${styles['priority-value']} ${
               editTask ? styles['hide-data'] : ''
             }`}
             style={{
-              color: userData.personalization.priorityColors[taskData.priority],
-              backgroundColor: `${
-                taskData.priority === 'low'
-                  ? `${
-                      userData.personalization.priorityColors[taskData.priority]
-                    }33`
-                  : taskData.priority === 'medium'
-                  ? `${
-                      userData.personalization.priorityColors[taskData.priority]
-                    }30`
-                  : `${
-                      userData.personalization.priorityColors[taskData.priority]
-                    }1a`
-              }`,
+              color: getPriorityValue(taskData.priority).color,
+              backgroundColor: getPriorityValue(taskData.priority).background,
             }}
           >
             {taskData.priority === 'high'
@@ -855,7 +918,7 @@ const TaskBox = ({
           <select
             className={`${styles['priority-select']} ${
               editTask ? styles['show-data'] : ''
-            }`}
+            }  ${mode === 'dark' ? styles['dark-menu'] : ''}`}
             value={taskData.priority}
             onChange={(e) =>
               setTaskData({ ...taskData, priority: e.target.value })
@@ -871,7 +934,11 @@ const TaskBox = ({
           <div
             className={`${styles['property-div']} ${styles['assignee-container']}`}
           >
-            <span className={styles['property-name']}>
+            <span
+              className={`${styles['property-name']}  ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               {taskObj.assignee.length === 1 ? 'Assignee' : 'Assignees'}:
             </span>
 
@@ -880,7 +947,7 @@ const TaskBox = ({
                 <i
                   className={`${styles['no-assignee-txt']} ${
                     editTask ? styles['hide-data'] : ''
-                  }`}
+                  } ${mode === 'dark' ? styles['dark-word'] : ''}`}
                 >
                   No assignee
                 </i>
@@ -894,7 +961,9 @@ const TaskBox = ({
                   >
                     <a
                       href={`/user/${assignee.username}`}
-                      className={styles['assignee-link']}
+                      className={`${styles['assignee-link']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
                     >
                       <img
                         src={getProfilePhoto(assignee, serverUrl)}
@@ -947,7 +1016,9 @@ const TaskBox = ({
                       }`}
                     />
                     <RxCross2
-                      className={styles['remove-assignee-icon']}
+                      className={`${styles['remove-assignee-icon']} ${
+                        mode === 'dark' ? styles['dark-assignee-icon'] : ''
+                      }`}
                       title="Remove"
                       onClick={() => removeAssignee(index)}
                     />
@@ -959,7 +1030,7 @@ const TaskBox = ({
                 <select
                   className={`${styles['assignees-select']} ${
                     editTask ? styles['show-data'] : ''
-                  }`}
+                  }  ${mode === 'dark' ? styles['dark-menu'] : ''}`}
                   ref={assigneeRef}
                 >
                   {project.team.map((member) => (
@@ -988,15 +1059,31 @@ const TaskBox = ({
 
         {assigned && (
           <div className={styles['more-property-div']}>
-            <span className={styles['property-name']}>Date Assigned:</span>
-            <span className={styles['date-created-value']}>
+            <span
+              className={`${styles['property-name']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
+              Date Assigned:
+            </span>
+            <span
+              className={`${styles['date-created-value']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
               {' '}
               {taskObj.createdAt ? (
                 `${months[new Date(taskObj.createdAt).getMonth()]} ${new Date(
                   taskObj.createdAt
                 ).getDate()}, ${new Date(taskObj.createdAt).getFullYear()}`
               ) : (
-                <i className={styles['no-assignee-txt']}>Not available</i>
+                <i
+                  className={`${styles['no-assignee-txt']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
+                  Not available
+                </i>
               )}
             </span>
           </div>
@@ -1024,26 +1111,48 @@ const TaskBox = ({
         >
           {!assigned && (
             <div className={styles['more-property-div']}>
-              <span className={styles['property-name']}>Date Created:</span>
-              <span className={styles['date-created-value']}>
+              <span
+                className={`${styles['property-name']} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
+                Date Created:
+              </span>
+              <span
+                className={`${styles['date-created-value']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 {' '}
                 {taskObj.createdAt ? (
                   `${months[new Date(taskObj.createdAt).getMonth()]} ${new Date(
                     taskObj.createdAt
                   ).getDate()}, ${new Date(taskObj.createdAt).getFullYear()}`
                 ) : (
-                  <i className={styles['no-assignee-txt']}>Not available</i>
+                  <i
+                    className={`${styles['no-assignee-txt']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
+                    Not available
+                  </i>
                 )}
               </span>
             </div>
           )}
 
           <div className={styles['more-property-div']}>
-            <span className={styles['property-name']}>Due Date:</span>
+            <span
+              className={`${styles['property-name']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
+              Due Date:
+            </span>
             <span
               className={`${styles['due-date-value']} ${
                 !assigned ? (editTask ? styles['hide-data'] : '') : ''
-              }`}
+              } ${mode === 'dark' ? styles['dark-text'] : ''}`}
             >
               {deadlineValue() ? (
                 `${
@@ -1059,7 +1168,13 @@ const TaskBox = ({
                   : `${taskData.deadline.getHours()} AM`
               }`
               ) : (
-                <i className={styles['no-assignee-txt']}>No due date</i>
+                <i
+                  className={`${styles['no-assignee-txt']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
+                  No due date
+                </i>
               )}
             </span>
 
@@ -1068,7 +1183,7 @@ const TaskBox = ({
               min={`${currentYear}-0${currentMonth + 1}-${currentDate}T00:00`}
               className={`${styles['due-date-input']}   ${
                 !assigned ? (editTask ? styles['show-data'] : '') : ''
-              }`}
+              } ${mode === 'dark' ? styles['dark-menu'] : ''}`}
               value={deadlineValue()}
               onChange={(e) =>
                 setTaskData({ ...taskData, deadline: new Date(e.target.value) })
@@ -1079,11 +1194,23 @@ const TaskBox = ({
           <div
             className={`${styles['more-property-div']} ${styles.description}`}
           >
-            <span className={styles['property-name']}>Description:</span>
+            <span
+              className={`${styles['property-name']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
+              Description:
+            </span>
             <div
               className={`${styles['description-value']} ${
-                !assigned ? (editTask ? styles['show-editable'] : '') : ''
-              }`}
+                !assigned
+                  ? editTask
+                    ? mode === 'dark'
+                      ? styles['dark-show-editable']
+                      : styles['show-editable']
+                    : ''
+                  : ''
+              } ${mode === 'dark' ? styles['dark-text'] : ''}`}
               contentEditable={!assigned && editTask}
               onBlur={(e) =>
                 setTaskData({
@@ -1093,7 +1220,13 @@ const TaskBox = ({
               }
             >
               {taskData.description.trim().length === 0 ? (
-                <i className={styles['no-assignee-txt']}>No description</i>
+                <i
+                  className={`${styles['no-assignee-txt']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
+                  No description
+                </i>
               ) : (
                 taskData.description
               )}
@@ -1108,14 +1241,20 @@ const TaskBox = ({
                   className={`${styles['more-property-div']} ${styles['custom-field-box']}`}
                 >
                   <span
-                    className={styles['custom-property-name']}
+                    className={`${styles['custom-property-name']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
                     title="Custom Field"
                   >
                     <IoColorPaletteSharp className={styles['custom-icon']} />
                     {obj.field}:
                   </span>
 
-                  <span className={styles['custom-field-value']}>
+                  <span
+                    className={`${styles['custom-field-value']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
                     {obj.value}
                   </span>
                 </div>
@@ -1123,54 +1262,70 @@ const TaskBox = ({
             </>
           )}
 
-          {editTask && userData.personalization.customFields.length > 0 && (
-            <>
-              {userData.personalization.customFields.map((obj) => (
-                <div
-                  key={obj._id}
-                  className={`${styles['more-property-div']} ${styles['custom-field-box']}`}
-                >
-                  <label
-                    className={styles['custom-property-label']}
-                    title="Custom Field"
-                    htmlFor={obj.field}
+          {!assigned &&
+            editTask &&
+            userData.personalization.customFields.length > 0 && (
+              <>
+                {userData.personalization.customFields.map((obj) => (
+                  <div
+                    key={obj._id}
+                    className={`${styles['more-property-div']} ${styles['custom-field-box']}`}
                   >
-                    <IoColorPaletteSharp className={styles['custom-icon']} />
-                    {obj.field}:
-                  </label>
+                    <label
+                      className={`${styles['custom-property-label']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                      title="Custom Field"
+                      htmlFor={obj.field}
+                    >
+                      <IoColorPaletteSharp className={styles['custom-icon']} />
+                      {obj.field}:
+                    </label>
 
-                  <input
-                    className={styles['custom-field']}
-                    id={obj.field}
-                    type="text"
-                    defaultValue={
-                      taskData.customFields.find(
-                        (elem) => elem.field === obj.field
-                      )
-                        ? taskData.customFields.find(
-                            (elem) => elem.field === obj.field
-                          ).value
-                        : ''
-                    }
-                    maxLength={30}
-                    onChange={handleCustomField(obj.field)}
-                  />
-                </div>
-              ))}
-            </>
-          )}
+                    <input
+                      className={`${styles['custom-field']} ${
+                        mode === 'dark' ? styles['dark-field'] : ''
+                      }`}
+                      id={obj.field}
+                      type="text"
+                      defaultValue={
+                        taskData.customFields.find(
+                          (elem) => elem.field === obj.field
+                        )
+                          ? taskData.customFields.find(
+                              (elem) => elem.field === obj.field
+                            ).value
+                          : ''
+                      }
+                      maxLength={30}
+                      onChange={handleCustomField(obj.field)}
+                    />
+                  </div>
+                ))}
+              </>
+            )}
 
           <div
             className={`${styles['more-property-div']} ${
               styles['activity-log-box']
             } ${task.customFields.length > 0 ? styles['add-margin'] : ''}`}
           >
-            <span className={styles['property-name']}>Activity Log:</span>
+            <span
+              className={`${styles['property-name']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
+              Activity Log:
+            </span>
             <div className={styles['activity-log']}>
               {taskActivities === null ? (
                 ''
               ) : taskActivities.length === 0 ? (
-                <i className={styles['no-recent-activity']}>
+                <i
+                  className={`${styles['no-recent-activity']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   {!activitiesData.loading
                     ? activitiesData.error
                       ? 'Unable to retrieve data'
@@ -1179,7 +1334,12 @@ const TaskBox = ({
                 </i>
               ) : (
                 taskActivities.map((activity) => (
-                  <span key={activity._id} className={styles['activity-box']}>
+                  <span
+                    key={activity._id}
+                    className={`${styles['activity-box']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
                     {' '}
                     <span className={styles['activity-date']}>
                       - [{' '}
@@ -1199,7 +1359,11 @@ const TaskBox = ({
                             : `${new Date(activity.time).getMinutes()}`
                         }`
                       ) : (
-                        <i className={styles['no-assignee-txt']}>
+                        <i
+                          className={`${styles['no-assignee-txt']} ${
+                            mode === 'dark' ? styles['dark-word'] : ''
+                          }`}
+                        >
                           No time available
                         </i>
                       )}

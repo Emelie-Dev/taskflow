@@ -601,7 +601,8 @@
 
 .dark-article {
   background: var(--dark-theme-background);
-  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px white;
+  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px var(--dark-theme-text),
+    -1px -1px 4px -2px var(--dark-theme-text);
 }
 
 .dark-menu {
@@ -610,12 +611,52 @@
 }
 
 .dark-list {
-  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px white,
-    -1px -1px 2px -1px white;
+  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px var(--dark-theme-text),
+    -1px -1px 2px -1px var(--dark-theme-text);
 }
 
 .dark-text {
   color: var(--dark-theme-color);
+  fill: var(--dark-theme-color);
+}
+
+.dark-edit-icon {
+  color: var(--dark-theme-color);
+}
+
+.dark-edit-icon:hover {
+  background: orange;
+}
+
+.dark-show-editable {
+  border: 2px solid white;
+  outline: none;
+}
+
+.dark-status-box1 {
+  color: #7cfc00;
+}
+
+.dark-status-box2 {
+  color: #ffa500;
+}
+
+.dark-status-box3 {
+  color: #ffb6c1;
+}
+
+.dark-assignee-icon {
+  color: var(--dark-theme-color);
+}
+
+.dark-assignee-icon:hover {
+  color: var(--dark-theme-text);
+}
+
+.dark-field {
+  border: 1px solid var(--dark-theme-text);
+  color: var(--dark-theme-color);
+  background: var(--dark-theme-background);
 }
 
 /* Animation */

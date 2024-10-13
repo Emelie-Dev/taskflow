@@ -783,7 +783,13 @@
 }
 
 .dark-task-item {
-  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px white;
+  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px white,
+    -1px -1px 4px -2px white;
+}
+
+.dark-task-item2 {
+  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px white,
+    -1px 1px 4px -2px white;
 }
 
 /* Animations */
