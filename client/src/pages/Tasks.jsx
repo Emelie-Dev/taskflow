@@ -932,7 +932,13 @@ const Tasks = () => {
             </h1>
 
             <div className={styles['add-task-btn-div']}>
-              <h1 className={styles['tasks-section-text']}>Tasks</h1>
+              <h1
+                className={`${styles['tasks-section-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
+                Tasks
+              </h1>
 
               {personalProjects && personalProjects.length !== 0 && (
                 <button

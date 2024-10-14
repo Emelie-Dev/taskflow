@@ -319,6 +319,27 @@
   cursor: default;
 }
 
+/* Dark Mode */
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-today-btn {
+  background: white;
+  color: black;
+  box-shadow: 1px 1px 20px -5px black, 1px 1px 10px -4px white;
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-article {
+  box-shadow: 1px 1px 20px -10px black, 1px 1px 4px -2px white,
+    -1px 1px 4px -2px white;
+}
+
 /* Animations */
 
 @keyframes showNav {

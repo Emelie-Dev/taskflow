@@ -53,12 +53,12 @@ export const months = [
 let currentHour = null;
 
 const Dashboard = () => {
+  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [showNav, setShowNav] = useState(false);
   const [addTask, setAddTask] = useState(false);
   const [userStats, setUserStats] = useState(null);
-  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [chartDetails, setChartDetails] = useState({ view: 0, option: '1m' });
   const [chartData, setChartData] = useState(null);
   const [taskCategory, setTaskCategory] = useState('recent');
@@ -86,7 +86,37 @@ const Dashboard = () => {
   const taskBoxRef = useRef();
   const graphRef = useRef();
 
-  const priorityColors = userData.personalization.priorityColors;
+  const priorityColors = (() => {
+    const lightInitialValues = {
+      high: '#ff0000',
+      medium: '#ffa500',
+      low: '#008000',
+    };
+
+    const darkInitialValues = {
+      high: '#ffb6c1',
+      medium: '#ffa500',
+      low: '#7cfc00',
+    };
+
+    const values = mode === 'dark' ? darkInitialValues : lightInitialValues;
+
+    let num = 0;
+
+    for (const prop in userData.personalization.priorityColors) {
+      if (
+        userData.personalization.priorityColors[prop] ===
+        lightInitialValues[prop]
+      )
+        num++;
+    }
+
+    if (num === 3) {
+      return values;
+    } else {
+      return userData.personalization.priorityColors;
+    }
+  })();
 
   // For user stats
   useEffect(() => {

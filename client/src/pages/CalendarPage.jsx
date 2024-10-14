@@ -12,7 +12,7 @@ import NavBar from '../components/NavBar';
 import { getProfilePhoto } from '../components/Header';
 
 const CalendarPage = () => {
-  const { userData, serverUrl } = useContext(AuthContext);
+  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -36,7 +36,37 @@ const CalendarPage = () => {
 
   const calenderRef = useRef();
 
-  const priorityColors = userData.personalization.priorityColors;
+  const priorityColors = (() => {
+    const lightInitialValues = {
+      high: '#ff0000',
+      medium: '#ffa500',
+      low: '#008000',
+    };
+
+    const darkInitialValues = {
+      high: '#ffb6c1',
+      medium: '#ffa500',
+      low: '#7cfc00',
+    };
+
+    const values = mode === 'dark' ? darkInitialValues : lightInitialValues;
+
+    let num = 0;
+
+    for (const prop in userData.personalization.priorityColors) {
+      if (
+        userData.personalization.priorityColors[prop] ===
+        lightInitialValues[prop]
+      )
+        num++;
+    }
+
+    if (num === 3) {
+      return values;
+    } else {
+      return userData.personalization.priorityColors;
+    }
+  })();
 
   const priorityColorsName = useMemo(() => {
     const colors = { ...priorityColors };
@@ -51,7 +81,7 @@ const CalendarPage = () => {
     }
 
     return colors;
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     const getCalendarDetails = async () => {
@@ -237,18 +267,26 @@ const CalendarPage = () => {
           <section className={styles['calendar-section']}>
             <div className={styles['calendar-section-head']}>
               <div className={styles['calendar-details']}>
-                <h1 className={styles['current-month']}>
+                <h1
+                  className={`${styles['current-month']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
                   {month[currentMonth - 1]} {currentYear}
                   <button
                     className={`${styles['alt-today-btn']} ${
                       enableTodayBtn() ? styles['disabled-btn'] : ''
-                    }`}
+                    } ${mode === 'dark' ? styles['dark-today-btn'] : ''}`}
                     onClick={moveToToday}
                   >
                     Today
                   </button>
                 </h1>
-                <p className={styles['calendar-text']}>
+                <p
+                  className={`${styles['calendar-text']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   This displays task deadlines with color-coded priorities:{' '}
                   {priorityColorsName.high} for{' '}
                   <span
@@ -277,11 +315,12 @@ const CalendarPage = () => {
                   .
                 </p>
               </div>
+
               <div className={styles['today-btn-div']}>
                 <button
                   className={`${styles['today-btn']} ${
                     enableTodayBtn() ? styles['disabled-btn'] : ''
-                  }`}
+                  } ${mode === 'dark' ? styles['dark-today-btn'] : ''}`}
                   onClick={moveToToday}
                 >
                   Today
@@ -319,19 +358,33 @@ const CalendarPage = () => {
           </section>
 
           <section className={styles['tasks-section']}>
-            <h1 className={styles['task-section-head']}>Tasks</h1>
+            <h1
+              className={`${styles['task-section-head']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
+              Tasks
+            </h1>
 
             <div className={styles['task-container']}>
               {tasks === null ? (
                 ''
               ) : tasks.length === 0 ? (
-                <div className={styles['scheduled-tasks-text']}>
+                <div
+                  className={`${styles['scheduled-tasks-text']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   {scheduledTaskMessage()}
                 </div>
               ) : (
                 tasks.map((task) => (
                   <div key={task.hour} className={styles['hour-category']}>
-                    <time className={styles['scheduled-time']}>
+                    <time
+                      className={`${styles['scheduled-time']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       {task.hour}:00
                     </time>
 
@@ -342,7 +395,9 @@ const CalendarPage = () => {
                           className={`${styles['scheduled-task']} `}
                         >
                           <div
-                            className={`${styles['scheduled-task-content']}`}
+                            className={`${styles['scheduled-task-content']} ${
+                              mode === 'dark' ? styles['dark-article'] : ''
+                            }`}
                             style={{
                               borderTop: `0.185rem solid ${
                                 priorityColors[elem.priority]
@@ -350,7 +405,11 @@ const CalendarPage = () => {
                             }}
                           >
                             <div className={styles['scheduled-task-box']}>
-                              <span className={styles['scheduled-task-name']}>
+                              <span
+                                className={`${styles['scheduled-task-name']} ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
+                                }`}
+                              >
                                 {elem.name}
                               </span>
 
@@ -360,17 +419,21 @@ const CalendarPage = () => {
                                 }
                               >
                                 <span
-                                  className={
+                                  className={`${
                                     styles['scheduled-task-property-name']
-                                  }
+                                  } ${
+                                    mode === 'dark' ? styles['dark-word'] : ''
+                                  }`}
                                 >
                                   Project:
                                 </span>
                                 <a
                                   href={`/project/${elem.project._id}`}
-                                  className={
+                                  className={`${
                                     styles['scheduled-task-project-name']
-                                  }
+                                  } ${
+                                    mode === 'dark' ? styles['dark-text'] : ''
+                                  }`}
                                 >
                                   {elem.project.name}
                                 </a>
@@ -382,13 +445,19 @@ const CalendarPage = () => {
                                 }
                               >
                                 <span
-                                  className={
+                                  className={`${
                                     styles['scheduled-task-property-name']
-                                  }
+                                  } ${
+                                    mode === 'dark' ? styles['dark-word'] : ''
+                                  }`}
                                 >
                                   Status:
                                 </span>
-                                <span>
+                                <span
+                                  className={`${
+                                    mode === 'dark' ? styles['dark-text'] : ''
+                                  }`}
+                                >
                                   {' '}
                                   {elem.status === 'open'
                                     ? 'Open'
@@ -472,7 +541,11 @@ const CalendarPage = () => {
               )}
 
               {tasksDetails.error && (
-                <div className={styles['no-projects-text']}>
+                <div
+                  className={`${styles['no-projects-text']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   <MdOutlineSignalWifiOff className={styles['network-icon']} />{' '}
                   Unable to retrieve data
                 </div>
@@ -484,7 +557,5 @@ const CalendarPage = () => {
     </main>
   );
 };
-
-// The 31'st date is throwing error
 
 export default CalendarPage;

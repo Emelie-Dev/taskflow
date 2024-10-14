@@ -31,12 +31,12 @@
 
 .table-head-box {
   width: 100%;
+  color: gray;
 }
 
 .table-head {
   text-transform: uppercase;
   font-family: monospace;
-  color: gray;
   padding-right: 4rem;
   padding-bottom: 1rem;
   padding-top: 0;
@@ -67,16 +67,16 @@
 }
 
 .current-date {
-  background: rgba(255, 166, 0, 0.37) !important;
+  background: rgba(255, 166, 0, 0.5) !important;
   transition: opacity 0.25s !important;
 }
 
 .current-date:hover {
-  background: rgba(255, 166, 0, 0.37) !important;
+  background: rgba(255, 166, 0, 0.5) !important;
 }
 
 .prev-month {
-  color: gray;
+  color: gray !important;
   pointer-events: none;
   font-weight: bold;
 }
@@ -149,6 +149,36 @@
 .arrow-icon {
   width: 1.2rem;
   height: 1.2rem;
+}
+
+/* Dark Mode */
+
+.dark-head {
+  background: var(--dark-theme-background);
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-table-data {
+  color: var(--dark-theme-color);
+  border-top: 2px solid var(--dark-theme-color);
+}
+
+.dark-table-data:hover {
+  background: rgba(255, 250, 250, 0.2);
+}
+
+.dark-clicked-date {
+  background: rgba(255, 250, 250, 0.2);
+  cursor: auto;
+}
+
+.dark-prev-month {
+  color: var(--dark-theme-text) !important;
+  pointer-events: none;
+  font-weight: bold;
 }
 
 /* Media Queries */

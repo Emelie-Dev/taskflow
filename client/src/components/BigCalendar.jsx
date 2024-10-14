@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styles from '../styles/BigCalendar.module.css';
 
 import { MdArrowForwardIos, MdArrowBackIosNew } from 'react-icons/md';
 import { FaCircle } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
+import { AuthContext } from '../App';
 
 const BigCalendar = ({
   currentMonth,
@@ -20,6 +21,8 @@ const BigCalendar = ({
   setTasksDetails,
   setTasks,
 }) => {
+  const { mode } = useContext(AuthContext);
+
   const maxDays = (currentMonth) => {
     const month = currentMonth;
     const arr30 = [4, 6, 9, 11];
@@ -229,8 +232,16 @@ const BigCalendar = ({
 
       <div className={styles['table-box']}>
         <table className={styles.table} ref={calenderRef}>
-          <thead className={styles.thead}>
-            <tr className={styles['table-head-box']}>
+          <thead
+            className={`${styles.thead} ${
+              mode === 'dark' ? styles['dark-head'] : ''
+            }`}
+          >
+            <tr
+              className={`${styles['table-head-box']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              } `}
+            >
               <th className={styles['table-head']}>mon</th>
               <th className={styles['table-head']}>tue</th>
               <th className={styles['table-head']}>wed</th>
@@ -248,12 +259,20 @@ const BigCalendar = ({
                   <td
                     key={dataIndex}
                     className={`${styles['table-data']} ${
-                      member ? '' : styles['prev-month']
+                      member
+                        ? ''
+                        : mode === 'dark'
+                        ? styles['dark-prev-month']
+                        : styles['prev-month']
                     } ${
-                      isClickedDate(member, input) ? styles['clickedDate'] : ''
+                      isClickedDate(member, input)
+                        ? mode === 'dark'
+                          ? styles['dark-clicked-date']
+                          : styles['clickedDate']
+                        : ''
                     } ${
                       checkCurrentDate(current) ? styles['current-date'] : ''
-                    } `}
+                    } ${mode === 'dark' ? styles['dark-table-data'] : ''}`}
                     onClick={member ? () => changeDate(input) : null}
                   >
                     <div className={styles['data-box']}>
