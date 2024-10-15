@@ -399,6 +399,60 @@
   margin-top: 1rem;
 }
 
+/* Dark Mode */
+
+.dark-category {
+  background: var(--dark-theme-background);
+  box-shadow: 1px 1px 10px -6px black, 1px 1px 10px -5px white;
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-category-rate {
+  color: #7cfc00;
+}
+
+.dark-category-rate2 {
+  color: #ffb6c1;
+}
+
+.dark-rate-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  fill: #7cfc00;
+  transform: scaleX(0.8);
+}
+
+.dark-icon-inverse {
+  transform: rotateZ(180deg) scaleX(0.8);
+  fill: #ffb6c1;
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.dark-select {
+  background: var(--dark-theme-background);
+  color: var(--dark-theme-color);
+}
+
+.dark-icon1 {
+  color: #ffb6c1;
+}
+
+.dark-icon2 {
+  color: #ffa500;
+}
+
+.dark-icon3 {
+  color: #7cfc00;
+}
+
 /* Animations */
 
 @keyframes showNav {

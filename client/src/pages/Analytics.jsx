@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import styles from '../styles/Analytics.module.css';
 
 import { MdOutlineSignalWifiOff } from 'react-icons/md';
@@ -8,7 +8,7 @@ import { GoDotFill } from 'react-icons/go';
 import useDebounce from '../hooks/useDebounce';
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../components/Loader';
-import { apiClient } from '../App';
+import { apiClient, AuthContext } from '../App';
 
 import {
   Chart as ChartJS,
@@ -41,6 +41,7 @@ ChartJS.register(
 // Continue from view and show button
 
 const Analytics = () => {
+  const { mode } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [projectOption, setProjectOption] = useState({
     value: '',
@@ -51,7 +52,6 @@ const Analytics = () => {
     view: false,
   });
   const [statusOption, setStatusOption] = useState('');
-
   const [graphWidth, setGraphWidth] = useState(0);
   const [displayGraph, setDisplayGraph] = useState(false);
   const [userStats, setUserStats] = useState(null);
@@ -59,7 +59,6 @@ const Analytics = () => {
   const [pieRequestData, setPieRequestData] = useState({ range: '1y' });
   const [pieInputData, setPieInputData] = useState({ type: null, value: '' });
   const [isPieInputValid, setIsPieInputValid] = useState(false);
-
   const [barChartData, setBarChartData] = useState(null);
   const [barRequestData, setBarRequestData] = useState({
     range: '1y',
@@ -67,7 +66,6 @@ const Analytics = () => {
   });
   const [barInputData, setBarInputData] = useState({ type: null, value: '' });
   const [isBarInputValid, setIsBarInputValid] = useState(false);
-
   const [lineChartData, setLineChartData] = useState(null);
   const [lineRequestData, setLineRequestData] = useState({
     range: '1y',
@@ -536,8 +534,8 @@ const Analytics = () => {
       {
         label: 'Created',
         data: barChartData ? barChartData.values.created : [],
-        backgroundColor: 'rgba(255,165,0,1)',
-        borderColor: 'rgba(255, 165, 0, 1)',
+        backgroundColor: `${mode === 'dark' ? '#ffa500' : 'orange'}`,
+        borderColor: `${mode === 'dark' ? '#ffa500' : 'orange'}`,
         borderWidth: 1,
         barThickness: 15,
         borderRadius: 5,
@@ -545,8 +543,8 @@ const Analytics = () => {
       {
         label: 'Completed',
         data: barChartData ? barChartData.values.completed : [],
-        backgroundColor: 'red',
-        borderColor: 'rgba(255, 165, 0, 1)',
+        backgroundColor: `${mode === 'dark' ? '#ffb6c1' : 'red'}`,
+        borderColor: `${mode === 'dark' ? '#ffb6c1' : 'red'}`,
         borderWidth: 1,
         barThickness: 15,
         borderRadius: 5,
@@ -560,10 +558,26 @@ const Analytics = () => {
         grid: {
           display: false,
         },
+        ticks: {
+          color: `${mode === 'dark' ? '#b0c4de' : 'gray'}`,
+        },
       },
       y: {
         grid: {
           display: false,
+        },
+        ticks: {
+          color: `${mode === 'dark' ? '#b0c4de' : 'gray'}`,
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        labels: {
+          color: `${mode === 'dark' ? '#b0c4de' : 'gray'}`,
+          font: {
+            size: 14,
+          },
         },
       },
     },
@@ -572,13 +586,14 @@ const Analytics = () => {
 
   const areaData = {
     labels: lineChartData ? lineChartData.labels.labelsText : [],
+
     datasets: [
       {
         label: 'Created',
         data: lineChartData ? lineChartData.values.created : [],
-        fill: 'rgba(255, 165, 0, 1)',
-        backgroundColor: 'orange',
-        borderColor: 'orange',
+        fill: `${mode === 'dark' ? '#ffa500' : 'orange'}`,
+        backgroundColor: `${mode === 'dark' ? '#ffa500' : 'orange'}`,
+        borderColor: `${mode === 'dark' ? '#ffa500' : 'orange'}`,
         borderWidth: 3,
         pointRadius: 3,
         tension: 0.4,
@@ -586,9 +601,9 @@ const Analytics = () => {
       {
         label: 'Completed',
         data: lineChartData ? lineChartData.values.completed : [],
-        fill: 'red',
-        backgroundColor: 'red',
-        borderColor: 'red',
+        fill: `${mode === 'dark' ? '#ffb6c1' : 'red'}`,
+        backgroundColor: `${mode === 'dark' ? '#ffb6c1' : 'red'}`,
+        borderColor: `${mode === 'dark' ? '#ffb6c1' : 'red'}`,
         borderWidth: 3,
         pointRadius: 3,
         tension: 0.4,
@@ -601,9 +616,31 @@ const Analytics = () => {
       beginAtZero: false,
       x: {
         type: 'category',
+        ticks: {
+          color: `${mode === 'dark' ? '#b0c4de' : 'gray'}`,
+        },
+        grid: {
+          color: `${mode === 'dark' ? '#b0c4de30' : 'rgba(0, 0, 0, 0.1)'}`,
+        },
       },
       y: {
         beginAtZero: false,
+        ticks: {
+          color: `${mode === 'dark' ? '#b0c4de' : 'gray'}`,
+        },
+        grid: {
+          color: `${mode === 'dark' ? '#b0c4de30' : 'rgba(0, 0, 0, 0.1)'}`,
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        labels: {
+          color: `${mode === 'dark' ? '#b0c4de' : 'gray'}`,
+          font: {
+            size: 14,
+          },
+        },
       },
     },
     responsive: false,
@@ -619,9 +656,9 @@ const Analytics = () => {
           : [], // Data values for each segment
         backgroundColor: [
           // Background colors for each segment
-          'red',
-          'orange',
-          'green',
+          `${mode === 'dark' ? '#ffb6c1' : 'red'}`,
+          `${mode === 'dark' ? '#ffa500' : 'orange'}`,
+          `${mode === 'dark' ? '#7cfc00' : 'green'}`,
         ],
         hoverOffset: 4,
       },
@@ -664,17 +701,39 @@ const Analytics = () => {
               </div>
             ) : userStats ? (
               <div className={styles['category-div']}>
-                <article className={styles['category']}>
+                <article
+                  className={`${styles['category']} ${
+                    mode === 'dark' ? styles['dark-category'] : ''
+                  }`}
+                >
                   <div className={styles['category-details']}>
-                    <h1 className={styles['category-head']}>Total Projects</h1>
-                    <div className={styles['category-number']}>
+                    <h1
+                      className={`${styles['category-head']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
+                      Total Projects
+                    </h1>
+                    <div
+                      className={`${styles['category-number']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
                       {userStats.projects}
                     </div>
-                    <span className={styles['category-text']}>
+                    <span
+                      className={`${styles['category-text']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       <span
                         className={
                           userStats.dataPercent.projects.created >= 0
-                            ? styles['category-rate']
+                            ? mode === 'dark'
+                              ? styles['dark-category-rate']
+                              : styles['category-rate']
+                            : mode === 'dark'
+                            ? styles['dark-category-rate2']
                             : styles['category-rate2']
                         }
                       >
@@ -701,7 +760,11 @@ const Analytics = () => {
                       <AiOutlineRise
                         className={
                           userStats.dataPercent.projects.created >= 0
-                            ? styles['rate-icon']
+                            ? mode === 'dark'
+                              ? styles['dark-rate-icon']
+                              : styles['rate-icon']
+                            : mode === 'dark'
+                            ? styles['dark-icon-inverse']
                             : styles['rate-icon-inverse']
                         }
                       />
@@ -709,17 +772,39 @@ const Analytics = () => {
                   )}
                 </article>
 
-                <article className={styles['category']}>
+                <article
+                  className={`${styles['category']} ${
+                    mode === 'dark' ? styles['dark-category'] : ''
+                  }`}
+                >
                   <div className={styles['category-details']}>
-                    <h1 className={styles['category-head']}>Total Tasks</h1>
-                    <div className={styles['category-number']}>
+                    <h1
+                      className={`${styles['category-head']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
+                      Total Tasks
+                    </h1>
+                    <div
+                      className={`${styles['category-number']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
                       {userStats.tasks}
                     </div>
-                    <span className={styles['category-text']}>
+                    <span
+                      className={`${styles['category-text']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       <span
                         className={
                           userStats.dataPercent.tasks.created >= 0
-                            ? styles['category-rate']
+                            ? mode === 'dark'
+                              ? styles['dark-category-rate']
+                              : styles['category-rate']
+                            : mode === 'dark'
+                            ? styles['dark-category-rate2']
                             : styles['category-rate2']
                         }
                       >
@@ -746,7 +831,11 @@ const Analytics = () => {
                       <AiOutlineRise
                         className={
                           userStats.dataPercent.tasks.created >= 0
-                            ? styles['rate-icon']
+                            ? mode === 'dark'
+                              ? styles['dark-rate-icon']
+                              : styles['rate-icon']
+                            : mode === 'dark'
+                            ? styles['dark-icon-inverse']
                             : styles['rate-icon-inverse']
                         }
                       />
@@ -754,19 +843,39 @@ const Analytics = () => {
                   )}
                 </article>
 
-                <article className={styles['category']}>
+                <article
+                  className={`${styles['category']} ${
+                    mode === 'dark' ? styles['dark-category'] : ''
+                  }`}
+                >
                   <div className={styles['category-details']}>
-                    <h1 className={styles['category-head']}>
+                    <h1
+                      className={`${styles['category-head']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       Completed Projects
                     </h1>
-                    <div className={styles['category-number']}>
+                    <div
+                      className={`${styles['category-number']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
                       {userStats.completedProjects}
                     </div>
-                    <span className={styles['category-text']}>
+                    <span
+                      className={`${styles['category-text']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       <span
                         className={
                           userStats.dataPercent.projects.completed >= 0
-                            ? styles['category-rate']
+                            ? mode === 'dark'
+                              ? styles['dark-category-rate']
+                              : styles['category-rate']
+                            : mode === 'dark'
+                            ? styles['dark-category-rate2']
                             : styles['category-rate2']
                         }
                       >
@@ -787,12 +896,17 @@ const Analytics = () => {
                         : 'more than last month'}
                     </span>
                   </div>
+
                   {userStats.completedProjects !== 0 && (
                     <span className={styles['rate-icon-box']}>
                       <AiOutlineRise
                         className={
                           userStats.dataPercent.projects.completed >= 0
-                            ? styles['rate-icon']
+                            ? mode === 'dark'
+                              ? styles['dark-rate-icon']
+                              : styles['rate-icon']
+                            : mode === 'dark'
+                            ? styles['dark-icon-inverse']
                             : styles['rate-icon-inverse']
                         }
                       />
@@ -800,17 +914,39 @@ const Analytics = () => {
                   )}
                 </article>
 
-                <article className={styles['category']}>
+                <article
+                  className={`${styles['category']} ${
+                    mode === 'dark' ? styles['dark-category'] : ''
+                  }`}
+                >
                   <div className={styles['category-details']}>
-                    <h1 className={styles['category-head']}>Completed Tasks</h1>
-                    <div className={styles['category-number']}>
+                    <h1
+                      className={`${styles['category-head']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
+                      Completed Tasks
+                    </h1>
+                    <div
+                      className={`${styles['category-number']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
                       {userStats.completedTasks}
                     </div>
-                    <span className={styles['category-text']}>
+                    <span
+                      className={`${styles['category-text']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       <span
                         className={
                           userStats.dataPercent.tasks.completed >= 0
-                            ? styles['category-rate']
+                            ? mode === 'dark'
+                              ? styles['dark-category-rate']
+                              : styles['category-rate']
+                            : mode === 'dark'
+                            ? styles['dark-category-rate2']
                             : styles['category-rate2']
                         }
                       >
@@ -837,7 +973,11 @@ const Analytics = () => {
                       <AiOutlineRise
                         className={
                           userStats.dataPercent.tasks.completed >= 0
-                            ? styles['rate-icon']
+                            ? mode === 'dark'
+                              ? styles['dark-rate-icon']
+                              : styles['rate-icon']
+                            : mode === 'dark'
+                            ? styles['dark-icon-inverse']
                             : styles['rate-icon-inverse']
                         }
                       />
@@ -847,11 +987,25 @@ const Analytics = () => {
               </div>
             ) : (
               <div className={styles['category-div']}>
-                <article className={styles['category']}>
+                <article
+                  className={`${styles['category']} ${
+                    mode === 'dark' ? styles['dark-category'] : ''
+                  }`}
+                >
                   <div className={styles['category-details']}>
-                    <h1 className={styles['category-head']}>Total Projects</h1>
+                    <h1
+                      className={`${styles['category-head']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
+                      Total Projects
+                    </h1>
 
-                    <span className={styles['article-fail-text']}>
+                    <span
+                      className={`${styles['article-fail-text']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       <MdOutlineSignalWifiOff
                         className={styles['network-icon']}
                       />{' '}
@@ -860,11 +1014,25 @@ const Analytics = () => {
                   </div>
                 </article>
 
-                <article className={styles['category']}>
+                <article
+                  className={`${styles['category']} ${
+                    mode === 'dark' ? styles['dark-category'] : ''
+                  }`}
+                >
                   <div className={styles['category-details']}>
-                    <h1 className={styles['category-head']}>Total Tasks</h1>
+                    <h1
+                      className={`${styles['category-head']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
+                      Total Tasks
+                    </h1>
 
-                    <span className={styles['article-fail-text']}>
+                    <span
+                      className={`${styles['article-fail-text']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       <MdOutlineSignalWifiOff
                         className={styles['network-icon']}
                       />{' '}
@@ -873,13 +1041,25 @@ const Analytics = () => {
                   </div>
                 </article>
 
-                <article className={styles['category']}>
+                <article
+                  className={`${styles['category']} ${
+                    mode === 'dark' ? styles['dark-category'] : ''
+                  }`}
+                >
                   <div className={styles['category-details']}>
-                    <h1 className={styles['category-head']}>
+                    <h1
+                      className={`${styles['category-head']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       Completed Projects
                     </h1>
 
-                    <span className={styles['article-fail-text']}>
+                    <span
+                      className={`${styles['article-fail-text']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       <MdOutlineSignalWifiOff
                         className={styles['network-icon']}
                       />{' '}
@@ -888,11 +1068,25 @@ const Analytics = () => {
                   </div>
                 </article>
 
-                <article className={styles['category']}>
+                <article
+                  className={`${styles['category']} ${
+                    mode === 'dark' ? styles['dark-category'] : ''
+                  }`}
+                >
                   <div className={styles['category-details']}>
-                    <h1 className={styles['category-head']}>Completed Tasks</h1>
+                    <h1
+                      className={`${styles['category-head']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
+                      Completed Tasks
+                    </h1>
 
-                    <span className={styles['article-fail-text']}>
+                    <span
+                      className={`${styles['article-fail-text']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       <MdOutlineSignalWifiOff
                         className={styles['network-icon']}
                       />{' '}
@@ -905,7 +1099,13 @@ const Analytics = () => {
 
             <div className={styles['pie-chart-container']}>
               <div className={styles['graph-head-box']}>
-                <span className={styles['graph-head']}>Tasks by Status</span>
+                <span
+                  className={`${styles['graph-head']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
+                  Tasks by Status
+                </span>
                 <div
                   className={`${styles['graph-head-container']} ${
                     window.matchMedia('(min-width: 900px)').matches
@@ -914,7 +1114,9 @@ const Analytics = () => {
                   }`}
                 >
                   <select
-                    className={styles['graph-select']}
+                    className={`${styles['graph-select']} ${
+                      mode === 'dark' ? styles['dark-select'] : ''
+                    }`}
                     onChange={handleChartOptions()}
                   >
                     <option value={'1y'}>1y</option>
@@ -939,7 +1141,7 @@ const Analytics = () => {
                         }`}
                         className={`${styles['request-input']} ${
                           statusOption === 'year' ? styles['year-input'] : ''
-                        }`}
+                        } ${mode === 'dark' ? styles['dark-select'] : ''}`}
                         value={pieInputData.value}
                         onChange={(e) => {
                           setPieInputData({
@@ -975,12 +1177,24 @@ const Analytics = () => {
                   }`}
                 >
                   <li className={styles['task-category-item']}>
-                    <GoDotFill className={styles['task-icon1']} />
+                    <GoDotFill
+                      className={`${styles['task-icon1']} ${
+                        mode === 'dark' ? styles['dark-icon1'] : ''
+                      }`}
+                    />
                     <div className={styles['task-item-details']}>
-                      <span className={styles['task-item-type']}>
+                      <span
+                        className={`${styles['task-item-type']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
+                      >
                         Open ({pieChartData ? pieChartData.openPercent : ''}%)
                       </span>
-                      <span className={styles['task-item-number']}>
+                      <span
+                        className={`${styles['task-item-number']} ${
+                          mode === 'dark' ? styles['dark-word'] : ''
+                        }`}
+                      >
                         {pieChartData
                           ? pieChartData.open === 1
                             ? '1 task'
@@ -991,14 +1205,26 @@ const Analytics = () => {
                   </li>
 
                   <li className={styles['task-category-item']}>
-                    <GoDotFill className={styles['task-icon2']} />
+                    <GoDotFill
+                      className={`${styles['task-icon2']} ${
+                        mode === 'dark' ? styles['dark-icon2'] : ''
+                      }`}
+                    />
                     <div className={styles['task-item-details']}>
-                      <span className={styles['task-item-type']}>
+                      <span
+                        className={`${styles['task-item-type']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
+                      >
                         {' '}
                         In Progress (
                         {pieChartData ? pieChartData.progressPercent : ''}%)
                       </span>
-                      <span className={styles['task-item-number']}>
+                      <span
+                        className={`${styles['task-item-number']} ${
+                          mode === 'dark' ? styles['dark-word'] : ''
+                        }`}
+                      >
                         {pieChartData
                           ? pieChartData.progress === 1
                             ? '1 task'
@@ -1009,13 +1235,25 @@ const Analytics = () => {
                   </li>
 
                   <li className={styles['task-category-item']}>
-                    <GoDotFill className={styles['task-icon3']} />
+                    <GoDotFill
+                      className={`${styles['task-icon3']} ${
+                        mode === 'dark' ? styles['dark-icon3'] : ''
+                      }`}
+                    />
                     <div className={styles['task-item-details']}>
-                      <span className={styles['task-item-type']}>
+                      <span
+                        className={`${styles['task-item-type']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
+                      >
                         Completed (
                         {pieChartData ? pieChartData.completedPercent : ''}%)
                       </span>
-                      <span className={styles['task-item-number']}>
+                      <span
+                        className={`${styles['task-item-number']} ${
+                          mode === 'dark' ? styles['dark-word'] : ''
+                        }`}
+                      >
                         {pieChartData
                           ? pieChartData.completed === 1
                             ? '1 task'
@@ -1036,7 +1274,11 @@ const Analytics = () => {
                     />
                   </div>
                 ) : !pieChartData ? (
-                  <div className={styles['pie-fail-text']}>
+                  <div
+                    className={`${styles['pie-fail-text']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
                     <MdOutlineSignalWifiOff
                       className={styles['network-icon']}
                     />{' '}
@@ -1060,11 +1302,19 @@ const Analytics = () => {
           <section className={styles['bottom-section']}>
             <div className={styles['project-graph-box']}>
               <div className={styles['graph-head-box']}>
-                <span className={styles['graph-head']}>Projects</span>
+                <span
+                  className={`${styles['graph-head']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
+                  Projects
+                </span>
 
                 <div className={styles['graph-head-container']}>
                   <select
-                    className={styles['graph-select']}
+                    className={`${styles['graph-select']} ${
+                      mode === 'dark' ? styles['dark-select'] : ''
+                    }`}
                     onChange={handleChartOptions('project')}
                   >
                     <option value={'1y'}>1y</option>
@@ -1089,7 +1339,7 @@ const Analytics = () => {
                             projectOption.value === 'year'
                               ? styles['year-input']
                               : ''
-                          }`}
+                          } ${mode === 'dark' ? styles['dark-select'] : ''}`}
                           value={barInputData.value}
                           onChange={(e) => {
                             setBarInputData({
@@ -1102,13 +1352,19 @@ const Analytics = () => {
 
                       {projectOption.view && (
                         <div className={styles['view-box']}>
-                          <span className={styles['view-text']}>View:</span>
+                          <span
+                            className={`${styles['view-text']} ${
+                              mode === 'dark' ? styles['dark-word'] : ''
+                            }`}
+                          >
+                            View:
+                          </span>
                           <select
                             className={`${styles['graph-select']} ${
                               !isBarInputValid
                                 ? styles['disable-chart-load']
                                 : ''
-                            }`}
+                            } ${mode === 'dark' ? styles['dark-select'] : ''}`}
                             ref={projectViewRef}
                             onChange={changeChartView('project')}
                           >
@@ -1160,7 +1416,11 @@ const Analytics = () => {
                   </div>
                 </div>
               ) : (
-                <div className={styles['chart-fail-text']}>
+                <div
+                  className={`${styles['chart-fail-text']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   <MdOutlineSignalWifiOff
                     className={`${styles['network-icon']} ${styles['chart-network-icon']}`}
                   />{' '}
@@ -1171,11 +1431,19 @@ const Analytics = () => {
 
             <div className={styles['tasks-area-box']}>
               <div className={styles['graph-head-box']}>
-                <span className={styles['graph-head']}>Tasks</span>
+                <span
+                  className={`${styles['graph-head']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
+                  Tasks
+                </span>
 
                 <div className={styles['graph-head-container']}>
                   <select
-                    className={styles['graph-select']}
+                    className={`${styles['graph-select']} ${
+                      mode === 'dark' ? styles['dark-select'] : ''
+                    }`}
                     onChange={handleChartOptions('task')}
                   >
                     <option value={'1y'}>1y</option>
@@ -1200,7 +1468,7 @@ const Analytics = () => {
                             taskOption.value === 'year'
                               ? styles['year-input']
                               : ''
-                          }`}
+                          }   ${mode === 'dark' ? styles['dark-select'] : ''}`}
                           value={lineInputData.value}
                           onChange={(e) => {
                             setLineInputData({
@@ -1213,12 +1481,20 @@ const Analytics = () => {
 
                       {taskOption.view && (
                         <div className={styles['view-box']}>
-                          <span className={styles['view-text']}>View:</span>
+                          <span
+                            className={`${styles['view-text']}   ${
+                              mode === 'dark' ? styles['dark-word'] : ''
+                            }`}
+                          >
+                            View:
+                          </span>
                           <select
                             className={`${styles['graph-select']} ${
                               !isLineInputValid
                                 ? styles['disable-chart-load']
                                 : ''
+                            }   ${
+                              mode === 'dark' ? styles['dark-select'] : ''
                             }`}
                             ref={taskViewRef}
                             onChange={changeChartView('task')}
@@ -1272,7 +1548,11 @@ const Analytics = () => {
                   </div>
                 </div>
               ) : (
-                <div className={styles['chart-fail-text']}>
+                <div
+                  className={`${styles['chart-fail-text']}   ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   <MdOutlineSignalWifiOff
                     className={`${styles['network-icon']} ${styles['chart-network-icon']}`}
                   />{' '}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext } from 'react';
 import styles from '../styles/ChatContainer.module.css';
 
 import { IoCheckmarkDoneSharp } from 'react-icons/io5';
@@ -12,12 +12,10 @@ import { BsFillFileEarmarkTextFill } from 'react-icons/bs';
 import { TbClock } from 'react-icons/tb';
 import { FaSearch } from 'react-icons/fa';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { AuthContext } from '../App';
 
 const ChatBox = ({ emptyMode, chatMode, goBack }) => {
-  const [height, setHeight] = useState(0);
-  const messageRef = useRef();
-  const headerRef = useRef();
-  const chatRef = useRef();
+  const { mode } = useContext(AuthContext);
 
   return (
     <div
@@ -25,11 +23,24 @@ const ChatBox = ({ emptyMode, chatMode, goBack }) => {
         chatMode === 'group' && emptyMode.group === false
           ? styles['show-chats']
           : ''
-      }`}
+      } ${mode === 'dark' ? styles['dark-chat-box'] : ''}`}
     >
-      <div className={styles['contact-head']}>
-        <span className={styles['back-arrow-box']} onClick={goBack}>
-          <FaArrowLeft className={styles['back-arrow']} />
+      <div
+        className={`${styles['contact-head']} ${
+          mode === 'dark' ? styles['dark-head'] : ''
+        }`}
+      >
+        <span
+          className={`${styles['back-arrow-box']} ${
+            mode === 'dark' ? styles['dark-arrow-box'] : ''
+          }`}
+          onClick={goBack}
+        >
+          <FaArrowLeft
+            className={`${styles['back-arrow']}  ${
+              mode === 'dark' ? styles['dark-arrow'] : ''
+            }`}
+          />
         </span>
         <figure className={styles['profile-img-box']}>
           <img
@@ -39,13 +50,27 @@ const ChatBox = ({ emptyMode, chatMode, goBack }) => {
         </figure>
 
         <div className={styles['name-box']}>
-          <h1 className={styles['chat-name']}>Boolean Autocrats</h1>
+          <h1
+            className={`${styles['chat-name']} ${
+              mode === 'dark' ? styles['dark-text'] : ''
+            }`}
+          >
+            Boolean Autocrats
+          </h1>
           {/* <span className={styles['last-time-seen']}>
             Last seen today at 9:50 AM
           </span> */}
         </div>
-        <div className={styles['search-div']}>
-          <FaSearch className={styles['chat-search-icon']} />
+        <div
+          className={`${styles['search-div']} ${
+            mode === 'dark' ? styles['dark-search-div'] : ''
+          }`}
+        >
+          <FaSearch
+            className={`${styles['chat-search-icon']}  ${
+              mode === 'dark' ? styles['dark-search-icon'] : ''
+            }`}
+          />
         </div>
       </div>
 
@@ -464,10 +489,23 @@ const ChatBox = ({ emptyMode, chatMode, goBack }) => {
         </article>
       </div>
 
-      <div className={styles['chat-input-container']}>
-        <GrAttachment className={styles['attachment-icon']} />
+      <div
+        className={`${styles['chat-input-container']} ${
+          mode === 'dark' ? styles['dark-input-container'] : ''
+        }`}
+      >
+        <GrAttachment
+          className={`${styles['attachment-icon']}  ${
+            mode === 'dark' ? styles['dark-word'] : ''
+          }`}
+        />
         <div className={styles['chat-input-box']}>
-          <textarea className={styles['chat-input']} rows={1}></textarea>
+          <textarea
+            className={`${styles['chat-input']} ${
+              mode === 'dark' ? styles['dark-input'] : ''
+            }`}
+            rows={1}
+          ></textarea>
           <span className={styles['send-icon-box']}>
             <BsSendFill className={styles['send-icon']} />
           </span>

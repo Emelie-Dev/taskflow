@@ -269,21 +269,18 @@ const Dashboard = () => {
         },
         ticks: {
           padding: 15,
-          color: `${mode === 'dark' ? 'rgb(253, 245, 230)' : 'gray'}`,
+          color: `${mode === 'dark' ? '#b0c4de' : 'gray'}`,
         },
       },
       y: {
-        color: 'red',
         grid: {
           borderDash: [5, 5],
-          color: `${
-            mode === 'dark' ? 'rgb(253, 245, 230)' : 'rgba(0, 0, 0, 0.1)'
-          }`,
+          color: `${mode === 'dark' ? '#b0c4de' : 'rgba(0, 0, 0, 0.1)'}`,
         },
         ticks: {
           stepSize: 10,
           padding: 15,
-          color: `${mode === 'dark' ? 'rgb(253, 245, 230)' : 'gray'}`,
+          color: `${mode === 'dark' ? '#b0c4de' : 'gray'}`,
         },
       },
     },

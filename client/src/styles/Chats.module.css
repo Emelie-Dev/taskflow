@@ -228,6 +228,45 @@
   display: flex !important;
 }
 
+/* Dark Mode */
+
+.dark-head {
+  padding: 1rem;
+  width: 50%;
+  cursor: pointer;
+  font-size: 1.05rem;
+  background: var(--dark-theme-background);
+  color: var(--dark-theme-text);
+  transition: background 0.3s;
+  font-weight: bold;
+  border-bottom: 2px solid var(--dark-theme-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark-head:hover {
+  background: rgb(100, 100, 100);
+}
+
+.dark-current-head {
+  font-weight: bold;
+  border-bottom: 2px solid orange;
+  color: var(--dark-theme-color);
+}
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-msg {
+  color: var(--dark-theme-text);
+}
+
+.dark-contacts-box:hover {
+  background: rgb(100, 100, 100);
+}
+
 /* Animations */
 
 @keyframes showNav {

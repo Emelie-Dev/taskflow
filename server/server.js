@@ -29,7 +29,7 @@ await mongoose.connect(
     ? process.env.DB_CONN_STR
     : process.env.DB_LOCAL_CONN_STR,
   {
-    autoIndex: false,
+    autoIndex: true,
   }
 );
 
