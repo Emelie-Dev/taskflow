@@ -165,7 +165,7 @@ const userSchema = new mongoose.Schema(
         defaultProjectView: 'grid',
         priorityColors: {
           high: '#ff0000',
-          medium: '#daa520',
+          medium: '#ffa500',
           low: '#008000',
         },
       },
