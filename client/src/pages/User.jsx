@@ -12,7 +12,7 @@ import { getProfilePhoto } from '../components/Header';
 
 const User = () => {
   const { username } = useParams();
-  const { serverUrl } = useContext(AuthContext);
+  const { serverUrl, mode } = useContext(AuthContext);
   const [userData, setUserData] = useState('loading');
   const [showNav, setShowNav] = useState(false);
 
@@ -50,7 +50,16 @@ const User = () => {
 
   const getValue = (property) => {
     if (property === 'dob') {
-      if (!userData.dob) return <i style={{ color: 'gray' }}>Not available</i>;
+      if (!userData.dob)
+        return (
+          <i
+            className={`${styles['gray-text']} ${
+              mode === 'dark' ? styles['dark-word'] : ''
+            }`}
+          >
+            Not available
+          </i>
+        );
 
       const date = new Date(userData.dob);
 
@@ -61,7 +70,13 @@ const User = () => {
       return userData[property] ? (
         userData[property]
       ) : (
-        <i style={{ color: 'gray' }}>Not available</i>
+        <i
+          className={`${styles['gray-text']} ${
+            mode === 'dark' ? styles['dark-word'] : ''
+          }`}
+        >
+          Not available
+        </i>
       );
     }
   };
@@ -86,9 +101,19 @@ const User = () => {
               />
             </div>
           ) : userData === null ? (
-            <div className={styles['error-text']}>This user does not exist</div>
+            <div
+              className={`${styles['error-text']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
+              This user does not exist
+            </div>
           ) : userData ? (
-            <div className={styles['profile-container']}>
+            <div
+              className={`${styles['profile-container']} ${
+                mode === 'dark' ? styles['dark-container'] : ''
+              }`}
+            >
               <div className={styles['left-section']}>
                 <figure className={styles['profile-pics-box']}>
                   <img
@@ -97,11 +122,19 @@ const User = () => {
                   />
                 </figure>
 
-                <span className={styles['username']}>
+                <span
+                  className={`${styles['username']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
                   {userData.firstName} {userData.lastName}
                 </span>
 
-                <span className={styles['user-title']}>
+                <span
+                  className={`${styles['user-title']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   {userData.occupation}
                 </span>
 
@@ -115,39 +148,99 @@ const User = () => {
 
               <div className={styles['right-section']}>
                 <div className={styles['property-box']}>
-                  <span className={styles['property-name']}>Username:</span>
-                  <span className={styles['property-value']}>
+                  <span
+                    className={`${styles['property-name']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    Username:
+                  </span>
+                  <span
+                    className={`${styles['property-value']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
                     {getValue('username')}
                   </span>
                 </div>
                 <div className={styles['property-box']}>
-                  <span className={styles['property-name']}>Phone Number:</span>
-                  <span className={styles['property-value']}>
+                  <span
+                    className={`${styles['property-name']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    Phone Number:
+                  </span>
+                  <span
+                    className={`${styles['property-value']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
                     {getValue('mobileNumber')}
                   </span>
                 </div>
                 <div className={styles['property-box']}>
-                  <span className={styles['property-name']}>Birthday:</span>
-                  <span className={styles['property-value']}>
+                  <span
+                    className={`${styles['property-name']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    Birthday:
+                  </span>
+                  <span
+                    className={`${styles['property-value']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
                     {' '}
                     {getValue('dob')}
                   </span>
                 </div>
                 <div className={styles['property-box']}>
-                  <span className={styles['property-name']}>Email:</span>
-                  <span className={styles['property-value']}>
+                  <span
+                    className={`${styles['property-name']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    Email:
+                  </span>
+                  <span
+                    className={`${styles['property-value']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
                     {getValue('email')}
                   </span>
                 </div>
                 <div className={styles['property-box']}>
-                  <span className={styles['property-name']}>Country:</span>
-                  <span className={styles['property-value']}>
+                  <span
+                    className={`${styles['property-name']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    Country:
+                  </span>
+                  <span
+                    className={`${styles['property-value']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
                     {getValue('country')}
                   </span>
                 </div>
                 <div className={styles['property-box']}>
-                  <span className={styles['property-name']}>Language:</span>
-                  <span className={styles['property-value']}>
+                  <span
+                    className={`${styles['property-name']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    Language:
+                  </span>
+                  <span
+                    className={`${styles['property-value']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
                     {getValue('language')}
                   </span>
                 </div>

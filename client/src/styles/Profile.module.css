@@ -171,6 +171,26 @@
   transform: translateY(2px);
 }
 
+.gray-text {
+  color: gray;
+}
+
+/* Dark Mode */
+
+.dark-container {
+  background: var(--dark-theme-background);
+  box-shadow: 1px 1px 10px -7px black, 1px 1px 10px -7px white,
+    -1px -1px 4px -3px white;
+}
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
 /* Animations */
 
 @keyframes showNav {

@@ -18,7 +18,7 @@ import NavBar from '../components/NavBar';
 import { getProfilePhoto } from '../components/Header';
 
 const Settings = () => {
-  const { userData, setUserData, serverUrl } = useContext(AuthContext);
+  const { userData, serverUrl, mode: theme } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [category, setCategory] = useState('general');
   const [displayCategory, setDisplayCategory] = useState(false);
@@ -61,12 +61,22 @@ const Settings = () => {
         }`}
         onClick={hideResponsiveSettings}
       >
-        <div className={styles['responsive-settings-category']}>
+        <div
+          className={`${styles['responsive-settings-category']} ${
+            theme === 'dark' ? styles['dark-settings-category'] : ''
+          }`}
+        >
           <span
-            className={styles['close-responsive-settings']}
+            className={`${styles['close-responsive-settings']}  ${
+              theme === 'dark' ? styles['dark-responsive-settings'] : ''
+            }`}
             onClick={() => setDisplayCategory(false)}
           >
-            <IoMdClose className={styles['close-responsive-icon']} />
+            <IoMdClose
+              className={`${styles['close-responsive-icon']}  ${
+                theme === 'dark' ? styles['dark-responsive-icon'] : ''
+              }`}
+            />
           </span>
 
           <figure className={styles['profile-img-box']}>
@@ -92,62 +102,105 @@ const Settings = () => {
             </span>
 
             <figcaption className={styles['profile-img-caption']}>
-              <span className={styles['username']}>Ofoka Vincent</span>
-              <span className={styles['user-title']}>Web Developer</span>
+              <span
+                className={`${styles['username']} ${
+                  theme === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
+                {userData.firstName} {userData.lastName}
+              </span>
+              <span
+                className={`${styles['user-title']} ${
+                  theme === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
+                {' '}
+                {userData.occupation}
+              </span>
             </figcaption>
           </figure>
 
           <ul className={styles['category-list']}>
             <li
               className={`${styles['category-item']} ${
-                category === 'general' ? styles['current-category-item'] : ''
-              }`}
-              onClick={() => {
-                setCategory('general');
-                setDisplayCategory(false);
-              }}
+                category === 'general'
+                  ? theme === 'dark'
+                    ? styles['dark-current-category']
+                    : styles['current-category-item']
+                  : ''
+              } ${theme === 'dark' ? styles['dark-category-item'] : ''}`}
             >
-              <CgProfile className={styles['category-icon']} /> Profile
+              <span
+                className={`${styles['category-box']} ${
+                  category === 'general' ? styles['current-category-box'] : ''
+                }`}
+                onClick={() => setCategory('general')}
+              >
+                <CgProfile className={styles['category-icon']} /> Profile
+              </span>
             </li>
 
             <li
               className={`${styles['category-item']} ${
                 category === 'notifications'
-                  ? styles['current-category-item']
+                  ? theme === 'dark'
+                    ? styles['dark-current-category']
+                    : styles['current-category-item']
                   : ''
-              }`}
-              onClick={() => {
-                setCategory('notifications');
-                setDisplayCategory(false);
-              }}
+              } ${theme === 'dark' ? styles['dark-category-item'] : ''}`}
             >
-              <IoIosNotifications className={styles['category-icon']} />{' '}
-              Notifications
+              <span
+                className={`${styles['category-box']} ${
+                  category === 'notifications'
+                    ? styles['current-category-box']
+                    : ''
+                }`}
+                onClick={() => setCategory('notifications')}
+              >
+                <IoIosNotifications className={styles['category-icon']} />{' '}
+                Notifications
+              </span>
             </li>
             <li
               className={`${styles['category-item']} ${
                 category === 'personalization'
-                  ? styles['current-category-item']
+                  ? theme === 'dark'
+                    ? styles['dark-current-category']
+                    : styles['current-category-item']
                   : ''
-              }`}
-              onClick={() => {
-                setCategory('personalization');
-                setDisplayCategory(false);
-              }}
+              } ${theme === 'dark' ? styles['dark-category-item'] : ''}`}
             >
-              <IoColorPaletteSharp className={styles['category-icon']} />{' '}
-              Personalization
+              {' '}
+              <span
+                className={`${styles['category-box']} ${
+                  category === 'personalization'
+                    ? styles['current-category-box']
+                    : ''
+                }`}
+                onClick={() => setCategory('personalization')}
+              >
+                <IoColorPaletteSharp className={styles['category-icon']} />{' '}
+                Personalization
+              </span>
             </li>
             <li
               className={`${styles['category-item']} ${
-                category === 'security' ? styles['current-category-item'] : ''
-              }`}
-              onClick={() => {
-                setCategory('security');
-                setDisplayCategory(false);
-              }}
+                category === 'security'
+                  ? theme === 'dark'
+                    ? styles['dark-current-category']
+                    : styles['current-category-item']
+                  : ''
+              } ${theme === 'dark' ? styles['dark-category-item'] : ''}`}
             >
-              <MdOutlineSecurity className={styles['category-icon']} /> Security
+              <span
+                className={`${styles['category-box']} ${
+                  category === 'security' ? styles['current-category-box'] : ''
+                }`}
+                onClick={() => setCategory('security')}
+              >
+                <MdOutlineSecurity className={styles['category-icon']} />{' '}
+                Security
+              </span>
             </li>
           </ul>
         </div>
@@ -205,10 +258,18 @@ const Settings = () => {
               </span>
 
               <figcaption className={styles['profile-img-caption']}>
-                <span className={styles['username']}>
+                <span
+                  className={`${styles['username']} ${
+                    theme === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
                   {userData.firstName} {userData.lastName}
                 </span>
-                <span className={styles['user-title']}>
+                <span
+                  className={`${styles['user-title']} ${
+                    theme === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   {' '}
                   {userData.occupation}
                 </span>
@@ -218,8 +279,12 @@ const Settings = () => {
             <ul className={styles['category-list']}>
               <li
                 className={`${styles['category-item']} ${
-                  category === 'general' ? styles['current-category-item'] : ''
-                }`}
+                  category === 'general'
+                    ? theme === 'dark'
+                      ? styles['dark-current-category']
+                      : styles['current-category-item']
+                    : ''
+                } ${theme === 'dark' ? styles['dark-category-item'] : ''}`}
               >
                 <span
                   className={`${styles['category-box']} ${
@@ -234,9 +299,11 @@ const Settings = () => {
               <li
                 className={`${styles['category-item']} ${
                   category === 'notifications'
-                    ? styles['current-category-item']
+                    ? theme === 'dark'
+                      ? styles['dark-current-category']
+                      : styles['current-category-item']
                     : ''
-                }`}
+                } ${theme === 'dark' ? styles['dark-category-item'] : ''}`}
               >
                 <span
                   className={`${styles['category-box']} ${
@@ -253,9 +320,11 @@ const Settings = () => {
               <li
                 className={`${styles['category-item']} ${
                   category === 'personalization'
-                    ? styles['current-category-item']
+                    ? theme === 'dark'
+                      ? styles['dark-current-category']
+                      : styles['current-category-item']
                     : ''
-                }`}
+                } ${theme === 'dark' ? styles['dark-category-item'] : ''}`}
               >
                 {' '}
                 <span
@@ -272,8 +341,12 @@ const Settings = () => {
               </li>
               <li
                 className={`${styles['category-item']} ${
-                  category === 'security' ? styles['current-category-item'] : ''
-                }`}
+                  category === 'security'
+                    ? theme === 'dark'
+                      ? styles['dark-current-category']
+                      : styles['current-category-item']
+                    : ''
+                } ${theme === 'dark' ? styles['dark-category-item'] : ''}`}
               >
                 <span
                   className={`${styles['category-box']} ${
@@ -291,7 +364,9 @@ const Settings = () => {
           </div>
 
           <AiOutlineMenuFold
-            className={styles['settings-menu-icon']}
+            className={`${styles['settings-menu-icon']}  ${
+              theme === 'dark' ? styles['dark-menu-icon'] : ''
+            }`}
             onClick={() => setDisplayCategory(true)}
           />
 

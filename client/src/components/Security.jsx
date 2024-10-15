@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import DeleteComponent from './DeleteComponent';
 
 const Security = () => {
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, setUserData, mode } = useContext(AuthContext);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [enableBtn, setEnableBtn] = useState(false);
@@ -202,14 +202,35 @@ const Security = () => {
         />
       )}
 
-      <h1 className={styles['section-head']}>Security</h1>
+      <h1
+        className={`${styles['section-head']} ${
+          mode === 'dark' ? styles['dark-text'] : ''
+        }`}
+      >
+        Security
+      </h1>
 
-      <div className={styles['content-container']}>
-        <p className={styles['password-head']}>Password</p>
+      <div
+        className={`${styles['content-container']} ${
+          mode === 'dark' ? styles['dark-container'] : ''
+        }`}
+      >
+        <p
+          className={`${styles['password-head']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
+          Password
+        </p>
 
         <div className={styles['password-box']}>
           <div className={styles['input-box']}>
-            <label className={styles.label}>
+            <label
+              className={`${styles.label}  ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="settings-password"
+            >
               {' '}
               {userData.hasPassword ? 'Current ' : ''}
               Password:
@@ -217,11 +238,14 @@ const Security = () => {
             <span
               className={`${styles['password-input-box']} ${
                 focusInput === 'old' ? styles['focus-input'] : ''
-              }`}
+              } ${mode === 'dark' ? styles['dark-input-box'] : ''}`}
             >
               <input
                 type={showOldPassword ? 'text' : 'password'}
-                className={styles['password-input']}
+                className={`${styles['password-input']} ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
+                id="settings-password"
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
                 onFocus={() => setFocusInput('old')}
@@ -230,12 +254,16 @@ const Security = () => {
 
               {showOldPassword ? (
                 <IoMdEye
-                  className={styles['show-icon']}
+                  className={`${styles['show-icon']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   onClick={() => setShowOldPassword(!showOldPassword)}
                 />
               ) : (
                 <IoMdEyeOff
-                  className={styles['show-icon']}
+                  className={`${styles['show-icon']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   onClick={() => setShowOldPassword(!showOldPassword)}
                 />
               )}
@@ -243,18 +271,26 @@ const Security = () => {
           </div>
 
           <div className={styles['input-box']}>
-            <label className={styles.label}>
+            <label
+              className={`${styles.label}  ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="settings-password2"
+            >
               {' '}
               {userData.hasPassword ? 'New ' : 'Confirm '} Password:
             </label>
             <span
               className={`${styles['password-input-box']} ${
                 focusInput === 'new' ? styles['focus-input'] : ''
-              }`}
+              } ${mode === 'dark' ? styles['dark-input-box'] : ''}`}
             >
               <input
                 type={showNewPassword ? 'text' : 'password'}
-                className={styles['password-input']}
+                className={`${styles['password-input']} ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
+                id="settings-password2"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 onFocus={() => setFocusInput('new')}
@@ -263,12 +299,16 @@ const Security = () => {
 
               {showNewPassword ? (
                 <IoMdEye
-                  className={styles['show-icon']}
+                  className={`${styles['show-icon']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   onClick={() => setShowNewPassword(!showNewPassword)}
                 />
               ) : (
                 <IoMdEyeOff
-                  className={styles['show-icon']}
+                  className={`${styles['show-icon']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   onClick={() => setShowNewPassword(!showNewPassword)}
                 />
               )}
@@ -277,10 +317,24 @@ const Security = () => {
         </div>
       </div>
 
-      <div className={styles['content-container']}>
-        <p className={styles['data-head']}>Data visibility</p>
+      <div
+        className={`${styles['content-container']} ${
+          mode === 'dark' ? styles['dark-container'] : ''
+        }`}
+      >
+        <p
+          className={`${styles['data-head']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
+          Data visibility
+        </p>
 
-        <span className={styles['data-text']}>
+        <span
+          className={`${styles['data-text']} ${
+            mode === 'dark' ? styles['dark-word'] : ''
+          }`}
+        >
           Select which details will be viewable by other users.
         </span>
 
@@ -289,56 +343,100 @@ const Security = () => {
             <input
               type="checkbox"
               className={styles['data-checkbox']}
+              id="security-first"
               checked={firstName}
               onChange={handleChange('firstName')}
             />
-            <label className={styles['data-label']}>First name</label>
+            <label
+              className={`${styles['data-label']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+              htmlFor="security-first"
+            >
+              First name
+            </label>
           </span>
           <span className={styles['data-box']}>
             <input
               type="checkbox"
               className={styles['data-checkbox']}
+              id="security-last"
               checked={lastName}
               onChange={handleChange('lastName')}
             />
-            <label className={styles['data-label']}>Last name</label>
+            <label
+              className={`${styles['data-label']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+              htmlFor="security-last"
+            >
+              Last name
+            </label>
           </span>
           <span className={styles['data-box']}>
             <input
               type="checkbox"
               className={styles['data-checkbox']}
+              id="security-number"
               checked={mobileNumber}
               onChange={handleChange('mobileNumber')}
             />
-            <label className={styles['data-label']}>Phone Number</label>
+            <label
+              className={`${styles['data-label']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+              htmlFor="security-number"
+            >
+              Phone Number
+            </label>
           </span>
           <span className={styles['data-box']}>
             <input
               type="checkbox"
               className={styles['data-checkbox']}
+              id="security-country"
               checked={country}
               onChange={handleChange('country')}
             />
-            <label className={styles['data-label']}>Country</label>
+            <label
+              className={`${styles['data-label']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+              htmlFor="security-country"
+            >
+              Country
+            </label>
           </span>{' '}
           <span className={styles['data-box']}>
             <input
               type="checkbox"
               className={styles['data-checkbox']}
+              id="security-language"
               checked={language}
               onChange={handleChange('language')}
             />
-            <label className={styles['data-label']}>Language</label>
+            <label
+              className={`${styles['data-label']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+              htmlFor="security-language"
+            >
+              Language
+            </label>
           </span>
           <span className={styles['data-box']}>
             <input
               type="checkbox"
               className={styles['data-checkbox']}
+              id="security-dob"
               checked={dob}
               onChange={handleChange('dob')}
             />
             <label
-              className={`${styles['data-label']} ${styles['data-label2']}`}
+              className={`${styles['data-label']} ${styles['data-label2']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+              htmlFor="security-dob"
             >
               Date of Birth
             </label>
@@ -373,13 +471,17 @@ const Security = () => {
 
       <div className={styles['btn-div']}>
         <button
-          className={styles['deactivate-btn']}
+          className={`${styles['deactivate-btn']} ${
+            mode === 'dark' ? styles['dark-btn'] : ''
+          }`}
           onClick={() => setDeleteModal({ value: true, type: 'deactivate' })}
         >
           Deactivate Account
         </button>
         <button
-          className={styles['delete-btn']}
+          className={`${styles['delete-btn']}  ${
+            mode === 'dark' ? styles['dark-btn'] : ''
+          }`}
           onClick={() => setDeleteModal({ value: true, type: 'Account' })}
         >
           Delete Account

@@ -262,6 +262,21 @@
   vertical-align: -3px;
 }
 
+/* Dark Mode */
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-input {
+  color: var(--dark-theme-color);
+  background: var(--dark-theme-background);
+}
+
 /* Animations */
 
 @keyframes rotate {

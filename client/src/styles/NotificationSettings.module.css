@@ -104,6 +104,16 @@
   pointer-events: none !important;
 }
 
+/* Dark Mode */
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
 /* Animations */
 
 @keyframes rotate {

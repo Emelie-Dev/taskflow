@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { SiKashflow } from 'react-icons/si';
 
 const NotificationSettings = () => {
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, setUserData, mode } = useContext(AuthContext);
   const [initialData, setInitialData] = useState({
     taskAssignment: userData.notificationSettings.taskAssignment,
     reminder: userData.notificationSettings.reminder,
@@ -76,13 +76,29 @@ const NotificationSettings = () => {
     <section className={styles.section}>
       <ToastContainer autoClose={2000} />
 
-      <h1 className={styles['section-head']}>Notifications</h1>
+      <h1
+        className={`${styles['section-head']} ${
+          mode === 'dark' ? styles['dark-text'] : ''
+        }`}
+      >
+        Notifications
+      </h1>
 
       <ul className={styles['list']}>
         <li className={styles['list-item']}>
           <span className={styles['item-details']}>
-            <span className={styles['item-head']}>Task Assignment</span>
-            <span className={styles['item-text']}>
+            <span
+              className={`${styles['item-head']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
+              Task Assignment
+            </span>
+            <span
+              className={`${styles['item-text']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               Enables you to receive notifications when assigned a new task.
             </span>
           </span>
@@ -96,8 +112,18 @@ const NotificationSettings = () => {
 
         <li className={styles['list-item']}>
           <span className={styles['item-details']}>
-            <span className={styles['item-head']}>Deadline and reminder</span>
-            <span className={styles['item-text']}>
+            <span
+              className={`${styles['item-head']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
+              Deadline and reminder
+            </span>
+            <span
+              className={`${styles['item-text']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               Keep you informed by sending notifications prior to and following
               the deadline of tasks.
             </span>
@@ -112,8 +138,18 @@ const NotificationSettings = () => {
 
         <li className={styles['list-item']}>
           <span className={styles['item-details']}>
-            <span className={styles['item-head']}>Project Activity</span>
-            <span className={styles['item-text']}>
+            <span
+              className={`${styles['item-head']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
+              Project Activity
+            </span>
+            <span
+              className={`${styles['item-text']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               Enable you to receive notifications about actions from team
               members concerning projects.
             </span>
@@ -128,8 +164,18 @@ const NotificationSettings = () => {
 
         <li className={styles['list-item']}>
           <span className={styles['item-details']}>
-            <span className={styles['item-head']}>Email notifications</span>
-            <span className={styles['item-text']}>
+            <span
+              className={`${styles['item-head']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
+              Email notifications
+            </span>
+            <span
+              className={`${styles['item-text']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               Important notifications will be sent to your email address.
             </span>
           </span>

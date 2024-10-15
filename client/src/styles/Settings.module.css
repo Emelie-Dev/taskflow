@@ -142,11 +142,11 @@
 }
 
 .current-category-item {
-  background: #f5f5dc;
+  background: #f5f5dc !important;
 }
 
 .current-category-box {
-  color: orange;
+  color: orange !important;
   font-weight: 600;
   cursor: default;
 }
@@ -162,10 +162,11 @@
   transition: color 0.2s;
   background: white;
   z-index: 3;
+  transition: fill 0.3s;
 }
 
 .settings-menu-icon:hover {
-  color: orange;
+  fill: orange;
 }
 
 .responsive-settings {
@@ -218,6 +219,41 @@
 
 .close-responsive-settings:hover {
   background: #dcdcdc;
+}
+
+/* Dark Mode */
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-category-item {
+  color: var(--dark-theme-text);
+}
+
+.dark-current-category {
+  background: rgba(245, 245, 220, 0.15);
+}
+
+.dark-settings-category {
+  background: var(--dark-theme-background);
+}
+
+.dark-responsive-icon {
+  fill: var(--dark-theme-color);
+}
+
+.dark-responsive-settings:hover {
+  background: rgba(245, 245, 220, 0.4);
+}
+
+.dark-menu-icon {
+  fill: var(--dark-theme-color);
+  background: var(--dark-theme-background);
 }
 
 /* Animations */

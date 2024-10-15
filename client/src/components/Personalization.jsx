@@ -8,7 +8,7 @@ import { SiKashflow } from 'react-icons/si';
 const customId = 'toast-id';
 
 const Personalization = () => {
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, setUserData, mode } = useContext(AuthContext);
   const [initialData, setInitialData] = useState({
     theme: userData.personalization.theme,
     defaultProjectView: userData.personalization.defaultProjectView,
@@ -177,9 +177,23 @@ const Personalization = () => {
     <section className={styles.section}>
       <ToastContainer autoClose={2500} />
 
-      <h1 className={styles['section-head']}>Personalization</h1>
+      <h1
+        className={`${styles['section-head']} ${
+          mode === 'dark' ? styles['dark-text'] : ''
+        }`}
+      >
+        Personalization
+      </h1>
+
       <div className={styles['option-div']}>
-        <span className={styles['option-head']}>Theme</span>
+        <span
+          className={`${styles['option-head']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
+          Theme
+        </span>
+
         <div className={styles['theme-container']}>
           <span className={styles['img-box']}>
             <img
@@ -197,7 +211,13 @@ const Personalization = () => {
               checked
               readOnly
             />
-            <span className={styles['theme-type']}>Light</span>
+            <span
+              className={`${styles['theme-type']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
+              Light
+            </span>
           </span>
           <span className={styles['img-box']}>
             <img
@@ -215,7 +235,13 @@ const Personalization = () => {
               checked
               readOnly
             />
-            <span className={styles['theme-type']}>Dark</span>
+            <span
+              className={`${styles['theme-type']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
+              Dark
+            </span>
           </span>
 
           <span className={styles['img-box']}>
@@ -234,7 +260,13 @@ const Personalization = () => {
               checked
               readOnly
             />
-            <span className={styles['theme-type']}>System default</span>
+            <span
+              className={`${styles['theme-type']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
+              System default
+            </span>
           </span>
         </div>
       </div>
@@ -242,10 +274,20 @@ const Personalization = () => {
       <div
         className={`${styles['option-div']} ${styles['project-div-container']}`}
       >
-        <span className={styles['option-head']}>Default project view</span>
+        <span
+          className={`${styles['option-head']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
+          Default project view
+        </span>
 
         <div className={styles['view-div']}>
-          <span className={styles['view-box']}>
+          <span
+            className={`${styles['view-box']} ${
+              mode === 'dark' ? styles['dark-word'] : ''
+            }`}
+          >
             <input
               type="radio"
               name="project-view"
@@ -255,7 +297,11 @@ const Personalization = () => {
             />{' '}
             Grid
           </span>
-          <span className={styles['view-box']}>
+          <span
+            className={`${styles['view-box']} ${
+              mode === 'dark' ? styles['dark-word'] : ''
+            }`}
+          >
             <input
               type="radio"
               name="project-view"
@@ -269,12 +315,20 @@ const Personalization = () => {
       </div>
 
       <div className={styles['option-div']}>
-        <span className={styles['option-head']}>
+        <span
+          className={`${styles['option-head']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
           Colors for priority levels
         </span>
 
         <div className={styles['color-div']}>
-          <span className={styles['color-box']}>
+          <span
+            className={`${styles['color-box']} ${
+              mode === 'dark' ? styles['dark-word'] : ''
+            }`}
+          >
             High:{' '}
             <input
               type="color"
@@ -283,7 +337,11 @@ const Personalization = () => {
               onChange={colorHandler('high')}
             />
           </span>
-          <span className={styles['color-box']}>
+          <span
+            className={`${styles['color-box']} ${
+              mode === 'dark' ? styles['dark-word'] : ''
+            }`}
+          >
             Medium:{' '}
             <input
               type="color"
@@ -292,7 +350,11 @@ const Personalization = () => {
               onChange={colorHandler('medium')}
             />
           </span>
-          <span className={styles['color-box']}>
+          <span
+            className={`${styles['color-box']} ${
+              mode === 'dark' ? styles['dark-word'] : ''
+            }`}
+          >
             Low:{' '}
             <input
               type="color"
@@ -305,8 +367,18 @@ const Personalization = () => {
       </div>
 
       <div className={styles['option-div']}>
-        <span className={styles['option-head']}>Custom fields</span>
-        <p className={styles['description']}>
+        <span
+          className={`${styles['option-head']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
+          Custom fields
+        </span>
+        <p
+          className={`${styles['description']} ${
+            mode === 'dark' ? styles['dark-word'] : ''
+          }`}
+        >
           Enable users to create additional fields for tasks.
         </p>
 
@@ -324,7 +396,7 @@ const Personalization = () => {
           <input
             className={`${styles['new-field-input']} ${
               customFields.length >= 5 ? styles['hide-new-field'] : ''
-            }`}
+            } ${mode === 'dark' ? styles['dark-input'] : ''}`}
             type="text"
             value={newField}
             onChange={(e) => setNewField(e.target.value)}

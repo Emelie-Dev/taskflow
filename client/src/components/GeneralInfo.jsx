@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styles from '../styles/GeneralInfo.module.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { apiClient, AuthContext } from '../App';
@@ -7,7 +7,7 @@ import { SiKashflow } from 'react-icons/si';
 const customId = 'toast-id';
 
 const GeneralInfo = () => {
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, setUserData, mode } = useContext(AuthContext);
 
   const [initialValue, setInitialValue] = useState({
     firstName: userData.firstName || '',
@@ -34,98 +34,7 @@ const GeneralInfo = () => {
     count !== 8 ? setEnableBtn(true) : setEnableBtn(false);
   }, [inputValue]);
 
-  const {
-    firstName,
-    lastName,
-    username,
-    occupation,
-    email,
-    mobileNumber,
-    country,
-    language,
-  } = inputValue;
-
-  const changeHandler = (input) => (e) => {
-    setInputValue({
-      ...inputValue,
-      [input]: e.target.value,
-    });
-  };
-
-  const handleReset = (e) => {
-    e.preventDefault();
-    setInputValue(initialValue);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (username.length === 0) {
-      return toast('Username field cannot be empty.', {
-        toastId: customId,
-      });
-    } else if (username.length > 30) {
-      return toast('Username cannot exceed 30 characters.', {
-        toastId: customId,
-      });
-    } else if (username.match(/\W/)) {
-      return toast(
-        'Username must consist of letters, numbers, and underscores only.',
-        {
-          toastId: customId,
-        }
-      );
-    }
-
-    setIsProcessing(true);
-
-    try {
-      const { data } = await apiClient.patch(
-        `/api/v1/users/profile`,
-        inputValue
-      );
-
-      const {
-        firstName,
-        lastName,
-        username,
-        occupation,
-        email,
-        mobileNumber,
-        country,
-        language,
-      } = data.data.userData;
-
-      setIsProcessing(false);
-      setUserData(data.data.userData);
-      setInitialValue({
-        firstName,
-        lastName,
-        username,
-        occupation,
-        email,
-        mobileNumber,
-        country,
-        language,
-      });
-      setEnableBtn(false);
-    } catch (err) {
-      setIsProcessing(false);
-      if (!err.response || !err.response.data || err.response.status === 500) {
-        return toast('An error occured while saving data.', {
-          toastId: 'toast-id1',
-          autoClose: 2000,
-        });
-      } else {
-        return toast(err.response.data.message, {
-          toastId: 'toast-id1',
-          autoClose: 2000,
-        });
-      }
-    }
-  };
-
-  const generateData = () => {
+  const generateData = useMemo(() => {
     const countries = [
       'Ascension Island',
       'Andorra',
@@ -585,12 +494,109 @@ const GeneralInfo = () => {
         <option key={index} value={elem} />
       )),
     };
+  }, []);
+
+  const {
+    firstName,
+    lastName,
+    username,
+    occupation,
+    email,
+    mobileNumber,
+    country,
+    language,
+  } = inputValue;
+
+  const changeHandler = (input) => (e) => {
+    setInputValue({
+      ...inputValue,
+      [input]: e.target.value,
+    });
+  };
+
+  const handleReset = (e) => {
+    e.preventDefault();
+    setInputValue(initialValue);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (username.length === 0) {
+      return toast('Username field cannot be empty.', {
+        toastId: customId,
+      });
+    } else if (username.length > 30) {
+      return toast('Username cannot exceed 30 characters.', {
+        toastId: customId,
+      });
+    } else if (username.match(/\W/)) {
+      return toast(
+        'Username must consist of letters, numbers, and underscores only.',
+        {
+          toastId: customId,
+        }
+      );
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const { data } = await apiClient.patch(
+        `/api/v1/users/profile`,
+        inputValue
+      );
+
+      const {
+        firstName,
+        lastName,
+        username,
+        occupation,
+        email,
+        mobileNumber,
+        country,
+        language,
+      } = data.data.userData;
+
+      setIsProcessing(false);
+      setUserData(data.data.userData);
+      setInitialValue({
+        firstName,
+        lastName,
+        username,
+        occupation,
+        email,
+        mobileNumber,
+        country,
+        language,
+      });
+      setEnableBtn(false);
+    } catch (err) {
+      setIsProcessing(false);
+      if (!err.response || !err.response.data || err.response.status === 500) {
+        return toast('An error occured while saving data.', {
+          toastId: 'toast-id1',
+          autoClose: 2000,
+        });
+      } else {
+        return toast(err.response.data.message, {
+          toastId: 'toast-id1',
+          autoClose: 2000,
+        });
+      }
+    }
   };
 
   return (
     <section className={styles['section']}>
       <ToastContainer autoClose={2500} />
-      <h1 className={styles['section-head']}>Profile</h1>
+      <h1
+        className={`${styles['section-head']} ${
+          mode === 'dark' ? styles['dark-text'] : ''
+        }`}
+      >
+        Profile
+      </h1>
 
       <form
         className={styles['form']}
@@ -600,18 +606,38 @@ const GeneralInfo = () => {
       >
         <div className={styles['form-box']}>
           <div className={styles['input-box']}>
-            <label className={styles['input-label']}>First Name:</label>
+            <label
+              className={`${styles['input-label']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="profile-firstname"
+            >
+              First Name:
+            </label>
             <input
-              className={styles['form-input']}
+              className={`${styles['form-input']} ${
+                mode === 'dark' ? styles['dark-input'] : ''
+              }`}
+              id="profile-firstname"
               value={firstName}
               onChange={changeHandler('firstName')}
             />
           </div>
 
           <div className={styles['input-box']}>
-            <label className={styles['input-label']}>Last Name:</label>
+            <label
+              className={`${styles['input-label']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="profile-lastname"
+            >
+              Last Name:
+            </label>
             <input
-              className={styles['form-input']}
+              className={`${styles['form-input']} ${
+                mode === 'dark' ? styles['dark-input'] : ''
+              }`}
+              id="profile-lastname"
               value={lastName}
               onChange={changeHandler('lastName')}
             />
@@ -620,18 +646,38 @@ const GeneralInfo = () => {
 
         <div className={styles['form-box']}>
           <div className={styles['input-box']}>
-            <label className={styles['input-label']}>Username:</label>
+            <label
+              className={`${styles['input-label']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="profile-username"
+            >
+              Username:
+            </label>
             <input
-              className={styles['form-input']}
+              className={`${styles['form-input']} ${
+                mode === 'dark' ? styles['dark-input'] : ''
+              }`}
+              id="profile-username"
               value={username}
               onChange={changeHandler('username')}
             />
           </div>
 
           <div className={styles['input-box']}>
-            <label className={styles['input-label']}>Occupation:</label>
+            <label
+              className={`${styles['input-label']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="profile-occupation"
+            >
+              Occupation:
+            </label>
             <input
-              className={`${styles['form-input']} ${styles['user-title']}`}
+              className={`${styles['form-input']} ${
+                mode === 'dark' ? styles['dark-input'] : ''
+              }`}
+              id="profile-occupation"
               value={occupation}
               onChange={changeHandler('occupation')}
             />
@@ -640,19 +686,39 @@ const GeneralInfo = () => {
 
         <div className={styles['form-box']}>
           <div className={styles['input-box']}>
-            <label className={styles['input-label']}>Email:</label>
+            <label
+              className={`${styles['input-label']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="profile-email"
+            >
+              Email:
+            </label>
             <input
-              className={styles['form-input']}
+              className={`${styles['form-input']} ${
+                mode === 'dark' ? styles['dark-input'] : ''
+              }`}
+              id="profile-email"
               value={email}
               onChange={changeHandler('email')}
             />
           </div>
 
           <div className={styles['input-box']}>
-            <label className={styles['input-label']}>Phone Number:</label>
+            <label
+              className={`${styles['input-label']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="profile-number"
+            >
+              Phone Number:
+            </label>
             <input
               type="number"
-              className={styles['form-input']}
+              className={`${styles['form-input']} ${
+                mode === 'dark' ? styles['dark-input'] : ''
+              }`}
+              id="profile-number"
               value={mobileNumber}
               onChange={changeHandler('mobileNumber')}
             />
@@ -661,25 +727,45 @@ const GeneralInfo = () => {
 
         <div className={styles['form-box']}>
           <div className={styles['input-box']}>
-            <label className={styles['input-label']}>Country:</label>
+            <label
+              className={`${styles['input-label']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="profile-country"
+            >
+              Country:
+            </label>
             <input
               list="countries"
-              className={styles['form-input']}
+              className={`${styles['form-input']} ${
+                mode === 'dark' ? styles['dark-input'] : ''
+              }`}
+              id="profile-country"
               value={country}
               onChange={changeHandler('country')}
             />
-            <datalist id="countries">{generateData().countries}</datalist>
+            <datalist id="countries">{generateData.countries}</datalist>
           </div>
 
           <div className={styles['input-box']}>
-            <label className={styles['input-label']}>Language:</label>
+            <label
+              className={`${styles['input-label']} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+              htmlFor="profile-language"
+            >
+              Language:
+            </label>
             <input
               list="languages"
-              className={styles['form-input']}
+              className={`${styles['form-input']} ${
+                mode === 'dark' ? styles['dark-input'] : ''
+              }`}
+              id="profile-language"
               value={language}
               onChange={changeHandler('language')}
             />
-            <datalist id="languages">{generateData().languages}</datalist>
+            <datalist id="languages">{generateData.languages}</datalist>
           </div>
         </div>
 

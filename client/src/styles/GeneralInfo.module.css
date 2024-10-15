@@ -108,6 +108,21 @@ input::-webkit-inner-spin-button {
   pointer-events: none !important;
 }
 
+/* Dark Mode */
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-input {
+  color: var(--dark-theme-color);
+  background: rgba(50, 50, 50);
+}
+
 /* Animations */
 
 @keyframes rotate {
