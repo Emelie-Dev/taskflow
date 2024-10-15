@@ -6,7 +6,6 @@ import {
   MdSecurity,
   MdDeleteSweep,
 } from 'react-icons/md';
-import { BsThreeDotsVertical } from 'react-icons/bs';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { months, generateName } from '../pages/Dashboard';
 import {
@@ -40,7 +39,7 @@ const NotificationContainer = ({
   setDeleteList,
   setDeleteCount,
 }) => {
-  const { serverUrl } = useContext(AuthContext);
+  const { mode } = useContext(AuthContext);
   const [showData, setShowData] = useState(true);
   const [containerHeight, setContainerHeight] = useState(null);
   const [deleteArray, setDeleteArray] = useState([]);
@@ -93,15 +92,26 @@ const NotificationContainer = ({
     if (notification.action === 'task') {
       if (notification.type.includes('assignedTask')) {
         return (
-          <article key={notification._id} className={styles.article}>
+          <article
+            key={notification._id}
+            className={`${styles.article} ${
+              mode === 'dark' ? styles['dark-article'] : ''
+            }`}
+          >
             <span className={styles['icon-box']}>
               <MdPersonAdd className={styles.icon} />
             </span>
 
             <div className={styles['message-box']}>
-              <span className={styles.message}>
+              <span
+                className={`${styles.message} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 <a
-                  className={styles['link-text']}
+                  className={`${styles['link-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   href={`/user/${notification.performer.username}`}
                 >
                   {generateName(
@@ -112,7 +122,9 @@ const NotificationContainer = ({
                 </a>{' '}
                 added you to the assignees of a task in the{' '}
                 <a
-                  className={styles['link-text']}
+                  className={`${styles['link-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   href={`/project/${notification.performer.projectId}`}
                 >
                   {notification.performer.project}
@@ -120,7 +132,11 @@ const NotificationContainer = ({
                 project.
               </span>
 
-              <time className={styles.time}>
+              <time
+                className={`${styles.time} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 {' '}
                 {new Date(notification.time).getHours() === 0 ||
                 new Date(notification.time).getHours() === 12
@@ -158,15 +174,26 @@ const NotificationContainer = ({
         );
       } else if (notification.type.includes('assignee')) {
         return (
-          <article key={notification._id} className={styles.article}>
+          <article
+            key={notification._id}
+            className={`${styles.article} ${
+              mode === 'dark' ? styles['dark-article'] : ''
+            }`}
+          >
             <span className={styles['icon-box']}>
               <MdPersonAddDisabled className={styles.icon} />
             </span>
 
             <div className={styles['message-box']}>
-              <span className={styles.message}>
+              <span
+                className={`${styles.message} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 <a
-                  className={styles['link-text']}
+                  className={`${styles['link-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   href={`/user/${notification.performer.username}`}
                 >
                   {generateName(
@@ -177,7 +204,9 @@ const NotificationContainer = ({
                 </a>{' '}
                 removed you from the assignees of a task in the{' '}
                 <a
-                  className={styles['link-text']}
+                  className={`${styles['link-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   href={`/project/${notification.performer.projectId}`}
                 >
                   {notification.performer.project}
@@ -185,7 +214,11 @@ const NotificationContainer = ({
                 project.
               </span>
 
-              <time className={styles.time}>
+              <time
+                className={`${styles.time} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 {' '}
                 {new Date(notification.time).getHours() === 0 ||
                 new Date(notification.time).getHours() === 12
@@ -227,7 +260,12 @@ const NotificationContainer = ({
       notification.type.includes('team')
     ) {
       return (
-        <article key={notification._id} className={styles.article}>
+        <article
+          key={notification._id}
+          className={`${styles.article} ${
+            mode === 'dark' ? styles['dark-article'] : ''
+          }`}
+        >
           <span className={styles['icon-box']}>
             {notification.state.response === 'confirm' ? (
               <GoCheckCircleFill className={styles.icon} />
@@ -237,9 +275,15 @@ const NotificationContainer = ({
           </span>
 
           <div className={styles['message-box']}>
-            <span className={styles.message}>
+            <span
+              className={`${styles.message} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
               <a
-                className={styles['link-text']}
+                className={`${styles['link-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
                 href={`/user/${notification.performer.username}`}
               >
                 {generateName(
@@ -253,7 +297,9 @@ const NotificationContainer = ({
                 : 'declined'}{' '}
               the invitation to join the team for your project,{' '}
               <a
-                className={styles['link-text']}
+                className={`${styles['link-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
                 href={`/project/${notification.performer.projectId}`}
               >
                 {notification.performer.project}
@@ -261,7 +307,11 @@ const NotificationContainer = ({
               .
             </span>
 
-            <time className={styles.time}>
+            <time
+              className={`${styles.time} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               {' '}
               {new Date(notification.time).getHours() === 0 ||
               new Date(notification.time).getHours() === 12
@@ -303,14 +353,25 @@ const NotificationContainer = ({
       notification.type.includes('team')
     ) {
       return (
-        <article key={notification._id} className={styles.article}>
+        <article
+          key={notification._id}
+          className={`${styles.article} ${
+            mode === 'dark' ? styles['dark-article'] : ''
+          }`}
+        >
           <span className={styles['icon-box']}>
             <BsEnvelopeOpenFill className={styles.icon} />
           </span>
           <div className={styles['message-box']}>
-            <span className={styles.message}>
+            <span
+              className={`${styles.message} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
               <a
-                className={styles['link-text']}
+                className={`${styles['link-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
                 href={`/user/${notification.performer.username}`}
               >
                 {generateName(
@@ -320,7 +381,11 @@ const NotificationContainer = ({
                 )}
               </a>{' '}
               sent you an invitation to join the project team for{' '}
-              <span className={styles['bold-text']}>
+              <span
+                className={`${styles['bold-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 {notification.performer.project}
               </span>
               .
@@ -359,7 +424,11 @@ const NotificationContainer = ({
               </button>
             </span>
 
-            <time className={styles.time}>
+            <time
+              className={`${styles.time} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               {' '}
               {new Date(notification.time).getHours() === 0 ||
               new Date(notification.time).getHours() === 12
@@ -401,14 +470,25 @@ const NotificationContainer = ({
       notification.type.includes('team')
     ) {
       return (
-        <article key={notification._id} className={styles.article}>
+        <article
+          key={notification._id}
+          className={`${styles.article} ${
+            mode === 'dark' ? styles['dark-article'] : ''
+          }`}
+        >
           <span className={styles['icon-box']}>
             <IoPersonRemove className={styles.icon} />
           </span>
           <div className={styles['message-box']}>
-            <span className={styles.message}>
+            <span
+              className={`${styles.message} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
               <a
-                className={styles['link-text']}
+                className={`${styles['link-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
                 href={`/user/${notification.performer.username}`}
               >
                 {generateName(
@@ -418,13 +498,21 @@ const NotificationContainer = ({
                 )}
               </a>{' '}
               removed you from the project team for{' '}
-              <span className={styles['bold-text']}>
+              <span
+                className={`${styles['bold-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 {notification.performer.project}
               </span>
               .
             </span>
 
-            <time className={styles.time}>
+            <time
+              className={`${styles.time} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               {' '}
               {new Date(notification.time).getHours() === 0 ||
               new Date(notification.time).getHours() === 12
@@ -466,12 +554,21 @@ const NotificationContainer = ({
       notification.type.includes('security')
     ) {
       return (
-        <article key={notification._id} className={styles.article}>
+        <article
+          key={notification._id}
+          className={`${styles.article} ${
+            mode === 'dark' ? styles['dark-article'] : ''
+          }`}
+        >
           <span className={styles['icon-box']}>
             <MdSecurity className={styles.icon} />
           </span>
           <div className={styles['message-box']}>
-            <span className={styles.message}>
+            <span
+              className={`${styles.message} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
               {notification.state.set
                 ? 'Your password was set successfully.'
                 : notification.state.reset
@@ -479,7 +576,11 @@ const NotificationContainer = ({
                 : 'Your password was changed successfully.'}
             </span>
 
-            <time className={styles.time}>
+            <time
+              className={`${styles.time} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               {' '}
               {new Date(notification.time).getHours() === 0 ||
               new Date(notification.time).getHours() === 12
@@ -521,17 +622,30 @@ const NotificationContainer = ({
       notification.type.includes('security')
     ) {
       return (
-        <article key={notification._id} className={styles.article}>
+        <article
+          key={notification._id}
+          className={`${styles.article} ${
+            mode === 'dark' ? styles['dark-article'] : ''
+          }`}
+        >
           <span className={styles['icon-box']}>
             <MdSecurity className={styles.icon} />
           </span>
           <div className={styles['message-box']}>
-            <span className={styles.message}>
+            <span
+              className={`${styles.message} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
               Your account was reactivated successfully. You will regain access
               to all your content.
             </span>
 
-            <time className={styles.time}>
+            <time
+              className={`${styles.time} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               {' '}
               {new Date(notification.time).getHours() === 0 ||
               new Date(notification.time).getHours() === 12
@@ -575,14 +689,25 @@ const NotificationContainer = ({
           !notification.type.includes('account'))
       ) {
         return (
-          <article key={notification._id} className={styles.article}>
+          <article
+            key={notification._id}
+            className={`${styles.article} ${
+              mode === 'dark' ? styles['dark-article'] : ''
+            }`}
+          >
             <span className={styles['icon-box']}>
               <GoProjectSymlink className={styles.icon} />
             </span>
             <div className={styles['message-box']}>
-              <span className={styles.message}>
+              <span
+                className={`${styles.message} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 <a
-                  className={styles['link-text']}
+                  className={`${styles['link-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   href={`/user/${notification.performer.username}`}
                 >
                   {generateName(
@@ -597,7 +722,9 @@ const NotificationContainer = ({
                   : ` ${notification.performer.filesLength} files`}
                 {notification.action === 'addition' ? ' to ' : ' from '} the{' '}
                 <a
-                  className={styles['link-text']}
+                  className={`${styles['link-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   href={`/project/${notification.project}`}
                 >
                   {notification.performer.project}
@@ -605,7 +732,11 @@ const NotificationContainer = ({
                 project.
               </span>
 
-              <time className={styles.time}>
+              <time
+                className={`${styles.time} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 {' '}
                 {new Date(notification.time).getHours() === 0 ||
                 new Date(notification.time).getHours() === 12
@@ -646,13 +777,26 @@ const NotificationContainer = ({
         notification.type.includes('account')
       ) {
         return (
-          <article key={notification._id} className={styles.article}>
+          <article
+            key={notification._id}
+            className={`${styles.article} ${
+              mode === 'dark' ? styles['dark-article'] : ''
+            }`}
+          >
             <span className={styles['icon-box']}>
               <GoProjectSymlink className={styles.icon} />
             </span>
             <div className={styles['message-box']}>
-              <span className={styles.message}>
-                <span className={styles['bold-text']}>
+              <span
+                className={`${styles.message} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
+                <span
+                  className={`${styles['bold-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
                   {generateName(
                     notification.performer.firstName,
                     notification.performer.lastName,
@@ -662,7 +806,9 @@ const NotificationContainer = ({
                 was no longer available and was subsequently removed from the
                 project team for{' '}
                 <a
-                  className={styles['link-text']}
+                  className={`${styles['link-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   href={`/project/${notification.project}`}
                 >
                   {notification.performer.project}
@@ -670,7 +816,11 @@ const NotificationContainer = ({
                 .
               </span>
 
-              <time className={styles.time}>
+              <time
+                className={`${styles.time} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 {' '}
                 {new Date(notification.time).getHours() === 0 ||
                 new Date(notification.time).getHours() === 12
@@ -711,14 +861,25 @@ const NotificationContainer = ({
         notification.type.includes('project')
       ) {
         return (
-          <article key={notification._id} className={styles.article}>
+          <article
+            key={notification._id}
+            className={`${styles.article} ${
+              mode === 'dark' ? styles['dark-article'] : ''
+            }`}
+          >
             <span className={styles['icon-box']}>
               <GoProjectSymlink className={styles.icon} />
             </span>
             <div className={styles['message-box']}>
-              <span className={styles.message}>
+              <span
+                className={`${styles.message} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 <a
-                  className={styles['link-text']}
+                  className={`${styles['link-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   href={`/user/${notification.performer.username}`}
                 >
                   {generateName(
@@ -729,7 +890,9 @@ const NotificationContainer = ({
                 </a>{' '}
                 left the {''}
                 <a
-                  className={styles['link-text']}
+                  className={`${styles['link-text']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
                   href={`/project/${notification.project}`}
                 >
                   {notification.performer.project}
@@ -737,7 +900,11 @@ const NotificationContainer = ({
                 project.
               </span>
 
-              <time className={styles.time}>
+              <time
+                className={`${styles.time} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 {' '}
                 {new Date(notification.time).getHours() === 0 ||
                 new Date(notification.time).getHours() === 12
@@ -779,14 +946,25 @@ const NotificationContainer = ({
       notification.type.includes('project')
     ) {
       return (
-        <article key={notification._id} className={styles.article}>
+        <article
+          key={notification._id}
+          className={`${styles.article} ${
+            mode === 'dark' ? styles['dark-article'] : ''
+          }`}
+        >
           <span className={styles['icon-box']}>
             <MdDeleteSweep className={styles.icon} />
           </span>
           <div className={styles['message-box']}>
-            <span className={styles.message}>
+            <span
+              className={`${styles.message} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            >
               <a
-                className={styles['link-text']}
+                className={`${styles['link-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
                 href={`/user/${notification.performer.username}`}
               >
                 {generateName(
@@ -796,13 +974,21 @@ const NotificationContainer = ({
                 )}
               </a>{' '}
               deleted the{' '}
-              <span className={styles['bold-text']}>
+              <span
+                className={`${styles['bold-text']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 {notification.performer.project}
               </span>{' '}
               project.
             </span>
 
-            <time className={styles.time}>
+            <time
+              className={`${styles.time} ${
+                mode === 'dark' ? styles['dark-word'] : ''
+              }`}
+            >
               {' '}
               {new Date(notification.time).getHours() === 0 ||
               new Date(notification.time).getHours() === 12
@@ -952,14 +1138,26 @@ const NotificationContainer = ({
     <div className={styles['article-container']} ref={containerRef}>
       <ToastContainer autoClose={2000} />
 
-      <h1 className={styles.head} ref={headerRef}>
+      <h1
+        className={`${styles.head} ${
+          mode === 'dark' ? styles['dark-text'] : ''
+        }`}
+        ref={headerRef}
+      >
         {showData ? (
           <IoIosArrowDown
-            className={styles.arrow}
+            className={`${styles.arrow} ${
+              mode === 'dark' ? styles['dark-text'] : ''
+            }`}
             onClick={hideNotifications}
           />
         ) : (
-          <IoIosArrowUp className={styles.arrow} onClick={showNotifications} />
+          <IoIosArrowUp
+            className={`${styles.arrow} ${
+              mode === 'dark' ? styles['dark-text'] : ''
+            }`}
+            onClick={showNotifications}
+          />
         )}
         <span className={styles['date-length']}>
           {group.length > 1_000_000 ? '1,000,000+' : group.length}

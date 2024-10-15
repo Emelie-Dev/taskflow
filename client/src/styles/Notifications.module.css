@@ -33,7 +33,6 @@
 
 .article-container {
   margin-bottom: 2rem;
-  overflow: hidden;
 }
 
 .article {
@@ -306,7 +305,7 @@
 }
 
 .select-all-icon2 {
-  fill: orange;
+  fill: orange !important;
 }
 
 .disable-delete-btn {
@@ -319,6 +318,31 @@
   width: 1.05rem;
   height: 1.05rem;
   animation: rotate 1s linear 0s infinite normal both;
+}
+
+/* Dark Mode */
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-container {
+  background: var(--dark-theme-background);
+}
+
+.dark-text {
+  color: var(--dark-theme-color);
+  fill: var(--dark-theme-color);
+}
+
+.dark-btn {
+  background: var(--dark-theme-background);
+}
+
+.dark-article {
+  background: var(--dark-theme-background);
+  box-shadow: 1px 1px 6px -4px black, 1px 1px 6px -4px white,
+    -1px -1px 4px -3px white;
 }
 
 /* Animations */

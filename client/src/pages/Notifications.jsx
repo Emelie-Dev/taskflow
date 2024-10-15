@@ -13,7 +13,7 @@ import { BiSolidSelectMultiple } from 'react-icons/bi';
 import DeleteComponent from '../components/DeleteComponent';
 
 const Notifications = () => {
-  const { userData, serverUrl } = useContext(AuthContext);
+  const { userData, mode } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [category, setCategory] = useState('unread');
   const [notifications, setNotifications] = useState(null);
@@ -210,7 +210,9 @@ const Notifications = () => {
 
       {deleteMode.value && (
         <div
-          className={styles['select-container']}
+          className={`${styles['select-container']} ${
+            mode === 'dark' ? styles['dark-container'] : ''
+          }`}
           style={{ height: `${headerHeight}px` }}
         >
           <span
@@ -220,10 +222,18 @@ const Notifications = () => {
               setDeleteList({});
             }}
           >
-            <IoCloseSharp className={styles['cancel-icon']} />
+            <IoCloseSharp
+              className={`${styles['cancel-icon']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
+            />
           </span>
 
-          <span className={styles['select-length-txt']}>
+          <span
+            className={`${styles['select-length-txt']} ${
+              mode === 'dark' ? styles['dark-text'] : ''
+            }`}
+          >
             {deleteLength} selected
           </span>
 
@@ -231,7 +241,7 @@ const Notifications = () => {
             <BiSolidSelectMultiple
               className={`${styles['select-all-icon']} ${
                 deleteLength === totalLength ? styles['select-all-icon2'] : ''
-              }`}
+              } ${mode === 'dark' ? styles['dark-text'] : ''}`}
               onClick={selectAll}
             />
 
@@ -239,7 +249,7 @@ const Notifications = () => {
               <button
                 className={`${styles['delete-notification-btn']} ${
                   deleteLength === 0 ? styles['disable-delete-btn'] : ''
-                }`}
+                } ${mode === 'dark' ? styles['dark-btn'] : ''}`}
                 onClick={() => {
                   setDeleteModal({ value: true });
                 }}
@@ -263,7 +273,11 @@ const Notifications = () => {
             {groups === null ? (
               ''
             ) : Object.entries(groups).length === 0 ? (
-              <div className={styles['no-notifications-text']}>
+              <div
+                className={`${styles['no-notifications-text']} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 No notifications available
               </div>
             ) : groups ? (
@@ -300,7 +314,11 @@ const Notifications = () => {
             )}
 
             {notificationData.error && (
-              <div className={styles['no-notifications-text']}>
+              <div
+                className={`${styles['no-notifications-text']} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 <MdOutlineSignalWifiOff className={styles['network-icon']} />
                 Unable to retrieve data
               </div>

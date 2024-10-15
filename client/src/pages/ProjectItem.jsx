@@ -781,6 +781,7 @@ const ProjectItem = () => {
       }
     } else if (activity.action === 'removal') {
       if (activity.type.includes('team')) {
+        // Fix project item issue in kicrosoft edge
         return (
           <>
             {activity.state.oldMembers.map((member, index, array) => (

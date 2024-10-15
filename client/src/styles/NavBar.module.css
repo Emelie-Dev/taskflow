@@ -72,7 +72,6 @@
   width: 1.25rem;
   height: 1.25rem;
   margin-right: 1rem;
-  /* fill: gray; */
   transition: fill 0.3s;
 }
 
@@ -80,12 +79,12 @@
   width: 1.4rem;
   height: 1.4rem;
   margin-right: 1rem;
-  fill: gray;
   transition: fill 0.3s;
 }
 
 .side-nav-link:hover,
-.side-nav-link:hover .side-nav-icon {
+.side-nav-link:hover .side-nav-icon,
+.side-nav-link:hover .side-nav-icon2 {
   color: orange;
   fill: orange;
   font-weight: 500;
