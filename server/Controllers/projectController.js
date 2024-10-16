@@ -919,7 +919,7 @@ export const updateTeam = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Generates notification for old members
-  if (oldMembers.length !== 0) {
+  if (oldMembers.length !== 0 && oldMembers[0]) {
     notifications.push({
       user: req.user._id,
       project: project._id,

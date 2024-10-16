@@ -35,7 +35,7 @@ import {
 import { getProfilePhoto } from '../components/Header';
 
 const ProjectItem = () => {
-  const { userData, serverUrl } = useContext(AuthContext);
+  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [displayModal, setDisplayModal] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
@@ -239,12 +239,6 @@ const ProjectItem = () => {
 
     getTasks();
   }, [tasksDetails]);
-
-  const hideNav = (e) => {
-    if (e.target === navRef.current) {
-      setShowNav(false);
-    }
-  };
 
   const hideFilesModal = (e) => {
     e.target === e.currentTarget && setShowFiles(false);
@@ -701,7 +695,9 @@ const ProjectItem = () => {
             ) : (
               <a
                 href={`/user/${activity.performer.username}`}
-                className={styles['activity-names']}
+                className={`${styles['activity-names']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
               >
                 {generateName(
                   activity.performer.firstName,
@@ -722,7 +718,9 @@ const ProjectItem = () => {
           <>
             <a
               href={`/user/${activity.state.username}`}
-              className={styles['activity-names']}
+              className={`${styles['activity-names']} ${
+                mode === 'dark' ? styles['dark-text'] : ''
+              }`}
             >
               {generateName(
                 activity.state.firstName,
@@ -745,7 +743,9 @@ const ProjectItem = () => {
             ) : (
               <a
                 href={`/user/${activity.performer.username}`}
-                className={styles['activity-names']}
+                className={`${styles['activity-names']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
               >
                 {generateName(
                   activity.performer.firstName,
@@ -781,28 +781,33 @@ const ProjectItem = () => {
       }
     } else if (activity.action === 'removal') {
       if (activity.type.includes('team')) {
-        // Fix project item issue in kicrosoft edge
-        return (
-          <>
-            {activity.state.oldMembers.map((member, index, array) => (
-              <a
-                key={member._id}
-                href={`/user/${member.username}`}
-                className={styles['activity-names']}
-              >
-                {index !== 0 ? ' ' : ''}
-                {generateName(
-                  member.firstName,
-                  member.lastName,
-                  member.username
-                )}
-                {index !== array.length - 1 ? ',' : ''}
-              </a>
-            ))}{' '}
-            {activity.state.oldMembers.length === 1 ? 'was' : 'were'} removed
-            from the team
-          </>
-        );
+        if (activity.state.oldMembers[0]) {
+          return (
+            <>
+              {activity.state.oldMembers.map((member, index, array) => (
+                <a
+                  key={member._id}
+                  href={`/user/${member.username}`}
+                  className={`${styles['activity-names']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
+                  {index !== 0 ? ' ' : ''}
+                  {generateName(
+                    member.firstName,
+                    member.lastName,
+                    member.username
+                  )}
+                  {index !== array.length - 1 ? ',' : ''}
+                </a>
+              ))}{' '}
+              {activity.state.oldMembers.length === 1 ? 'was' : 'were'} removed
+              from the team
+            </>
+          );
+        } else {
+          return '';
+        }
       }
     } else if (activity.action === 'creation') {
       return 'A task was created';
@@ -814,7 +819,9 @@ const ProjectItem = () => {
         <>
           <a
             href={`/user/${activity.performer.username}`}
-            className={styles['activity-names']}
+            className={`${styles['activity-names']} ${
+              mode === 'dark' ? styles['dark-text'] : ''
+            }`}
           >
             {generateName(
               activity.performer.firstName,
@@ -1105,30 +1112,50 @@ const ProjectItem = () => {
             </div>
           ) : project.error ? (
             project.code === 500 ? (
-              <span className={styles['error-text']}>
+              <span
+                className={`${styles['error-text']} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 Unable to load project. Please check the URL or your network
                 connection and try reloading the page.
               </span>
             ) : project.code === 404 ? (
-              <span className={styles['error-text']}>
+              <span
+                className={`${styles['error-text']} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 This project does not exist.
               </span>
             ) : (
-              <span className={styles['error-text']}>
+              <span
+                className={`${styles['error-text']} ${
+                  mode === 'dark' ? styles['dark-word'] : ''
+                }`}
+              >
                 Unable to load project.
               </span>
             )
           ) : (
             <>
-              <h1 className={styles['project-name']}>
+              <h1
+                className={`${styles['project-name']}  ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
                 {project.name}{' '}
                 {project.status === 'inactive' ? (
                   <IoIosCloseCircleOutline
-                    className={styles['inactive-icon']}
+                    className={`${styles['inactive-icon']} ${
+                      mode === 'dark' ? styles['dark-red'] : ''
+                    }`}
                   />
                 ) : (
                   <IoIosCheckmarkCircleOutline
-                    className={styles['active-icon']}
+                    className={`${styles['active-icon']} ${
+                      mode === 'dark' ? styles['dark-green'] : ''
+                    }`}
                   />
                 )}
               </h1>
@@ -1170,17 +1197,27 @@ const ProjectItem = () => {
 
               <div className={styles['project-container']}>
                 <div className={styles['left-section']}>
-                  <div className={styles['project-content']}>
+                  <div
+                    className={`${styles['project-content']} ${
+                      mode === 'dark' ? styles['dark-project-content'] : ''
+                    } `}
+                  >
                     <span className={styles['project-leader']}>
-                      <span className={styles['leader-text']}>
+                      <span
+                        className={`${styles['leader-text']} ${
+                          mode === 'dark' ? styles['dark-word'] : ''
+                        }`}
+                      >
                         Project Leader:
                       </span>
-                      <span className={styles['leader']}>
+                      <span className={styles.leader}>
                         <a
                           href={
                             isOwner() ? null : `/user/${project.user.username}`
                           }
-                          className={styles['project-leader-link']}
+                          className={`${styles['project-leader-link']}  ${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
                         >
                           <img
                             src={getProfilePhoto(project.user, serverUrl)}
@@ -1200,12 +1237,24 @@ const ProjectItem = () => {
                     </span>
 
                     <span className={styles['project-description']}>
-                      <span className={styles['description-text']}>
+                      <span
+                        className={`${styles['description-text']}  ${
+                          mode === 'dark' ? styles['dark-word'] : ''
+                        }`}
+                      >
                         Project Description:
                       </span>
-                      <div className={styles['description']}>
+                      <div
+                        className={`${styles['description']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
+                      >
                         {project.description.length === 0 ? (
-                          <i className={styles['italic-text']}>
+                          <i
+                            className={`${styles['italic-text']} ${
+                              mode === 'dark' ? styles['dark-word'] : ''
+                            }`}
+                          >
                             No description
                           </i>
                         ) : (
@@ -1215,33 +1264,62 @@ const ProjectItem = () => {
                     </span>
                   </div>
 
-                  <div className={styles['alt-project-details-container']}>
-                    <span className={styles['project-details-head']}>
+                  <div
+                    className={`${styles['alt-project-details-container']} ${
+                      mode === 'dark' ? styles['dark-container'] : ''
+                    }`}
+                  >
+                    <span
+                      className={`${styles['project-details-head']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
                       Project Details
                     </span>
 
                     <div className={styles['table-container']}>
                       <table className={styles.table}>
                         <tbody>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                              className={`${styles['table-project-data']} ${
+                                styles['table-property']
+                              } ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Tasks:
                             </td>
-                            <td className={styles['table-project-data']}>
+                            <td
+                              className={`${styles['table-project-data']}  ${
+                                mode === 'dark' ? styles['dark-text'] : ''
+                              }`}
+                            >
+                              {' '}
                               {project.details.complete +
                                 project.details.open +
                                 project.details.progress}
                             </td>
                           </tr>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                              className={` ${styles['table-project-data']} ${
+                                styles['table-property']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Created:
                             </td>
-                            <td className={styles['table-project-data']}>{`${
+                            <td
+                              className={`${styles['table-project-data']}  ${
+                                mode === 'dark' ? styles['dark-text'] : ''
+                              }`}
+                            >{`${
                               months[new Date(project.createdAt).getMonth()]
                             } ${new Date(
                               project.createdAt
@@ -1249,13 +1327,23 @@ const ProjectItem = () => {
                               project.createdAt
                             ).getFullYear()}`}</td>
                           </tr>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                              className={` ${styles['table-project-data']} ${
+                                styles['table-property']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Deadline:
                             </td>
-                            <td className={styles['table-project-data']}>
+                            <td
+                              className={`${styles['table-project-data']}  ${
+                                mode === 'dark' ? styles['dark-text'] : ''
+                              }`}
+                            >
                               {project.deadline ? (
                                 `${
                                   months[new Date(project.deadline).getMonth()]
@@ -1269,41 +1357,73 @@ const ProjectItem = () => {
                               )}
                             </td>
                           </tr>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                              className={`${styles['table-project-data']} ${
+                                styles['table-property']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Team:
                             </td>
-                            <td className={styles['table-project-data']}>
+                            <td
+                              className={`${styles['table-project-data']}  ${
+                                mode === 'dark' ? styles['dark-text'] : ''
+                              }`}
+                            >
+                              {' '}
                               {project.team.length}{' '}
                               {project.team.length === 1 ? 'member' : 'members'}
                             </td>
                           </tr>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                              className={`${styles['table-project-data']} ${
+                                styles['table-property']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Status:
                             </td>
                             <td
-                              className={`${styles['table-project-data']} ${styles['project-status']}`}
+                              className={`${styles['table-project-data']} ${
+                                styles['project-status']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
+                              {' '}
                               {project.status}
                             </td>
                           </tr>
                         </tbody>
                       </table>
                     </div>
+
                     <div className={styles['progress-div']}>
                       <span className={styles['progress-box']}>
-                        <span>Progress</span>
+                        <span
+                          className={`${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
+                        >
+                          Progress
+                        </span>
                         <span className={styles['progress-value']}>
+                          {' '}
                           {project.details.projectProgress}%
                         </span>
                       </span>
 
-                      <span className={styles['progress-bar-box']}>
+                      <span
+                        className={`${styles['progress-bar-box']} ${
+                          mode === 'dark' ? styles['dark-progress-bar'] : ''
+                        }`}
+                      >
                         <span
                           className={styles['progress-bar']}
                           style={{
@@ -1316,14 +1436,30 @@ const ProjectItem = () => {
                     </div>
                   </div>
 
-                  <div className={styles['alt-project-team-container']}>
-                    <span className={styles['team-head']}>Team</span>
+                  <div
+                    className={`${styles['alt-project-team-container']} ${
+                      mode === 'dark' ? styles['dark-container'] : ''
+                    }`}
+                  >
+                    <span
+                      className={`${styles['team-head']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
+                      Team
+                    </span>
 
                     <div className={styles['team-div']}>
                       {project.team.length === 0 ? (
                         <div className={styles['no-content-box']}>
                           {' '}
-                          <i className={styles['italic-text']}>No member</i>
+                          <i
+                            className={`${styles['italic-text']} ${
+                              mode === 'dark' ? styles['dark-word'] : ''
+                            }`}
+                          >
+                            No member
+                          </i>
                         </div>
                       ) : (
                         project.team.map((member) => (
@@ -1345,14 +1481,22 @@ const ProjectItem = () => {
                               }`}
                             />
                             <span className={styles['member-details']}>
-                              <span className={styles['member-name']}>
+                              <span
+                                className={`${styles['member-name']} ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
+                                }`}
+                              >
                                 {generateName(
                                   member.firstName,
                                   member.lastName,
                                   member.username
                                 )}
                               </span>
-                              <span className={styles['member-title']}>
+                              <span
+                                className={`${styles['member-title']} ${
+                                  mode === 'dark' ? styles['dark-word'] : ''
+                                }`}
+                              >
                                 {member.occupation}
                               </span>
                             </span>
@@ -1362,10 +1506,22 @@ const ProjectItem = () => {
                     </div>
                   </div>
 
-                  <div className={styles['files-conatiner']}>
+                  <div
+                    className={`${styles['files-conatiner']} ${
+                      mode === 'dark' ? styles['dark-container'] : ''
+                    }`}
+                  >
                     {selectMode.value ? (
-                      <div className={styles['delete-files-box']}>
-                        <span className={styles['delete-files-text']}>
+                      <div
+                        className={`${styles['delete-files-box']} ${
+                          mode === 'dark' ? styles['dark-box'] : ''
+                        }`}
+                      >
+                        <span
+                          className={`${styles['delete-files-text']}  ${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
+                        >
                           Selected {disposableFiles.length}{' '}
                           {disposableFiles.length === 1 ? 'file' : 'files'}
                         </span>
@@ -1413,15 +1569,23 @@ const ProjectItem = () => {
                               ).length
                                 ? styles['select-all-icon2']
                                 : ''
-                            }`}
+                            }  ${mode === 'dark' ? styles['dark-word'] : ''}`}
                             onClick={selectAllData('files', checkBoxRef)}
                           />
                         </div>
                       </div>
                     ) : (
-                      <div className={styles['file-container-head']}>
+                      <div
+                        className={`${styles['file-container-head']} ${
+                          mode === 'dark' ? styles['dark-bg'] : ''
+                        }`}
+                      >
                         {' '}
-                        <h1 className={styles['files-text']}>
+                        <h1
+                          className={`${styles['files-text']} ${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
+                        >
                           Project Files
                           {!isOwner() && !project.addFiles ? (
                             ''
@@ -1462,13 +1626,21 @@ const ProjectItem = () => {
                       {project.files.length === 0 ? (
                         <div className={styles['no-content-box']}>
                           {' '}
-                          <i className={styles['italic-text']}>No file</i>{' '}
+                          <i
+                            className={`${styles['italic-text']}  ${
+                              mode === 'dark' ? styles['dark-word'] : ''
+                            }`}
+                          >
+                            No file
+                          </i>{' '}
                         </div>
                       ) : (
                         project.files.map((file, index) => (
                           <article
                             key={file._id}
-                            className={styles['uploaded-file']}
+                            className={`${styles['uploaded-file']} ${
+                              mode === 'dark' ? styles['dark-file'] : ''
+                            }`}
                           >
                             <img
                               className={styles['file-icon']}
@@ -1477,11 +1649,19 @@ const ProjectItem = () => {
                               )}`}
                             />
                             <div className={styles['file-content']}>
-                              <span className={styles['file-name']}>
+                              <span
+                                className={`${styles['file-name']}  ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
+                                }`}
+                              >
                                 {getFileName(file.name, file.path).name}
                               </span>
                               <span className={styles['file-details']}>
-                                <span className={styles['file-property']}>
+                                <span
+                                  className={`${styles['file-property']}  ${
+                                    mode === 'dark' ? styles['dark-word'] : ''
+                                  }`}
+                                >
                                   Sender:
                                 </span>
                                 <span
@@ -1507,10 +1687,18 @@ const ProjectItem = () => {
                                 </span>
                               </span>
                               <span className={styles['file-details']}>
-                                <span className={styles['file-property']}>
+                                <span
+                                  className={`${styles['file-property']}  ${
+                                    mode === 'dark' ? styles['dark-word'] : ''
+                                  }`}
+                                >
                                   Size:
                                 </span>
-                                <span className={styles['file-size']}>
+                                <span
+                                  className={`${styles['file-size']} ${
+                                    mode === 'dark' ? styles['dark-text'] : ''
+                                  }`}
+                                >
                                   {calculateSize(file.size).value}
                                   <span className={styles['size-unit']}>
                                     {calculateSize(file.size).unit}
@@ -1518,14 +1706,23 @@ const ProjectItem = () => {
                                 </span>
                               </span>
                               <span className={styles['file-details']}>
-                                <span className={styles['file-property']}>
+                                <span
+                                  className={`${styles['file-property']}  ${
+                                    mode === 'dark' ? styles['dark-word'] : ''
+                                  }`}
+                                >
                                   Time:
                                 </span>
-                                <span className={styles['time-sent']}>
+                                <span
+                                  className={`${styles['time-sent']} ${
+                                    mode === 'dark' ? styles['dark-text'] : ''
+                                  }`}
+                                >
                                   {fileDate(file.time)}
                                 </span>
                               </span>
                             </div>
+
                             {!isOwner() &&
                             file.sender.userId !== userData._id ? (
                               <a
@@ -1549,7 +1746,9 @@ const ProjectItem = () => {
                               >
                                 <FiDownload
                                   title="Download"
-                                  className={styles['download-icon']}
+                                  className={`${styles['download-icon']} ${
+                                    mode === 'dark' ? styles['dark-text'] : ''
+                                  }`}
                                 />
                               </a>
                             ) : selectMode.value ? (
@@ -1563,12 +1762,20 @@ const ProjectItem = () => {
                             ) : (
                               <div className={styles['menu-box']}>
                                 <BsThreeDotsVertical
-                                  className={styles['menu-file-icon']}
+                                  className={`${styles['menu-file-icon']} ${
+                                    mode === 'dark' ? styles['dark-text'] : ''
+                                  }`}
                                 />
 
-                                <ul className={styles['menu-list']}>
+                                <ul
+                                  className={`${styles['menu-list']} ${
+                                    mode === 'dark' ? styles['dark-box'] : ''
+                                  }`}
+                                >
                                   <li
-                                    className={styles['menu-item']}
+                                    className={`${styles['menu-item']} ${
+                                      mode === 'dark' ? styles['dark-text'] : ''
+                                    }`}
                                     onClick={() => {
                                       setSelectMode({ value: true, index });
                                       setDisposableFiles([file.name]);
@@ -1595,7 +1802,11 @@ const ProjectItem = () => {
                                                 .serverName
                                             }`
                                       }
-                                      className={styles['download-link']}
+                                      className={`${styles['download-link']} ${
+                                        mode === 'dark'
+                                          ? styles['dark-text']
+                                          : ''
+                                      }`}
                                       download={true}
                                     >
                                       Download
@@ -1612,34 +1823,62 @@ const ProjectItem = () => {
                 </div>
 
                 <div className={styles['right-section']}>
-                  <div className={styles['project-details-container']}>
-                    <span className={styles['project-details-head']}>
+                  <div
+                    className={`${styles['project-details-container']} ${
+                      mode === 'dark' ? styles['dark-container'] : ''
+                    }`}
+                  >
+                    <span
+                      className={`${styles['project-details-head']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
                       Project Details
                     </span>
 
                     <div className={styles['table-container']}>
                       <table className={styles.table}>
                         <tbody>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                              className={`${styles['table-project-data']} ${
+                                styles['table-property']
+                              } ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Tasks:
                             </td>
-                            <td className={styles['table-project-data']}>
+                            <td
+                              className={`${styles['table-project-data']}  ${
+                                mode === 'dark' ? styles['dark-text'] : ''
+                              }`}
+                            >
                               {' '}
                               {project.details.complete +
                                 project.details.open +
                                 project.details.progress}
                             </td>
                           </tr>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={` ${styles['table-project-data']} ${styles['table-property']}`}
+                              className={` ${styles['table-project-data']} ${
+                                styles['table-property']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Created:
                             </td>
-                            <td className={styles['table-project-data']}>{`${
+                            <td
+                              className={`${styles['table-project-data']}  ${
+                                mode === 'dark' ? styles['dark-text'] : ''
+                              }`}
+                            >{`${
                               months[new Date(project.createdAt).getMonth()]
                             } ${new Date(
                               project.createdAt
@@ -1647,13 +1886,23 @@ const ProjectItem = () => {
                               project.createdAt
                             ).getFullYear()}`}</td>
                           </tr>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={` ${styles['table-project-data']} ${styles['table-property']}`}
+                              className={` ${styles['table-project-data']} ${
+                                styles['table-property']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Deadline:
                             </td>
-                            <td className={styles['table-project-data']}>
+                            <td
+                              className={`${styles['table-project-data']}  ${
+                                mode === 'dark' ? styles['dark-text'] : ''
+                              }`}
+                            >
                               {project.deadline ? (
                                 `${
                                   months[new Date(project.deadline).getMonth()]
@@ -1667,26 +1916,44 @@ const ProjectItem = () => {
                               )}
                             </td>
                           </tr>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                              className={`${styles['table-project-data']} ${
+                                styles['table-property']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Team:
                             </td>
-                            <td className={styles['table-project-data']}>
+                            <td
+                              className={`${styles['table-project-data']}  ${
+                                mode === 'dark' ? styles['dark-text'] : ''
+                              }`}
+                            >
                               {' '}
                               {project.team.length}{' '}
                               {project.team.length === 1 ? 'member' : 'members'}
                             </td>
                           </tr>
-                          <tr>
+                          <tr
+                            className={`${
+                              mode === 'dark' ? styles['dark-tr'] : styles.tr
+                            }`}
+                          >
                             <td
-                              className={`${styles['table-project-data']} ${styles['table-property']}`}
+                              className={`${styles['table-project-data']} ${
+                                styles['table-property']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               Status:
                             </td>
                             <td
-                              className={`${styles['table-project-data']} ${styles['project-status']}`}
+                              className={`${styles['table-project-data']} ${
+                                styles['project-status']
+                              }  ${mode === 'dark' ? styles['dark-text'] : ''}`}
                             >
                               {' '}
                               {project.status}
@@ -1695,16 +1962,27 @@ const ProjectItem = () => {
                         </tbody>
                       </table>
                     </div>
+
                     <div className={styles['progress-div']}>
                       <span className={styles['progress-box']}>
-                        <span>Progress</span>
+                        <span
+                          className={`${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
+                        >
+                          Progress
+                        </span>
                         <span className={styles['progress-value']}>
                           {' '}
                           {project.details.projectProgress}%
                         </span>
                       </span>
 
-                      <span className={styles['progress-bar-box']}>
+                      <span
+                        className={`${styles['progress-bar-box']} ${
+                          mode === 'dark' ? styles['dark-progress-bar'] : ''
+                        }`}
+                      >
                         <span
                           className={styles['progress-bar']}
                           style={{
@@ -1717,14 +1995,30 @@ const ProjectItem = () => {
                     </div>
                   </div>
 
-                  <div className={styles['project-team-container']}>
-                    <span className={styles['team-head']}>Team</span>
+                  <div
+                    className={`${styles['project-team-container']} ${
+                      mode === 'dark' ? styles['dark-container'] : ''
+                    }`}
+                  >
+                    <span
+                      className={`${styles['team-head']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
+                      Team
+                    </span>
 
                     <div className={styles['team-div']}>
                       {project.team.length === 0 ? (
                         <div className={styles['no-content-box']}>
                           {' '}
-                          <i className={styles['italic-text']}>No member</i>
+                          <i
+                            className={`${styles['italic-text']} ${
+                              mode === 'dark' ? styles['dark-word'] : ''
+                            }`}
+                          >
+                            No member
+                          </i>
                         </div>
                       ) : (
                         project.team.map((member) => (
@@ -1746,14 +2040,22 @@ const ProjectItem = () => {
                               }`}
                             />
                             <span className={styles['member-details']}>
-                              <span className={styles['member-name']}>
+                              <span
+                                className={`${styles['member-name']} ${
+                                  mode === 'dark' ? styles['dark-text'] : ''
+                                }`}
+                              >
                                 {generateName(
                                   member.firstName,
                                   member.lastName,
                                   member.username
                                 )}
                               </span>
-                              <span className={styles['member-title']}>
+                              <span
+                                className={`${styles['member-title']} ${
+                                  mode === 'dark' ? styles['dark-word'] : ''
+                                }`}
+                              >
                                 {member.occupation}
                               </span>
                             </span>
@@ -1766,19 +2068,33 @@ const ProjectItem = () => {
               </div>
 
               <div className={styles['activities-container']}>
-                <h1 className={styles['activity-head']}>Activities</h1>
+                <h1
+                  className={`${styles['activity-head']} ${
+                    mode === 'dark' ? styles['dark-text'] : ''
+                  }`}
+                >
+                  Activities
+                </h1>
 
                 {projectActivities.length === 0 ? (
                   <div className={styles['no-project-activity-box']}>
                     {' '}
-                    <i className={styles['no-project-activity-txt']}>
+                    <i
+                      className={`${styles['no-project-activity-txt']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                    >
                       No activity
                     </i>{' '}
                   </div>
                 ) : (
                   <>
                     <div className={styles['activity-header']}>
-                      <div className={styles['activity-header-text']}>
+                      <div
+                        className={`${styles['activity-header-text']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
+                      >
                         {activitySelectMode.value ? (
                           <span className={styles['delete-activity-text']}>
                             {disposableActivities.length} selected{' '}
@@ -1843,7 +2159,11 @@ const ProjectItem = () => {
                           </button>
                         </div>
                       ) : (
-                        <div className={styles['entry-navigation-box']}>
+                        <div
+                          className={`${styles['entry-navigation-box']} ${
+                            mode === 'dark' ? styles['dark-navigation-box'] : ''
+                          } `}
+                        >
                           <span
                             className={`${styles['activity-content-box']} ${
                               styles['activity-arrow-box']
@@ -1851,7 +2171,9 @@ const ProjectItem = () => {
                             onClick={() => goToPage(tablePage - 1)}
                           >
                             <MdKeyboardDoubleArrowLeft
-                              className={styles['activity-icon']}
+                              className={`${styles['activity-icon']} ${
+                                mode === 'dark' ? styles['dark-icon'] : ''
+                              }`}
                             />
                           </span>
 
@@ -1866,6 +2188,8 @@ const ProjectItem = () => {
                                     tablePage === index + 1
                                       ? styles['current-page']
                                       : ''
+                                  } ${
+                                    mode === 'dark' ? styles['dark-num'] : ''
                                   }`}
                                   onClick={() => goToPage(index + 1)}
                                 >
@@ -1875,14 +2199,24 @@ const ProjectItem = () => {
 
                               {!activitiesData.lastPage && (
                                 <span
-                                  className={styles['activity-content-box']}
+                                  className={`${
+                                    styles['activity-content-box']
+                                  } ${
+                                    mode === 'dark' ? styles['dark-num'] : ''
+                                  }`}
                                   onClick={() =>
                                     goToPage(projectActivities.length + 1)
                                   }
                                 >
                                   {activitiesData.loading ? (
                                     <div
-                                      className={styles['searching-loader']}
+                                      className={`${
+                                        styles['searching-loader']
+                                      } ${
+                                        mode === 'dark'
+                                          ? styles['dark-loader']
+                                          : ''
+                                      }`}
                                     ></div>
                                   ) : (
                                     projectActivities.length + 1
@@ -1899,7 +2233,9 @@ const ProjectItem = () => {
                             onClick={() => goToPage(tablePage + 1)}
                           >
                             <MdKeyboardDoubleArrowRight
-                              className={styles['activity-icon']}
+                              className={`${styles['activity-icon']} ${
+                                mode === 'dark' ? styles['dark-icon'] : ''
+                              }`}
                             />
                           </span>
                         </div>
@@ -1943,7 +2279,13 @@ const ProjectItem = () => {
                           {projectActivities[tablePage - 1].map(
                             (activity, index) => (
                               <tr key={activity._id}>
-                                <td className={styles['activity-table-data']}>
+                                <td
+                                  className={`${
+                                    styles['activity-table-data']
+                                  } ${
+                                    mode === 'dark' ? styles['dark-text'] : ''
+                                  }`}
+                                >
                                   {getActivityMessage(activity)}
                                 </td>
                                 <td className={styles['activity-table-data']}>
@@ -1951,7 +2293,11 @@ const ProjectItem = () => {
                                     (activity.action === 'deletion' &&
                                       activity.type.includes('task'))) && (
                                     <span
-                                      className={`${styles['activity-type']} ${styles['activity-type1']}`}
+                                      className={`${styles['activity-type']} ${
+                                        mode === 'dark'
+                                          ? styles['dark-type1']
+                                          : styles['activity-type1']
+                                      } `}
                                     >
                                       <FaTasks
                                         className={styles['activity-type-icon']}
@@ -1965,7 +2311,11 @@ const ProjectItem = () => {
                                     activity.action === 'extension' ||
                                     activity.action === 'transition') && (
                                     <span
-                                      className={`${styles['activity-type']} ${styles['activity-type3']}`}
+                                      className={`${styles['activity-type']} ${
+                                        mode === 'dark'
+                                          ? styles['dark-type3']
+                                          : styles['activity-type3']
+                                      } `}
                                     >
                                       <RxUpdate
                                         className={styles['activity-type-icon']}
@@ -1983,7 +2333,11 @@ const ProjectItem = () => {
                                     (activity.action === 'exit' &&
                                       activity.type.includes('project'))) && (
                                     <span
-                                      className={`${styles['activity-type']} ${styles['activity-type2']}`}
+                                      className={`${styles['activity-type']} ${
+                                        mode === 'dark'
+                                          ? styles['dark-type2']
+                                          : styles['activity-type2']
+                                      } `}
                                     >
                                       <BsPeopleFill
                                         className={styles['activity-type-icon']}
@@ -1998,7 +2352,11 @@ const ProjectItem = () => {
                                       activity.type.includes('files')) ||
                                     activity.action === 'filePermission') && (
                                     <span
-                                      className={`${styles['activity-type']} ${styles['activity-type4']}`}
+                                      className={`${styles['activity-type']} ${
+                                        mode === 'dark'
+                                          ? styles['dark-type4']
+                                          : styles['activity-type4']
+                                      } `}
                                     >
                                       <FaFileAlt
                                         className={
@@ -2013,7 +2371,13 @@ const ProjectItem = () => {
                                     activity.action === 'deletion') &&
                                     activity.type.includes('deadline') && (
                                       <span
-                                        className={`${styles['activity-type']} ${styles['activity-type3']}`}
+                                        className={`${
+                                          styles['activity-type']
+                                        } ${
+                                          mode === 'dark'
+                                            ? styles['dark-type3']
+                                            : styles['activity-type3']
+                                        } `}
                                       >
                                         <RxUpdate
                                           className={
@@ -2025,12 +2389,25 @@ const ProjectItem = () => {
                                     )}
                                 </td>
 
-                                <td className={styles['activity-table-data']}>
+                                <td
+                                  className={`${
+                                    styles['activity-table-data']
+                                  } ${
+                                    mode === 'dark' ? styles['dark-text'] : ''
+                                  }`}
+                                >
                                   {months[new Date(activity.time).getMonth()]}{' '}
                                   {new Date(activity.time).getDate()},{' '}
                                   {new Date(activity.time).getFullYear()}
                                 </td>
-                                <td className={styles['activity-table-data']}>
+
+                                <td
+                                  className={`${
+                                    styles['activity-table-data']
+                                  } ${
+                                    mode === 'dark' ? styles['dark-text'] : ''
+                                  }`}
+                                >
                                   {new Date(activity.time).getHours() === 0 ||
                                   new Date(activity.time).getHours() === 12
                                     ? 12
@@ -2055,7 +2432,13 @@ const ProjectItem = () => {
                                   <td className={styles['activity-table-data']}>
                                     {deletingActivity.id === activity._id ? (
                                       <div
-                                        className={styles['searching-loader2']}
+                                        className={`${
+                                          styles['searching-loader2']
+                                        } ${
+                                          mode === 'dark'
+                                            ? styles['dark-loader']
+                                            : ''
+                                        }`}
                                       ></div>
                                     ) : activitySelectMode.value ? (
                                       <input
@@ -2077,16 +2460,36 @@ const ProjectItem = () => {
                                         }
                                       >
                                         <BsThreeDotsVertical
-                                          className={styles['activity-menu']}
+                                          className={`${
+                                            styles['activity-menu']
+                                          } ${
+                                            mode === 'dark'
+                                              ? styles['dark-icon']
+                                              : ''
+                                          }`}
                                         />
 
                                         <ul
-                                          className={
+                                          className={`${
                                             styles['activity-action-box']
-                                          }
+                                          } ${
+                                            mode === 'dark'
+                                              ? styles['dark-box']
+                                              : ''
+                                          }`}
                                         >
                                           <li
-                                            className={styles['action-option']}
+                                            className={`${
+                                              styles['action-option']
+                                            } ${
+                                              mode === 'dark'
+                                                ? styles['dark-text']
+                                                : ''
+                                            } ${
+                                              mode === 'dark'
+                                                ? styles['dark-option']
+                                                : ''
+                                            }`}
                                             onClick={() => {
                                               setActivitySelectMode({
                                                 value: true,
@@ -2101,7 +2504,13 @@ const ProjectItem = () => {
                                           </li>
 
                                           <li
-                                            className={styles['action-option']}
+                                            className={`${
+                                              styles['action-option']
+                                            } ${
+                                              mode === 'dark'
+                                                ? styles['dark-option']
+                                                : ''
+                                            }`}
                                             onClick={deleteActivity(
                                               activity._id
                                             )}
@@ -2125,7 +2534,13 @@ const ProjectItem = () => {
 
               <div className={styles['task-container']}>
                 <div className={styles['task-head-div']}>
-                  <h1 className={styles['task-head']}>Tasks</h1>
+                  <h1
+                    className={`${styles['task-head']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    } `}
+                  >
+                    Tasks
+                  </h1>
 
                   {isOwner() && (
                     <button
@@ -2141,9 +2556,11 @@ const ProjectItem = () => {
                     <li
                       className={`${styles['taks-category']} ${
                         tasksDetails.category === 'all'
-                          ? styles['current-task-category']
+                          ? mode === 'dark'
+                            ? styles['dark-current-category']
+                            : styles['current-task-category']
                           : ''
-                      }`}
+                      } ${mode === 'dark' ? styles['dark-category'] : ''} `}
                       onClick={changeTaskCategory('all')}
                     >
                       All tasks
@@ -2151,9 +2568,11 @@ const ProjectItem = () => {
                     <li
                       className={`${styles['taks-category']} ${
                         tasksDetails.category === 'open'
-                          ? styles['current-task-category']
+                          ? mode === 'dark'
+                            ? styles['dark-current-category']
+                            : styles['current-task-category']
                           : ''
-                      }`}
+                      } ${mode === 'dark' ? styles['dark-category'] : ''}`}
                       onClick={changeTaskCategory('open')}
                     >
                       Open
@@ -2161,9 +2580,11 @@ const ProjectItem = () => {
                     <li
                       className={`${styles['taks-category']} ${
                         tasksDetails.category === 'progress'
-                          ? styles['current-task-category']
+                          ? mode === 'dark'
+                            ? styles['dark-current-category']
+                            : styles['current-task-category']
                           : ''
-                      }`}
+                      } ${mode === 'dark' ? styles['dark-category'] : ''}`}
                       onClick={changeTaskCategory('progress')}
                     >
                       In Progress
@@ -2171,9 +2592,11 @@ const ProjectItem = () => {
                     <li
                       className={`${styles['taks-category']} ${
                         tasksDetails.category === 'complete'
-                          ? styles['current-task-category']
+                          ? mode === 'dark'
+                            ? styles['dark-current-category']
+                            : styles['current-task-category']
                           : ''
-                      }`}
+                      } ${mode === 'dark' ? styles['dark-category'] : ''}`}
                       onClick={changeTaskCategory('complete')}
                     >
                       Completed
@@ -2191,14 +2614,22 @@ const ProjectItem = () => {
                     />
                   </div>
                 ) : tasksData.error ? (
-                  <div className={styles['no-tasks-text']}>
+                  <div
+                    className={`${styles['no-tasks-text']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
                     <MdOutlineSignalWifiOff
                       className={styles['network-icon']}
                     />{' '}
                     Unable to retrieve data
                   </div>
                 ) : tasks.length === 0 ? (
-                  <div className={styles['no-tasks-text']}>
+                  <div
+                    className={`${styles['no-tasks-text']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
                     {' '}
                     No task availaible{' '}
                   </div>
@@ -2208,10 +2639,18 @@ const ProjectItem = () => {
                       <li key={task._id} className={styles['task-item']}>
                         <span className={styles['task-box']}>
                           {task.status === 'complete' ? (
-                            <GrStatusGood className={styles['status-icon']} />
+                            <GrStatusGood
+                              className={`${styles['status-icon']} ${
+                                mode === 'dark' ? styles['dark-status'] : ''
+                              }`}
+                            />
                           ) : task.status === 'progress' ? (
                             <svg
-                              className={`${styles['status-icon']} ${styles['status-icon3']}`}
+                              className={`${styles['status-icon']} ${
+                                styles['status-icon3']
+                              } ${
+                                mode === 'dark' ? styles['dark-status3'] : ''
+                              }`}
                               stroke="currentColor"
                               strokeWidth="0"
                               viewBox="0 0 24 24"
@@ -2220,22 +2659,34 @@ const ProjectItem = () => {
                             </svg>
                           ) : (
                             <VscIssueReopened
-                              className={`${styles['status-icon']}  ${styles['status-icon2']}`}
+                              className={`${styles['status-icon']}  ${
+                                styles['status-icon2']
+                              } ${
+                                mode === 'dark' ? styles['dark-status2'] : ''
+                              }`}
                             />
                           )}
 
-                          <span className={styles['task-name']}>
+                          <span
+                            className={`${styles['task-name']} ${
+                              mode === 'dark' ? styles['dark-text'] : ''
+                            }`}
+                          >
                             {task.name}
                           </span>
 
                           {isOwner() && (
                             <span className={styles['action-box']}>
                               <span
-                                className={styles['delete-icon-box']}
+                                className={`${styles['delete-icon-box']} ${
+                                  mode === 'dark' ? styles['dark-icon-box'] : ''
+                                }`}
                                 title="Delete Task"
                               >
                                 <MdDelete
-                                  className={styles['delete-icon']}
+                                  className={`${styles['delete-icon']} ${
+                                    mode === 'dark' ? styles['dark-icon'] : ''
+                                  }`}
                                   onClick={() => {
                                     setDeleteModal({
                                       value: true,
@@ -2255,11 +2706,15 @@ const ProjectItem = () => {
                         {isOwner() && (
                           <span className={styles['alt-action-box']}>
                             <span
-                              className={styles['delete-icon-box']}
+                              className={`${styles['delete-icon-box']} ${
+                                mode === 'dark' ? styles['dark-icon-box'] : ''
+                              }`}
                               title="Delete Task"
                             >
                               <MdDelete
-                                className={styles['delete-icon']}
+                                className={`${styles['delete-icon']} ${
+                                  mode === 'dark' ? styles['dark-icon'] : ''
+                                }`}
                                 onClick={() => {
                                   setDeleteModal({
                                     value: true,

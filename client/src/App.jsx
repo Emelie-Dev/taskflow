@@ -111,6 +111,7 @@ const App = () => {
             path="/analytics"
             element={<ProtectedRoute element={Analytics} />}
           />
+
           <Route
             path="/settings"
             element={<ProtectedRoute element={Settings} />}

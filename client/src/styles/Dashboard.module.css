@@ -779,7 +779,7 @@
 }
 
 .dark-task-progress {
-  background: var(--dark-theme-color);
+  background: rgb(176, 196, 222, 0.5);
 }
 
 .dark-task-item {

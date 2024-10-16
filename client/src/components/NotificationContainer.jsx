@@ -44,6 +44,7 @@ const NotificationContainer = ({
   const [containerHeight, setContainerHeight] = useState(null);
   const [deleteArray, setDeleteArray] = useState([]);
   const [isProcessing, setIsProcessing] = useState(null);
+  const [processingId, setProcessingId] = useState(new Set());
 
   const containerRef = useRef();
   const headerRef = useRef();
@@ -394,11 +395,14 @@ const NotificationContainer = ({
             <span className={styles['btn-box']}>
               <button
                 className={`${styles['accept-btn']} ${
-                  isProcessing ? styles['disable-delete-btn'] : ''
+                  isProcessing && processingId.has(notification._id)
+                    ? styles['disable-delete-btn']
+                    : ''
                 }`}
                 onClick={respondToInvitation(notification._id, 'confirm')}
               >
-                {isProcessing === 'confirm' ? (
+                {isProcessing === 'confirm' &&
+                processingId.has(notification._id) ? (
                   <>
                     <SiKashflow className={styles['deleting-icon']} />
                     Processing....
@@ -409,11 +413,14 @@ const NotificationContainer = ({
               </button>
               <button
                 className={`${styles['decline-btn']} ${
-                  isProcessing ? styles['disable-delete-btn'] : ''
+                  isProcessing && processingId.has(notification._id)
+                    ? styles['disable-delete-btn']
+                    : ''
                 }`}
                 onClick={respondToInvitation(notification._id, 'decline')}
               >
-                {isProcessing === 'decline' ? (
+                {isProcessing === 'decline' &&
+                processingId.has(notification._id) ? (
                   <>
                     <SiKashflow className={styles['deleting-icon']} />
                     Processing....
@@ -1104,12 +1111,19 @@ const NotificationContainer = ({
   };
 
   const respondToInvitation = (id, response) => async () => {
+    const ids = new Set(processingId);
+    ids.add(id);
+
+    setProcessingId(ids);
     setIsProcessing(response);
 
     try {
       await apiClient.patch(`/api/v1/projects/${id}/reply-invitation`, {
         response,
       });
+
+      ids.delete(id);
+      setProcessingId(ids);
       setIsProcessing(null);
       setDeleteCount((prevCount) => prevCount + 1);
       setGroups((groups) => {
@@ -1120,6 +1134,8 @@ const NotificationContainer = ({
         return newGroups;
       });
     } catch (err) {
+      ids.delete(id);
+      setProcessingId(ids);
       setIsProcessing(null);
 
       if (!err.response || !err.response.data || err.response.status === 500) {
