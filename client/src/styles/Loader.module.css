@@ -3,6 +3,11 @@
     changeColor 1.2s linear 0s infinite alternate both;
 }
 
+.dark-loader {
+  animation: rotate 1.2s linear 0s infinite normal both,
+    changeColor2 1.2s linear 0s infinite alternate both;
+}
+
 /* Animations */
 
 @keyframes rotate {
@@ -18,6 +23,20 @@
 @keyframes changeColor {
   0% {
     color: black;
+  }
+
+  50% {
+    color: gray;
+  }
+
+  100% {
+    color: orange;
+  }
+}
+
+@keyframes changeColor2 {
+  0% {
+    color: white;
   }
 
   50% {

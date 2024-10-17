@@ -4,7 +4,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import Loader from '../components/Loader';
 
 const ProtectedRoute = ({ element: Component, ...prop }) => {
-  const { userData, setUserData, isAuthenticated, setIsAuthenticated } =
+  const { setUserData, isAuthenticated, setIsAuthenticated, mode } =
     useContext(AuthContext);
   const path = useLocation().pathname.split('/')[1];
 
@@ -34,7 +34,12 @@ const ProtectedRoute = ({ element: Component, ...prop }) => {
     return (
       <div className="auth-loader-box">
         <Loader style={{ width: '2.5rem', height: '2.5rem' }} />
-        <span className="auth-loader-text">Loading page....</span>
+        <span
+          className="auth-loader-text"
+          style={{ color: mode === 'dark' ? 'rgb(255, 250, 250)' : 'black' }}
+        >
+          Loading page....
+        </span>
       </div>
     );
   }

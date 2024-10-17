@@ -194,6 +194,20 @@
   margin: 0 1rem;
 }
 
+/* Dark Mode  */
+
+.dark-container {
+  background: var(--dark-theme-background);
+}
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-modal {
+  background: rgba(255, 250, 250, 0.3);
+}
+
 /* Animation */
 
 @keyframes fadeIn {

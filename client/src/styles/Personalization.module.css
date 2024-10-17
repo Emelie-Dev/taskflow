@@ -277,6 +277,17 @@
   background: var(--dark-theme-background);
 }
 
+.dark-remove-box {
+  background: var(--dark-theme-background);
+  color: var(--dark-theme-color);
+  box-shadow: 1px 1px 8px -4px black, 1px 1px 8px -6px white,
+    -1px -1px 8px -6px white;
+}
+
+.dark-remove-box:hover {
+  background: rgb(50, 50, 50);
+}
+
 /* Animations */
 
 @keyframes rotate {

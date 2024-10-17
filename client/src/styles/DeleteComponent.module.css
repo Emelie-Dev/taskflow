@@ -91,7 +91,7 @@
 
 .fetching-token {
   pointer-events: none;
-  color: gray;
+  color: gray !important;
   opacity: 0.7;
 }
 
@@ -221,11 +221,11 @@
 }
 
 .focus-input {
-  border: 1px solid orange;
+  border: 1px solid orange !important;
 }
 
 .focus-token-input {
-  border-bottom: 1px solid orange;
+  border-bottom: 1px solid orange !important;
 }
 
 .searching-loader {
@@ -242,6 +242,66 @@
   animation: l3 0.8s infinite linear;
   margin-left: 1rem;
   margin-top: 0.3rem;
+}
+
+/* Dark Mode */
+
+.dark-container {
+  background: var(--dark-theme-background);
+}
+
+.dark-modal {
+  background: rgba(255, 250, 250, 0.3);
+}
+
+.dark-text {
+  color: var(--dark-theme-color);
+  fill: var(--dark-theme-color);
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-input {
+  color: var(--dark-theme-color);
+  background: var(--dark-theme-background);
+  border: 1px solid rgba(176, 196, 222, 0.404);
+}
+
+.dark-field {
+  color: var(--dark-theme-color);
+  background: var(--dark-theme-background);
+}
+
+.dark-input-box {
+  fill: var(--dark-theme-color);
+  background: var(--dark-theme-background);
+  border: 1px solid rgba(176, 196, 222, 0.404);
+}
+
+.dark-field2 {
+  color: var(--dark-theme-color);
+  background: var(--dark-theme-background);
+}
+
+.dark-input-box2 {
+  border: none;
+  border-bottom: 1px solid rgba(176, 196, 222, 0.404);
+}
+
+.dark-red {
+  color: #ffb6c1;
+}
+
+.dark-token {
+  pointer-events: none;
+  color: var(--dark-theme-text) !important;
+  opacity: 0.7;
+}
+
+.dark-loader {
+  background: var(--dark-theme-text);
 }
 
 /* Animations */

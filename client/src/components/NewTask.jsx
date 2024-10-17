@@ -28,7 +28,7 @@ const NewTask = ({
   setTasks,
   category,
 }) => {
-  const { userData, serverUrl } = useContext(AuthContext);
+  const { userData, serverUrl, mode } = useContext(AuthContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [taskData, setTaskData] = useState({
     name: '',
@@ -282,14 +282,30 @@ const NewTask = ({
     <section className={styles.section} onClick={hideComponent}>
       <ToastContainer autoClose={2000} />
 
-      <div className={styles['modal-container']}>
+      <div
+        className={`${styles['modal-container']} ${
+          mode === 'dark' ? styles['dark-container'] : ''
+        }`}
+      >
         <span
-          className={styles['close-modal']}
+          className={`${styles['close-modal']}  ${
+            mode === 'dark' ? styles['dark-modal'] : ''
+          }`}
           onClick={() => setAddTask(false)}
         >
-          <IoCloseSharp className={styles['close-modal-icon']} />
+          <IoCloseSharp
+            className={`${styles['close-modal-icon']}   ${
+              mode === 'dark' ? styles['dark-text'] : ''
+            }`}
+          />
         </span>
-        <h1 className={styles['modal-head']}>Add Task</h1>
+        <h1
+          className={`${styles['modal-head']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
+          Add Task
+        </h1>
 
         <form
           className={styles.form}
@@ -301,12 +317,19 @@ const NewTask = ({
           <div className={styles['modal-list']}>
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="task-name">
+                <label
+                  className={`${styles['form-label']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="task-name"
+                >
                   Task Name
                 </label>
               </span>
               <input
-                className={styles['form-input']}
+                className={`${styles['form-input']}  ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
                 id="task-name"
                 type="text"
                 value={taskData.name}
@@ -318,13 +341,20 @@ const NewTask = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="project">
+                <label
+                  className={`${styles['form-label']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="project"
+                >
                   Project
                 </label>
               </span>
 
               <select
-                className={styles['form-select']}
+                className={`${styles['form-select']}  ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
                 id="project"
                 value={taskData.project}
                 onChange={(e) => {
@@ -342,7 +372,11 @@ const NewTask = ({
 
               {!fixedProject && projectsDetails.error && (
                 <span className={styles['project-error-box']}>
-                  <i className={styles['project-error-text']}>
+                  <i
+                    className={`${styles['project-error-text']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
                     Unable to load some projects
                   </i>{' '}
                   <button
@@ -358,12 +392,19 @@ const NewTask = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="priority">
+                <label
+                  className={`${styles['form-label']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="priority"
+                >
                   Priority
                 </label>
               </span>
               <select
-                className={styles['form-select']}
+                className={`${styles['form-select']}  ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
                 id="priority"
                 value={taskData.priority}
                 onChange={(e) =>
@@ -378,13 +419,20 @@ const NewTask = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="status">
+                <label
+                  className={`${styles['form-label']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="status"
+                >
                   Status
                 </label>
               </span>
 
               <select
-                className={styles['form-select']}
+                className={`${styles['form-select']}  ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
                 id="status"
                 value={taskData.status}
                 onChange={(e) =>
@@ -399,13 +447,20 @@ const NewTask = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="due-date">
+                <label
+                  className={`${styles['form-label']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="due-date"
+                >
                   Due Date
                 </label>
               </span>
 
               <input
-                className={styles['form-input']}
+                className={`${styles['form-input']}  ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
                 type="datetime-local"
                 id="due-date"
                 min={`${currentYear}-0${currentMonth + 1}-${currentDate}T00:00`}
@@ -416,14 +471,21 @@ const NewTask = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="assignee">
+                <label
+                  className={`${styles['form-label']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="assignee"
+                >
                   Add Assignee
                 </label>
               </span>
 
               <span className={styles['assignees-box']}>
                 <input
-                  className={`${styles['form-input']} ${styles['assignee-input']}`}
+                  className={`${styles['form-input']} ${
+                    styles['assignee-input']
+                  } ${mode === 'dark' ? styles['dark-input'] : ''}`}
                   list="team"
                   id="assignee"
                   ref={assigneeRef}
@@ -462,19 +524,31 @@ const NewTask = ({
               className={`${styles.category} ${styles['assignees-category']}`}
             >
               <span className={styles['label-box']}>
-                <label className={styles['form-label']}>
+                <label
+                  className={`${styles['form-label']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   {assigneesData.length === 1 ? 'Assignee' : 'Assignees'}
                 </label>
               </span>
 
               <div className={styles['assignees']}>
                 {assigneesData.length === 0 ? (
-                  <i className={styles['no-assignees-txt']}>No Assignees</i>
+                  <i
+                    className={`${styles['no-assignees-txt']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    No Assignees
+                  </i>
                 ) : (
                   assigneesData.map((assignee, index) => (
                     <span key={assignee._id} className={styles['assignee-box']}>
                       <IoCloseSharp
-                        className={styles['remove-assignee']}
+                        className={`${styles['remove-assignee']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
                         onClick={() => removeAssignee(index)}
                       />
                       <span className={styles['image-box']}>
@@ -499,13 +573,20 @@ const NewTask = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="description">
+                <label
+                  className={`${styles['form-label']}  ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="description"
+                >
                   Description
                 </label>
               </span>
 
               <textarea
-                className={`${styles['form-input']} ${styles['task-description']}`}
+                className={`${styles['form-input']} ${
+                  styles['task-description']
+                } ${mode === 'dark' ? styles['dark-input'] : ''}`}
                 id="description"
                 rows={5}
                 value={taskData.description}
@@ -518,7 +599,12 @@ const NewTask = ({
             {customFields.length > 0 && (
               <div className={styles.category}>
                 <span className={styles['label-box']}>
-                  <label className={styles['form-label']} htmlFor="description">
+                  <label
+                    className={`${styles['form-label']}  ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                    htmlFor="description"
+                  >
                     Custom Fields
                   </label>
 
@@ -526,13 +612,17 @@ const NewTask = ({
                     {customFields.map((obj, index) => (
                       <div key={index} className={styles['custom-field-box']}>
                         <label
-                          className={styles['custom-field-label']}
+                          className={`${styles['custom-field-label']} ${
+                            mode === 'dark' ? styles['dark-word'] : ''
+                          }`}
                           htmlFor={obj.field}
                         >
                           {obj.field}:
                         </label>
                         <input
-                          className={styles['custom-field']}
+                          className={`${styles['custom-field']} ${
+                            mode === 'dark' ? styles['dark-input'] : ''
+                          }`}
                           id={obj.field}
                           type="text"
                           maxLength={30}

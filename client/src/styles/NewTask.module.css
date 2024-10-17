@@ -94,7 +94,7 @@
 }
 
 .form-input:focus {
-  border: 1px solid orange;
+  border: 1px solid orange !important;
 }
 
 .form-select {
@@ -342,6 +342,30 @@
 
 .custom-field:focus {
   border: 1px solid orange;
+}
+
+/* Dark Mode */
+
+.dark-container {
+  background: var(--dark-theme-background);
+}
+
+.dark-text {
+  color: var(--dark-theme-color);
+}
+
+.dark-word {
+  color: var(--dark-theme-text);
+}
+
+.dark-modal {
+  background: rgba(255, 250, 250, 0.3);
+}
+
+.dark-input {
+  color: var(--dark-theme-color);
+  background: var(--dark-theme-background);
+  border: 1px solid rgba(176, 196, 222, 0.4);
 }
 
 /* Animations */

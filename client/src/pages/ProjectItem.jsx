@@ -1001,43 +1001,73 @@ const ProjectItem = () => {
             className={styles['show-files-section']}
             onClick={hideFilesModal}
           >
-            <div className={styles['modal-container']}>
+            <div
+              className={`${styles['modal-container']} ${
+                mode === 'dark' ? styles['dark-bg'] : ''
+              }`}
+            >
               <span
-                className={styles['close-modal']}
+                className={`${styles['close-modal']} ${
+                  mode === 'dark' ? styles['dark-modal'] : ''
+                }`}
                 onClick={() => setShowFiles(false)}
               >
-                <IoCloseSharp className={styles['close-modal-icon']} />
+                <IoCloseSharp
+                  className={`${styles['close-modal-icon']} ${
+                    mode === 'dark' ? styles['dark-pic'] : ''
+                  }`}
+                />
               </span>
-              <h1 className={styles['modal-head']}>Add Files</h1>
+              <h1
+                className={`${styles['modal-head']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+              >
+                Add Files
+              </h1>
 
               <ul className={styles['files-list']}>
                 {files.map((file, index) => (
                   <li key={file.name} className={styles['file-item']}>
-                    <RiDeleteBin6Line
-                      className={styles['remove-file-icon']}
-                      title="Remove File"
-                      onClick={() => removeFile(index)}
-                    />
-
-                    <span className={styles['file-no']}>{index + 1}.</span>
+                    <span
+                      className={`${styles['file-no']} ${
+                        mode === 'dark' ? styles['dark-text'] : ''
+                      }`}
+                    >
+                      {index + 1}.
+                    </span>
                     <div className={styles['file-info']}>
                       <div
                         className={`${styles['file-info-box']} ${styles['file-name-box']}`}
                       >
-                        <span className={styles['file-info-property']}>
+                        <span
+                          className={`${styles['file-info-property']} ${
+                            mode === 'dark' ? styles['dark-word'] : ''
+                          }`}
+                        >
                           Original Name:
                         </span>
-                        <span className={styles['file-info-value']}>
+                        <span
+                          className={`${styles['file-info-value']} ${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
+                        >
                           {file.name}
                         </span>
                       </div>
 
                       <div className={styles['file-info-box']}>
-                        <label className={styles['file-info-property']}>
+                        <label
+                          className={`${styles['file-info-property']} ${
+                            mode === 'dark' ? styles['dark-word'] : ''
+                          }`}
+                        >
                           New Name:
                         </label>
                         <input
-                          className={styles['file-new-name']}
+                          className={`${styles['file-new-name']} ${
+                            mode === 'dark' ? styles['dark-new-name'] : ''
+                          }`}
                           type="text"
                           placeholder="Leave blank to use the original name"
                           ref={addToRef(namesRef)}
@@ -1048,11 +1078,17 @@ const ProjectItem = () => {
                         className={`${styles['file-info-box']} ${styles['file-size-box']}`}
                       >
                         <span
-                          className={`${styles['file-info-property']} ${styles['file-info-size']}`}
+                          className={`${styles['file-info-property']} ${
+                            styles['file-info-size']
+                          } ${mode === 'dark' ? styles['dark-word'] : ''}`}
                         >
                           Size:
                         </span>
-                        <span className={styles['file-info-value']}>
+                        <span
+                          className={`${styles['file-info-value']} ${
+                            mode === 'dark' ? styles['dark-text'] : ''
+                          }`}
+                        >
                           {calculateSize(file.size).value}
                           <span className={styles['file-size-unit']}>
                             {calculateSize(file.size).unit}
@@ -1060,6 +1096,14 @@ const ProjectItem = () => {
                         </span>
                       </div>
                     </div>
+
+                    <RiDeleteBin6Line
+                      className={`${styles['remove-file-icon']} ${
+                        mode === 'dark' ? styles['dark-word'] : ''
+                      }`}
+                      title="Remove File"
+                      onClick={() => removeFile(index)}
+                    />
                   </li>
                 ))}
               </ul>
@@ -2636,7 +2680,12 @@ const ProjectItem = () => {
                 ) : (
                   <ul className={styles['tasks-list']}>
                     {tasks.map((task) => (
-                      <li key={task._id} className={styles['task-item']}>
+                      <li
+                        key={task._id}
+                        className={`${styles['task-item']} ${
+                          mode === 'dark' ? styles['dark-item'] : ''
+                        }`}
+                      >
                         <span className={styles['task-box']}>
                           {task.status === 'complete' ? (
                             <GrStatusGood

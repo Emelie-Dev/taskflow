@@ -17,7 +17,12 @@ const ProfilePictureCropper = ({
   fileRef,
   toast,
 }) => {
-  const { userData, setUserData, serverUrl } = useContext(AuthContext);
+  const {
+    userData,
+    setUserData,
+    serverUrl,
+    mode: theme,
+  } = useContext(AuthContext);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [deleteMode, setDeleteMode] = useState(false);
@@ -130,10 +135,20 @@ const ProfilePictureCropper = ({
 
   return (
     <section className={styles.section} onClick={closeCropModal}>
-      <div className={styles['modal-container']}>
-        <span className={styles['close-modal']}>
+      <div
+        className={`${styles['modal-container']} ${
+          theme === 'dark' ? styles['dark-container'] : ''
+        }`}
+      >
+        <span
+          className={`${styles['close-modal']} ${
+            theme === 'dark' ? styles['dark-modal'] : ''
+          }`}
+        >
           <IoCloseSharp
-            className={styles['close-modal-icon']}
+            className={`${styles['close-modal-icon']} ${
+              theme === 'dark' ? styles['dark-text'] : ''
+            }`}
             onClick={() => {
               setImage(null);
               setCropData(null);
@@ -141,7 +156,13 @@ const ProfilePictureCropper = ({
             }}
           />
         </span>
-        <span className={styles.head}>Edit profile picture</span>
+        <span
+          className={`${styles.head} ${
+            theme === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
+          Edit profile picture
+        </span>
 
         {mode === 'edit' ? (
           <>
@@ -204,7 +225,9 @@ const ProfilePictureCropper = ({
           <div className={styles['view-container']}>
             {userData.photo === 'default.jpeg' ? (
               <div
-                className={styles['no-picture-div']}
+                className={`${styles['no-picture-div']} ${
+                  theme === 'dark' ? styles['dark-text'] : ''
+                }`}
                 style={{ width, height }}
               >
                 No profile picture
@@ -217,6 +240,7 @@ const ProfilePictureCropper = ({
                 alt="Profile Picture"
               />
             )}
+
             <div className={styles['btn-div']}>
               <button
                 className={`${styles['cancel-btn']} ${
@@ -236,8 +260,16 @@ const ProfilePictureCropper = ({
 
             {deleteMode && (
               <div className={styles['delete-container']}>
-                <div className={styles['delete-box']}>
-                  <span className={styles['delete-text']}>
+                <div
+                  className={`${styles['delete-box']} ${
+                    theme === 'dark' ? styles['dark-container'] : ''
+                  }`}
+                >
+                  <span
+                    className={`${styles['delete-text']} ${
+                      theme === 'dark' ? styles['dark-text'] : ''
+                    }`}
+                  >
                     Are you sure you want to remove your profile picture?
                   </span>
 

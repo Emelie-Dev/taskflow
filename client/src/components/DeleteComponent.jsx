@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from '../styles/DeleteComponent.module.css';
 import { IoCloseSharp } from 'react-icons/io5';
-import { apiClient } from '../App';
+import { apiClient, AuthContext } from '../App';
 import { SiKashflow } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
@@ -21,6 +21,7 @@ const DeleteComponent = ({
   setGroups,
   setDeleteLength,
 }) => {
+  const { mode } = useContext(AuthContext);
   const [isNameValid, setIsNameValid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [name, setName] = useState('');
@@ -413,15 +414,29 @@ const DeleteComponent = ({
     <section className={styles.section} onClick={hideDisplayModal}>
       <ToastContainer autoClose={2000} />
 
-      <div className={styles['modal-container']}>
+      <div
+        className={`${styles['modal-container']} ${
+          mode === 'dark' ? styles['dark-container'] : ''
+        }`}
+      >
         <span
-          className={styles['close-modal']}
+          className={`${styles['close-modal']} ${
+            mode === 'dark' ? styles['dark-modal'] : ''
+          }`}
           onClick={() => setDeleteModal({ value: false, type: null })}
         >
-          <IoCloseSharp className={styles['close-modal-icon']} />
+          <IoCloseSharp
+            className={`${styles['close-modal-icon']}  ${
+              mode === 'dark' ? styles['dark-text'] : ''
+            }`}
+          />
         </span>
 
-        <h1 className={styles['modal-head']}>
+        <h1
+          className={`${styles['modal-head']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
           {' '}
           {type === 'deactivate'
             ? 'Deactivate Account'
@@ -434,7 +449,11 @@ const DeleteComponent = ({
             : `Delete ${type}`}{' '}
         </h1>
 
-        <div className={styles['delete-content']}>
+        <div
+          className={`${styles['delete-content']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
           {type === 'Project' ? (
             <>
               <span className={styles['delete-text']}>
@@ -444,7 +463,9 @@ const DeleteComponent = ({
               </span>
 
               <input
-                className={styles['delete-input']}
+                className={`${styles['delete-input']} ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -493,10 +514,12 @@ const DeleteComponent = ({
               <span
                 className={`${styles['pswd-box']} ${
                   focusInput ? styles['focus-input'] : ''
-                }`}
+                } ${mode === 'dark' ? styles['dark-input-box'] : ''}`}
               >
                 <input
-                  className={styles['pswd']}
+                  className={`${styles['pswd']} ${
+                    mode === 'dark' ? styles['dark-field'] : ''
+                  }`}
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -506,12 +529,16 @@ const DeleteComponent = ({
 
                 {showPassword ? (
                   <IoMdEye
-                    className={styles['show-icon']}
+                    className={`${styles['show-icon']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
                     onClick={() => setShowPassword(!showPassword)}
                   />
                 ) : (
                   <IoMdEyeOff
-                    className={styles['show-icon']}
+                    className={`${styles['show-icon']} ${
+                      mode === 'dark' ? styles['dark-text'] : ''
+                    }`}
                     onClick={() => setShowPassword(!showPassword)}
                   />
                 )}
@@ -548,10 +575,14 @@ const DeleteComponent = ({
                   <span
                     className={`${styles['pswd-box']} ${
                       styles['pswd-token-box']
-                    } ${focusInput ? styles['focus-token-input'] : ''}`}
+                    } ${focusInput ? styles['focus-token-input'] : ''}  ${
+                      mode === 'dark' ? styles['dark-input-box2'] : ''
+                    }`}
                   >
                     <input
-                      className={`${styles['pswd']} ${styles['pswd-token']}`}
+                      className={`${styles['pswd']} ${styles['pswd-token']}  ${
+                        mode === 'dark' ? styles['dark-field2'] : ''
+                      }`}
                       type="number"
                       value={token}
                       onChange={(e) => setToken(e.target.value)}
@@ -569,10 +600,12 @@ const DeleteComponent = ({
                   <span
                     className={`${styles['pswd-box']} ${
                       focusInput ? styles['focus-input'] : ''
-                    }`}
+                    } ${mode === 'dark' ? styles['dark-input-box'] : ''}`}
                   >
                     <input
-                      className={styles['pswd']}
+                      className={`${styles['pswd']} ${
+                        mode === 'dark' ? styles['dark-field'] : ''
+                      }`}
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -582,12 +615,16 @@ const DeleteComponent = ({
 
                     {showPassword ? (
                       <IoMdEye
-                        className={styles['show-icon']}
+                        className={`${styles['show-icon']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
                         onClick={() => setShowPassword(!showPassword)}
                       />
                     ) : (
                       <IoMdEyeOff
-                        className={styles['show-icon']}
+                        className={`${styles['show-icon']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
                         onClick={() => setShowPassword(!showPassword)}
                       />
                     )}
@@ -629,19 +666,37 @@ const DeleteComponent = ({
             <span className={styles['resend-token-box']}>
               <span
                 className={`${styles['resend-token-txt']} ${
-                  fetching || isProcessing ? styles['fetching-token'] : ''
-                } ${showCounter ? styles['fetching-token'] : ''}`}
+                  fetching || isProcessing
+                    ? mode === 'dark'
+                      ? styles['dark-token']
+                      : styles['fetching-token']
+                    : ''
+                } ${
+                  showCounter
+                    ? mode === 'dark'
+                      ? styles['dark-token']
+                      : styles['fetching-token']
+                    : ''
+                } ${mode === 'dark' ? styles['dark-red'] : ''}`}
                 onClick={getDeleteToken('link')}
               >
                 Resend code
               </span>{' '}
               {fetching ? (
-                <div className={styles['searching-loader']}></div>
+                <div
+                  className={`${styles['searching-loader']}  ${
+                    mode === 'dark' ? styles['dark-loader'] : ''
+                  }`}
+                ></div>
               ) : (
                 ''
               )}
               {showCounter ? (
-                <span className={`${styles['resend-token-timer']}`}>
+                <span
+                  className={`${styles['resend-token-timer']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                >
                   {tokenCounter}s
                 </span>
               ) : (

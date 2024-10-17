@@ -39,20 +39,32 @@ const App = () => {
   const [mode, setMode] = useState('');
 
   useEffect(() => {
+    setMode(window.localStorage.getItem('mode'));
+  }, []);
+
+  useEffect(() => {
     if (userData.personalization) {
       const theme = userData.personalization.theme;
 
       switch (theme) {
         case 'light':
           setMode('light');
+          window.localStorage.setItem('mode', 'light');
           break;
 
         case 'dark':
           setMode('dark');
+          window.localStorage.setItem('mode', 'dark');
           break;
 
         case 'system':
           setMode(
+            window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+          );
+          window.localStorage.setItem(
+            'mode',
             window.matchMedia('(prefers-color-scheme: dark)').matches
               ? 'dark'
               : 'light'

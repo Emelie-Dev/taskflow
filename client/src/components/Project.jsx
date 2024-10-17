@@ -17,7 +17,7 @@ const Project = ({
   setProjects,
   setCreateCount,
 }) => {
-  const { serverUrl } = useContext(AuthContext);
+  const { serverUrl, mode } = useContext(AuthContext);
   const currentYear = new Date().getFullYear();
   const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
   const currentDate = String(new Date().getDate()).padStart(2, '0');
@@ -252,14 +252,28 @@ const Project = ({
     <section className={styles.section} onClick={hideDisplayModal}>
       <ToastContainer autoClose={2000} />
 
-      <div className={styles['modal-container']}>
+      <div
+        className={`${styles['modal-container']} ${
+          mode === 'dark' ? styles['dark-container'] : ''
+        }`}
+      >
         <span
-          className={styles['close-modal']}
+          className={`${styles['close-modal']} ${
+            mode === 'dark' ? styles['dark-modal'] : ''
+          }`}
           onClick={() => setDisplayModal(false)}
         >
-          <IoCloseSharp className={styles['close-modal-icon']} />
+          <IoCloseSharp
+            className={`${styles['close-modal-icon']} ${
+              mode === 'dark' ? styles['dark-text'] : ''
+            }`}
+          />
         </span>
-        <h1 className={styles['modal-head']}>
+        <h1
+          className={`${styles['modal-head']} ${
+            mode === 'dark' ? styles['dark-text'] : ''
+          }`}
+        >
           {editProject ? 'Edit Project' : 'Create Project'}
         </h1>
 
@@ -274,12 +288,19 @@ const Project = ({
           <div className={styles['modal-list']}>
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="project-name">
+                <label
+                  className={`${styles['form-label']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="project-name"
+                >
                   Project Name
                 </label>
               </span>
               <input
-                className={styles['form-input']}
+                className={`${styles['form-input']} ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
                 id="project-name"
                 type="text"
                 value={project.name}
@@ -291,13 +312,20 @@ const Project = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="status">
+                <label
+                  className={`${styles['form-label']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="status"
+                >
                   Status
                 </label>
               </span>
 
               <select
-                className={styles['form-select']}
+                className={`${styles['form-select']} ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
                 id="status"
                 value={project.status}
                 onChange={(e) =>
@@ -311,13 +339,20 @@ const Project = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="deadline">
+                <label
+                  className={`${styles['form-label']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="deadline"
+                >
                   Deadline
                 </label>
               </span>
 
               <input
-                className={styles['form-input']}
+                className={`${styles['form-input']} ${
+                  mode === 'dark' ? styles['dark-input'] : ''
+                }`}
                 type="date"
                 id="deadline"
                 min={`${currentYear}-${currentMonth}-${currentDate}`}
@@ -330,14 +365,21 @@ const Project = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="team">
+                <label
+                  className={`${styles['form-label']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="team"
+                >
                   Add Team Member
                 </label>
               </span>
 
               <span className={styles['add-member-box']}>
                 <input
-                  className={`${styles['form-input']} ${styles['team-input']}`}
+                  className={`${styles['form-input']} ${styles['team-input']} ${
+                    mode === 'dark' ? styles['dark-input'] : ''
+                  }`}
                   type="text"
                   id="team"
                   placeholder={'Provide username e.g @user1'}
@@ -365,19 +407,32 @@ const Project = ({
               className={`${styles.category} ${styles['assignees-category']}`}
             >
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="members">
+                <label
+                  className={`${styles['form-label']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="members"
+                >
                   Team Members
                 </label>
               </span>
 
               <div className={styles['assignees']}>
                 {team.length === 0 ? (
-                  <i className={styles['no-team-text']}>No team member</i>
+                  <i
+                    className={`${styles['no-team-text']} ${
+                      mode === 'dark' ? styles['dark-word'] : ''
+                    }`}
+                  >
+                    No team member
+                  </i>
                 ) : (
                   team.map((member) => (
                     <span key={member._id} className={styles['assignee-box']}>
                       <IoCloseSharp
-                        className={styles['remove-assignee']}
+                        className={`${styles['remove-assignee']} ${
+                          mode === 'dark' ? styles['dark-text'] : ''
+                        }`}
                         onClick={removeMember(member._id)}
                         title="Remove"
                       />
@@ -403,13 +458,20 @@ const Project = ({
 
             <div className={styles.category}>
               <span className={styles['label-box']}>
-                <label className={styles['form-label']} htmlFor="description">
+                <label
+                  className={`${styles['form-label']} ${
+                    mode === 'dark' ? styles['dark-word'] : ''
+                  }`}
+                  htmlFor="description"
+                >
                   Description
                 </label>
               </span>
 
               <textarea
-                className={`${styles['form-input']} ${styles['project-description']}`}
+                className={`${styles['form-input']} ${
+                  styles['project-description']
+                } ${mode === 'dark' ? styles['dark-input'] : ''}`}
                 id="description"
                 rows={10}
                 value={project.description}
@@ -429,7 +491,12 @@ const Project = ({
                   setProject({ ...project, addFiles: e.target.checked })
                 }
               />
-              <label className={styles['add-files-label']} htmlFor="add-files">
+              <label
+                className={`${styles['add-files-label']} ${
+                  mode === 'dark' ? styles['dark-text'] : ''
+                }`}
+                htmlFor="add-files"
+              >
                 Enable team members to add files.
               </label>
             </div>
