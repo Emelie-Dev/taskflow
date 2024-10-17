@@ -9,7 +9,7 @@ import styles from '../styles/Header.module.css';
 import { MdOutlineSegment } from 'react-icons/md';
 import { IoIosSearch, IoMdClose, IoIosNotifications } from 'react-icons/io';
 import { Link, useNavigate } from 'react-router-dom';
-import { IoChatbubblesSharp } from 'react-icons/io5';
+import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
 import { FaSearch } from 'react-icons/fa';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { HiOutlineLogout } from 'react-icons/hi';
@@ -234,6 +234,17 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
               >
                 <FaRegCircleUser className={styles['user-profile-icon']} />
                 My Profile
+              </Link>
+            </li>
+            <li>
+              <Link
+                className={`${styles['profile-link-box2']}  ${
+                  mode === 'dark' ? styles['dark-link-box'] : ''
+                }`}
+                to={'/settings'}
+              >
+                <IoSettingsOutline className={styles['user-profile-icon']} />
+                Settings
               </Link>
             </li>
             <li

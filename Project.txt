@@ -52,7 +52,7 @@
     - Fix profile images  ✔
     - Fix forgot password ✔
     - Fix Deactivate and delete account for google auth users.(Check if user has password in security page) ✔
-    - Add settings to header dropdown
+    - Add settings to header dropdown ✔
     - Fix color priority in personalization page on theme toogle
     - Use toastify to tell users warning before their actions
     - Add scroll down arrow in calendar page

@@ -205,7 +205,8 @@
   transition: background 0.2s, color 0.2s;
 }
 
-.profile-link-box {
+.profile-link-box,
+.profile-link-box2 {
   font-family: var(--general-font);
   padding: 0.6rem 1rem;
   padding-right: 2rem;
@@ -228,12 +229,17 @@
   border-radius: 5px 5px 0 0;
 }
 
+.profile-link-box2 {
+  border-radius: none;
+}
+
 .user-profile-item {
   border-radius: 0 0 5px 5px;
 }
 
 .user-profile-item:hover,
-.profile-link-box:hover {
+.profile-link-box:hover,
+.profile-link-box2:hover {
   background: orange;
   color: white;
 }
@@ -282,6 +288,8 @@
   pointer-events: none;
 }
 
+/* Dark Mode  */
+
 .dark-theme {
   background: #252525;
   border-bottom: 1px solid var(--dark-theme-color);
@@ -313,6 +321,8 @@
 
 .dark-profile-box {
   background: var(--dark-theme-background);
+  box-shadow: 1px 1px 10px -4px black, 1px 1px 10px -6px white,
+    -1px -1px 10px -6px white;
 }
 
 .dark-profile-item,
