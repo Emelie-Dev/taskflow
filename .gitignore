@@ -15,9 +15,7 @@ dist-ssr
 
 # # Ignore all files in a specific directory
 server/Public/project-files/*
-
-# # Do not ignore the directory itself
-!server/Public/project-files/
+!server/Public/project-files/user-667eb3e45115ea2d66485282-83233656228633.js
 
 *.env
 *.vscode/
