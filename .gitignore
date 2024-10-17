@@ -17,6 +17,8 @@ dist-ssr
 server/Public/project-files/*
 !server/Public/project-files/user-667eb3e45115ea2d66485282-83233656228633.js
 
+project.txt
+
 *.env
 *.vscode/
 
@@ -32,3 +34,4 @@ server/Public/project-files/*
 *.sln
 *.sw?
 
+Project.txt

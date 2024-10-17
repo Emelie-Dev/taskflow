@@ -57,7 +57,7 @@
     - Use toastify to tell users warning before their actions
     - Add scroll down arrow in calendar page
     - Fix notifications functionality in the backend based on the data from user notification settings
-    - Fix upload files for hosted site
+    - Fix upload files for hosted site ✔
 
 
 
@@ -125,8 +125,3 @@
     - Project leaders do not need to be added in the team project property
     - Project and tasks analytics will cover the page width
 
-
-
-Leonard - (WL) (LW) (L
-MTOOOOO - (LL) (LW) (L
-Kelvinn - (WW) (WW) (LW)
