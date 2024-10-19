@@ -53,11 +53,12 @@
     - Fix forgot password ✔
     - Fix Deactivate and delete account for google auth users.(Check if user has password in security page) ✔
     - Add settings to header dropdown ✔
-    - Fix color priority in personalization page on theme toogle
-    - Use toastify to tell users warning before their actions
-    - Add scroll down arrow in calendar page
-    - Fix notifications functionality in the backend based on the data from user notification settings
+    - Fix color priority in personalization page on theme toogle ✔
+    - Use toastify to tell users warning before their actions ✔
+    - Add scroll down arrow in calendar page ✔
+    - Fix notifications functionality in the backend based on the data from user notification settings ✔
     - Fix upload files for hosted site ✔
+    - Adjust toastify theme
 
 
 

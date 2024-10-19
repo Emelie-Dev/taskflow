@@ -262,6 +262,20 @@
   vertical-align: -3px;
 }
 
+/* .custom-toast-btn {
+  outline: none;
+  border: 2px solid orange;
+  background: orange;
+  color: white;
+  padding: 0.4rem 0.6rem;
+  font-family: var(--general-font);
+  border-radius: 5px;
+  font-size: 1.01rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  pointer-events: none;
+} */
+
 /* Dark Mode */
 
 .dark-text {

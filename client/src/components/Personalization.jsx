@@ -7,8 +7,21 @@ import { SiKashflow } from 'react-icons/si';
 
 const customId = 'toast-id';
 
+const lightInitialValues = {
+  high: '#ff0000',
+  medium: '#ffa500',
+  low: '#008000',
+};
+
+const darkInitialValues = {
+  high: '#ffb6c1',
+  medium: '#ffa500',
+  low: '#7cfc00',
+};
+
 const Personalization = () => {
-  const { userData, setUserData, mode } = useContext(AuthContext);
+  const { userData, setUserData, mode, colorNotified, setColorNotified } =
+    useContext(AuthContext);
   const [initialData, setInitialData] = useState({
     theme: userData.personalization.theme,
     defaultProjectView: userData.personalization.defaultProjectView,
@@ -33,13 +46,28 @@ const Personalization = () => {
 
   useEffect(() => {
     let colorCount = 0;
+    let colorCondition;
 
     for (const prop in priorityColors) {
       priorityColors[prop] === initialData.priorityColors[prop] && colorCount++;
     }
 
+    colorCondition = colorCount !== 3;
+
+    if (colorCondition) {
+      const values = mode === 'dark' ? darkInitialValues : lightInitialValues;
+
+      let num = 0;
+
+      for (const prop in values) {
+        priorityColors[prop] === values[prop] && num++;
+      }
+
+      colorCondition = num !== 3;
+    }
+
     if (
-      colorCount !== 3 ||
+      colorCondition ||
       theme !== initialData.theme ||
       defaultProjectView !== initialData.defaultProjectView ||
       initialData.customFields.length !== customFields.length
@@ -68,9 +96,30 @@ const Personalization = () => {
     }
   }, [theme, defaultProjectView, priorityColors, customFields]);
 
+  useEffect(() => {
+    const values = mode === 'dark' ? darkInitialValues : lightInitialValues;
+
+    if (!isColorChanged()) {
+      setPriorityColors(values);
+    } else {
+      setPriorityColors(userData.personalization.priorityColors);
+    }
+  }, [mode]);
+
   const colorHandler = (level) => (e) => {
     const newObj = { ...priorityColors, [level]: e.target.value };
     setPriorityColors(newObj);
+
+    if (!colorNotified) {
+      toast(
+        'Priority colors automatically adjust based on the theme. If you change any of the colors, this automatic switching will be disabled.',
+        {
+          position: 'top-right',
+          autoClose: false,
+        }
+      );
+      setColorNotified(true);
+    }
   };
 
   const addField = () => {
@@ -122,9 +171,16 @@ const Personalization = () => {
   };
 
   const resetData = () => {
+    const values = mode === 'dark' ? darkInitialValues : lightInitialValues;
+
+    if (!isColorChanged()) {
+      setPriorityColors(values);
+    } else {
+      setPriorityColors(userData.personalization.priorityColors);
+    }
+
     setTheme(initialData.theme);
     setDefaultProjectView(initialData.defaultProjectView);
-    setPriorityColors(initialData.priorityColors);
     setCustomFields(initialData.customFields);
   };
 
@@ -134,12 +190,21 @@ const Personalization = () => {
 
   const submitData = async () => {
     setIsProcessing(true);
+    let colors;
+
+    if (isColorChanged()) {
+      colors = priorityColors;
+    } else {
+      colors = lightInitialValues;
+    }
+
+    // const colors =
 
     try {
       const { data } = await apiClient.patch(`/api/v1/users/personalization`, {
         theme,
         defaultProjectView,
-        priorityColors,
+        priorityColors: colors,
         customFields,
       });
 
@@ -171,6 +236,17 @@ const Personalization = () => {
         });
       }
     }
+  };
+
+  const isColorChanged = () => {
+    let num = 0;
+
+    for (const prop in userData.personalization.priorityColors) {
+      userData.personalization.priorityColors[prop] ===
+        lightInitialValues[prop] && num++;
+    }
+
+    return num !== 3;
   };
 
   return (

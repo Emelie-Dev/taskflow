@@ -766,7 +766,7 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
   for (let assignee of req.body.assignee) {
     if (!taskAssignees.includes(assignee)) {
       const userData = await User.findById(assignee).select(
-        'username firstName lastName'
+        'username firstName lastName notificationSettings'
       );
 
       newAssignees.push(assignee);
@@ -787,18 +787,20 @@ export const updateAssignees = asyncErrorHandler(async (req, res, next) => {
 
       assignedTasks.push(newTask);
 
-      assignmentNotifications.push({
-        user: assignee,
-        action: 'task',
-        performer: {
-          projectId: project._id,
-          project: project.name,
-          username: req.user.username,
-          firstName: req.user.firstName,
-          lastName: req.user.lastName,
-        },
-        type: ['assignedTask'],
-      });
+      if (userData.notificationSettings.taskAssignment) {
+        assignmentNotifications.push({
+          user: assignee,
+          action: 'task',
+          performer: {
+            projectId: project._id,
+            project: project.name,
+            username: req.user.username,
+            firstName: req.user.firstName,
+            lastName: req.user.lastName,
+          },
+          type: ['assignedTask'],
+        });
+      }
     }
   }
 

@@ -37,6 +37,8 @@ const App = () => {
   const [userData, setUserData] = useState({});
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [mode, setMode] = useState('');
+  const [colorNotified, setColorNotified] = useState(false);
+  const [calendarNotified, setCalendarNotified] = useState(false);
 
   useEffect(() => {
     setMode(window.localStorage.getItem('mode'));
@@ -95,6 +97,10 @@ const App = () => {
         serverUrl,
         mode,
         setMode,
+        colorNotified,
+        setColorNotified,
+        calendarNotified,
+        setCalendarNotified,
       }}
     >
       <ErrorBoundary FallbackComponent={ErrorPage}>

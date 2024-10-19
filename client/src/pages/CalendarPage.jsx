@@ -10,22 +10,23 @@ import { generateName } from './Dashboard';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 import { getProfilePhoto } from '../components/Header';
+import { FaArrowUp } from 'react-icons/fa6';
+import useDebounce from '../hooks/useDebounce';
 
 const CalendarPage = () => {
-  const { userData, serverUrl, mode } = useContext(AuthContext);
+  const { userData, serverUrl, mode, calendarNotified, setCalendarNotified } =
+    useContext(AuthContext);
   const [showNav, setShowNav] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState({ status: true, error: false });
   const [tasksData, setTasksData] = useState(null);
-
   const [requestData, setRequestData] = useState({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     day: new Date().getDate(),
     page: 1,
   });
-
   const [tasks, setTasks] = useState(null);
   const [tasksDetails, setTasksDetails] = useState({
     loading: true,
@@ -33,8 +34,11 @@ const CalendarPage = () => {
     error: false,
     pageError: false,
   });
+  const [showScroll, setShowScroll] = useState(false);
 
   const calenderRef = useRef();
+  const bodyRef = useRef();
+  const containerRef = useRef();
 
   const priorityColors = (() => {
     const lightInitialValues = {
@@ -82,6 +86,41 @@ const CalendarPage = () => {
 
     return colors;
   }, [mode]);
+
+  useEffect(() => {
+    const notifyUser = () => {
+      if (!calendarNotified) {
+        toast(
+          'If you select a date, scroll down to view tasks scheduled for that date.',
+          {
+            autoClose: 5000,
+            toastId: 'custom-id',
+            theme: 'dark',
+          }
+        );
+        setCalendarNotified(true);
+      }
+    };
+    notifyUser();
+
+    const scrollHandler = (e) => {
+      if (e.target.scrollTop >= containerRef.current.offsetHeight + 10) {
+        setShowScroll(true);
+      } else {
+        setShowScroll(false);
+      }
+    };
+
+    const debouncedScrollHandler = useDebounce(scrollHandler, 200);
+
+    if (bodyRef.current)
+      bodyRef.current.addEventListener('scroll', debouncedScrollHandler);
+
+    return () => {
+      if (bodyRef.current)
+        bodyRef.current.removeEventListener('scroll', debouncedScrollHandler);
+    };
+  }, []);
 
   useEffect(() => {
     const getCalendarDetails = async () => {
@@ -263,8 +302,18 @@ const CalendarPage = () => {
       <section className={styles.section}>
         <Header page={'Calendar'} setShowNav={setShowNav} />
 
-        <section className={styles['section-content']}>
-          <section className={styles['calendar-section']}>
+        <section className={styles['section-content']} ref={bodyRef}>
+          {showScroll && (
+            <span
+              className={styles['down-arrow-box']}
+              title="Scroll Up"
+              onClick={() => containerRef.current.scrollIntoView()}
+            >
+              <FaArrowUp className={styles['down-arrow']} />
+            </span>
+          )}
+
+          <section className={styles['calendar-section']} ref={containerRef}>
             <div className={styles['calendar-section-head']}>
               <div className={styles['calendar-details']}>
                 <h1
@@ -356,7 +405,6 @@ const CalendarPage = () => {
               setTasks={setTasks}
             />
           </section>
-
           <section className={styles['tasks-section']}>
             <h1
               className={`${styles['task-section-head']} ${
