@@ -6,7 +6,6 @@ import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { AuthContext } from '../App';
-import 'react-toastify/dist/ReactToastify.css';
 
 import { apiClient } from '../App';
 

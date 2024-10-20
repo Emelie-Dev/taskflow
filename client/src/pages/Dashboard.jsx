@@ -426,7 +426,7 @@ const Dashboard = () => {
       )}
 
       <section className={styles.section}>
-        <Header page={'Dashboard'} setShowNav={setShowNav} />
+        <Header page={'Dashboard'} setShowNav={setShowNav} toast={toast} />
 
         <section className={styles['left-section']}>
           <div className={styles['left-section-head']}>

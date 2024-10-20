@@ -11,7 +11,6 @@ import { FaSquareInstagram } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
 import { RiTwitterXFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-
 const features = [
   {
     src: '/assets/images/depositphotos_135721568-stock-photo-woman-writing-in-notebook.jpg',

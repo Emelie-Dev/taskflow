@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext } from 'react';
+import React, { useRef, useState, useContext, useEffect } from 'react';
 import styles from '../styles/Profile.module.css';
 import { AuthContext } from '../App';
 import { months } from './Dashboard';

@@ -3,7 +3,7 @@ import styles from '../styles/NavBar.module.css';
 import { Link } from 'react-router-dom';
 import { SiKashflow, SiSimpleanalytics } from 'react-icons/si';
 import { MdOutlineDashboard } from 'react-icons/md';
-import { GoProjectTemplate, GoProjectSymlink } from 'react-icons/go';
+import { GoProjectSymlink } from 'react-icons/go';
 import { FaTasks, FaCalendarAlt } from 'react-icons/fa';
 import { IoChatbubblesSharp, IoSettingsOutline } from 'react-icons/io5';
 import { IoIosNotifications } from 'react-icons/io';

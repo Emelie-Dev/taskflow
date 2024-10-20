@@ -15,7 +15,7 @@ import { FaRegCircleUser } from 'react-icons/fa6';
 import { HiOutlineLogout } from 'react-icons/hi';
 import { AuthContext, apiClient } from '../App';
 import { generateName } from '../pages/Dashboard';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const Header = ({ page, setShowNav, setHeaderHeight }) => {
   const { userData, serverUrl, mode } = useContext(AuthContext);
@@ -110,8 +110,6 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
       }`}
       ref={headerRef}
     >
-      <ToastContainer autoClose={2000} />
-
       <b className={styles['menu-icon-box']}>
         <MdOutlineSegment
           className={`${styles['menu-icon']} ${
@@ -256,7 +254,11 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
               onClick={logout}
             >
               {isProcessing ? (
-                <div className={styles['searching-loader']}></div>
+                <div
+                  className={`${styles['searching-loader']} ${
+                    mode === 'dark' ? styles['dark-loader'] : ''
+                  }`}
+                ></div>
               ) : (
                 <HiOutlineLogout className={styles['user-profile-icon']} />
               )}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styles from '../styles/Personalization.module.css';
 import FieldInput from './FieldInput';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { apiClient, AuthContext } from '../App';
 import { SiKashflow } from 'react-icons/si';
 
@@ -257,8 +257,6 @@ const Personalization = () => {
 
   return (
     <section className={styles.section}>
-      <ToastContainer autoClose={2500} />
-
       <h1
         className={`${styles['section-head']} ${
           mode === 'dark' ? styles['dark-text'] : ''

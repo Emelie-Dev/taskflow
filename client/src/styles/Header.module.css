@@ -330,6 +330,10 @@
   color: var(--dark-theme-color);
 }
 
+.dark-loader {
+  background: var(--dark-theme-text);
+}
+
 /* Animations */
 
 @keyframes showNav {

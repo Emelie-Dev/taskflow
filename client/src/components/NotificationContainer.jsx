@@ -16,7 +16,7 @@ import {
 import { BsEnvelopeOpenFill } from 'react-icons/bs';
 import { IoPersonRemove } from 'react-icons/io5';
 import { apiClient, AuthContext } from '../App';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { SiKashflow } from 'react-icons/si';
 
 const days = [
@@ -1154,8 +1154,6 @@ const NotificationContainer = ({
 
   return (
     <div className={styles['article-container']} ref={containerRef}>
-      <ToastContainer autoClose={2000} />
-
       <h1
         className={`${styles.head} ${
           mode === 'dark' ? styles['dark-text'] : ''

@@ -20,6 +20,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import ErrorPage from './pages/ErrorPage';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
+import 'react-toastify/dist/ReactToastify.css';
 
 const serverUrl =
   import.meta.env.MODE === 'production'

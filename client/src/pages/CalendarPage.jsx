@@ -298,12 +298,12 @@ const CalendarPage = () => {
 
   return (
     <main className={styles.div}>
-      {/* <ToastContainer autoClose={2000} /> */}
+      <ToastContainer autoClose={2000} />
 
       <NavBar page={'Calendar'} showNav={showNav} setShowNav={setShowNav} />
 
       <section className={styles.section}>
-        <Header page={'Calendar'} setShowNav={setShowNav} />
+        <Header page={'Calendar'} setShowNav={setShowNav} toast={toast} />
 
         <section className={styles['section-content']} ref={bodyRef}>
           {showScroll && (

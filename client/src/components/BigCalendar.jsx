@@ -3,7 +3,6 @@ import styles from '../styles/BigCalendar.module.css';
 
 import { MdArrowForwardIos, MdArrowBackIosNew } from 'react-icons/md';
 import { FaCircle } from 'react-icons/fa';
-import { ToastContainer, toast } from 'react-toastify';
 import { AuthContext } from '../App';
 
 const BigCalendar = ({
@@ -220,8 +219,6 @@ const BigCalendar = ({
         loading.status ? styles['hide-table-box'] : ''
       }`}
     >
-      <ToastContainer autoClose={2000} />
-
       <span
         className={styles['prev-arrow-box']}
         title="Previous Month"

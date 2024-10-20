@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styles from '../styles/Security.module.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { apiClient, AuthContext } from '../App';
 import { SiKashflow } from 'react-icons/si';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
@@ -202,8 +202,6 @@ const Security = () => {
 
   return (
     <section className={styles.section}>
-      <ToastContainer autoClose={2000} />
-
       {deleteModal.value && (
         <DeleteComponent
           toast={toast}

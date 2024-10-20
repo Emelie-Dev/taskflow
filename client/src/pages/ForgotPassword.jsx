@@ -5,8 +5,6 @@ import { MdOutlineMail } from 'react-icons/md';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
-import 'react-toastify/dist/ReactToastify.css';
-
 import { apiClient, AuthContext } from '../App';
 
 const ForgotPassword = () => {

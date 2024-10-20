@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styles from '../styles/NotificationSettings.module.css';
 import { AuthContext, apiClient } from '../App';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { SiKashflow } from 'react-icons/si';
 
 const NotificationSettings = () => {
@@ -62,11 +62,13 @@ const NotificationSettings = () => {
         return toast('An error occured while saving data.', {
           toastId: 'toast-id1',
           theme: mode,
+          autoClose: 2000,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id1',
           theme: mode,
+          autoClose: 2000,
         });
       }
     }
@@ -76,8 +78,6 @@ const NotificationSettings = () => {
 
   return (
     <section className={styles.section}>
-      <ToastContainer autoClose={2000} />
-
       <h1
         className={`${styles['section-head']} ${
           mode === 'dark' ? styles['dark-text'] : ''

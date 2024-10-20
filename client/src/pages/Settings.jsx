@@ -53,7 +53,7 @@ const Settings = () => {
 
   return (
     <main className={styles.main}>
-      <ToastContainer autoClose={2000} />
+      <ToastContainer autoClose={2500} />
 
       <section
         className={`${styles['responsive-settings']} ${

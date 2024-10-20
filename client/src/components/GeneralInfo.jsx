@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styles from '../styles/GeneralInfo.module.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { apiClient, AuthContext } from '../App';
 import { SiKashflow } from 'react-icons/si';
 
@@ -594,7 +594,6 @@ const GeneralInfo = () => {
 
   return (
     <section className={styles['section']}>
-      <ToastContainer autoClose={2500} />
       <h1
         className={`${styles['section-head']} ${
           mode === 'dark' ? styles['dark-text'] : ''
