@@ -107,6 +107,7 @@ const TaskBox = ({
 
           return toast('An error occured while fetching task activities.', {
             toastId: 'toast-id1',
+            theme: mode,
           });
         }
       }
@@ -248,10 +249,12 @@ const TaskBox = ({
           ) {
             toast('An error occured while updating the assignees.', {
               toastId: 'toast-id2',
+              theme: mode,
             });
           } else {
             toast(err.response.data.message, {
               toastId: 'toast-id2',
+              theme: mode,
             });
           }
         }
@@ -272,11 +275,13 @@ const TaskBox = ({
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occured while saving the task.', {
           toastId: 'toast-id2',
+          theme: mode,
         });
       }
 
       return toast(err.response.data.message, {
         toastId: 'toast-id2',
+        theme: mode,
       });
     }
   };
@@ -305,11 +310,13 @@ const TaskBox = ({
       if (!err.response.data) {
         return toast('An error occured while deleting the task.', {
           toastId: 'toast-id3',
+          theme: mode,
         });
       }
 
       return toast(err.response.data.message, {
         toastId: 'toast-id3',
+        theme: mode,
       });
     }
   };

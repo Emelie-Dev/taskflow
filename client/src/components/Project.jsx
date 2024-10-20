@@ -122,10 +122,12 @@ const Project = ({
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occured while searching for user.', {
           toastId: 'toast-id1',
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     }
@@ -190,10 +192,12 @@ const Project = ({
 
           toast(response.data.data.message, {
             toastId: 'toast-id3',
+            theme: mode,
           });
         } catch {
           toast('An error occured while updating the team members.', {
             toastId: 'toast-id3',
+            theme: mode,
           });
         }
       }
@@ -239,10 +243,12 @@ const Project = ({
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast(message, {
           toastId: 'toast-id2',
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id2',
+          theme: mode,
         });
       }
     }

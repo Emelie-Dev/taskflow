@@ -91,7 +91,6 @@ const getRangeLabels = (type, year, month, date, hour, view) => {
       break;
 
     case 'm':
-      const originalMonth = month;
       const daysDiff = maxDays(month + 1, year);
       const dataLength = Math.ceil(daysDiff / 3) + 1;
       month--;

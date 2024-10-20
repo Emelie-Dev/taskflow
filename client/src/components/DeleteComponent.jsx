@@ -74,6 +74,7 @@ const DeleteComponent = ({
     if (!isNameValid) {
       return toast('Type in the correct project name to delete the project.', {
         toastId: 'toast-id1',
+        theme: mode,
       });
     }
 
@@ -127,10 +128,12 @@ const DeleteComponent = ({
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occurred while deleting project.', {
           toastId: 'toast-id1',
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     }
@@ -153,6 +156,7 @@ const DeleteComponent = ({
       if (data.data.message !== '') {
         toast(data.data.message, {
           toastId: 'toast-id2',
+          theme: mode,
         });
       }
     } catch (err) {
@@ -164,11 +168,13 @@ const DeleteComponent = ({
           }.`,
           {
             toastId: 'toast-id2',
+            theme: mode,
           }
         );
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id2',
+          theme: mode,
         });
       }
     }
@@ -199,12 +205,14 @@ const DeleteComponent = ({
           {
             toastId: 'toast-id3',
             autoClose: 2000,
+            theme: mode,
           }
         );
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id3',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }
@@ -234,11 +242,13 @@ const DeleteComponent = ({
         return toast('An error occurred while deleting task.', {
           toastId: 'toast-id4',
           autoClose: 2000,
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id4',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }
@@ -260,11 +270,13 @@ const DeleteComponent = ({
         return toast('An error occurred while deactivating account.', {
           toastId: 'toast-id5',
           autoClose: 2000,
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id5',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }
@@ -294,11 +306,13 @@ const DeleteComponent = ({
         return toast('An error occurred while sending verification code.', {
           toastId: 'toast-id6',
           autoClose: 2000,
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id6',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }
@@ -319,11 +333,13 @@ const DeleteComponent = ({
         return toast('An error occurred while deleting account.', {
           toastId: 'toast-id7',
           autoClose: 2000,
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id7',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }
@@ -344,11 +360,13 @@ const DeleteComponent = ({
         return toast('An error occurred while exiting the project.', {
           toastId: 'toast-id8',
           autoClose: 2000,
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id8',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }
@@ -399,12 +417,14 @@ const DeleteComponent = ({
           {
             toastId: 'toast-id9',
             autoClose: 2000,
+            theme: mode,
           }
         );
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id9',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }

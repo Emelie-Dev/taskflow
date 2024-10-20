@@ -168,6 +168,7 @@ const NewTask = ({
     if (taskData.name.trim() === '') {
       return toast('Please provide a value for the name field.', {
         toastId: 'toast-id1',
+        theme: mode,
       });
     }
 
@@ -215,10 +216,12 @@ const NewTask = ({
           ) {
             toast('An error occured while assigning the task.', {
               toastId: 'toast-id2',
+              theme: mode,
             });
           } else {
             toast(err.response.data.message, {
               toastId: 'toast-id2',
+              theme: mode,
             });
           }
         }
@@ -258,11 +261,13 @@ const NewTask = ({
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occured while creating task.', {
           toastId: 'toast-id2',
+          theme: mode,
         });
       }
 
       return toast(err.response.data.message, {
         toastId: 'toast-id2',
+        theme: mode,
       });
     } finally {
       setIsProcessing(false);

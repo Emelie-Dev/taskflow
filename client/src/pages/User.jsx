@@ -31,6 +31,7 @@ const User = () => {
           setUserData(false);
           return toast('An error occured while searching for user.', {
             toastId: 'toast-id',
+            theme: mode,
           });
         } else {
           if (err.response.status === 404) {
@@ -40,6 +41,7 @@ const User = () => {
           }
           return toast(err.response.data.message, {
             toastId: 'toast-id',
+            theme: mode,
           });
         }
       }

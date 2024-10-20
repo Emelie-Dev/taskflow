@@ -114,8 +114,8 @@ const Personalization = () => {
       toast(
         'Priority colors automatically adjust based on the theme. If you change any of the colors, this automatic switching will be disabled.',
         {
-          position: 'top-right',
           autoClose: false,
+          theme: mode,
         }
       );
       setColorNotified(true);
@@ -132,20 +132,24 @@ const Personalization = () => {
     } else if (fieldArray.includes(String(newField).toLowerCase())) {
       return toast('Field name already exists.', {
         toastId: customId,
+        theme: mode,
       });
     } else if (newField.length === 0) {
       return toast('Field name cannot be empty.', {
         toastId: customId,
+        theme: mode,
       });
     } else if (newField.length > 20) {
       return toast('Field name cannot exceed 20 characters.', {
         toastId: customId,
+        theme: mode,
       });
     } else if (newField.match(/\W/)) {
       return toast(
         'Field name must consist of letters, numbers, and underscores only.',
         {
           toastId: customId,
+          theme: mode,
         }
       );
     } else {
@@ -229,10 +233,12 @@ const Personalization = () => {
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occured while saving data.', {
           toastId: 'toast-id1',
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     }

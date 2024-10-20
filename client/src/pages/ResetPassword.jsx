@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import styles from '../styles/Login.module.css';
 import { SiKashflow } from 'react-icons/si';
 import { RiLockPasswordFill } from 'react-icons/ri';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-
+import { AuthContext } from '../App';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { apiClient } from '../App';
 
 const ResetPassword = () => {
+  const { mode } = useContext(AuthContext);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,6 +23,10 @@ const ResetPassword = () => {
 
   useEffect(() => {
     document.title = 'TaskFlow - Reset Password';
+    document.documentElement.style.setProperty(
+      '--toastify-color-progress-light',
+      'orange'
+    );
 
     const checkAuth = async () => {
       try {

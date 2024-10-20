@@ -19,6 +19,10 @@ const ProtectedRoute = ({ element: Component, ...prop }) => {
         if (data.status === 'success') {
           setIsAuthenticated(true);
           setUserData(data.data.user);
+          document.documentElement.style.setProperty(
+            '--toastify-color-progress-light',
+            'gray'
+          );
         } else {
           setIsAuthenticated(false);
         }

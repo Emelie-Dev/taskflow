@@ -18,12 +18,15 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
 
   const query = new URLSearchParams(useLocation().search);
 
   useEffect(() => {
     document.title = 'TaskFlow - Login';
+    document.documentElement.style.setProperty(
+      '--toastify-color-progress-light',
+      'orange'
+    );
 
     const checkAuth = async () => {
       const error = query.get('error');
@@ -31,13 +34,14 @@ const Login = () => {
 
       if (error) {
         if (code === 404) {
-          return toast('There’s no account linked to this Google login.');
+          return toast('There’s no account linked to this Google login.', {});
         } else if (code === 400) {
           return toast(
-            'You did not sign up with Google. Please log in with your email and password.'
+            'You did not sign up with Google. Please log in with your email and password.',
+            {}
           );
         } else {
-          return toast('An error occurred while logging in with Google.');
+          return toast('An error occurred while logging in with Google.', {});
         }
       }
 
@@ -47,7 +51,9 @@ const Login = () => {
         if (data.status === 'success') {
           navigate('/dashboard');
         }
-      } catch {}
+      } catch {
+        setIsAuthenticated(false);
+      }
     };
 
     checkAuth();

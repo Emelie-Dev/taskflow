@@ -25,6 +25,10 @@ const AccountAccess = () => {
 
   useEffect(() => {
     document.title = 'TaskFlow - Signup';
+    document.documentElement.style.setProperty(
+      '--toastify-color-progress-light',
+      'orange'
+    );
 
     const checkAuth = async () => {
       const error = query.get('error');
@@ -32,9 +36,9 @@ const AccountAccess = () => {
 
       if (error) {
         if (isOperational.toLowerCase() === 'true') {
-          return toast('This email already exists.');
+          return toast('This email already exists.', {});
         } else {
-          return toast('An error occurred while signing up with Google');
+          return toast('An error occurred while signing up with Google', {});
         }
       }
 

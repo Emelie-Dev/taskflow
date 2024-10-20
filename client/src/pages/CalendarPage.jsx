@@ -95,7 +95,7 @@ const CalendarPage = () => {
           {
             autoClose: 5000,
             toastId: 'custom-id',
-            theme: 'dark',
+            theme: mode,
           }
         );
         setCalendarNotified(true);
@@ -142,11 +142,13 @@ const CalendarPage = () => {
         ) {
           return toast('An error occured while fetching calendar details.', {
             toastId: 'toast-id1',
+            theme: mode,
           });
         }
 
         return toast(err.response.data.message, {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     };
@@ -213,6 +215,7 @@ const CalendarPage = () => {
 
         return toast('An error occured while fetching tasks.', {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     };
@@ -295,7 +298,7 @@ const CalendarPage = () => {
 
   return (
     <main className={styles.div}>
-      <ToastContainer autoClose={2000} />
+      {/* <ToastContainer autoClose={2000} /> */}
 
       <NavBar page={'Calendar'} showNav={showNav} setShowNav={setShowNav} />
 

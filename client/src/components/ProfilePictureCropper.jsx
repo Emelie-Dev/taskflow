@@ -97,10 +97,12 @@ const ProfilePictureCropper = ({
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occurred during picture upload!', {
           toastId: 'toast-id1',
+          theme,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id1',
+          theme,
         });
       }
     }
@@ -124,10 +126,12 @@ const ProfilePictureCropper = ({
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occurred while removing profile picture.', {
           toastId: 'toast-id2',
+          theme,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id2',
+          theme,
         });
       }
     }

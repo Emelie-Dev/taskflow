@@ -9,21 +9,17 @@
   --general-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   --toastify-color-light: white;
-  --toastify-color-dark: #121212;
+  --toastify-color-dark: black;
   --toastify-font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
     'Lucida Sans', Arial, sans-serif;
   --toastify-text-color-light: black;
   --toastify-text-color-dark: white;
   --toastify-color-progress-light: orange;
-  --toastify-color-progress-dark: orange;
+  --toastify-color-progress-dark: #b0c4de;
   --dark-theme-background: rgb(37, 37, 37);
   --dark-theme-color: rgb(255, 250, 250);
   --dark-theme-foreground: white;
   --dark-theme-text: #b0c4de;
-}
-
-.dark-theme {
-  background: var(--dark-theme-background);
 }
 
 @font-face {
@@ -56,4 +52,8 @@
   font-size: 1.1rem;
   font-family: var(--general-font);
   font-weight: 500;
+}
+
+.dark-theme {
+  background: var(--dark-theme-background);
 }

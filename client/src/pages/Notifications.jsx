@@ -80,10 +80,12 @@ const Notifications = () => {
         ) {
           return toast('An error occured while fetching notifications.', {
             toastId: 'toast-id1',
+            theme: mode,
           });
         } else {
           return toast(err.response.data.message, {
             toastId: 'toast-id1',
+            theme: mode,
           });
         }
       }

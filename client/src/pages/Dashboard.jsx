@@ -129,6 +129,7 @@ const Dashboard = () => {
         setUserStats(false);
         return toast('An error occured while fetching user stats.', {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     };
@@ -149,6 +150,7 @@ const Dashboard = () => {
         setChartData(false);
         return toast('An error occured while fetching chart data.', {
           toastId: 'toast-id2',
+          theme: mode,
         });
       }
     };
@@ -169,6 +171,7 @@ const Dashboard = () => {
         setUserTasks(false);
         return toast('An error occured while fetching user tasks.', {
           toastId: 'toast-id3',
+          theme: mode,
         });
       }
     };
@@ -216,6 +219,7 @@ const Dashboard = () => {
 
         return toast('An error occured while fetching scheduled tasks.', {
           toastId: 'toast-id4',
+          theme: mode,
         });
       }
     };

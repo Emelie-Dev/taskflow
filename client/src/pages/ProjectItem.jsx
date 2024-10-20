@@ -114,6 +114,7 @@ const ProjectItem = () => {
           return toast('Unable to load project.', {
             toastId: 'toast-id1',
             autoClose: 2000,
+            theme: mode,
           });
         } else {
           if (err.response.status === 404) {
@@ -125,6 +126,7 @@ const ProjectItem = () => {
           return toast(err.response.data.message, {
             toastId: 'toast-id1',
             autoClose: 2000,
+            theme: mode,
           });
         }
       }
@@ -227,11 +229,13 @@ const ProjectItem = () => {
           return toast('An error occured while fetching tasks.', {
             toastId: 'toast-id7',
             autoClose: 2000,
+            theme: mode,
           });
         } else {
           return toast(err.response.data.message, {
             toastId: 'toast-id7',
             autoClose: 2000,
+            theme: mode,
           });
         }
       }
@@ -258,6 +262,7 @@ const ProjectItem = () => {
         }${calculateSize(freeSpace).unit}.`,
         {
           toastId: 'toast-id2',
+          theme: mode,
         }
       );
     }
@@ -349,11 +354,13 @@ const ProjectItem = () => {
         return toast(`Unable to upload file${files.length === 1 ? '' : 's'}.`, {
           toastId: 'toast-id3',
           autoClose: 2000,
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id3',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }
@@ -875,11 +882,13 @@ const ProjectItem = () => {
           return toast('An error occured while fetching activities.', {
             toastId: 'toast-id5',
             autoClose: 2000,
+            theme: mode,
           });
         } else {
           return toast(err.response.data.message, {
             toastId: 'toast-id5',
             autoClose: 2000,
+            theme: mode,
           });
         }
       }
@@ -912,11 +921,13 @@ const ProjectItem = () => {
         return toast('An error occured while deleting activity.', {
           toastId: 'toast-id6',
           autoClose: 2000,
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id6',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }

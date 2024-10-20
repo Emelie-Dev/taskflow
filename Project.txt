@@ -58,7 +58,7 @@
     - Add scroll down arrow in calendar page ✔
     - Fix notifications functionality in the backend based on the data from user notification settings ✔
     - Fix upload files for hosted site ✔
-    - Adjust toastify theme
+    - Adjust toastify theme ✔
 
 
 

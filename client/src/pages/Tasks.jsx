@@ -117,6 +117,7 @@ const Tasks = () => {
 
           return toast('An error occured while fetching personal projects.', {
             toastId: 'toast-id1',
+            theme: mode,
           });
         }
       }
@@ -169,6 +170,7 @@ const Tasks = () => {
 
           return toast('An error occured while fetching assigned projects.', {
             toastId: 'toast-id2',
+            theme: mode,
           });
         }
       }
@@ -231,6 +233,7 @@ const Tasks = () => {
 
           return toast('An error occured while fetching tasks.', {
             toastId: 'toast-id3',
+            theme: mode,
           });
         }
       }

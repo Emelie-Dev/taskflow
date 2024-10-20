@@ -525,16 +525,19 @@ const GeneralInfo = () => {
     if (username.length === 0) {
       return toast('Username field cannot be empty.', {
         toastId: customId,
+        theme: mode,
       });
     } else if (username.length > 30) {
       return toast('Username cannot exceed 30 characters.', {
         toastId: customId,
+        theme: mode,
       });
     } else if (username.match(/\W/)) {
       return toast(
         'Username must consist of letters, numbers, and underscores only.',
         {
           toastId: customId,
+          theme: mode,
         }
       );
     }
@@ -577,11 +580,13 @@ const GeneralInfo = () => {
         return toast('An error occured while saving data.', {
           toastId: 'toast-id1',
           autoClose: 2000,
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id1',
           autoClose: 2000,
+          theme: mode,
         });
       }
     }

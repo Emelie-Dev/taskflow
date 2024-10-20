@@ -135,6 +135,7 @@ const Projects = () => {
 
         return toast('An error occured while fetching projects.', {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     };

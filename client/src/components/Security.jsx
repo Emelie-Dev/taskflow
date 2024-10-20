@@ -70,6 +70,7 @@ const Security = () => {
             } password.`,
             {
               toastId: 'toast-id1',
+              theme: mode,
             }
           );
         } else if (
@@ -84,11 +85,13 @@ const Security = () => {
             {
               toastId: 'toast-id1',
               autoClose: 2500,
+              theme: mode,
             }
           );
         } else if (password.length < 8) {
           return toast('The new password must be more than 8 characters.', {
             toastId: 'toast-id1',
+            theme: mode,
           });
         }
       } else {
@@ -99,6 +102,7 @@ const Security = () => {
             }.`,
             {
               toastId: 'toast-id1',
+              theme: mode,
             }
           );
         } else if (
@@ -113,15 +117,18 @@ const Security = () => {
             {
               toastId: 'toast-id1',
               autoClose: 2500,
+              theme: mode,
             }
           );
         } else if (oldPassword.length < 8) {
           return toast('Password must be more than 8 characters.', {
             toastId: 'toast-id1',
+            theme: mode,
           });
         } else if (oldPassword !== password) {
           return toast('Password and confirm password do not match.', {
             toastId: 'toast-id1',
+            theme: mode,
           });
         }
       }
@@ -154,6 +161,7 @@ const Security = () => {
       if (data.data.userData.passwordMessage) {
         return toast(data.data.userData.passwordMessage, {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
 
@@ -172,6 +180,7 @@ const Security = () => {
 
           return toast('Your password has been set successfully.', {
             toastId: 'toast-id1',
+            theme: mode,
           });
         }
       }
@@ -180,10 +189,12 @@ const Security = () => {
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occured while saving data.', {
           toastId: 'toast-id1',
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     }

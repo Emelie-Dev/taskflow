@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import styles from '../styles/Login.module.css';
 import { SiKashflow } from 'react-icons/si';
 import { MdOutlineMail } from 'react-icons/md';
@@ -7,9 +7,10 @@ import { ToastContainer, toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import { apiClient } from '../App';
+import { apiClient, AuthContext } from '../App';
 
 const ForgotPassword = () => {
+  const { mode } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -17,6 +18,10 @@ const ForgotPassword = () => {
 
   useEffect(() => {
     document.title = 'TaskFlow - Forgot Password';
+    document.documentElement.style.setProperty(
+      '--toastify-color-progress-light',
+      'orange'
+    );
 
     const checkAuth = async () => {
       try {

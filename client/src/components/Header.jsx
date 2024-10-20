@@ -92,10 +92,12 @@ const Header = ({ page, setShowNav, setHeaderHeight }) => {
       if (!err.response || !err.response.data || err.response.status === 500) {
         return toast('An error occurred while logging out.', {
           toastId: 'toast-id1',
+          theme: mode,
         });
       } else {
         return toast(err.response.data.message, {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     }

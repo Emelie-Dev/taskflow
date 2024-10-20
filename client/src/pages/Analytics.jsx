@@ -126,6 +126,7 @@ const Analytics = () => {
         setUserStats(false);
         return toast('An error occured while fetching user stats.', {
           toastId: 'toast-id1',
+          theme: mode,
         });
       }
     };
@@ -156,6 +157,7 @@ const Analytics = () => {
         setPieChartData(false);
         return toast('An error occured while fetching pie chart data.', {
           toastId: 'toast-id2',
+          theme: mode,
         });
       }
     };
@@ -214,6 +216,7 @@ const Analytics = () => {
         setBarChartData(false);
         return toast('An error occured while fetching bar chart data.', {
           toastId: 'toast-id3',
+          theme: mode,
         });
       }
     };
@@ -296,6 +299,7 @@ const Analytics = () => {
         setLineChartData(false);
         return toast('An error occured while fetching line chart data.', {
           toastId: 'toast-id4',
+          theme: mode,
         });
       }
     };
