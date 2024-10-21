@@ -41,4 +41,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-For any inquiries or support, please contact [vincentofoka@gmail.com](vincentofoka@gmail.com).
+For any inquiries or support, please contact [vincentofoka@gmail.com](mailto:vincentofoka@gmail.com).
