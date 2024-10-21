@@ -51,6 +51,10 @@ const features = [
 ];
 
 const Home = () => {
+  useEffect(() => {
+    document.body.classList.remove('dark-theme');
+  }, []);
+
   return (
     <>
       {/* Header  and Description */}

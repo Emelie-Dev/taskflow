@@ -20,6 +20,7 @@ const ForgotPassword = () => {
       '--toastify-color-progress-light',
       'orange'
     );
+    document.body.classList.remove('dark-theme');
 
     const checkAuth = async () => {
       try {

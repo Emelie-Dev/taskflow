@@ -17,12 +17,18 @@ const ProtectedRoute = ({ element: Component, ...prop }) => {
         const { data } = await apiClient.get('/api/v1/auth/auth-check');
 
         if (data.status === 'success') {
-          setIsAuthenticated(true);
           setUserData(data.data.user);
           document.documentElement.style.setProperty(
             '--toastify-color-progress-light',
             'gray'
           );
+
+          if (mode === 'dark') {
+            document.body.classList.add('dark-theme');
+          } else {
+            document.body.classList.remove('dark-theme');
+          }
+          setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);
         }
