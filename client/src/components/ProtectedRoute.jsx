@@ -23,11 +23,6 @@ const ProtectedRoute = ({ element: Component, ...prop }) => {
             'gray'
           );
 
-          if (mode === 'dark') {
-            document.body.classList.add('dark-theme');
-          } else {
-            document.body.classList.remove('dark-theme');
-          }
           setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);

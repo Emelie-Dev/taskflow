@@ -51,12 +51,8 @@ const features = [
 ];
 
 const Home = () => {
-  useEffect(() => {
-    document.body.classList.remove('dark-theme');
-  }, []);
-
   return (
-    <>
+    <section className={styles.body}>
       {/* Header  and Description */}
 
       <section className={styles.section}>
@@ -364,7 +360,7 @@ const Home = () => {
           </div>
         </div>
       </footer>
-    </>
+    </section>
   );
 };
 
