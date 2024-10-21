@@ -1,5 +1,17 @@
 # TaskFlow
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+## Introduction
+
 TaskFlow is a task management web application designed to streamline task tracking, assignments, and updates. It provides a user-friendly interface to manage tasks, set priorities, and track progress, making it easy to stay organized and efficient.
 
 ## Features
